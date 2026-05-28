@@ -6,6 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
+// ── Enums ────────────────────────────────────────────
 export type OrganizationType = "agency" | "company";
 export type Region = "wallonie" | "bruxelles" | "flandre";
 export type UserRole = "admin" | "recruiter" | "viewer";
@@ -31,196 +32,240 @@ export type ApplicationStatus =
   | "refuse";
 export type SubscriptionPlan = "starter" | "pro" | "agency";
 export type SubscriptionStatus = "trial" | "active" | "cancelled";
-
 export type License = "B" | "C" | "CE" | "CACES1" | "CACES3" | "CACES5";
 export type Language = "fr" | "nl" | "en";
 
-export interface Database {
+// ── Row types (what the DB returns) ─────────────────
+export interface Organization {
+  id: string;
+  name: string;
+  type: OrganizationType;
+  address: string | null;
+  city: string | null;
+  region: Region | null;
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  logo_url: string | null;
+  primary_color: string | null;
+  created_at: string;
+}
+
+export interface User {
+  id: string;
+  organization_id: string;
+  email: string;
+  full_name: string;
+  role: UserRole;
+  created_at: string;
+}
+
+export interface JobOffer {
+  id: string;
+  organization_id: string;
+  created_by: string;
+  title: string;
+  description: string | null;
+  contract_type: ContractType;
+  sector: Sector;
+  city: string;
+  region: Region;
+  salary_min: number | null;
+  salary_max: number | null;
+  salary_period: SalaryPeriod | null;
+  show_salary: boolean;
+  required_licenses: string[];
+  required_languages: string[];
+  shift_type: ShiftType | null;
+  start_date: string | null;
+  is_urgent: boolean;
+  status: JobStatus;
+  views_count: number;
+  applications_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Candidate {
+  id: string;
+  organization_id: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  email: string | null;
+  city: string | null;
+  region: Region | null;
+  availability: CandidateAvailability;
+  licenses: string[];
+  languages: string[];
+  has_caces: boolean;
+  caces_types: string[];
+  experience_years: number | null;
+  sectors: string[];
+  notes: string | null;
+  status: CandidateStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Application {
+  id: string;
+  job_offer_id: string;
+  candidate_id: string | null;
+  applicant_name: string;
+  applicant_phone: string;
+  applicant_email: string | null;
+  cover_message: string | null;
+  licenses: string[];
+  has_caces: boolean;
+  caces_types: string[];
+  availability: CandidateAvailability;
+  status: ApplicationStatus;
+  notes: string | null;
+  applied_at: string;
+  updated_at: string;
+}
+
+export interface Subscription {
+  id: string;
+  organization_id: string;
+  plan: SubscriptionPlan;
+  status: SubscriptionStatus;
+  trial_ends_at: string | null;
+  current_period_end: string | null;
+  created_at: string;
+}
+
+// ── Insert types ─────────────────────────────────────
+export type OrganizationInsert = {
+  name: string;
+  type: OrganizationType;
+  address?: string | null;
+  city?: string | null;
+  region?: Region | null;
+  phone?: string | null;
+  email?: string | null;
+  website?: string | null;
+  logo_url?: string | null;
+  primary_color?: string | null;
+};
+
+export type UserInsert = {
+  id: string;
+  organization_id: string;
+  email: string;
+  full_name: string;
+  role?: UserRole;
+};
+
+export type JobOfferInsert = {
+  organization_id: string;
+  created_by: string;
+  title: string;
+  description?: string | null;
+  contract_type: ContractType;
+  sector: Sector;
+  city: string;
+  region: Region;
+  salary_min?: number | null;
+  salary_max?: number | null;
+  salary_period?: SalaryPeriod | null;
+  show_salary?: boolean;
+  required_licenses?: string[];
+  required_languages?: string[];
+  shift_type?: ShiftType | null;
+  start_date?: string | null;
+  is_urgent?: boolean;
+  status?: JobStatus;
+};
+
+export type CandidateInsert = {
+  organization_id: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  email?: string | null;
+  city?: string | null;
+  region?: Region | null;
+  availability?: CandidateAvailability;
+  licenses?: string[];
+  languages?: string[];
+  has_caces?: boolean;
+  caces_types?: string[];
+  experience_years?: number | null;
+  sectors?: string[];
+  notes?: string | null;
+  status?: CandidateStatus;
+};
+
+export type ApplicationInsert = {
+  job_offer_id: string;
+  candidate_id?: string | null;
+  applicant_name: string;
+  applicant_phone: string;
+  applicant_email?: string | null;
+  cover_message?: string | null;
+  licenses?: string[];
+  has_caces?: boolean;
+  caces_types?: string[];
+  availability?: CandidateAvailability;
+  status?: ApplicationStatus;
+  notes?: string | null;
+};
+
+export type SubscriptionInsert = {
+  organization_id: string;
+  plan?: SubscriptionPlan;
+  status?: SubscriptionStatus;
+  trial_ends_at?: string | null;
+  current_period_end?: string | null;
+};
+
+// ── Supabase Database schema ─────────────────────────
+// Utilise `type` (pas `interface`) pour la compatibilité avec supabase-js v2
+export type Database = {
   public: {
     Tables: {
       organizations: {
-        Row: {
-          id: string;
-          name: string;
-          type: OrganizationType;
-          address: string | null;
-          city: string | null;
-          region: Region | null;
-          phone: string | null;
-          email: string | null;
-          website: string | null;
-          logo_url: string | null;
-          primary_color: string | null;
-          created_at: string;
-        };
-        Insert: Omit<
-          Database["public"]["Tables"]["organizations"]["Row"],
-          "id" | "created_at"
-        > &
-          Partial<
-            Pick<
-              Database["public"]["Tables"]["organizations"]["Row"],
-              "id" | "created_at"
-            >
-          >;
-        Update: Partial<Database["public"]["Tables"]["organizations"]["Row"]>;
+        Row: Organization;
+        Insert: OrganizationInsert;
+        Update: Partial<OrganizationInsert>;
+        Relationships: never[];
       };
       users: {
-        Row: {
-          id: string;
-          organization_id: string;
-          email: string;
-          full_name: string;
-          role: UserRole;
-          created_at: string;
-        };
-        Insert: Omit<
-          Database["public"]["Tables"]["users"]["Row"],
-          "created_at"
-        > &
-          Partial<
-            Pick<Database["public"]["Tables"]["users"]["Row"], "created_at">
-          >;
-        Update: Partial<Database["public"]["Tables"]["users"]["Row"]>;
+        Row: User;
+        Insert: UserInsert;
+        Update: Partial<Omit<UserInsert, "id">>;
+        Relationships: never[];
       };
       job_offers: {
-        Row: {
-          id: string;
-          organization_id: string;
-          created_by: string;
-          title: string;
-          description: string | null;
-          contract_type: ContractType;
-          sector: Sector;
-          city: string;
-          region: Region;
-          salary_min: number | null;
-          salary_max: number | null;
-          salary_period: SalaryPeriod | null;
-          show_salary: boolean;
-          required_licenses: License[];
-          required_languages: Language[];
-          shift_type: ShiftType | null;
-          start_date: string | null;
-          is_urgent: boolean;
-          status: JobStatus;
-          views_count: number;
-          applications_count: number;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Omit<
-          Database["public"]["Tables"]["job_offers"]["Row"],
-          "id" | "created_at" | "updated_at" | "views_count" | "applications_count"
-        > &
-          Partial<
-            Pick<
-              Database["public"]["Tables"]["job_offers"]["Row"],
-              | "id"
-              | "created_at"
-              | "updated_at"
-              | "views_count"
-              | "applications_count"
-            >
-          >;
-        Update: Partial<Database["public"]["Tables"]["job_offers"]["Row"]>;
+        Row: JobOffer;
+        Insert: JobOfferInsert;
+        Update: Partial<JobOfferInsert>;
+        Relationships: never[];
       };
       candidates: {
-        Row: {
-          id: string;
-          organization_id: string;
-          first_name: string;
-          last_name: string;
-          phone: string;
-          email: string | null;
-          city: string | null;
-          region: Region | null;
-          availability: CandidateAvailability;
-          licenses: License[];
-          languages: Language[];
-          has_caces: boolean;
-          caces_types: string[];
-          experience_years: number | null;
-          sectors: Sector[];
-          notes: string | null;
-          status: CandidateStatus;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Omit<
-          Database["public"]["Tables"]["candidates"]["Row"],
-          "id" | "created_at" | "updated_at"
-        > &
-          Partial<
-            Pick<
-              Database["public"]["Tables"]["candidates"]["Row"],
-              "id" | "created_at" | "updated_at"
-            >
-          >;
-        Update: Partial<Database["public"]["Tables"]["candidates"]["Row"]>;
+        Row: Candidate;
+        Insert: CandidateInsert;
+        Update: Partial<CandidateInsert>;
+        Relationships: never[];
       };
       applications: {
-        Row: {
-          id: string;
-          job_offer_id: string;
-          candidate_id: string | null;
-          applicant_name: string;
-          applicant_phone: string;
-          applicant_email: string | null;
-          cover_message: string | null;
-          licenses: License[];
-          has_caces: boolean;
-          caces_types: string[];
-          availability: CandidateAvailability;
-          status: ApplicationStatus;
-          notes: string | null;
-          applied_at: string;
-          updated_at: string;
-        };
-        Insert: Omit<
-          Database["public"]["Tables"]["applications"]["Row"],
-          "id" | "applied_at" | "updated_at"
-        > &
-          Partial<
-            Pick<
-              Database["public"]["Tables"]["applications"]["Row"],
-              "id" | "applied_at" | "updated_at"
-            >
-          >;
-        Update: Partial<Database["public"]["Tables"]["applications"]["Row"]>;
+        Row: Application;
+        Insert: ApplicationInsert;
+        Update: Partial<ApplicationInsert>;
+        Relationships: never[];
       };
       subscriptions: {
-        Row: {
-          id: string;
-          organization_id: string;
-          plan: SubscriptionPlan;
-          status: SubscriptionStatus;
-          trial_ends_at: string | null;
-          current_period_end: string | null;
-          created_at: string;
-        };
-        Insert: Omit<
-          Database["public"]["Tables"]["subscriptions"]["Row"],
-          "id" | "created_at"
-        > &
-          Partial<
-            Pick<
-              Database["public"]["Tables"]["subscriptions"]["Row"],
-              "id" | "created_at"
-            >
-          >;
-        Update: Partial<Database["public"]["Tables"]["subscriptions"]["Row"]>;
+        Row: Subscription;
+        Insert: SubscriptionInsert;
+        Update: Partial<SubscriptionInsert>;
+        Relationships: never[];
       };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
     Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
-}
-
-export type Organization = Database["public"]["Tables"]["organizations"]["Row"];
-export type User = Database["public"]["Tables"]["users"]["Row"];
-export type JobOffer = Database["public"]["Tables"]["job_offers"]["Row"];
-export type Candidate = Database["public"]["Tables"]["candidates"]["Row"];
-export type Application = Database["public"]["Tables"]["applications"]["Row"];
-export type Subscription = Database["public"]["Tables"]["subscriptions"]["Row"];
+};

@@ -1,50 +1,42 @@
 import Link from "next/link";
-import { Check, ArrowRight, Zap } from "lucide-react";
+import { Check, ArrowRight, ChevronDown } from "lucide-react";
 import { SiteNav } from "@/components/layout/SiteNav";
 
 export const metadata = {
   title: "Tarifs — HardSwork",
-  description: "Recrutez les meilleurs profils du terrain en Belgique. Plans Starter, Pro et Agence.",
+  description: "Des plans de recrutement clairs pour trouver les experts du terrain belge.",
 };
 
 const PLANS = [
   {
     id: "starter",
-    name: "Starter",
-    price: "Gratuit",
-    period: "",
+    name: "Gratuit",
+    price: "0",
     description: "Pour tester la plateforme",
-    cta: "Commencer gratuitement",
+    cta: "S'inscrire",
     href: "/recrute",
     featured: false,
     features: [
       "1 offre d'emploi active",
-      "Accès à la liste des candidats",
+      "Profils candidats illimités",
       "Formulaire de candidature public",
       "Tableau de bord basique",
     ],
-    locked: [
-      "Contacts candidats masqués",
-      "Candidathèque illimitée",
-      "Pipeline Kanban",
-    ],
+    locked: ["Contacts candidats masqués", "Pas de données qualité"],
   },
   {
     id: "pro",
     name: "Pro",
     price: "89",
-    period: "/ mois",
     description: "Pour les PME qui recrutent en direct",
-    cta: "Démarrer l'essai gratuit",
+    cta: "Choisir Pro",
     href: "/recrute",
     featured: true,
     features: [
-      "Offres illimitées",
-      "Contacts candidats débloqués",
+      "Offres d'emploi illimitées",
+      "Candidats débloqués",
       "Candidathèque complète",
-      "Pipeline Kanban B2B",
-      "Export CSV des candidatures",
-      "Support prioritaire",
+      "Support technique 24/7",
     ],
     locked: [],
   },
@@ -52,19 +44,15 @@ const PLANS = [
     id: "agency",
     name: "Agence",
     price: "249",
-    period: "/ mois",
     description: "Pour les agences de recrutement",
-    cta: "Nous contacter",
+    cta: "Contacter la vente",
     href: "mailto:hello@hardswork.be",
     featured: false,
     features: [
-      "Multi-sites illimités",
-      "Utilisateurs illimités",
+      "Clients illimités",
+      "API & intégrations ATS",
+      "Account Manager Dédié",
       "Gestion d'intérim",
-      "Sourcing illimité",
-      "API access",
-      "Account manager dédié",
-      "Onboarding personnalisé",
     ],
     locked: [],
   },
@@ -72,16 +60,16 @@ const PLANS = [
 
 const FAQS = [
   {
-    q: "Puis-je annuler à tout moment ?",
+    q: "Comment fonctionne la liste de qualité ?",
+    a: "Notre algorithme classe les candidats selon leur profil, expérience et disponibilité pour ne vous présenter que les meilleurs correspondants.",
+  },
+  {
+    q: "Puis-je changer de plan à tout moment ?",
     a: "Oui, sans engagement ni frais de résiliation. Votre abonnement reste actif jusqu'à la fin de la période payée.",
   },
   {
-    q: "Y a-t-il un essai gratuit ?",
-    a: "Oui — 30 jours gratuits sur le plan Pro, sans carte bancaire. Vous passez au plan Starter automatiquement si vous ne souhaitez pas continuer.",
-  },
-  {
-    q: "Comment fonctionne le déverrouillage des contacts ?",
-    a: "Avec un plan Pro ou Agence, vous accédez aux coordonnées complètes (téléphone, email, CV) de tous les candidats de votre base.",
+    q: "Quels secteurs couvrez-vous ?",
+    a: "Construction, logistique, transport, industrie, médical, sécurité et nettoyage — tous les métiers du terrain belge.",
   },
   {
     q: "Les candidats paient-ils quelque chose ?",
@@ -95,65 +83,64 @@ export default function TarifsPage() {
       <SiteNav />
 
       <div className="pt-[60px]">
-        {/* ── HERO ─────────────────────────────────────────── */}
-        <div className="bg-[#0F0E0D] py-16 text-center">
-          <span className="inline-block text-[11px] font-black text-brand bg-brand/15 px-3 py-1.5 rounded-full uppercase tracking-widest mb-5">
+
+        {/* ── HERO sombre ──────────────────────────────── */}
+        <div className="bg-[#0F0E0D] py-20 text-center px-6">
+          <span className="inline-block text-[11px] font-black text-brand border border-brand/30 bg-brand/10 px-4 py-1.5 rounded-full uppercase tracking-widest mb-6">
             30 jours gratuits · Sans carte bancaire
           </span>
           <h1
-            className="font-display font-black text-white uppercase leading-none mb-4"
-            style={{ fontSize: "clamp(2.2rem, 5vw, 4rem)", letterSpacing: "-0.02em" }}
+            className="font-display font-black text-white uppercase leading-[0.9] mb-5"
+            style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)", letterSpacing: "-0.02em" }}
           >
-            Des tarifs{" "}
-            <span className="text-brand">[clairs].</span>
+            Choisissez votre <span className="text-brand">[plan]</span>
+            <br />de recrutement.
           </h1>
-          <p className="text-white/45 text-base max-w-lg mx-auto">
-            Recrutez les meilleurs profils du terrain en Belgique.
-            Payez uniquement ce dont vous avez besoin.
+          <p className="text-white/45 text-base max-w-lg mx-auto leading-relaxed">
+            Des outils de haute précision pour trouver les experts du terrain.
+            Pas de fioritures, juste la performance brute.
           </p>
         </div>
 
-        {/* ── PLANS ────────────────────────────────────────── */}
-        <div className="max-w-5xl mx-auto px-6 py-12">
+        {/* ── PLANS ────────────────────────────────────── */}
+        <div className="max-w-5xl mx-auto px-6 py-14">
           <div className="grid md:grid-cols-3 gap-5">
             {PLANS.map((plan) => (
               <div
                 key={plan.id}
                 className={`rounded-2xl border overflow-hidden flex flex-col ${
                   plan.featured
-                    ? "border-brand shadow-xl shadow-brand/10 relative"
+                    ? "border-brand shadow-xl shadow-brand/10"
                     : "border-ink-100 bg-white"
                 }`}
               >
+                {/* Badge featured */}
                 {plan.featured && (
-                  <>
-                    <div className="bg-brand text-white text-[10px] font-black uppercase tracking-widest text-center py-2">
-                      ⭐ Le plus populaire
-                    </div>
-                    <div className="bg-white flex-1 flex flex-col" />
-                  </>
-                )}
-                <div className={`p-6 flex flex-col flex-1 ${plan.featured ? "bg-white absolute inset-0 top-8 rounded-b-2xl" : ""}`}>
-                  {/* Nom + prix */}
-                  <div className="mb-5">
-                    <p className="font-display font-black text-ink uppercase text-sm tracking-widest mb-2">
-                      {plan.name}
-                    </p>
-                    <div className="flex items-end gap-1 mb-1">
-                      {plan.price === "Gratuit" ? (
-                        <span className="font-display font-black text-ink text-3xl">Gratuit</span>
-                      ) : (
-                        <>
-                          <span className="font-display font-black text-ink text-4xl">{plan.price}€</span>
-                          <span className="text-ink-500 text-sm mb-1">{plan.period}</span>
-                        </>
-                      )}
-                    </div>
-                    <p className="text-ink-500 text-xs">{plan.description}</p>
+                  <div className="bg-brand text-white text-[10px] font-black uppercase tracking-widest text-center py-2.5">
+                    ⭐ Le plus populaire
                   </div>
+                )}
+
+                <div className={`p-6 flex flex-col flex-1 ${plan.featured ? "bg-white" : ""}`}>
+                  {/* Nom */}
+                  <p className="font-display font-black text-ink-400 uppercase text-[11px] tracking-widest mb-3">
+                    {plan.name}
+                  </p>
+
+                  {/* Prix */}
+                  <div className="flex items-end gap-1 mb-1">
+                    <span
+                      className="font-display font-black text-ink leading-none"
+                      style={{ fontSize: "clamp(2.2rem, 4vw, 3rem)" }}
+                    >
+                      {plan.price}€
+                    </span>
+                    <span className="text-ink-400 text-sm mb-1.5">&nbsp;/mois</span>
+                  </div>
+                  <p className="text-ink-400 text-xs mb-6">{plan.description}</p>
 
                   {/* Features */}
-                  <ul className="space-y-2.5 mb-6 flex-1">
+                  <ul className="space-y-2.5 mb-7 flex-1">
                     {plan.features.map((f) => (
                       <li key={f} className="flex items-start gap-2 text-sm text-ink-700">
                         <Check size={14} className="text-brand shrink-0 mt-0.5" strokeWidth={3} />
@@ -162,7 +149,7 @@ export default function TarifsPage() {
                     ))}
                     {plan.locked.map((f) => (
                       <li key={f} className="flex items-start gap-2 text-sm text-ink-300 line-through">
-                        <Check size={14} className="text-ink-100 shrink-0 mt-0.5" strokeWidth={3} />
+                        <Check size={14} className="text-ink-100 shrink-0 mt-0.5" strokeWidth={2} />
                         {f}
                       </li>
                     ))}
@@ -171,7 +158,7 @@ export default function TarifsPage() {
                   {/* CTA */}
                   <Link
                     href={plan.href}
-                    className={`flex items-center justify-center gap-2 font-display font-black uppercase text-sm py-3 rounded-xl transition w-full ${
+                    className={`flex items-center justify-center gap-2 font-display font-black uppercase text-[13px] py-3.5 rounded-xl transition w-full ${
                       plan.featured
                         ? "bg-brand hover:bg-brand-dark text-white"
                         : "border border-ink-200 text-ink hover:border-brand hover:text-brand"
@@ -179,15 +166,15 @@ export default function TarifsPage() {
                     style={{ letterSpacing: "0.05em" }}
                   >
                     {plan.cta}
-                    <ArrowRight size={14} />
+                    <ArrowRight size={13} />
                   </Link>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* ── Garanties ────────────────────────────────── */}
-          <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* Garanties */}
+          <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { icon: "✅", label: "Sans engagement" },
               { icon: "🔒", label: "Données sécurisées" },
@@ -196,54 +183,73 @@ export default function TarifsPage() {
             ].map(({ icon, label }) => (
               <div key={label} className="bg-white border border-ink-100 rounded-xl p-3 text-center">
                 <span className="text-xl">{icon}</span>
-                <p className="text-xs font-bold text-ink mt-1">{label}</p>
+                <p className="text-xs font-bold text-ink mt-1.5">{label}</p>
               </div>
             ))}
           </div>
+        </div>
 
-          {/* ── FAQ ──────────────────────────────────────── */}
-          <div className="mt-14">
+        {/* ── FAQ sur fond blanc ───────────────────────── */}
+        <div className="border-t border-ink-100 bg-white">
+          <div className="max-w-3xl mx-auto px-6 py-16">
             <h2
-              className="font-display font-black text-ink uppercase text-center mb-8"
-              style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", letterSpacing: "-0.01em" }}
+              className="font-display font-black text-ink uppercase leading-none mb-10"
+              style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", letterSpacing: "-0.02em" }}
             >
-              Questions fréquentes
+              FAQ.
             </h2>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="divide-y divide-ink-100">
               {FAQS.map(({ q, a }) => (
-                <div key={q} className="bg-white border border-ink-100 rounded-2xl p-5">
-                  <p className="font-bold text-ink text-sm mb-2">{q}</p>
-                  <p className="text-ink-500 text-sm leading-relaxed">{a}</p>
-                </div>
+                <details key={q} className="group">
+                  <summary className="flex items-center justify-between gap-6 py-5 cursor-pointer list-none">
+                    <span className="font-display font-black text-ink uppercase text-[13px] tracking-wide">
+                      {q}
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      className="text-ink-300 shrink-0 transition-transform duration-200 group-open:rotate-180"
+                    />
+                  </summary>
+                  <p className="pb-6 text-ink-500 text-sm leading-relaxed">{a}</p>
+                </details>
               ))}
             </div>
           </div>
-
-          {/* ── CTA Final ────────────────────────────────── */}
-          <div className="mt-14 bg-[#0F0E0D] rounded-2xl p-8 text-center">
-            <div className="w-10 h-10 bg-brand/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <Zap size={20} className="text-brand" />
-            </div>
-            <h2
-              className="font-display font-black text-white uppercase leading-none mb-3"
-              style={{ fontSize: "clamp(1.6rem, 3vw, 2.4rem)", letterSpacing: "-0.01em" }}
-            >
-              Prêt à recruter les{" "}
-              <span className="text-brand">[meilleurs]</span> ?
-            </h2>
-            <p className="text-white/45 text-sm mb-6">
-              30 jours gratuits · Sans carte bancaire · Annulation à tout moment
-            </p>
-            <Link
-              href="/recrute"
-              className="inline-flex items-center gap-2 font-display font-black uppercase text-white bg-brand hover:bg-brand-dark transition rounded-xl px-8 py-3.5 text-sm"
-              style={{ letterSpacing: "0.05em" }}
-            >
-              Démarrer gratuitement
-              <ArrowRight size={15} />
-            </Link>
-          </div>
         </div>
+
+        {/* ── CTA FINAL sombre ─────────────────────────── */}
+        <div className="bg-[#0F0E0D] py-20 text-center px-6">
+          <h2
+            className="font-display font-black text-white uppercase leading-[0.9] mb-7"
+            style={{ fontSize: "clamp(2rem, 5vw, 3.8rem)", letterSpacing: "-0.02em" }}
+          >
+            Prêt à renforcer <span className="text-brand">[vos équipes]</span>&nbsp;?
+          </h2>
+          <p className="text-white/40 text-sm mb-8">
+            30 jours gratuits · Sans carte bancaire · Annulation à tout moment
+          </p>
+          <Link
+            href="/recrute"
+            className="inline-flex items-center gap-3 bg-brand hover:bg-brand-dark text-white font-display font-black uppercase px-10 py-4 rounded-xl transition text-[13px]"
+            style={{ letterSpacing: "0.08em" }}
+          >
+            Lancer mon premier recrutement
+            <ArrowRight size={15} />
+          </Link>
+        </div>
+
+        {/* ── FOOTER ───────────────────────────────────── */}
+        <footer className="border-t border-ink-100 bg-[#FAFAF8] py-8 px-6">
+          <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-ink-300 text-xs">© 2026 HardSwork · Belgique · Tous droits réservés</p>
+            <div className="flex gap-6 text-ink-300 text-xs">
+              <Link href="/legal/cgu" className="hover:text-ink transition">CGU</Link>
+              <Link href="/legal/privacy" className="hover:text-ink transition">Confidentialité</Link>
+              <Link href="mailto:hello@hardswork.be" className="hover:text-ink transition">Contact</Link>
+            </div>
+          </div>
+        </footer>
+
       </div>
     </div>
   );

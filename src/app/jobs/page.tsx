@@ -72,7 +72,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
   const hasFilters = searchParams.secteur || searchParams.region || searchParams.q;
 
   return (
-    <div className="min-h-screen bg-[#F4F1EC] font-body">
+    <div className="min-h-screen bg-[#F4F1EC] font-body pb-20">
       <SiteNav />
 
       {/* ══ HERO SOMBRE ════════════════════════════════════ */}
@@ -216,8 +216,8 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                   return (
                     <div
                       key={offer.id}
-                      className={`bg-white rounded-xl border flex items-center gap-4 px-4 py-3 transition-all hover:shadow-md group ${
-                        offer.is_urgent ? "border-brand/30" : "border-ink-100"
+                      className={`bg-white rounded-xl border flex items-center gap-4 px-4 py-3 transition-all hover:shadow-md hover:border-brand/20 group ${
+                        offer.is_urgent ? "border-brand/40" : "border-ink-100"
                       }`}
                     >
                       {/* Photo miniature secteur */}
@@ -233,7 +233,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
 
                       {/* Infos */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           {offer.is_urgent && (
                             <span className="text-[9px] font-black text-white bg-brand px-1.5 py-0.5 rounded uppercase tracking-wide">
                               Urgent
@@ -243,50 +243,30 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                             {offer.title}
                           </h2>
                         </div>
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <span className="text-[11px] text-ink-500 font-semibold">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[11px] bg-ink-100 text-ink-600 font-bold px-2 py-0.5 rounded">
                             {CONTRACT_LABELS[offer.contract_type] ?? offer.contract_type}
                           </span>
-                          <span className="text-[11px] text-ink-300">·</span>
-                          <span className="text-[11px] text-ink-500">
+                          <span className="text-[11px] bg-ink-100 text-ink-600 font-bold px-2 py-0.5 rounded">
                             Salaire : {offer.show_salary && offer.salary_min ? salary : "Compétitif"}
                           </span>
                           {offer.city && (
-                            <>
-                              <span className="text-[11px] text-ink-300">·</span>
-                              <span className="flex items-center gap-1 text-[11px] text-ink-500">
-                                <MapPin size={9} />
-                                Lieu : {offer.city}
-                              </span>
-                            </>
+                            <span className="flex items-center gap-1 text-[11px] bg-ink-100 text-ink-600 font-bold px-2 py-0.5 rounded">
+                              <MapPin size={9} />
+                              Lieu : {offer.city}
+                            </span>
                           )}
                         </div>
                       </div>
 
-                      {/* CTA Postuler (visible pour les offres urgentes ou au hover) */}
-                      <div className="shrink-0 flex items-center gap-2">
-                        {offer.is_urgent ? (
-                          <Link
-                            href={`/postuler/${offer.id}`}
-                            onClick={e => e.stopPropagation()}
-                            className="bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-[11px] px-4 py-2 rounded-lg transition-colors"
-                            style={{ letterSpacing: "0.05em" }}
-                          >
-                            Postuler
-                          </Link>
-                        ) : (
-                          <Link
-                            href={`/jobs/${offer.id}`}
-                            className="hidden group-hover:flex items-center gap-1 text-brand font-bold text-[11px] border border-brand/30 hover:border-brand px-3 py-1.5 rounded-lg transition-all"
-                          >
-                            Voir <ChevronRight size={11} />
-                          </Link>
-                        )}
+                      {/* CTA Postuler — toujours visible */}
+                      <div className="shrink-0">
                         <Link
-                          href={`/jobs/${offer.id}`}
-                          className="w-8 h-8 rounded-lg border border-ink-100 group-hover:border-brand/30 flex items-center justify-center text-ink-300 group-hover:text-brand transition-all"
+                          href={`/postuler/${offer.id}`}
+                          className="bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-[11px] px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+                          style={{ letterSpacing: "0.05em" }}
                         >
-                          <ChevronRight size={14} />
+                          Postuler
                         </Link>
                       </div>
                     </div>
@@ -295,24 +275,6 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
               </div>
             )}
 
-            {/* Banner recruteur bas de page */}
-            <div className="mt-6 bg-[#0F0E0D] rounded-2xl p-5 flex items-center justify-between gap-4 flex-wrap">
-              <div>
-                <p className="font-display font-black text-white uppercase text-sm">
-                  Vous recrutez ? Publiez votre offre en 2 minutes.
-                </p>
-                <p className="text-white/40 text-xs mt-0.5">
-                  Les candidats viennent à vous.
-                </p>
-              </div>
-              <Link
-                href="/recrute"
-                className="bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-sm px-5 py-2.5 rounded-xl transition-colors shrink-0"
-                style={{ letterSpacing: "0.04em" }}
-              >
-                Publier une offre
-              </Link>
-            </div>
           </div>
 
           {/* ── COLONNE DROITE : sidebar ───────────────────── */}
@@ -366,25 +328,34 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
               </div>
             )}
 
-            {/* Alerte email */}
-            <div className="bg-white rounded-2xl border border-ink-100 p-5 text-center">
-              <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Bell size={18} className="text-brand" />
+            {/* Alerte email avec photo */}
+            <div className="rounded-2xl border border-ink-100 overflow-hidden">
+              {/* Photo worker */}
+              <div className="h-36 relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=600&auto=format&fit=crop&q=80"
+                  alt="Travailleur"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0F0E0D]/80 to-transparent" />
               </div>
-              <p className="font-display font-black text-ink uppercase text-sm leading-tight mb-1">
-                Nous recherchons les meilleures offres pour vous.
-              </p>
-              <p className="text-[11px] text-ink-500 mb-4">
-                Recevez les nouvelles offres qui correspondent à votre profil.
-              </p>
-              <Link
-                href="/signup/candidat"
-                className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-[12px] py-2.5 rounded-xl transition-colors w-full"
-                style={{ letterSpacing: "0.04em" }}
-              >
-                <Bell size={12} />
-                Créer une alerte email
-              </Link>
+              <div className="bg-white p-4 text-center">
+                <p className="font-display font-black text-ink uppercase text-sm leading-tight mb-1">
+                  Nous recherchons les meilleures offres pour vous.
+                </p>
+                <p className="text-[11px] text-ink-500 mb-4">
+                  Recevez les nouvelles offres qui correspondent à votre profil.
+                </p>
+                <Link
+                  href="/signup/candidat"
+                  className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-[12px] py-2.5 rounded-xl transition-colors w-full"
+                  style={{ letterSpacing: "0.04em" }}
+                >
+                  <Bell size={12} />
+                  Créer une alerte email
+                </Link>
+              </div>
             </div>
 
             {/* CTA Recruteur sidebar */}
@@ -406,6 +377,27 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
               </Link>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* ══ BARRE STICKY BAS ════════════════════════════════ */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0F0E0D]/95 backdrop-blur-sm border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+          <div>
+            <p className="font-display font-black text-white uppercase text-sm leading-none">
+              Vous recrutez ? Publiez votre offre en 2 minutes.
+            </p>
+            <p className="text-white/45 text-xs mt-0.5">
+              Les candidats viennent à vous.
+            </p>
+          </div>
+          <Link
+            href="/recrute"
+            className="bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-sm px-6 py-2.5 rounded-xl transition-colors shrink-0"
+            style={{ letterSpacing: "0.04em" }}
+          >
+            Publier une offre
+          </Link>
         </div>
       </div>
     </div>

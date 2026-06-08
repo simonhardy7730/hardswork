@@ -19,7 +19,7 @@ export function SiteNav() {
             { label: "Tarifs", href: "/tarifs" },
           ].map((l) => (
             <Link key={l.href} href={l.href}
-              className="text-[13px] text-white/55 hover:text-white transition-colors font-medium underline-grow">
+              className="text-[13px] text-white/80 hover:text-white transition-colors font-semibold">
               {l.label}
             </Link>
           ))}
@@ -29,13 +29,13 @@ export function SiteNav() {
         <div className="flex items-center gap-2">
           {/* Connexion — texte discret */}
           <Link href="/login"
-            className="hidden sm:block text-[13px] text-white/45 hover:text-white/80 transition-colors font-medium px-2">
+            className="hidden sm:block text-[13px] text-white/70 hover:text-white transition-colors font-semibold px-2">
             Connexion
           </Link>
 
           {/* Je cherche un emploi — ghost outline */}
           <Link href="/signup/candidat"
-            className="hidden md:inline-flex items-center gap-1.5 border border-white/20 hover:border-white/40 text-white/70 hover:text-white transition-all rounded-lg font-semibold"
+            className="hidden md:inline-flex items-center gap-1.5 border border-white/30 hover:border-white/60 text-white/85 hover:text-white transition-all rounded-lg font-semibold"
             style={{ padding: "0.4375rem 0.875rem", fontSize: "0.75rem" }}>
             Je cherche un emploi
           </Link>

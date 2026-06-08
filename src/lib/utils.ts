@@ -57,6 +57,7 @@ export const SECTOR_LABELS: Record<string, string> = {
   transport: "Transport",
   nettoyage: "Nettoyage",
   securite: "Sécurité",
+  medical: "Médical",
   autre: "Autre",
 };
 

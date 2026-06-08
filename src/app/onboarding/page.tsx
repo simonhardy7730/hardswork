@@ -113,11 +113,11 @@ export default function OnboardingPage() {
         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
           <Check size={32} className="text-green-600" />
         </div>
-        <h2 className="text-xl font-bold text-[#1E293B]">C&apos;est prêt !</h2>
-        <p className="text-[#64748B] text-sm">
+        <h2 className="text-xl font-bold text-ink">C&apos;est prêt !</h2>
+        <p className="text-ink-500 text-sm">
           Redirection vers votre tableau de bord...
         </p>
-        <Loader2 size={20} className="animate-spin text-[#1E40AF] mx-auto" />
+        <Loader2 size={20} className="animate-spin text-brand mx-auto" />
       </div>
     );
   }
@@ -135,15 +135,15 @@ export default function OnboardingPage() {
                     step > s.num
                       ? "bg-[#10B981] text-white"
                       : step === s.num
-                        ? "bg-[#1E40AF] text-white"
-                        : "bg-[#E2E8F0] text-[#94A3B8]"
+                        ? "bg-brand text-white"
+                        : "bg-[#E8E2DA] text-ink-300"
                   }`}
                 >
                   {step > s.num ? <Check size={14} /> : s.num}
                 </div>
                 <span
                   className={`text-xs font-medium hidden sm:block ${
-                    step === s.num ? "text-[#1E293B]" : "text-[#94A3B8]"
+                    step === s.num ? "text-ink" : "text-ink-300"
                   }`}
                 >
                   {s.label}
@@ -151,33 +151,33 @@ export default function OnboardingPage() {
               </div>
               {i < STEPS.length - 1 && (
                 <div
-                  className={`h-px w-8 ${step > s.num ? "bg-[#10B981]" : "bg-[#E2E8F0]"}`}
+                  className={`h-px w-8 ${step > s.num ? "bg-[#10B981]" : "bg-[#E8E2DA]"}`}
                 />
               )}
             </div>
           ))}
         </div>
-        <div className="h-1 bg-[#E2E8F0] rounded-full overflow-hidden">
+        <div className="h-1 bg-[#E8E2DA] rounded-full overflow-hidden">
           <div
-            className="h-full bg-[#1E40AF] transition-all duration-500"
+            className="h-full bg-brand transition-all duration-500"
             style={{ width: `${((step - 1) / 2) * 100}%` }}
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-[#E2E8F0] p-8">
+      <div className="bg-white rounded-2xl shadow-sm border border-ink-100 p-8">
         {/* =================== ÉTAPE 1 =================== */}
         {step === 1 && (
           <>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-                <Building2 size={20} className="text-[#1E40AF]" />
+                <Building2 size={20} className="text-brand" />
               </div>
               <div>
-                <h2 className="font-bold text-[#1E293B]">
+                <h2 className="font-bold text-ink">
                   Votre organisation
                 </h2>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-ink-500">
                   Complétez votre profil (optionnel)
                 </p>
               </div>
@@ -185,7 +185,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#1E293B] mb-1.5">
+                <label className="block text-sm font-medium text-ink mb-1.5">
                   Région
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -199,8 +199,8 @@ export default function OnboardingPage() {
                       }
                       className={`py-2 px-3 rounded-lg border text-sm font-medium transition capitalize ${
                         orgData.region === r
-                          ? "border-[#1E40AF] bg-blue-50 text-[#1E40AF]"
-                          : "border-[#E2E8F0] text-[#64748B] hover:border-[#1E40AF]"
+                          ? "border-brand bg-blue-50 text-brand"
+                          : "border-ink-100 text-ink-500 hover:border-brand"
                       }`}
                     >
                       {r.charAt(0).toUpperCase() + r.slice(1)}
@@ -211,13 +211,13 @@ export default function OnboardingPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#1E293B] mb-1.5">
+                  <label className="block text-sm font-medium text-ink mb-1.5">
                     Ville
                   </label>
                   <div className="relative">
                     <MapPin
                       size={15}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300"
                     />
                     <input
                       type="text"
@@ -226,18 +226,18 @@ export default function OnboardingPage() {
                         setOrgData((p) => ({ ...p, city: e.target.value }))
                       }
                       placeholder="Liège"
-                      className="w-full pl-9 pr-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:border-[#1E40AF] transition"
+                      className="w-full pl-9 pr-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#1E293B] mb-1.5">
+                  <label className="block text-sm font-medium text-ink mb-1.5">
                     Téléphone
                   </label>
                   <div className="relative">
                     <Phone
                       size={15}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300"
                     />
                     <input
                       type="tel"
@@ -246,21 +246,21 @@ export default function OnboardingPage() {
                         setOrgData((p) => ({ ...p, phone: e.target.value }))
                       }
                       placeholder="+32 4 xxx xx xx"
-                      className="w-full pl-9 pr-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:border-[#1E40AF] transition"
+                      className="w-full pl-9 pr-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                     />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#1E293B] mb-1.5">
+                <label className="block text-sm font-medium text-ink mb-1.5">
                   Site web{" "}
-                  <span className="text-[#94A3B8] font-normal">(optionnel)</span>
+                  <span className="text-ink-300 font-normal">(optionnel)</span>
                 </label>
                 <div className="relative">
                   <Globe
                     size={15}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300"
                   />
                   <input
                     type="url"
@@ -269,7 +269,7 @@ export default function OnboardingPage() {
                       setOrgData((p) => ({ ...p, website: e.target.value }))
                     }
                     placeholder="https://votre-site.be"
-                    className="w-full pl-9 pr-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:border-[#1E40AF] transition"
+                    className="w-full pl-9 pr-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                   />
                 </div>
               </div>
@@ -277,7 +277,7 @@ export default function OnboardingPage() {
 
             <button
               onClick={() => setStep(2)}
-              className="w-full mt-6 bg-[#1E40AF] text-white py-2.5 rounded-lg font-medium text-sm hover:bg-blue-800 transition flex items-center justify-center gap-2"
+              className="w-full mt-6 bg-brand text-white py-2.5 rounded-lg font-medium text-sm hover:bg-brand-dark transition flex items-center justify-center gap-2"
             >
               Continuer <ArrowRight size={16} />
             </button>
@@ -289,13 +289,13 @@ export default function OnboardingPage() {
           <>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-                <UserPlus size={20} className="text-[#1E40AF]" />
+                <UserPlus size={20} className="text-brand" />
               </div>
               <div>
-                <h2 className="font-bold text-[#1E293B]">
+                <h2 className="font-bold text-ink">
                   Inviter des recruteurs
                 </h2>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-ink-500">
                   Vous pouvez le faire plus tard
                 </p>
               </div>
@@ -309,11 +309,11 @@ export default function OnboardingPage() {
                   onChange={(e) => setInviteEmail(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addInvite()}
                   placeholder="recruteur@example.be"
-                  className="flex-1 px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:border-[#1E40AF] transition"
+                  className="flex-1 px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                 />
                 <button
                   onClick={addInvite}
-                  className="px-4 py-2.5 bg-[#F1F5F9] border border-[#E2E8F0] rounded-lg text-sm font-medium text-[#1E293B] hover:bg-[#E2E8F0] transition"
+                  className="px-4 py-2.5 bg-surface-2 border border-ink-100 rounded-lg text-sm font-medium text-ink hover:bg-[#E8E2DA] transition"
                 >
                   Ajouter
                 </button>
@@ -324,14 +324,14 @@ export default function OnboardingPage() {
                   {invites.map((email) => (
                     <div
                       key={email}
-                      className="flex items-center justify-between px-3 py-2 bg-[#F1F5F9] rounded-lg"
+                      className="flex items-center justify-between px-3 py-2 bg-surface-2 rounded-lg"
                     >
-                      <span className="text-sm text-[#1E293B]">{email}</span>
+                      <span className="text-sm text-ink">{email}</span>
                       <button
                         onClick={() =>
                           setInvites((prev) => prev.filter((e) => e !== email))
                         }
-                        className="text-[#94A3B8] hover:text-red-500 text-xs"
+                        className="text-ink-300 hover:text-red-500 text-xs"
                       >
                         ✕
                       </button>
@@ -341,7 +341,7 @@ export default function OnboardingPage() {
               )}
 
               {invites.length === 0 && (
-                <p className="text-xs text-[#94A3B8] text-center py-4">
+                <p className="text-xs text-ink-300 text-center py-4">
                   Vous inviterez vos collègues depuis les Paramètres.
                 </p>
               )}
@@ -350,13 +350,13 @@ export default function OnboardingPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setStep(1)}
-                className="flex-1 py-2.5 border border-[#E2E8F0] rounded-lg text-sm font-medium text-[#64748B] hover:bg-[#F1F5F9] transition"
+                className="flex-1 py-2.5 border border-ink-100 rounded-lg text-sm font-medium text-ink-500 hover:bg-surface-2 transition"
               >
                 Retour
               </button>
               <button
                 onClick={() => setStep(3)}
-                className="flex-1 bg-[#1E40AF] text-white py-2.5 rounded-lg font-medium text-sm hover:bg-blue-800 transition flex items-center justify-center gap-2"
+                className="flex-1 bg-brand text-white py-2.5 rounded-lg font-medium text-sm hover:bg-brand-dark transition flex items-center justify-center gap-2"
               >
                 Continuer <ArrowRight size={16} />
               </button>
@@ -369,13 +369,13 @@ export default function OnboardingPage() {
           <>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-                <Briefcase size={20} className="text-[#1E40AF]" />
+                <Briefcase size={20} className="text-brand" />
               </div>
               <div>
-                <h2 className="font-bold text-[#1E293B]">
+                <h2 className="font-bold text-ink">
                   Créer votre première offre
                 </h2>
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-ink-500">
                   Enregistrée en brouillon, publiez quand vous voulez
                 </p>
               </div>
@@ -384,7 +384,7 @@ export default function OnboardingPage() {
             {!skipOffer ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#1E293B] mb-1.5">
+                  <label className="block text-sm font-medium text-ink mb-1.5">
                     Titre du poste
                   </label>
                   <input
@@ -394,13 +394,13 @@ export default function OnboardingPage() {
                       setOfferData((p) => ({ ...p, title: e.target.value }))
                     }
                     placeholder="ex: Cariste CACES 3, Chauffeur SPL..."
-                    className="w-full px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:border-[#1E40AF] transition"
+                    className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-[#1E293B] mb-1.5">
+                    <label className="block text-sm font-medium text-ink mb-1.5">
                       Secteur
                     </label>
                     <select
@@ -411,7 +411,7 @@ export default function OnboardingPage() {
                           sector: e.target.value,
                         }))
                       }
-                      className="w-full px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:border-[#1E40AF] transition bg-white"
+                      className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition bg-white"
                     >
                       {Object.entries(SECTOR_LABELS).map(([val, label]) => (
                         <option key={val} value={val}>
@@ -421,7 +421,7 @@ export default function OnboardingPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#1E293B] mb-1.5">
+                    <label className="block text-sm font-medium text-ink mb-1.5">
                       Type de contrat
                     </label>
                     <select
@@ -432,7 +432,7 @@ export default function OnboardingPage() {
                           contract_type: e.target.value,
                         }))
                       }
-                      className="w-full px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:border-[#1E40AF] transition bg-white"
+                      className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition bg-white"
                     >
                       <option value="interim">Contrat intérimaire</option>
                       <option value="cdi">CDI</option>
@@ -443,7 +443,7 @@ export default function OnboardingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#1E293B] mb-1.5">
+                  <label className="block text-sm font-medium text-ink mb-1.5">
                     Ville
                   </label>
                   <input
@@ -453,13 +453,13 @@ export default function OnboardingPage() {
                       setOfferData((p) => ({ ...p, city: e.target.value }))
                     }
                     placeholder="Liège, Charleroi, Namur..."
-                    className="w-full px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:border-[#1E40AF] transition"
+                    className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                   />
                 </div>
 
                 <button
                   onClick={() => setSkipOffer(true)}
-                  className="text-xs text-[#94A3B8] hover:text-[#64748B] underline"
+                  className="text-xs text-ink-300 hover:text-ink-500 underline"
                 >
                   Passer cette étape →
                 </button>
@@ -469,12 +469,12 @@ export default function OnboardingPage() {
                 <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mx-auto">
                   <Sparkles size={24} className="text-green-600" />
                 </div>
-                <p className="text-sm text-[#64748B]">
+                <p className="text-sm text-ink-500">
                   Vous créerez vos offres depuis le tableau de bord.
                 </p>
                 <button
                   onClick={() => setSkipOffer(false)}
-                  className="text-xs text-[#1E40AF] hover:underline"
+                  className="text-xs text-brand hover:underline"
                 >
                   ← Créer une offre maintenant
                 </button>
@@ -484,14 +484,14 @@ export default function OnboardingPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setStep(2)}
-                className="flex-1 py-2.5 border border-[#E2E8F0] rounded-lg text-sm font-medium text-[#64748B] hover:bg-[#F1F5F9] transition"
+                className="flex-1 py-2.5 border border-ink-100 rounded-lg text-sm font-medium text-ink-500 hover:bg-surface-2 transition"
               >
                 Retour
               </button>
               <button
                 onClick={handleFinish}
                 disabled={loading}
-                className="flex-1 bg-[#1E40AF] text-white py-2.5 rounded-lg font-medium text-sm hover:bg-blue-800 transition flex items-center justify-center gap-2 disabled:opacity-60"
+                className="flex-1 bg-brand text-white py-2.5 rounded-lg font-medium text-sm hover:bg-brand-dark transition flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 {loading ? (
                   <Loader2 size={16} className="animate-spin" />

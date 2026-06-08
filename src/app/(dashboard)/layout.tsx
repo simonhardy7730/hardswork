@@ -24,7 +24,7 @@ export default async function DashboardLayout({
   if (!profile) redirect("/onboarding");
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
+    <div className="flex h-screen bg-surface overflow-hidden">
       <DashboardSidebar org={profile.organizations as never} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <DashboardTopbar user={profile} />

@@ -3,47 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  Briefcase,
-  Users,
-  Settings,
-  LogOut,
-  ChevronRight,
+  LayoutDashboard, Briefcase, Users, Settings, LogOut,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import type { Organization } from "@/lib/supabase/types";
+import { HardSworkLogo } from "@/components/ui/HardieIcon";
 
 const NAV_ITEMS = [
-  {
-    href: "/dashboard",
-    icon: LayoutDashboard,
-    label: "Tableau de bord",
-    exact: true,
-  },
-  {
-    href: "/dashboard/offres",
-    icon: Briefcase,
-    label: "Offres d'emploi",
-    exact: false,
-  },
-  {
-    href: "/dashboard/candidats",
-    icon: Users,
-    label: "Candidats",
-    exact: false,
-  },
-  {
-    href: "/dashboard/settings",
-    icon: Settings,
-    label: "Paramètres",
-    exact: false,
-  },
+  { href: "/dashboard",          icon: LayoutDashboard, label: "Tableau de bord", exact: true },
+  { href: "/dashboard/offres",   icon: Briefcase,       label: "Offres d'emploi",  exact: false },
+  { href: "/dashboard/candidats",icon: Users,           label: "Candidats",        exact: false },
+  { href: "/dashboard/settings", icon: Settings,        label: "Paramètres",       exact: false },
 ];
 
 export default function DashboardSidebar({ org }: { org: Organization }) {
   const pathname = usePathname();
-  const router = useRouter();
+  const router   = useRouter();
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -52,74 +28,55 @@ export default function DashboardSidebar({ org }: { org: Organization }) {
   }
 
   return (
-    <aside className="w-60 bg-white border-r border-[#E2E8F0] flex flex-col shrink-0">
+    <aside className="w-[220px] bg-[#0F0E0D] border-r border-white/[0.07] flex flex-col shrink-0">
+
       {/* Logo */}
-      <div className="p-5 border-b border-[#E2E8F0]">
-        <Link href="/dashboard" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-[#1E40AF] rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">R</span>
-          </div>
-          <span className="font-bold text-[#1E293B] text-base">Rekruut</span>
+      <div className="px-5 py-4 border-b border-white/[0.06]">
+        <Link href="/dashboard">
+          <HardSworkLogo size="sm" dark />
         </Link>
       </div>
 
-      {/* Org name */}
-      <div className="px-4 py-3 border-b border-[#E2E8F0]">
-        <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg bg-[#F8FAFC]">
-          <div className="w-7 h-7 rounded-md bg-[#1E40AF]/10 flex items-center justify-center shrink-0">
-            <span className="text-[#1E40AF] text-xs font-bold">
+      {/* Organisation */}
+      <div className="px-4 py-3 border-b border-white/[0.06]">
+        <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-white/[0.05]">
+          <div className="w-7 h-7 rounded-lg bg-brand/20 flex items-center justify-center shrink-0">
+            <span className="text-brand text-xs font-black font-display">
               {org?.name?.[0]?.toUpperCase() ?? "O"}
             </span>
           </div>
-          <div className="overflow-hidden">
-            <p className="text-xs font-semibold text-[#1E293B] truncate">
-              {org?.name ?? "Organisation"}
-            </p>
-            <p className="text-[10px] text-[#94A3B8] capitalize">
+          <div className="overflow-hidden flex-1">
+            <p className="text-[12px] font-semibold text-white truncate">{org?.name ?? "Organisation"}</p>
+            <p className="text-[10px] text-white/30 capitalize">
               {org?.type === "agency" ? "Agence" : "Entreprise"}
             </p>
           </div>
-          <ChevronRight size={14} className="text-[#94A3B8] ml-auto shrink-0" />
         </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      <nav className="flex-1 px-3 py-3 space-y-0.5">
         {NAV_ITEMS.map(({ href, icon: Icon, label, exact }) => {
-          const isActive = exact
-            ? pathname === href
-            : pathname.startsWith(href);
+          const isActive = exact ? pathname === href : pathname.startsWith(href);
           return (
-            <Link
-              key={href}
-              href={href}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all group ${
+            <Link key={href} href={href}
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all ${
                 isActive
-                  ? "bg-[#1E40AF] text-white"
-                  : "text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#1E293B]"
-              }`}
-            >
-              <Icon
-                size={18}
-                className={
-                  isActive
-                    ? "text-white"
-                    : "text-[#94A3B8] group-hover:text-[#1E293B]"
-                }
-              />
+                  ? "bg-brand text-white"
+                  : "text-white/40 hover:text-white hover:bg-white/[0.06]"
+              }`}>
+              <Icon size={16} className={isActive ? "text-white" : "text-white/30"} />
               {label}
             </Link>
           );
         })}
       </nav>
 
-      {/* Sign out */}
-      <div className="p-3 border-t border-[#E2E8F0]">
-        <button
-          onClick={handleSignOut}
-          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-[#64748B] hover:bg-red-50 hover:text-red-600 transition-all w-full"
-        >
-          <LogOut size={18} />
+      {/* Déconnexion */}
+      <div className="p-3 border-t border-white/[0.06]">
+        <button onClick={handleSignOut}
+          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-semibold text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-all w-full">
+          <LogOut size={16} />
           Se déconnecter
         </button>
       </div>

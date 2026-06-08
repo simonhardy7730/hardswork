@@ -1,30 +1,24 @@
 import Link from "next/link";
+import { HardSworkLogo } from "@/components/ui/HardieIcon";
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+    <div className="min-h-screen bg-[#0F0E0D] flex flex-col">
       {/* Header */}
-      <header className="py-5 px-6">
-        <Link href="/" className="flex items-center gap-2 w-fit">
-          <div className="w-7 h-7 bg-[#1E40AF] rounded-md flex items-center justify-center">
-            <span className="text-white font-bold text-sm">R</span>
-          </div>
-          <span className="text-lg font-bold text-[#1E293B]">Rekruut</span>
+      <header className="py-5 px-6 border-b border-white/[0.06]">
+        <Link href="/" className="w-fit block">
+          <HardSworkLogo size="md" dark />
         </Link>
       </header>
 
       {/* Content */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8">
+      <main className="flex-1 flex items-center justify-center px-4 py-10">
         {children}
       </main>
 
       {/* Footer */}
-      <footer className="py-4 text-center text-xs text-[#94A3B8]">
-        30 jours d&apos;essai gratuit · Sans carte bancaire
+      <footer className="py-5 text-center text-xs text-white/20 border-t border-white/[0.06]">
+        © 2025 HardSwork · Belgique · Tous droits réservés
       </footer>
     </div>
   );

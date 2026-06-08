@@ -109,7 +109,7 @@ export default async function DashboardPage() {
       label: "Offres actives",
       value: offresResult.count ?? 0,
       icon: Briefcase,
-      color: "bg-blue-50 text-[#1E40AF]",
+      color: "bg-brand/10 text-brand",
       href: "/dashboard/offres",
     },
     {
@@ -149,17 +149,18 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[#1E293B]">
+          <h1 className="text-xl font-bold text-[#0F0E0D]">
             Bonjour,{" "}
             {profile.full_name.split(" ")[0]} 👋
           </h1>
-          <p className="text-sm text-[#64748B] mt-0.5">
-            Voici ce qui se passe sur votre espace Rekruut
+          <p className="text-sm text-ink-500 mt-0.5">
+            Voici ce qui se passe sur votre espace HardSwork
           </p>
         </div>
         <Link
           href="/dashboard/offres/nouvelle"
-          className="flex items-center gap-2 bg-[#1E40AF] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 transition"
+          className="btn-brand"
+            style={{ padding: "0.5rem 1rem", fontSize: "0.8125rem" }}
         >
           <Plus size={16} />
           Nouvelle offre
@@ -172,33 +173,33 @@ export default async function DashboardPage() {
           <Link
             key={m.label}
             href={m.href}
-            className="bg-white rounded-xl border border-[#E2E8F0] p-5 hover:shadow-sm hover:border-[#1E40AF]/30 transition-all group"
+            className="bg-white rounded-xl border border-ink-100 p-5 hover:shadow-sm hover:border-brand/30 transition-all group"
           >
             <div
               className={`w-9 h-9 rounded-lg flex items-center justify-center ${m.color} mb-3`}
             >
               <m.icon size={18} />
             </div>
-            <div className="text-2xl font-bold text-[#1E293B] mb-0.5">
+            <div className="text-2xl font-bold text-[#0F0E0D] mb-0.5">
               {m.value}
             </div>
-            <div className="text-xs text-[#64748B]">{m.label}</div>
+            <div className="text-xs text-ink-500">{m.label}</div>
             {m.sublabel && (
-              <div className="text-[10px] text-[#94A3B8]">{m.sublabel}</div>
+              <div className="text-[10px] text-ink-300">{m.sublabel}</div>
             )}
           </Link>
         ))}
       </div>
 
       {/* Feed d'activité */}
-      <div className="bg-white rounded-xl border border-[#E2E8F0]">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
-          <h2 className="font-semibold text-[#1E293B] text-sm">
+      <div className="bg-white rounded-xl border border-ink-100">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-ink-100">
+          <h2 className="font-semibold text-[#0F0E0D] text-sm">
             Dernières candidatures
           </h2>
           <Link
             href="/dashboard/offres"
-            className="text-xs text-[#1E40AF] hover:underline flex items-center gap-1"
+            className="text-xs text-brand hover:underline flex items-center gap-1"
           >
             Voir tout <ArrowRight size={12} />
           </Link>
@@ -206,19 +207,19 @@ export default async function DashboardPage() {
 
         {!recentApps || recentApps.length === 0 ? (
           <div className="py-12 text-center">
-            <Users size={32} className="text-[#E2E8F0] mx-auto mb-3" />
-            <p className="text-sm text-[#94A3B8]">
+            <Users size={32} className="text-[#E8E2DA] mx-auto mb-3" />
+            <p className="text-sm text-ink-300">
               Aucune candidature pour le moment.
             </p>
             <Link
               href="/dashboard/offres/nouvelle"
-              className="text-sm text-[#1E40AF] hover:underline mt-1 inline-block"
+              className="text-sm text-brand hover:underline mt-1 inline-block"
             >
               Créer une offre d&apos;emploi →
             </Link>
           </div>
         ) : (
-          <div className="divide-y divide-[#F1F5F9]">
+          <div className="divide-y divide-ink-100">
             {recentApps.map((app) => {
               const job = app.job_offers as {
                 title: string;
@@ -229,11 +230,11 @@ export default async function DashboardPage() {
                 <Link
                   key={app.id}
                   href={`/dashboard/offres/${app.job_offer_id}/candidatures`}
-                  className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#F8FAFC] transition group"
+                  className="flex items-center gap-4 px-5 py-3.5 hover:bg-surface transition group"
                 >
                   {/* Avatar initiales */}
-                  <div className="w-9 h-9 rounded-full bg-[#1E40AF]/10 flex items-center justify-center shrink-0">
-                    <span className="text-[#1E40AF] text-xs font-bold">
+                  <div className="w-9 h-9 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
+                    <span className="text-brand text-xs font-bold">
                       {app.applicant_name
                         .split(" ")
                         .map((n: string) => n[0])
@@ -245,7 +246,7 @@ export default async function DashboardPage() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-sm font-semibold text-[#1E293B]">
+                      <span className="text-sm font-semibold text-[#0F0E0D]">
                         {app.applicant_name}
                       </span>
                       <span
@@ -257,7 +258,7 @@ export default async function DashboardPage() {
                         {STATUS_LABELS[app.status]}
                       </span>
                     </div>
-                    <div className="text-xs text-[#64748B] truncate">
+                    <div className="text-xs text-ink-500 truncate">
                       {job?.title} ·{" "}
                       {SECTOR_LABELS[job?.sector ?? ""] ?? job?.sector} ·{" "}
                       {job?.city}
@@ -269,7 +270,7 @@ export default async function DashboardPage() {
                       <a
                         href={`tel:${app.applicant_phone}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-1 text-xs text-[#64748B] hover:text-[#1E40AF] transition"
+                        className="flex items-center gap-1 text-xs text-ink-500 hover:text-brand transition"
                       >
                         <Phone size={13} />
                         <span className="hidden sm:block">
@@ -277,13 +278,13 @@ export default async function DashboardPage() {
                         </span>
                       </a>
                     )}
-                    <div className="flex items-center gap-1 text-[10px] text-[#94A3B8]">
+                    <div className="flex items-center gap-1 text-[10px] text-ink-300">
                       <Clock size={11} />
                       {formatRelative(app.applied_at)}
                     </div>
                     <ArrowRight
                       size={14}
-                      className="text-[#E2E8F0] group-hover:text-[#1E40AF] transition"
+                      className="text-[#E8E2DA] group-hover:text-brand transition"
                     />
                   </div>
                 </Link>
@@ -297,44 +298,44 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Link
           href="/dashboard/offres/nouvelle"
-          className="bg-white rounded-xl border border-[#E2E8F0] p-4 hover:shadow-sm hover:border-[#1E40AF]/30 transition-all flex items-center gap-3"
+          className="bg-white rounded-xl border border-ink-100 p-4 hover:shadow-sm hover:border-brand/30 transition-all flex items-center gap-3"
         >
           <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
-            <Plus size={18} className="text-[#1E40AF]" />
+            <Plus size={18} className="text-brand" />
           </div>
           <div>
-            <div className="text-sm font-medium text-[#1E293B]">
+            <div className="text-sm font-medium text-[#0F0E0D]">
               Nouvelle offre
             </div>
-            <div className="text-xs text-[#94A3B8]">Publier en 2 minutes</div>
+            <div className="text-xs text-ink-300">Publier en 2 minutes</div>
           </div>
         </Link>
         <Link
           href="/dashboard/candidats"
-          className="bg-white rounded-xl border border-[#E2E8F0] p-4 hover:shadow-sm hover:border-[#1E40AF]/30 transition-all flex items-center gap-3"
+          className="bg-white rounded-xl border border-ink-100 p-4 hover:shadow-sm hover:border-brand/30 transition-all flex items-center gap-3"
         >
           <div className="w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center">
             <Users size={18} className="text-purple-600" />
           </div>
           <div>
-            <div className="text-sm font-medium text-[#1E293B]">
+            <div className="text-sm font-medium text-[#0F0E0D]">
               Base candidats
             </div>
-            <div className="text-xs text-[#94A3B8]">Gérer vos profils</div>
+            <div className="text-xs text-ink-300">Gérer vos profils</div>
           </div>
         </Link>
         <Link
           href="/dashboard/settings"
-          className="bg-white rounded-xl border border-[#E2E8F0] p-4 hover:shadow-sm hover:border-[#1E40AF]/30 transition-all flex items-center gap-3"
+          className="bg-white rounded-xl border border-ink-100 p-4 hover:shadow-sm hover:border-brand/30 transition-all flex items-center gap-3"
         >
           <div className="w-9 h-9 bg-green-50 rounded-lg flex items-center justify-center">
             <UserCheck size={18} className="text-green-600" />
           </div>
           <div>
-            <div className="text-sm font-medium text-[#1E293B]">
+            <div className="text-sm font-medium text-[#0F0E0D]">
               Inviter l&apos;équipe
             </div>
-            <div className="text-xs text-[#94A3B8]">Ajouter des recruteurs</div>
+            <div className="text-xs text-ink-300">Ajouter des recruteurs</div>
           </div>
         </Link>
       </div>

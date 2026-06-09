@@ -767,10 +767,10 @@ export default async function HomePage() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-8 border-t border-white/[0.05]">
-            <p className="text-xs text-white/20">© 2025 HardSwork · Belgique 🇧🇪 · Tous droits réservés</p>
+            <p className="text-xs text-white/20">© 2026 HardSwork · Belgique 🇧🇪 · Tous droits réservés</p>
             <div className="flex gap-5 text-xs text-white/20">
-              <Link href="#" className="hover:text-white/50 transition-colors">Confidentialité</Link>
-              <Link href="#" className="hover:text-white/50 transition-colors">Conditions d&apos;utilisation</Link>
+              <Link href="/legal/privacy" className="hover:text-white/50 transition-colors">Confidentialité</Link>
+              <Link href="/legal/cgu" className="hover:text-white/50 transition-colors">Conditions d&apos;utilisation</Link>
             </div>
           </div>
         </div>

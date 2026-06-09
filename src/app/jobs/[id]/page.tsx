@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { CONTRACT_LABELS, SECTOR_LABELS, REGION_LABELS } from "@/lib/utils";
 import { SiteNav } from "@/components/layout/SiteNav";
+import ShareButtons from "@/components/jobs/ShareButtons";
 
 /* ─── Photos Unsplash par secteur ────────────────────── */
 const SECTOR_PHOTOS: Record<string, string> = {
@@ -329,9 +330,12 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 {org?.description ?? `Entreprise active dans le secteur ${sectorLabel.toLowerCase()} en Belgique. Recrutement en cours via HardSwork.`}
               </p>
 
-              <button className="w-full border border-ink-200 hover:border-brand text-ink-500 hover:text-brand font-display font-black uppercase text-[11px] py-2.5 rounded-xl transition tracking-widest">
-                Voir la fiche entreprise
-              </button>
+              <Link
+                href={`/jobs?secteur=${offer.sector}`}
+                className="block text-center w-full border border-ink-200 hover:border-brand text-ink-500 hover:text-brand font-display font-black uppercase text-[11px] py-2.5 rounded-xl transition tracking-widest"
+              >
+                Voir les offres similaires
+              </Link>
             </div>
 
             {/* Infos pratiques */}
@@ -393,21 +397,10 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               <p className="text-[10px] font-black text-ink-300 uppercase tracking-widest mb-3">
                 Partager
               </p>
-              <div className="flex gap-2">
-                {[
-                  { label: "LinkedIn", bg: "#0A66C2", color: "white" },
-                  { label: "WhatsApp", bg: "#25D366", color: "white" },
-                  { label: "Copier", bg: "#F2EDE7", color: "#0F0E0D" },
-                ].map(({ label, bg, color }) => (
-                  <button
-                    key={label}
-                    className="flex-1 text-[10px] font-black rounded-lg py-2 uppercase tracking-wide hover:opacity-80 transition"
-                    style={{ background: bg, color }}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
+              <ShareButtons
+                url={`https://hardswork.vercel.app/jobs/${offer.id}`}
+                title={offer.title}
+              />
             </div>
           </div>
         </div>

@@ -11,6 +11,7 @@ import {
   Shield, Sparkles, Briefcase,
 } from "lucide-react";
 import { HardSworkLogo, HardieIcon } from "@/components/ui/HardieIcon";
+import GoogleButton from "@/components/auth/GoogleButton";
 
 /* ─── Données secteurs ────────────────────────────────── */
 const SECTORS_DATA = [
@@ -109,12 +110,13 @@ export default function CandidatSignupPage() {
     setError("");
     const supabase = createClient();
 
+    // 1. Créer le compte auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: auth.email,
       password: auth.password,
       options: {
         data: { full_name: auth.full_name, user_type: "candidate" },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/candidat/dashboard`,
       },
     });
 
@@ -124,6 +126,7 @@ export default function CandidatSignupPage() {
       return;
     }
 
+    // 2. Upload CV si fourni
     let cvUrl: string | null = null;
     if (cvFile) {
       const ext = cvFile.name.split(".").pop();
@@ -137,27 +140,30 @@ export default function CandidatSignupPage() {
       }
     }
 
-    const { error: candidateError } = await supabase.from("candidates").insert({
-      auth_user_id: authData.user.id,
-      first_name: auth.full_name.split(" ")[0] ?? auth.full_name,
-      last_name: auth.full_name.split(" ").slice(1).join(" ") || "-",
-      phone: auth.phone,
-      email: auth.email,
-      city: profile.city || null,
-      region: (profile.region as "wallonie" | "bruxelles" | "flandre") || null,
-      availability: profile.availability as "immediate" | "1_semaine" | "1_mois",
-      licenses: profile.licenses,
-      has_caces: profile.has_caces,
-      caces_types: profile.caces_types,
-      experience_years: profile.experience_years ? parseInt(profile.experience_years) : null,
-      sectors: selectedSectors,
-      notes: cvUrl ?? null,
-      status: "actif",
-      organization_id: null,
+    // 3. Créer le profil via API route (service role, bypass RLS)
+    const res = await fetch("/api/signup-candidat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        auth_user_id: authData.user.id,
+        first_name: auth.full_name.split(" ")[0] ?? auth.full_name,
+        last_name: auth.full_name.split(" ").slice(1).join(" ") || "-",
+        phone: auth.phone,
+        email: auth.email,
+        city: profile.city || null,
+        region: profile.region || null,
+        availability: profile.availability,
+        licenses: profile.licenses,
+        has_caces: profile.has_caces,
+        caces_types: profile.caces_types,
+        experience_years: profile.experience_years || null,
+        sectors: selectedSectors,
+        cv_url: cvUrl,
+      }),
     });
 
-    if (candidateError) {
-      setError("Erreur lors de la création du profil. Réessayez ou contactez le support.");
+    if (!res.ok) {
+      setError("Erreur lors de la création du profil. Réessayez.");
       setLoading(false);
       return;
     }
@@ -606,6 +612,22 @@ export default function CandidatSignupPage() {
                 Créer un compte recruteur
               </Link>
             </p>
+          )}
+
+          {step === 3 && (
+            <>
+              <div className="relative my-3">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-ink-100" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-[#FAFAF8] px-3 text-[10px] text-ink-300 uppercase tracking-widest">
+                    ou
+                  </span>
+                </div>
+              </div>
+              <GoogleButton redirectTo="/candidat/dashboard" label="Inscription avec Google" dark={false} />
+            </>
           )}
 
           {error && step !== 3 && (

@@ -122,6 +122,22 @@ export default async function HomePage() {
     .from("candidates")
     .select("id", { count: "exact", head: true });
 
+  // Compteurs par secteur
+  const sectorKeys = ["logistique","transport","industrie","construction","nettoyage","securite","medical"];
+  const sectorCountsRaw = await Promise.all(
+    sectorKeys.map((s) =>
+      supabase
+        .from("job_offers")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "active")
+        .eq("sector", s)
+        .then(({ count }) => ({ sector: s, count: count ?? 0 }))
+    )
+  );
+  const sectorCounts: Record<string, number> = Object.fromEntries(
+    sectorCountsRaw.map(({ sector, count }) => [sector, count])
+  );
+
   const jobs = (featuredRaw ?? []) as unknown as JobOffer[];
 
   /* demo jobs if DB empty */
@@ -274,7 +290,7 @@ export default async function HomePage() {
                   <div className="absolute inset-0 p-5 flex flex-col justify-between" style={{ zIndex: 2 }}>
                     <div className="flex justify-end">
                       <span className="text-[11px] font-bold text-white/60 bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded-full">
-                        {s.count} offres
+                        {sectorCounts[s.key] > 0 ? `${sectorCounts[s.key]}` : s.count} offres
                       </span>
                     </div>
                     <div>

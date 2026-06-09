@@ -62,7 +62,7 @@ export default function NotFound() {
       {/* Footer */}
       <footer className="px-6 py-4 border-t border-white/[0.07] text-center">
         <p className="text-xs text-white/20">
-          © 2025 HardSwork · Belgique · Tous droits réservés
+          © 2026 HardSwork · Belgique · Tous droits réservés
         </p>
       </footer>
     </div>

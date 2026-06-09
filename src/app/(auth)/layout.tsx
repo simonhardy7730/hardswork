@@ -18,7 +18,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       {/* Footer */}
       <footer className="py-5 text-center text-xs text-white/20 border-t border-white/[0.06]">
-        © 2025 HardSwork · Belgique · Tous droits réservés
+        © 2026 HardSwork · Belgique · Tous droits réservés
       </footer>
     </div>
   );

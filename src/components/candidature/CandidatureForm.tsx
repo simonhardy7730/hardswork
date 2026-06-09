@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Loader2, Phone, User, Mail, CheckCircle2 } from "lucide-react";
 
 interface Props {
@@ -56,22 +55,23 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
     setLoading(true);
     setError("");
 
-    const supabase = createClient();
-
-    const { error: err } = await supabase.from("applications").insert({
-      job_offer_id: jobId,
-      applicant_name: `${form.first_name} ${form.last_name}`.trim(),
-      applicant_phone: form.phone,
-      applicant_email: form.email || null,
-      availability: form.availability,
-      licenses: form.licenses,
-      has_caces: form.has_caces,
-      caces_types: form.caces_types,
-      cover_message: form.cover_message || null,
-      status: "nouveau",
+    const res = await fetch("/api/postuler", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        job_offer_id: jobId,
+        applicant_name: `${form.first_name} ${form.last_name}`.trim(),
+        applicant_phone: form.phone,
+        applicant_email: form.email || null,
+        availability: form.availability,
+        licenses: form.licenses,
+        has_caces: form.has_caces,
+        caces_types: form.caces_types,
+        cover_message: form.cover_message || null,
+      }),
     });
 
-    if (err) {
+    if (!res.ok) {
       setError("Une erreur est survenue. Réessayez.");
       setLoading(false);
       return;

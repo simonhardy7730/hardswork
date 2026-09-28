@@ -84,7 +84,7 @@ export const VALUE_BRANDS = [
 ];
 
 /** Marques qui vendent en direct (leur propre site = vendeur officiel pour leurs pièces). */
-const BRAND_STORES = [
+export const BRAND_STORES = [
   ...VALUE_BRANDS,
   "zara", "h&m", "mango", "celio", "kiabi", "jules", "bershka", "pull&bear", "sandro", "maje",
   "the kooples", "ami paris", "de fursac", "ba&sh", "claudie pierlot", "gant", "hugo boss", "boss",

@@ -45,30 +45,62 @@
 
 ### 3.1 Ce que fait déjà le prototype (dans ce dossier)
 
-- Envoi d'une photo ou capture d'écran (réduite dans le navigateur pour aller vite).
-- **Analyse par Claude (vision)** : univers (vêtement, montre, sac…), marque et niveau de confiance, modèle probable, matière, coupe, prix boutique estimé, requête « exacte », requêtes « style » **sans nom de marque**, et checklist qualité adaptée (grammage, mouvement, verre, type de cuir, protection UV…).
-- **Recherche Google Shopping France** (via SerpApi) : 1 requête en mode exact, 3 en mode style, dédoublonnées.
-- **Classement noté** :
-  - *Fiabilité* : officiel > revendeur reconnu > seconde main authentifiée > occasion entre particuliers > à vérifier.
-  - *Qualité* : indices dans l'annonce (matière, fabrication, mouvement, métal, verres…), marques réputées, avis clients.
-  - *Prix* : relatif aux autres offres, avec l'économie en % par rapport au prix boutique.
-  - *Alertes* : plateforme à risque, prix anormalement bas pour du neuf de marque, vente entre particuliers.
-  - Mode exact : la fiabilité pèse 50 %. Mode style : la qualité pèse 45 %.
-- Tri « Recommandé / Prix / Qualité ».
-- **Mode démo** automatique sans clés API, avec des données d'exemple clairement signalées.
+**Direction artistique « l'atelier »** : pour ne pas ressembler à un site généré, tout vient du monde du vêtement.
+Toile denim et fil de surpiqûre orange, papier patron quadrillé, mètre ruban, étiquette tissée pour le logo,
+étiquette de composition pour la fiche de la pièce, étiquettes de prix volantes pour les offres, tringle et cintres pour l'historique.
+Typographies : Archivo en largeur étendue (titres « étiquette de travail ») et IBM Plex Mono (mentions techniques).
 
-### 3.2 Feuille de route
+**L'arrivée sur le site** : une veste en denim fermée par une fermeture éclair. Le curseur descend, la veste s'ouvre en V
+et révèle le site, comme une doublure. On peut aussi tirer la fermeture au doigt. Jouée une fois par visite,
+désactivée pour les personnes qui préfèrent moins d'animations, bouton « Entrer » pour passer.
+
+**Le parcours en 3 étapes**
+1. **Photo** (ou capture d'écran), avec une précision facultative (« la montre, pas le pull »).
+2. **Marque** : le site dit ce qu'il voit (« On pense que c'est du Lacoste, modèle L.12.12. C'est bien ça ? »)
+   avec ses indices et son niveau de confiance. L'utilisateur confirme, corrige (suggestions de marques)
+   ou répond « je ne connais pas la marque ». Puis il choisit : **la pièce exacte au meilleur prix** ou **son sosie, moins cher**.
+3. **Résultats** notés, triables (recommandé, prix, qualité), avec un **curseur de budget**.
+
+**Les onglets**
+- **Chercher** : le parcours ci-dessus.
+- **Mes alertes** : un bouton « M'alerter d'une promo » sur chaque recherche. Prix de départ, prix du jour,
+  prix cible modifiable (10 % sous le meilleur prix par défaut). Les prix sont revérifiés à chaque visite
+  (au-delà de 6 h) ; une pièce en baisse ou sous le prix cible remonte en haut avec la mention « Promo ».
+- **Mon vestiaire** : l'historique des recherches, sur une tringle, pour rouvrir un résultat en un geste.
+- **La promesse** : « Des sosies, jamais des faux », comment on classe les vendeurs et comment on note.
+- Sur téléphone, les onglets passent en barre fixe en bas de l'écran, comme une appli.
+
+**Sous le capot**
+- `/api/analyze` : Claude (vision) lit la photo : univers, marque et confiance, modèle, matière, coupe, prix boutique,
+  requêtes de recherche, checklist qualité adaptée (grammage, mouvement, verre, métal, protection UV…).
+- `/api/search` : prend la marque confirmée par l'utilisateur, reconstruit la requête si elle a été corrigée,
+  cherche sur Google Shopping France (SerpApi), puis note chaque offre : fiabilité du vendeur, qualité, prix, alertes contrefaçon.
+- Alertes et vestiaire sont gardés dans le navigateur (prototype). **Mode démo** automatique sans clés API, clairement signalé.
+
+### 3.2 Idées pour la suite (classées par impact)
+1. **Plusieurs pièces sur une photo** : on encadre chaque pièce, l'utilisateur touche celle qu'il veut.
+2. **Le look complet** : une photo de tenue → toutes les pièces d'un coup, avec le total (« ce look : 140 € au lieu de 980 € »).
+3. **Carte à partager** (format story) : « Trouvé sur Sosilook : −72 % ». Le meilleur moteur de bouche-à-oreille.
+4. **Historique des prix** en courbe : savoir si une « promo » en est vraiment une.
+5. **Mes tailles** (taille, pointure, tour de poignet) pour ne montrer que ce qui est disponible, et alerte « retour en stock ».
+6. **Comparateur côte à côte** original / sosie : matière, fabrication, prix, note.
+7. **Coût par port** : prix ÷ nombre de fois qu'on la portera. Montre pourquoi une pièce de qualité peut coûter moins cher à l'usage.
+8. **Compteur d'économies** : « Tu as économisé 340 € cette année avec Sosilook ».
+9. **Coller un lien** (Instagram, Pinterest, vidéo) au lieu d'une photo.
+10. **Boutiques proches** pour essayer avant d'acheter.
+
+### 3.3 Feuille de route
 
 **Phase 1 — Lancement (semaines 1 à 4)**
 - Brancher les vraies clés (Anthropic + SerpApi), mettre en ligne sur Vercel, acheter le domaine.
 - Tester sur 50 pièces réelles (20 vêtements, 10 montres, 10 sacs, 5 bijoux, 5 lunettes) et ajuster les notes.
-- Ajouter un **lien TikTok/Instagram** en entrée (en plus de la photo) et un **recadrage** quand plusieurs pièces sont visibles (« laquelle veux-tu ? »).
+- **Plusieurs pièces sur une photo** : choisir celle qu'on veut.
 - Mise en cache des recherches (même pièce = même résultat pendant 24 h) pour diviser les coûts.
 - Inscription aux programmes d'affiliation (Awin, Effiliation, Kwanko, Amazon Partenaires, Vestiaire Collective, Zalando…).
 
 **Phase 2 — Traction (mois 2 et 3)**
 - **Pages « Look »** partageables : sosilook.fr/look/… avec la pièce, les meilleurs prix et les sosies (très bon pour le référencement Google et le partage TikTok).
-- **Alertes prix** : « préviens-moi quand ce sac passe sous 200 € ».
+- **Alertes par e-mail** : comptes utilisateurs + base Supabase + vérification planifiée (cron Vercel) + envoi via Resend (déjà utilisés sur Hardswork). Le prototype vérifie déjà les prix à chaque visite.
 - Lecture des fiches produit par l'IA pour une note qualité plus précise (composition exacte, pays de fabrication, grammage).
 - Compte utilisateur : favoris, taille, budget, style préféré.
 - Ajout de la seconde main en direct (Vinted, Vestiaire Collective, Chrono24) en plus de Google Shopping.
@@ -79,7 +111,7 @@
 - Version installable (PWA) avec appareil photo direct. L'appli native seulement si les chiffres le justifient.
 - Ouverture Belgique, Suisse, puis Espagne et Italie.
 
-### 3.3 Technique
+### 3.4 Technique
 
 | Brique | Choix | Pourquoi |
 |---|---|---|

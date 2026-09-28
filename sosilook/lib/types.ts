@@ -82,10 +82,26 @@ export interface ScoredOffer extends Offer {
   warnings: string[];
 }
 
-export interface FindResponse {
+export interface AnalyzeResponse {
+  analysis: GarmentAnalysis;
+  demo: boolean;
+}
+
+export interface SearchRequest {
+  analysis: GarmentAnalysis;
+  mode: Mode;
+  /** Marque confirmée ou corrigée par l'utilisateur (null = inconnue). */
+  brand: string | null;
+  /** Modèle / référence confirmé par l'utilisateur. */
+  model: string | null;
+}
+
+export interface SearchResponse {
   mode: Mode;
   analysis: GarmentAnalysis;
   offers: ScoredOffer[];
-  demo: { analysis: boolean; search: boolean };
+  /** Meilleur prix chez un vendeur sans alerte (en mode exact : fiable uniquement). */
+  bestPrice: number | null;
+  demo: boolean;
   notes: string[];
 }

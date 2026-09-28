@@ -119,3 +119,10 @@ export function scoreOffers(offers: Offer[], analysis: GarmentAnalysis, mode: Mo
 
   return scored.sort((a, b) => b.overall - a.overall);
 }
+
+/** Meilleur prix « recommandable » : en mode exact, jamais une offre suspecte. */
+export function bestPrice(offers: ScoredOffer[], mode: Mode): number | null {
+  return offers
+    .filter((o) => mode === "style" || (o.trust !== "a_verifier" && o.warnings.length === 0))
+    .reduce<number | null>((min, o) => (o.price != null && (min == null || o.price < min) ? o.price : min), null);
+}

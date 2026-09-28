@@ -2,11 +2,84 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer components {
-  .card {
-    @apply rounded-2xl border border-encre/10 bg-white/70 shadow-[0_1px_0_rgba(28,27,25,0.04)];
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
   }
-  .chip {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  body {
+    /* Papier patron : quadrillage fin + repère tous les 5 carreaux */
+    background-color: #f7f7f4;
+    background-image: linear-gradient(rgba(111, 127, 166, 0.16) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(111, 127, 166, 0.16) 1px, transparent 1px),
+      linear-gradient(rgba(111, 127, 166, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(111, 127, 166, 0.08) 1px, transparent 1px);
+    background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  }
+  :focus-visible {
+    outline: 2px dashed #d9822b;
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Titres « étiquette de travail » : Archivo en largeur étendue */
+  .display {
+    font-stretch: 125%;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+  }
+  .etendu {
+    font-stretch: 112%;
+  }
+  .serre {
+    font-stretch: 80%;
+  }
+
+  /* Surpiqûre : pointillé couleur fil, légèrement en retrait du bord */
+  .surpiqure {
+    position: relative;
+  }
+  .surpiqure::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border: 1.5px dashed rgba(217, 130, 43, 0.85);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  /* Étiquette tissée (onglets, logo) */
+  .tissee {
+    @apply relative inline-flex items-center bg-denim px-4 py-2 text-[#F4EFE6] shadow-etiquette;
+    background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 3px);
+  }
+
+  /* Étiquette de composition (fiche d'analyse) */
+  .compo {
+    @apply relative bg-white font-mono text-[13px] text-encre shadow-etiquette;
+    background-image: repeating-linear-gradient(0deg, rgba(19, 26, 43, 0.025) 0 1px, transparent 1px 4px);
+  }
+
+  /* Ligne de découpe « couper ici » */
+  .decoupe {
+    background-image: linear-gradient(90deg, #5b6479 55%, transparent 45%);
+    background-size: 10px 1.5px;
+    background-repeat: repeat-x;
+    height: 1.5px;
+  }
+
+  .puce {
+    @apply inline-flex items-center gap-1 whitespace-nowrap rounded-[3px] px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide;
+  }
+}
+
+/* L'intro fermeture éclair ne se rejoue pas dans la même session, ni si on préfère moins d'animations */
+html[data-intro="skip"] #intro-zip {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  #intro-zip {
+    display: none;
   }
 }

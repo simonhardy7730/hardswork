@@ -22,13 +22,20 @@ npm run dev                  # http://localhost:3100
 ## Organisation du code
 
 ```
-app/page.tsx          Interface : envoi de photo, choix du mode, résultats notés
-app/api/find/route.ts API : analyse → recherche → notation
-lib/analyze.ts        Analyse de la photo par Claude (sortie structurée)
-lib/search.ts         Recherche Google Shopping (SerpApi)
-lib/score.ts          Notes qualité / prix / globale et alertes
-lib/retailers.ts      Base de confiance des vendeurs (officiel, agréé, seconde main…)
-lib/demo.ts           Données d'exemple du mode démo
+app/page.tsx                 En-tête, onglets, alertes et vestiaire
+app/api/analyze/route.ts     Étape 1 : la photo → ce qu'on voit (marque proposée…)
+app/api/search/route.ts      Étape 2 : marque confirmée → recherche → notation
+components/ZipperIntro.tsx   L'intro « veste qui s'ouvre » (canvas)
+components/SearchFlow.tsx    Parcours Photo → Marque → Résultats
+components/Results.tsx       Étiquette de composition + étiquettes de prix
+components/AlertsPanel.tsx   Onglet « Mes alertes »
+components/Wardrobe.tsx      Onglet « Mon vestiaire »
+lib/storage.ts               Alertes et vestiaire (stockés dans le navigateur)
+lib/analyze.ts               Analyse de la photo par Claude (sortie structurée)
+lib/search.ts                Recherche Google Shopping (SerpApi)
+lib/score.ts                 Notes qualité / prix / globale et alertes
+lib/retailers.ts             Base de confiance des vendeurs (officiel, agréé, seconde main…)
+lib/demo.ts                  Données d'exemple du mode démo
 ```
 
 ## Déplacer vers son propre dépôt

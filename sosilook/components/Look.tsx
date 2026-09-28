@@ -2,7 +2,7 @@
 
 import type { GarmentAnalysis, Mode, SearchResponse } from "@/lib/types";
 import { BRAND_STORES } from "@/lib/retailers";
-import { TRUST_STYLE, UNIVERSE_LABEL, euros } from "./ui";
+import { ImpactBadge, TRUST_STYLE, UNIVERSE_LABEL, euros } from "./ui";
 
 export interface LookChoice {
   include: boolean;
@@ -340,6 +340,9 @@ export function LookResults({
                           <li key={o.id} className="flex items-center gap-3 py-2 text-sm">
                             <span className="min-w-0 flex-1">
                               {k === 0 && <span className="puce mr-1.5 bg-fil text-white">Notre choix</span>}
+                              <span className="mr-1.5 align-middle">
+                                <ImpactBadge impact={o.impact} compact />
+                              </span>
                               <span className="font-semibold">{o.seller}</span>{" "}
                               <span className={`puce ml-1 align-middle ${TRUST_STYLE[o.trust]}`}>{o.trustLabel}</span>
                               <span className="block truncate text-xs text-craie">{o.title}</span>

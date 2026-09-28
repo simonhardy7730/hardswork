@@ -41,6 +41,29 @@ export function NotrePromesse() {
           ))}
         </ul>
 
+        <h2 className="etendu mt-10 text-lg font-bold">La lettre impact, de A à E</h2>
+        <p className="mt-2 text-sm text-encre/75">
+          D&apos;où vient la pièce, en quoi elle est faite, combien de temps elle durera. Pour l&apos;instant, c&apos;est
+          une <strong className="text-encre">estimation</strong>, et le détail est toujours affiché sous l&apos;offre.
+        </p>
+        <ul className="mt-3 space-y-1.5 text-sm text-encre/75">
+          {[
+            ["+", "Seconde main : c'est ce qui a le moins d'impact"],
+            ["+", "Matière recyclée, bio, lin ou chanvre ; fabrication européenne ; pièce durable"],
+            ["−", "Fibres synthétiques (microplastiques), plastique ou simili-cuir"],
+            ["−", "Ultra fast fashion, pièce de qualité faible"],
+          ].map(([sign, text]) => (
+            <li key={text} className="grid grid-cols-[16px_1fr] gap-2">
+              <span className={`font-mono font-bold ${sign === "+" ? "text-ok" : "text-alerte"}`}>{sign}</span>
+              {text}
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 text-xs text-craie">
+          Bientôt : les pays de tissage, teinture et confection publiés par les marques (loi AGEC) et le coût
+          environnemental officiel quand il existe.
+        </p>
+
         <h2 className="etendu mt-10 text-lg font-bold">Comment on note une offre</h2>
         <dl className="mt-4 space-y-3 text-sm">
           {[

@@ -2,9 +2,9 @@
 
 import { useMemo, useState } from "react";
 import type { ScoredOffer, SearchResponse } from "@/lib/types";
-import { Cloche, Jauge, TRUST_STYLE, UNIVERSE_LABEL, euros } from "./ui";
+import { Cloche, ImpactBadge, Jauge, TRUST_STYLE, UNIVERSE_LABEL, euros } from "./ui";
 
-type SortKey = "overall" | "price" | "quality";
+type SortKey = "overall" | "price" | "quality" | "impact";
 
 export function Results({
   result,
@@ -31,6 +31,7 @@ export function Results({
     const list = result.offers.filter((o) => o.price == null || o.price <= budget);
     if (sort === "price") list.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
     if (sort === "quality") list.sort((a, b) => b.quality - a.quality);
+    if (sort === "impact") list.sort((a, b) => b.impact.points - a.impact.points);
     return list;
   }, [result, sort, budget]);
 
@@ -100,6 +101,7 @@ export function Results({
                   ["overall", "Recommandé"],
                   ["price", "Prix"],
                   ["quality", "Qualité"],
+                  ["impact", "Impact"],
                 ] as const
               ).map(([k, l]) => (
                 <button
@@ -216,15 +218,27 @@ function PriceTag({ offer: o, rank }: { offer: ScoredOffer; rank: number }) {
             {o.secondHand && <span className="puce bg-patron-carton text-craie">Seconde main</span>}
           </div>
           <p className="mt-1 line-clamp-2 text-sm text-encre/75">{o.title}</p>
+          <div className="mt-2">
+            <ImpactBadge impact={o.impact} />
+          </div>
           <div className="mt-3 space-y-1">
             <Jauge label="Note" value={o.overall} fort />
             <Jauge label="Qualité" value={o.quality} />
             <Jauge label="Prix" value={o.priceScore} />
           </div>
           <details className="mt-2 text-xs text-craie">
-            <summary className="cursor-pointer select-none hover:text-encre">Le détail de la note</summary>
-            <ul className="mt-1.5 space-y-0.5 pl-1">
+            <summary className="cursor-pointer select-none hover:text-encre">Le détail des notes</summary>
+            <p className="mt-1.5 font-mono text-[10px] uppercase tracking-wider text-encre/70">Qualité</p>
+            <ul className="mt-0.5 space-y-0.5 pl-1">
               {o.qualityReasons.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+            </ul>
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-wider text-encre/70">
+              Impact {o.impact.grade} · estimation
+            </p>
+            <ul className="mt-0.5 space-y-0.5 pl-1">
+              {o.impact.reasons.map((r) => (
                 <li key={r}>{r}</li>
               ))}
             </ul>

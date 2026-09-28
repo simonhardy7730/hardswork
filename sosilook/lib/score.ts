@@ -1,5 +1,6 @@
 import type { GarmentAnalysis, Mode, Offer, ScoredOffer } from "./types";
 import { classifySeller, TRUST_LABELS, TRUST_POINTS, VALUE_BRANDS } from "./retailers";
+import { estimateImpact } from "./impact";
 
 /**
  * Note qualité (0-10) à partir d'indices vérifiables dans l'annonce.
@@ -120,6 +121,8 @@ export function scoreOffers(offers: Offer[], analysis: GarmentAnalysis, mode: Mo
       overall: round1(overall - (warnings.length ? 1.5 : 0)),
       savingsPct,
       warnings,
+      // En mode exact, c'est la même pièce : la matière repérée sur la photo s'applique.
+      impact: estimateImpact(offer, tier, quality, mode === "exact" ? analysis.material_guess : ""),
     };
   });
 

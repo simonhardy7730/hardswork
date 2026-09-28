@@ -1,4 +1,4 @@
-import type { TrustTier } from "@/lib/types";
+import type { Impact, ImpactGrade, TrustTier } from "@/lib/types";
 
 export const euros = (n: number | null | undefined) =>
   n == null ? "—" : n.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
@@ -90,5 +90,44 @@ export function Jauge({ label, value, fort }: { label: string; value: number; fo
         {value.toFixed(1)}
       </span>
     </div>
+  );
+}
+
+const GRADE_STYLE: Record<ImpactGrade, string> = {
+  A: "bg-[#1E7A4C] text-white",
+  B: "bg-[#78A83A] text-white",
+  C: "bg-[#E2B324] text-encre",
+  D: "bg-[#E07B2A] text-white",
+  E: "bg-[#C23B22] text-white",
+};
+
+/** Pastille de la lettre impact : les cinq lettres, celle de l'offre ressortie. */
+export function ImpactBadge({ impact, compact }: { impact: Impact; compact?: boolean }) {
+  if (compact) {
+    return (
+      <span
+        title={`Impact estimé ${impact.grade}`}
+        className={`inline-grid h-5 w-5 place-items-center rounded-[3px] font-mono text-[11px] font-bold ${GRADE_STYLE[impact.grade]}`}
+      >
+        {impact.grade}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5" title="Lettre impact estimée">
+      <span className="font-mono text-[10px] uppercase tracking-wider text-craie">Impact</span>
+      <span className="inline-flex overflow-hidden rounded-[3px] ring-1 ring-encre/10">
+        {(["A", "B", "C", "D", "E"] as const).map((g) => (
+          <span
+            key={g}
+            className={`grid place-items-center font-mono font-bold ${
+              g === impact.grade ? `h-6 w-6 text-[12px] ${GRADE_STYLE[g]}` : "h-6 w-4 bg-patron-carton text-[9px] text-craie/60"
+            }`}
+          >
+            {g}
+          </span>
+        ))}
+      </span>
+    </span>
   );
 }

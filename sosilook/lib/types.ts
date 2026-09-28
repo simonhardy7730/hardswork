@@ -86,6 +86,15 @@ export interface Offer {
   origin: Mode;
 }
 
+export type ImpactGrade = "A" | "B" | "C" | "D" | "E";
+
+/** Lettre impact estimée (le « Yuka de la mode ») : d'où vient la pièce, en quoi elle est faite. */
+export interface Impact {
+  grade: ImpactGrade;
+  points: number; // 0-100
+  reasons: string[];
+}
+
 export interface ScoredOffer extends Offer {
   trust: TrustTier;
   trustLabel: string;
@@ -94,6 +103,7 @@ export interface ScoredOffer extends Offer {
   priceScore: number; // 0-10, 10 = le moins cher du lot
   overall: number; // 0-10
   savingsPct: number | null; // vs prix boutique estimé
+  impact: Impact;
   warnings: string[];
 }
 

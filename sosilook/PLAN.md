@@ -61,6 +61,14 @@ désactivée pour les personnes qui préfèrent moins d'animations, bouton « En
    ou répond « je ne connais pas la marque ». Puis il choisit : **la pièce exacte au meilleur prix** ou **son sosie, moins cher**.
 3. **Résultats** notés, triables (recommandé, prix, qualité), avec un **curseur de budget**.
 
+**Le look complet** : sur la photo d'une personne, le site repère chaque pièce de la tête aux pieds
+(lunettes, veste, chemise, pantalon, montre, sac, chaussures…) et plante une épingle numérotée sur chacune.
+Pour chaque pièce : marque proposée à confirmer ou corriger, choix « exacte » ou « sosie » (ou tout d'un coup),
+case à décocher pour ignorer une pièce. Toutes les pièces sont cherchées en parallèle, puis le look est recomposé :
+notre choix pour chaque pièce (la mieux notée chez un vendeur sûr), 3 offres par pièce, et le total du look
+comparé aux prix boutique. Chaque pièce s'ouvre sur toutes ses offres, avec l'alerte promo.
+Coût : une seule analyse de photo pour tout le look, mais une recherche par pièce.
+
 **Les onglets**
 - **Chercher** : le parcours ci-dessus.
 - **Mes alertes** : un bouton « M'alerter d'une promo » sur chaque recherche. Prix de départ, prix du jour,
@@ -79,7 +87,8 @@ désactivée pour les personnes qui préfèrent moins d'animations, bouton « En
 
 ### 3.2 Idées pour la suite (classées par impact)
 1. **Plusieurs pièces sur une photo** : on encadre chaque pièce, l'utilisateur touche celle qu'il veut.
-2. **Le look complet** : une photo de tenue → toutes les pièces d'un coup, avec le total (« ce look : 140 € au lieu de 980 € »).
+2. **La lettre impact (le « Yuka de la mode »)** : une lettre de A à E par offre, pour savoir d'où vient la pièce
+   et ce qu'elle coûte à la planète. Voir la section 3.5.
 3. **Carte à partager** (format story) : « Trouvé sur Sosilook : −72 % ». Le meilleur moteur de bouche-à-oreille.
 4. **Historique des prix** en courbe : savoir si une « promo » en est vraiment une.
 5. **Mes tailles** (taille, pointure, tour de poignet) pour ne montrer que ce qui est disponible, et alerte « retour en stock ».
@@ -111,7 +120,27 @@ désactivée pour les personnes qui préfèrent moins d'animations, bouton « En
 - Version installable (PWA) avec appareil photo direct. L'appli native seulement si les chiffres le justifient.
 - Ouverture Belgique, Suisse, puis Espagne et Italie.
 
-### 3.4 Technique
+### 3.5 La lettre impact : le « Yuka de la mode »
+Une lettre de A à E sur chaque offre, à côté du prix et de la qualité. Très bonne idée, et le moment est idéal :
+- **La loi AGEC** oblige depuis 2023 les grandes marques à indiquer sur la fiche produit les pays de tissage,
+  de teinture et de confection, la part de matière recyclée et le relargage de microplastiques.
+- **Le coût environnemental officiel** (méthode Écobalyse de l'ADEME) peut être affiché par les marques depuis
+  octobre 2025, et près de 100 marques l'ont déjà adopté. Une base publique existe sur beta.gouv.
+- **Clear Fashion** fait déjà un « Fashion Score » (appli de scan, environ 500 marques notées). C'est un partenaire
+  possible plus qu'un concurrent : eux notent la pièce, nous trouvons où l'acheter moins cher.
+
+Ce qui nous différencie : la lettre apparaît **au moment du choix**, entre la pièce originale et ses sosies,
+et la seconde main est mise en avant (réutiliser une pièce est ce qui a le moins d'impact).
+
+Proposition en deux temps :
+1. **Version estimée** (rapide) : seconde main, matière (naturelle, recyclée ou synthétique), durabilité
+   (notre note qualité), fabrication européenne quand elle est indiquée. Toujours marquée « estimation ».
+2. **Version officielle** : lecture de la fiche produit (pays AGEC), coût environnemental Écobalyse quand il existe,
+   voire partenariat avec Clear Fashion.
+
+Point de vigilance : une lettre mal fondée ferait perdre la confiance. On affiche toujours d'où vient la note.
+
+### 3.6 Technique
 
 | Brique | Choix | Pourquoi |
 |---|---|---|

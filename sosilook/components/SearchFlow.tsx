@@ -5,11 +5,12 @@ import type { AnalyzeResponse, GarmentAnalysis, Mode, SearchResponse } from "@/l
 import { BRAND_STORES } from "@/lib/retailers";
 import { Ciseaux, MetreRuban, UNIVERSE_LABEL } from "./ui";
 import { Results } from "./Results";
+import { LookResults, LookSetup, initialChoices, type LookChoice, type LookResult } from "./Look";
 
-type Step = "photo" | "marque" | "resultats";
+type Step = "photo" | "marque" | "resultats" | "look" | "look-resultats";
 
 /** Réduit la photo côté navigateur (max 1280 px) pour un envoi rapide. */
-async function toResizedDataUrl(file: File): Promise<string> {
+async function toResizedDataUrl(file: File): Promise<{ dataUrl: string; portrait: boolean }> {
   const url = URL.createObjectURL(file);
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -23,7 +24,7 @@ async function toResizedDataUrl(file: File): Promise<string> {
     canvas.width = Math.round(img.width * scale);
     canvas.height = Math.round(img.height * scale);
     canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", 0.85);
+    return { dataUrl: canvas.toDataURL("image/jpeg", 0.85), portrait: img.height > img.width * 1.15 };
   } finally {
     URL.revokeObjectURL(url);
   }
@@ -59,6 +60,12 @@ export function SearchFlow({
   const [image, setImage] = useState<string | null>(null);
   const [hint, setHint] = useState("");
   const [analysis, setAnalysis] = useState<GarmentAnalysis | null>(null);
+  // Tenue complète : toutes les pièces repérées, les choix par pièce et les résultats par pièce
+  const [items, setItems] = useState<GarmentAnalysis[]>([]);
+  const [isOutfit, setIsOutfit] = useState(false);
+  const [choices, setChoices] = useState<LookChoice[]>([]);
+  const [lookResults, setLookResults] = useState<LookResult[]>([]);
+  const [openItem, setOpenItem] = useState<number | null>(null);
   const [demoAnalysis, setDemoAnalysis] = useState(false);
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -74,6 +81,7 @@ export function SearchFlow({
   useEffect(() => {
     if (!reopen) return;
     setImage(reopen.image);
+    setIsOutfit(false);
     setAnalysis(reopen.result.analysis);
     setBrand(reopen.result.analysis.brand.name ?? "");
     setModel(reopen.result.analysis.model_guess ?? "");
@@ -92,25 +100,38 @@ export function SearchFlow({
     }
     setError(null);
     try {
-      const dataUrl = await toResizedDataUrl(file);
+      const { dataUrl, portrait } = await toResizedDataUrl(file);
       setImage(dataUrl);
-      await analyse(dataUrl);
+      await analyse(dataUrl, portrait);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Impossible de lire cette image.");
     }
   }
 
-  async function analyse(dataUrl = image) {
-    if (!dataUrl) return;
+  async function analyse(dataUrl: string, portrait: boolean) {
     setBusy("analyse");
     setError(null);
     try {
-      const res = await postJson<AnalyzeResponse>("/api/analyze", { image: dataUrl, hint: hint.trim() || undefined });
-      setAnalysis(res.analysis);
+      const res = await postJson<AnalyzeResponse>("/api/analyze", {
+        image: dataUrl,
+        hint: hint.trim() || undefined,
+        portrait, // ne sert qu'au mode démo
+      });
       setDemoAnalysis(res.demo);
-      setBrand(res.analysis.brand.name ?? "");
-      setModel(res.analysis.model_guess ?? "");
-      setStep("marque");
+      setItems(res.items);
+      setIsOutfit(res.isOutfit);
+      if (res.isOutfit) {
+        setChoices(initialChoices(res.items));
+        setLookResults([]);
+        setOpenItem(null);
+        setStep("look");
+      } else {
+        const first = res.items[0];
+        setAnalysis(first);
+        setBrand(first.brand.name ?? "");
+        setModel(first.model_guess ?? "");
+        setStep("marque");
+      }
       scrollTop();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erreur inattendue.");
@@ -142,22 +163,69 @@ export function SearchFlow({
     }
   }
 
+  /** Cherche toutes les pièces cochées du look, 3 à la fois, en affichant les résultats au fil de l'eau. */
+  async function searchLook() {
+    const todo = choices.map((c, i) => (c.include ? i : -1)).filter((i) => i >= 0);
+    const next: LookResult[] = items.map(() => null);
+    setLookResults([...next]);
+    setOpenItem(null);
+    setBusy("style");
+    setError(null);
+    setStep("look-resultats");
+    scrollTop();
+
+    const run = async (i: number) => {
+      const c = choices[i];
+      try {
+        const res = await postJson<SearchResponse>("/api/search", {
+          analysis: items[i],
+          mode: c.mode,
+          brand: c.brand.trim() || null,
+          model: c.model.trim() || null,
+        });
+        next[i] = res;
+        if (image) onSearched(res, image);
+      } catch (e) {
+        next[i] = { error: e instanceof Error ? e.message : "Recherche impossible pour cette pièce." };
+      }
+      setLookResults([...next]);
+    };
+    const queue = [...todo];
+    await Promise.all(
+      Array.from({ length: Math.min(3, queue.length) }, async () => {
+        while (queue.length) await run(queue.shift()!);
+      }),
+    );
+    setBusy(null);
+  }
+
   function restart() {
     setStep("photo");
     setImage(null);
     setAnalysis(null);
+    setItems([]);
+    setIsOutfit(false);
+    setLookResults([]);
+    setOpenItem(null);
     setResult(null);
     setHint("");
     setError(null);
     scrollTop();
   }
 
-  const steps: Array<[Step, string]> = [
-    ["photo", "Photo"],
-    ["marque", "Marque"],
-    ["resultats", "Résultats"],
-  ];
+  const steps: Array<[Step, string]> = isOutfit
+    ? [
+        ["photo", "Photo"],
+        ["look", "Le look"],
+        ["look-resultats", "Résultats"],
+      ]
+    : [
+        ["photo", "Photo"],
+        ["marque", "Marque"],
+        ["resultats", "Résultats"],
+      ];
   const stepIndex = steps.findIndex(([s]) => s === step);
+  const openResult = openItem != null ? lookResults[openItem] : null;
 
   return (
     <div ref={top} className="scroll-mt-24">
@@ -165,7 +233,7 @@ export function SearchFlow({
       <ol className="mb-8 flex items-center gap-0 font-mono text-[11px] uppercase tracking-[0.14em]">
         {steps.map(([s, label], i) => {
           const reached = i <= stepIndex;
-          const clickable = i < stepIndex && !(s === "marque" && !analysis);
+          const clickable = i < stepIndex && !(s === "marque" && !analysis) && !(s === "look" && busy !== null);
           return (
             <li key={s} className="flex items-center">
               {i > 0 && (
@@ -177,7 +245,11 @@ export function SearchFlow({
               <button
                 type="button"
                 disabled={!clickable}
-                onClick={() => (s === "photo" ? restart() : setStep(s))}
+                onClick={() => {
+                  setOpenItem(null);
+                  if (s === "photo") restart();
+                  else setStep(s);
+                }}
                 className={`flex items-center gap-2 ${reached ? "text-encre" : "text-craie/70"} ${clickable ? "hover:text-fil-fonce" : ""}`}
                 aria-current={s === step ? "step" : undefined}
               >
@@ -208,6 +280,10 @@ export function SearchFlow({
               Une veste croisée dans la rue, une montre sur une photo, un sac dans une vidéo. Montre-la nous :
               on retrouve <strong className="font-semibold text-encre">la pièce exacte au meilleur prix</strong>, chez
               des vendeurs sûrs, ou <strong className="font-semibold text-encre">son sosie</strong> pour beaucoup moins.
+            </p>
+            <p className="mt-4 max-w-[52ch] border-l-2 border-fil pl-3 text-[15px] text-encre/80">
+              <strong className="font-semibold text-encre">Une tenue entière te plaît ?</strong> Envoie la photo de la
+              personne : on repère chaque pièce, de la tête aux pieds, et on te recompose le look.
             </p>
             <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs uppercase tracking-wider text-craie">
               {["Vêtements", "Chaussures", "Sacs & sacoches", "Montres", "Bijoux", "Lunettes"].map((u) => (
@@ -258,7 +334,7 @@ export function SearchFlow({
               {busy === "analyse" && (
                 <span className="absolute inset-x-0 bottom-0 bg-denim px-4 py-3 text-left font-mono text-xs uppercase tracking-wider text-[#F4EFE6]">
                   <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-fil align-middle" />
-                  On examine la pièce : marque, matière, coupe…
+                  On examine la photo : pièces, marques, matières…
                 </span>
               )}
             </button>
@@ -276,7 +352,7 @@ export function SearchFlow({
               id="hint"
               value={hint}
               onChange={(e) => setHint(e.target.value)}
-              placeholder="« la montre, pas le pull », « le sac noir à gauche »…"
+              placeholder="« juste la veste », « la montre, pas le pull »…"
               className="mt-2 w-full border-b-[1.5px] border-encre/20 bg-transparent py-2 text-[15px] outline-none placeholder:text-craie/60 focus:border-fil"
             />
             {error && <p className="mt-4 border-l-2 border-alerte pl-3 text-sm text-alerte">{error}</p>}
@@ -297,6 +373,53 @@ export function SearchFlow({
           error={error}
           onSearch={search}
           onRestart={restart}
+        />
+      )}
+
+      {step === "look" && (
+        <LookSetup
+          image={image}
+          items={items}
+          choices={choices}
+          setChoices={setChoices}
+          demo={demoAnalysis}
+          busy={busy !== null}
+          error={error}
+          onSearch={searchLook}
+          onRestart={restart}
+        />
+      )}
+
+      {step === "look-resultats" && openItem == null && (
+        <LookResults
+          image={image}
+          items={items}
+          choices={choices}
+          results={lookResults}
+          onOpen={(i) => {
+            setOpenItem(i);
+            scrollTop();
+          }}
+          onEdit={() => setStep("look")}
+          onRestart={restart}
+        />
+      )}
+
+      {step === "look-resultats" && openResult && "offers" in openResult && (
+        <Results
+          key={`look-${openItem}`}
+          result={openResult}
+          image={image}
+          backLabel="← Retour au look"
+          onRestart={() => {
+            setOpenItem(null);
+            scrollTop();
+          }}
+          onEditBrand={() => {
+            setOpenItem(null);
+            setStep("look");
+          }}
+          onCreateAlert={() => onCreateAlert(openResult, image)}
         />
       )}
 

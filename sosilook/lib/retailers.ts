@@ -90,6 +90,7 @@ export const BRAND_STORES = [
   "the kooples", "ami paris", "de fursac", "ba&sh", "claudie pierlot", "gant", "hugo boss", "boss",
   "polo ralph lauren", "fossil", "swatch", "casio", "daniel wellington", "pandora", "swarovski", "apm monaco",
   "michael kors", "coach", "furla", "fred perry", "nike", "adidas", "veja", "new balance",
+  "bexley", "minelli", "paraboot", "heschung", "j.m. weston", "sebago", "church's",
 ];
 
 /** Plateformes où la contrefaçon est fréquente pour les pièces de marque. */

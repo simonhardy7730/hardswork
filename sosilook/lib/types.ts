@@ -2,11 +2,11 @@ import { z } from "zod";
 
 export type Mode = "exact" | "style";
 
-/** Ce que Claude voit sur la photo. */
+/** Une pièce repérée sur la photo. */
 export const GarmentAnalysisSchema = z.object({
-  is_fashion_item: z
-    .boolean()
-    .describe("true si la photo montre bien un article de mode (vêtement, chaussures, sac, montre, bijou, lunettes, accessoire)"),
+  pin: z
+    .object({ x: z.number(), y: z.number() })
+    .describe("Centre approximatif de la pièce sur la photo, en fraction de 0 à 1 depuis le coin haut-gauche (x vers la droite, y vers le bas)"),
   universe: z
     .enum(["vetement", "chaussures", "sac", "montre", "bijou", "lunettes", "accessoire"])
     .describe("Univers de l'article"),
@@ -49,6 +49,21 @@ export const GarmentAnalysisSchema = z.object({
 
 export type GarmentAnalysis = z.infer<typeof GarmentAnalysisSchema>;
 
+/** Toute la photo : une seule pièce (photo produit) ou une tenue complète. */
+export const PhotoAnalysisSchema = z.object({
+  contains_fashion: z
+    .boolean()
+    .describe("true si la photo montre au moins un article de mode (vêtement, chaussures, sac, montre, bijou, lunettes, accessoire)"),
+  is_outfit: z
+    .boolean()
+    .describe("true si la photo montre une personne ou une tenue avec plusieurs pièces à retrouver"),
+  items: z
+    .array(GarmentAnalysisSchema)
+    .describe("Chaque pièce identifiable, de la tête aux pieds (8 au maximum). Une seule pièce pour une photo produit."),
+});
+
+export type PhotoAnalysis = z.infer<typeof PhotoAnalysisSchema>;
+
 export type TrustTier =
   | "officiel" // site de la marque
   | "agree" // revendeur agréé / grand magasin
@@ -83,7 +98,8 @@ export interface ScoredOffer extends Offer {
 }
 
 export interface AnalyzeResponse {
-  analysis: GarmentAnalysis;
+  items: GarmentAnalysis[];
+  isOutfit: boolean;
   demo: boolean;
 }
 

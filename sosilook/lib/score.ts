@@ -35,6 +35,7 @@ const MATERIAL_SIGNALS: Array<{ re: RegExp; pts: number; label: string }> = [
   // Signaux négatifs
   { re: /polyester|acrylique|acrylic/i, pts: -1.5, label: "Contient des fibres synthétiques" },
   { re: /\bpu\b|simili|faux leather/i, pts: -1, label: "Simili-cuir" },
+  { re: /plastique|plastic|r[ée]sine/i, pts: -1, label: "Plastique" },
 ];
 
 
@@ -82,10 +83,15 @@ export function scoreOffers(offers: Offer[], analysis: GarmentAnalysis, mode: Mo
     const { score: quality, reasons } = qualityOf(offer);
     const warnings: string[] = [];
 
+    // Avec un prix boutique connu, on note l'économie réelle ; sinon, la position parmi les offres trouvées.
     const priceScore =
-      offer.price == null || prices.length < 2 || maxP === minP
+      offer.price == null
         ? 5
-        : 10 - ((offer.price - minP) / (maxP - minP)) * 10;
+        : retail
+          ? clamp((1 - offer.price / retail) * 10 + 1.5, 0, 10)
+          : prices.length < 2 || maxP === minP
+            ? 5
+            : 10 - ((offer.price - minP) / (maxP - minP)) * 10;
 
     const savingsPct = retail && offer.price ? Math.round((1 - offer.price / retail) * 100) : null;
 

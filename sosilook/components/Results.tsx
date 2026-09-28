@@ -12,9 +12,11 @@ export function Results({
   onRestart,
   onEditBrand,
   onCreateAlert,
+  backLabel = "← Nouvelle photo",
 }: {
   result: SearchResponse;
   image: string | null;
+  backLabel?: string;
   onRestart: () => void;
   onEditBrand: () => void;
   onCreateAlert: () => void;
@@ -54,7 +56,7 @@ export function Results({
           )}
           <CareLabel result={result} onEditBrand={onEditBrand} />
           <button type="button" onClick={onRestart} className="mt-4 w-full py-1 font-mono text-xs uppercase tracking-wider text-craie hover:text-fil-fonce">
-            ← Nouvelle photo
+            {backLabel}
           </button>
         </aside>
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { analyzeGarment } from "@/lib/analyze";
+import { analyzePhoto } from "@/lib/analyze";
 import type { AnalyzeResponse } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -9,9 +9,9 @@ const MEDIA_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as co
 type MediaType = (typeof MEDIA_TYPES)[number];
 const MAX_BASE64_CHARS = 7_000_000; // ≈ 5 Mo
 
-/** Étape 1 : la photo → ce qu'on voit (marque proposée, matière, requêtes…). */
+/** Étape 1 : la photo → la ou les pièces repérées (marque proposée, matière, requêtes…). */
 export async function POST(req: Request) {
-  let body: { image?: string; hint?: string };
+  let body: { image?: string; hint?: string; portrait?: boolean };
   try {
     body = await req.json();
   } catch {
@@ -27,17 +27,21 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { analysis, demo } = await analyzeGarment(
-      { mediaType: match[1] as MediaType, data: match[2] },
+    const { analysis, demo } = await analyzePhoto(
+      { mediaType: match[1] as MediaType, data: match[2], portrait: body.portrait === true },
       body.hint?.slice(0, 300),
     );
-    if (!analysis.is_fashion_item) {
+    if (!analysis.contains_fashion || analysis.items.length === 0) {
       return NextResponse.json(
         { error: "On ne voit pas d'article de mode sur cette photo. Essaie de cadrer la pièce." },
         { status: 422 },
       );
     }
-    return NextResponse.json({ analysis, demo } satisfies AnalyzeResponse);
+    return NextResponse.json({
+      items: analysis.items,
+      isOutfit: analysis.is_outfit && analysis.items.length > 1,
+      demo,
+    } satisfies AnalyzeResponse);
   } catch (err) {
     console.error(err);
     const message = err instanceof Error ? err.message : "Erreur inattendue.";

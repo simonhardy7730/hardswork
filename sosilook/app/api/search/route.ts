@@ -7,8 +7,13 @@ import { GarmentAnalysisSchema, type GarmentAnalysis, type Mode, type SearchResp
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+// L'épingle ne sert pas à la recherche (et manque dans les alertes créées avant son ajout).
+const ItemSchema = GarmentAnalysisSchema.extend({
+  pin: GarmentAnalysisSchema.shape.pin.optional(),
+});
+
 const BodySchema = z.object({
-  analysis: GarmentAnalysisSchema,
+  analysis: ItemSchema,
   mode: z.enum(["exact", "style"]),
   brand: z.string().trim().max(80).nullable(),
   model: z.string().trim().max(80).nullable(),
@@ -36,6 +41,7 @@ export async function POST(req: Request) {
   const corrected = !same(brand, original.brand.name) || !same(model, original.model_guess);
   const analysis: GarmentAnalysis = {
     ...original,
+    pin: original.pin ?? { x: 0.5, y: 0.5 },
     brand: { ...original.brand, name: brand, confidence: corrected && brand ? "haute" : original.brand.confidence },
     model_guess: model,
     exact_query: corrected

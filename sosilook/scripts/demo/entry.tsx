@@ -22,16 +22,37 @@ type ClaudeRuntime = { use: (name: string) => Promise<unknown> };
 
 const SCHEMA = JSON.stringify(z.toJSONSchema(PhotoAnalysisSchema));
 
-let samplePromise: Promise<SampleFn | null> | null = null;
-function getSample(): Promise<SampleFn | null> {
+const OPEN_IN_BROWSER = "Ouvre le lien dans un navigateur (Chrome ou Safari, sur claude.ai), connecté à ton compte Claude, puis réessaie.";
+
+/** La capacité « sample » avec images, ou la raison pour laquelle elle manque. */
+type SampleAccess = { sample: SampleFn; reason?: undefined } | { sample: null; reason: string };
+
+let accessPromise: Promise<SampleAccess> | null = null;
+function getSample(): Promise<SampleAccess> {
   const runtime = (window as unknown as { claude?: ClaudeRuntime }).claude;
-  if (!runtime) return Promise.resolve(null);
-  samplePromise ??= (runtime.use("sample") as Promise<SampleFn | null>).then(async (s) => {
-    if (!s) return null;
-    const limits = await s.limits().catch(() => null);
-    return limits?.images ? s : null;
-  });
-  return samplePromise;
+  if (!runtime) {
+    return Promise.resolve({ sample: null, reason: `La page est ouverte en dehors de Claude. ${OPEN_IN_BROWSER}` });
+  }
+  accessPromise ??= (runtime.use("sample") as Promise<SampleFn | null>)
+    .then(async (s): Promise<SampleAccess> => {
+      if (!s) {
+        return { sample: null, reason: `Cette application ne laisse pas encore la page utiliser Claude. ${OPEN_IN_BROWSER}` };
+      }
+      const limits = await s.limits().catch(() => null);
+      if (!limits?.images) {
+        return { sample: null, reason: `Cette application ne permet pas encore d'envoyer une photo à Claude depuis une page. ${OPEN_IN_BROWSER}` };
+      }
+      return { sample: s };
+    })
+    .catch(() => ({ sample: null, reason: `Claude n'a pas répondu. ${OPEN_IN_BROWSER}` }));
+  return accessPromise;
+}
+
+/** L'analyse d'exemple, avec la raison affichée à l'utilisateur. */
+async function exampleWithNotice(req: Request, notice: string): Promise<Response> {
+  const res = await analyzeDemo(req);
+  if (!res.ok) return res;
+  return json({ ...((await res.json()) as AnalyzeResponse), notice });
 }
 
 function dataUrlToBlob(dataUrl: string): Blob {
@@ -45,8 +66,10 @@ const json = (body: unknown, status = 200) => Response.json(body, { status });
 
 async function analyze(req: Request): Promise<Response> {
   const body = (await req.clone().json()) as { image?: string; hint?: string };
-  const sample = await getSample();
-  if (!sample || !body.image) return analyzeDemo(req);
+  const access = await getSample();
+  if (!access.sample) return exampleWithNotice(req, access.reason);
+  const sample = access.sample;
+  if (!body.image) return analyzeDemo(req);
 
   const prompt = `${SYSTEM_PROMPT}
 
@@ -72,9 +95,15 @@ ${SCHEMA}`;
     } satisfies AnalyzeResponse);
   } catch (e) {
     const code = (e as { code?: string })?.code;
-    // Pas d'autorisation, ou Claude indisponible dans cette vue : on montre l'exemple.
-    if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed", "images_unavailable"].includes(code ?? "")) {
-      return analyzeDemo(req);
+    // Pas d'autorisation, ou Claude indisponible dans cette vue : on montre l'exemple, en disant pourquoi.
+    if (code === "not_granted") {
+      return exampleWithNotice(req, "L'autorisation d'utiliser Claude n'a pas été donnée. Recharge la page, envoie une photo et accepte la demande d'autorisation.");
+    }
+    if (code === "sampling_disabled") {
+      return exampleWithNotice(req, "Claude n'est pas disponible pour les pages publiées sur ton compte (ou ton organisation).");
+    }
+    if (["not_declared", "capability_disabled", "capability_removed", "images_unavailable"].includes(code ?? "")) {
+      return exampleWithNotice(req, `Cette vue ne permet pas d'envoyer une photo à Claude. ${OPEN_IN_BROWSER}`);
     }
     const messages: Record<string, string> = {
       rate_limited: "Trop de photos d'un coup : attends un peu avant de réessayer.",

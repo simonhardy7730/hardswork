@@ -111,6 +111,8 @@ export interface AnalyzeResponse {
   items: GarmentAnalysis[];
   isOutfit: boolean;
   demo: boolean;
+  /** Pourquoi l'analyse est un exemple (affiché à l'utilisateur). */
+  notice?: string;
 }
 
 export interface SearchRequest {

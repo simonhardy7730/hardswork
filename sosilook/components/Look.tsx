@@ -2,7 +2,7 @@
 
 import type { GarmentAnalysis, Mode, SearchResponse } from "@/lib/types";
 import { BRAND_STORES } from "@/lib/retailers";
-import { ImpactBadge, TRUST_STYLE, UNIVERSE_LABEL, euros } from "./ui";
+import { DemoNotice, ImpactBadge, TRUST_STYLE, UNIVERSE_LABEL, euros } from "./ui";
 
 export interface LookChoice {
   include: boolean;
@@ -76,6 +76,7 @@ export function LookSetup({
   choices,
   setChoices,
   demo,
+  demoNotice,
   busy,
   error,
   onSearch,
@@ -86,6 +87,7 @@ export function LookSetup({
   choices: LookChoice[];
   setChoices: (c: LookChoice[]) => void;
   demo: boolean;
+  demoNotice?: string;
   busy: boolean;
   error: string | null;
   onSearch: () => void;
@@ -107,11 +109,7 @@ export function LookSetup({
       </div>
 
       <div>
-        {demo && (
-          <p className="mb-5 inline-block bg-fil-clair px-3 py-1.5 font-mono text-xs text-fil-fonce">
-            Mode démo : tenue d&apos;exemple (clé Anthropic non configurée).
-          </p>
-        )}
+        {demo && <DemoNotice notice={demoNotice} what="tenue d'exemple" />}
         <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-fil-fonce">Le look complet</p>
         <h2 className="display mt-1 text-3xl !leading-[1.04] text-denim sm:text-[44px]">
           {items.length} pièces repérées

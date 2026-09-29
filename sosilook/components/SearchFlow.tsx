@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { AnalyzeResponse, GarmentAnalysis, Mode, SearchResponse } from "@/lib/types";
 import { BRAND_STORES } from "@/lib/retailers";
-import { Ciseaux, MetreRuban, UNIVERSE_LABEL } from "./ui";
+import { Ciseaux, DemoNotice, MetreRuban, UNIVERSE_LABEL } from "./ui";
 import { Results } from "./Results";
 import { LookResults, LookSetup, initialChoices, type LookChoice, type LookResult } from "./Look";
 
@@ -67,6 +67,7 @@ export function SearchFlow({
   const [lookResults, setLookResults] = useState<LookResult[]>([]);
   const [openItem, setOpenItem] = useState<number | null>(null);
   const [demoAnalysis, setDemoAnalysis] = useState(false);
+  const [demoNotice, setDemoNotice] = useState<string | undefined>(undefined);
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [result, setResult] = useState<SearchResponse | null>(null);
@@ -118,6 +119,7 @@ export function SearchFlow({
         portrait, // ne sert qu'au mode démo
       });
       setDemoAnalysis(res.demo);
+      setDemoNotice(res.notice);
       setItems(res.items);
       setIsOutfit(res.isOutfit);
       if (res.isOutfit) {
@@ -365,6 +367,7 @@ export function SearchFlow({
           image={image}
           analysis={analysis}
           demo={demoAnalysis}
+          demoNotice={demoNotice}
           brand={brand}
           setBrand={setBrand}
           model={model}
@@ -383,6 +386,7 @@ export function SearchFlow({
           choices={choices}
           setChoices={setChoices}
           demo={demoAnalysis}
+          demoNotice={demoNotice}
           busy={busy !== null}
           error={error}
           onSearch={searchLook}
@@ -441,6 +445,7 @@ function ConfirmBrand({
   image,
   analysis: a,
   demo,
+  demoNotice,
   brand,
   setBrand,
   model,
@@ -453,6 +458,7 @@ function ConfirmBrand({
   image: string | null;
   analysis: GarmentAnalysis;
   demo: boolean;
+  demoNotice?: string;
   brand: string;
   setBrand: (v: string) => void;
   model: string;
@@ -473,11 +479,7 @@ function ConfirmBrand({
       </div>
 
       <div>
-        {demo && (
-          <p className="mb-5 inline-block bg-fil-clair px-3 py-1.5 font-mono text-xs text-fil-fonce">
-            Mode démo : analyse d&apos;exemple (clé Anthropic non configurée).
-          </p>
-        )}
+        {demo && <DemoNotice notice={demoNotice} what="analyse d'exemple" />}
         <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-craie">
           {UNIVERSE_LABEL[a.universe] ?? a.universe} · {a.category}
         </p>
@@ -573,3 +575,4 @@ function ConfirmBrand({
     </div>
   );
 }
+

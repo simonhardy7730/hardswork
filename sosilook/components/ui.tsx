@@ -131,3 +131,20 @@ export function ImpactBadge({ impact, compact }: { impact: Impact; compact?: boo
     </span>
   );
 }
+
+/** Explique pourquoi l'analyse affichée est un exemple, et non celle de la photo. */
+export function DemoNotice({ notice, what }: { notice?: string; what: string }) {
+  if (!notice) {
+    return (
+      <p className="mb-5 inline-block bg-fil-clair px-3 py-1.5 font-mono text-xs text-fil-fonce">
+        Mode démo : {what} (clé Anthropic non configurée).
+      </p>
+    );
+  }
+  return (
+    <div className="mb-6 border-l-4 border-alerte bg-alerte/10 px-4 py-3 text-sm">
+      <p className="font-semibold text-alerte">Ta photo n&apos;a pas été analysée : ceci est un exemple.</p>
+      <p className="mt-1 text-encre/80">{notice}</p>
+    </div>
+  );
+}

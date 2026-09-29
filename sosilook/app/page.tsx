@@ -47,7 +47,7 @@ export default function Home() {
         const res = await fetch("/api/search", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ analysis: a.analysis, mode: a.mode, brand: a.brand, model: a.model }),
+          body: JSON.stringify({ analysis: a.analysis, mode: a.mode, brand: a.brand, model: a.model, gender: a.analysis.gender }),
         });
         if (res.ok) {
           const json = (await res.json()) as SearchResponse;

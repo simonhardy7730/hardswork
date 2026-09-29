@@ -1,14 +1,16 @@
 "use client";
 
-import type { GarmentAnalysis, Mode, SearchResponse } from "@/lib/types";
+import type { GarmentAnalysis, Gender, Mode, SearchResponse } from "@/lib/types";
+import { GENDER_LABEL } from "@/lib/gender";
 import { BRAND_STORES } from "@/lib/retailers";
-import { DemoNotice, ImpactBadge, TRUST_STYLE, UNIVERSE_LABEL, euros } from "./ui";
+import { DemoNotice, GenderPicker, ImpactBadge, TRUST_STYLE, UNIVERSE_LABEL, euros } from "./ui";
 
 export interface LookChoice {
   include: boolean;
   brand: string;
   model: string;
   mode: Mode;
+  gender: Gender;
 }
 
 export type LookResult = SearchResponse | { error: string } | null;
@@ -18,6 +20,7 @@ export const initialChoices = (items: GarmentAnalysis[]): LookChoice[] =>
     include: true,
     brand: it.brand.name ?? "",
     model: it.model_guess ?? "",
+    gender: it.gender ?? "mixte",
     // Marque reconnue avec assurance → on propose la pièce exacte ; sinon son sosie.
     mode: it.brand.name && it.brand.confidence !== "faible" ? "exact" : "style",
   }));
@@ -102,6 +105,11 @@ export function LookSetup({
   const setAll = (mode: Mode) =>
     setChoices(choices.map((c) => ({ ...c, mode: mode === "exact" && !c.brand.trim() ? "style" : mode })));
   const count = choices.filter((c) => c.include).length;
+  // Le rayon du look : celui de toutes les pièces non mixtes, s'il est commun.
+  const genders = new Set(choices.filter((c) => c.gender !== "mixte").map((c) => c.gender));
+  const lookGender: Gender | null = genders.size === 1 ? Array.from(genders)[0] : genders.size === 0 ? "mixte" : null;
+  const setLookGender = (g: Gender) =>
+    setChoices(choices.map((c, i) => ({ ...c, gender: g === "mixte" || items[i].gender !== "mixte" ? g : c.gender })));
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,340px)_1fr]">
@@ -130,7 +138,11 @@ export function LookSetup({
           ce qui ne t&apos;intéresse pas.
         </p>
 
-        <div className="mt-5 flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-wider">
+        <div className="mt-5">
+          <GenderPicker value={lookGender} onChange={setLookGender} label="Le look est pour" options={["homme", "femme"]} />
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-wider">
           <span className="text-craie">Tout en :</span>
           <button type="button" onClick={() => setAll("exact")} className="border border-denim px-2.5 py-1.5 text-denim hover:bg-denim hover:text-[#F4EFE6]">
             Pièces exactes
@@ -159,7 +171,7 @@ export function LookSetup({
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-craie">
-                          {UNIVERSE_LABEL[it.universe]} · {it.category}
+                          {UNIVERSE_LABEL[it.universe]} · {it.category} · {GENDER_LABEL[c.gender]}
                         </p>
                         <p className="etendu font-bold leading-snug">{it.title}</p>
                       </div>

@@ -3,13 +3,15 @@ import { z } from "zod";
 import { searchOffers } from "@/lib/search";
 import { bestPrice, scoreOffers } from "@/lib/score";
 import { GarmentAnalysisSchema, type GarmentAnalysis, type Mode, type SearchResponse } from "@/lib/types";
+import { withGender } from "@/lib/gender";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-// L'épingle ne sert pas à la recherche (et manque dans les alertes créées avant son ajout).
+// L'épingle et le genre manquent dans les alertes créées avant leur ajout.
 const ItemSchema = GarmentAnalysisSchema.extend({
   pin: GarmentAnalysisSchema.shape.pin.optional(),
+  gender: GarmentAnalysisSchema.shape.gender.optional(),
 });
 
 const BodySchema = z.object({
@@ -17,6 +19,7 @@ const BodySchema = z.object({
   mode: z.enum(["exact", "style"]),
   brand: z.string().trim().max(80).nullable(),
   model: z.string().trim().max(80).nullable(),
+  gender: GarmentAnalysisSchema.shape.gender.optional(),
 });
 
 const same = (a: string | null, b: string | null) => (a ?? "").trim().toLowerCase() === (b ?? "").trim().toLowerCase();
@@ -39,14 +42,19 @@ export async function POST(req: Request) {
 
   // Si l'utilisateur a corrigé la marque ou le modèle, on reconstruit la requête exacte.
   const corrected = !same(brand, original.brand.name) || !same(model, original.model_guess);
+  // Le choix de l'utilisateur l'emporte sur ce que l'analyse a déduit.
+  const gender = parsed.gender ?? original.gender ?? "mixte";
   const analysis: GarmentAnalysis = {
     ...original,
     pin: original.pin ?? { x: 0.5, y: 0.5 },
+    gender,
     brand: { ...original.brand, name: brand, confidence: corrected && brand ? "haute" : original.brand.confidence },
     model_guess: model,
-    exact_query: corrected
-      ? [brand, model, original.category, original.colors[0]].filter(Boolean).join(" ")
-      : original.exact_query,
+    exact_query: withGender(
+      corrected ? [brand, model, original.category, original.colors[0]].filter(Boolean).join(" ") : original.exact_query,
+      gender,
+    ),
+    style_queries: original.style_queries.map((q) => withGender(q, gender)),
     // Le prix boutique estimé valait pour la marque d'origine.
     estimated_retail_price_eur: same(brand, original.brand.name) ? original.estimated_retail_price_eur : null,
   };

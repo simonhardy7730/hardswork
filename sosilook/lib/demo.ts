@@ -1,5 +1,6 @@
 import type { GarmentAnalysis, Mode, Offer, PhotoAnalysis } from "./types";
 import { merchantUrl } from "./links";
+import { withGender } from "./gender";
 
 /**
  * Données d'EXEMPLE utilisées quand les clés API ne sont pas configurées.
@@ -9,6 +10,7 @@ import { merchantUrl } from "./links";
 
 const DEMO_POLO: GarmentAnalysis = {
   pin: { x: 0.5, y: 0.45 },
+  gender: "homme",
   universe: "vetement",
   category: "polo",
   title: "Polo piqué blanc à logo crocodile",
@@ -42,6 +44,7 @@ const DEMO_POLO: GarmentAnalysis = {
 const DEMO_OUTFIT: GarmentAnalysis[] = [
   {
     pin: { x: 0.5, y: 0.1 },
+    gender: "homme",
     universe: "lunettes",
     category: "lunettes de soleil",
     title: "Lunettes de soleil rondes écaille",
@@ -66,6 +69,7 @@ const DEMO_OUTFIT: GarmentAnalysis[] = [
   },
   {
     pin: { x: 0.42, y: 0.34 },
+    gender: "homme",
     universe: "vetement",
     category: "blazer croisé",
     title: "Blazer croisé marine à boutons dorés",
@@ -90,6 +94,7 @@ const DEMO_OUTFIT: GarmentAnalysis[] = [
   },
   {
     pin: { x: 0.52, y: 0.28 },
+    gender: "homme",
     universe: "vetement",
     category: "chemise oxford",
     title: "Chemise Oxford blanche col boutonné",
@@ -114,6 +119,7 @@ const DEMO_OUTFIT: GarmentAnalysis[] = [
   },
   {
     pin: { x: 0.48, y: 0.64 },
+    gender: "homme",
     universe: "vetement",
     category: "pantalon chino",
     title: "Chino beige coupe droite",
@@ -135,6 +141,7 @@ const DEMO_OUTFIT: GarmentAnalysis[] = [
   },
   {
     pin: { x: 0.62, y: 0.47 },
+    gender: "homme",
     universe: "montre",
     category: "montre rectangulaire",
     title: "Montre rectangulaire cadran blanc, bracelet cuir",
@@ -159,6 +166,7 @@ const DEMO_OUTFIT: GarmentAnalysis[] = [
   },
   {
     pin: { x: 0.5, y: 0.92 },
+    gender: "homme",
     universe: "chaussures",
     category: "mocassins",
     title: "Mocassins à pampilles en cuir marron",
@@ -187,14 +195,17 @@ export function demoPhotoAnalysis(portrait: boolean): PhotoAnalysis {
     : { contains_fashion: true, is_outfit: false, items: [DEMO_POLO] };
 }
 
-const base = (mode: Mode, id: string, title: string, seller: string, price: number, extra: Partial<Offer> = {}): Offer => ({
+type Base = (id: string, title: string, seller: string, price: number, extra?: Partial<Offer>) => Offer;
+
+/** Fabrique d'offres d'exemple pour une pièce : le lien cherche la pièce, au bon rayon, chez le vendeur. */
+const offerMaker = (mode: Mode, analysis: GarmentAnalysis): Base => (id, title, seller, price, extra = {}) => ({
   id,
   title,
   seller,
   price: Math.round(price * 100) / 100,
   currency: "EUR",
-  // On cherche la pièce elle-même, sans l'état ou le détail ajouté après le tiret.
-  url: merchantUrl(seller, title.split(" — ")[0]),
+  // On cherche la pièce elle-même (sans l'état ou le détail ajouté après le tiret), au bon rayon.
+  url: merchantUrl(seller, withGender(title.split(" — ")[0], analysis.gender)),
   origin: mode,
   ...extra,
 });
@@ -241,50 +252,51 @@ const STYLE_SHOPS: Record<GarmentAnalysis["universe"], Array<[string, number, st
 };
 
 export function demoOffers(analysis: GarmentAnalysis, mode: Mode): Offer[] {
+  const base = offerMaker(mode, analysis);
   // Le polo d'exemple garde ses offres détaillées.
-  if (analysis.title === DEMO_POLO.title && analysis.brand.name === "Lacoste") return demoPolo(mode);
+  if (analysis.title === DEMO_POLO.title && analysis.brand.name === "Lacoste") return demoPolo(mode, base);
 
   const retail = analysis.estimated_retail_price_eur ?? 90;
-  const what = `${analysis.category} ${analysis.colors[0] ?? ""}`.trim();
+  const what = withGender(`${analysis.category} ${analysis.colors[0] ?? ""}`, analysis.gender);
 
   if (mode === "exact" && analysis.brand.name) {
     const name = `${analysis.brand.name} ${analysis.model_guess ?? ""} ${what}`.replace(/\s+/g, " ").trim();
     return [
-      base(mode, "e1", name, analysis.brand.name, retail, { rating: 4.6, reviews: 320 }),
-      base(mode, "e2", name, "Galeries Lafayette", retail),
-      base(mode, "e3", name, "Zalando", retail * 0.88, { rating: 4.4, reviews: 90 }),
-      base(mode, "e4", `${name} — très bon état`, "Vestiaire Collective", retail * 0.52, { secondHand: true }),
-      base(mode, "e5", `${name} — porté quelques fois`, "Vinted", retail * 0.38, { secondHand: true }),
+      base("e1", name, analysis.brand.name, retail, { rating: 4.6, reviews: 320 }),
+      base("e2", name, "Galeries Lafayette", retail),
+      base("e3", name, "Zalando", retail * 0.88, { rating: 4.4, reviews: 90 }),
+      base("e4", `${name} — très bon état`, "Vestiaire Collective", retail * 0.52, { secondHand: true }),
+      base("e5", `${name} — porté quelques fois`, "Vinted", retail * 0.38, { secondHand: true }),
     ];
   }
 
   return STYLE_SHOPS[analysis.universe].map(([seller, factor, detail], i) =>
-    base(mode, `s${i}`, `${what} ${analysis.material_guess} — ${detail}`, seller, retail * factor, {
+    base(`s${i}`, `${what} ${analysis.material_guess} — ${detail}`, seller, retail * factor, {
       rating: 4 + (i % 3) * 0.2,
       reviews: 40 + i * 70,
     }),
   );
 }
 
-function demoPolo(mode: Mode): Offer[] {
+function demoPolo(mode: Mode, base: Base): Offer[] {
   if (mode === "exact") {
     return [
-      base(mode, "e1", "Polo Lacoste L.12.12 classic fit coton piqué blanc", "Lacoste", 110, { rating: 4.6, reviews: 2140 }),
-      base(mode, "e2", "Lacoste polo L.12.12 blanc 100% coton", "Galeries Lafayette", 110),
-      base(mode, "e3", "Lacoste L.12.12 polo coton piqué blanc", "Zalando", 94.95, { rating: 4.5, reviews: 380 }),
-      base(mode, "e4", "Polo Lacoste L1212 blanc", "Place des Tendances", 88),
-      base(mode, "e5", "Polo Lacoste L.12.12 blanc taille 4 — très bon état", "Vestiaire Collective", 49, { secondHand: true }),
-      base(mode, "e6", "Polo Lacoste blanc L.12.12 T.M porté 2 fois", "Vinted", 32, { secondHand: true }),
-      base(mode, "e7", "Polo crocodile blanc homme coton", "AliExpress", 16.5),
+      base("e1", "Polo Lacoste L.12.12 classic fit coton piqué blanc", "Lacoste", 110, { rating: 4.6, reviews: 2140 }),
+      base("e2", "Lacoste polo L.12.12 blanc 100% coton", "Galeries Lafayette", 110),
+      base("e3", "Lacoste L.12.12 polo coton piqué blanc", "Zalando", 94.95, { rating: 4.5, reviews: 380 }),
+      base("e4", "Polo Lacoste L1212 blanc", "Place des Tendances", 88),
+      base("e5", "Polo Lacoste L.12.12 blanc taille 4 — très bon état", "Vestiaire Collective", 49, { secondHand: true }),
+      base("e6", "Polo Lacoste blanc L.12.12 T.M porté 2 fois", "Vinted", 32, { secondHand: true }),
+      base("e7", "Polo crocodile blanc homme coton", "AliExpress", 16.5),
     ];
   }
   return [
-    base(mode, "s1", "Polo piqué Supima 100% coton blanc", "Uniqlo", 24.9, { rating: 4.5, reviews: 910 }),
-    base(mode, "s2", "Polo en maille piquée 100% coton bio blanc", "Arket", 45, { rating: 4.4, reviews: 120 }),
-    base(mode, "s3", "Polo coton piqué épais blanc — fabriqué au Portugal", "Asphalte", 59),
-    base(mode, "s4", "Polo manches courtes coton piqué blanc", "Massimo Dutti", 39.95, { rating: 4.2, reviews: 64 }),
-    base(mode, "s5", "Polo piqué blanc coupe regular", "Celio", 22.99, { rating: 4.0, reviews: 230 }),
-    base(mode, "s6", "Polo blanc 65% coton 35% polyester", "Kiabi", 9, { rating: 4.1, reviews: 1500 }),
-    base(mode, "s7", "Polo Pacific manches courtes 100% coton, made in France", "Saint James", 79),
+    base("s1", "Polo piqué Supima 100% coton blanc", "Uniqlo", 24.9, { rating: 4.5, reviews: 910 }),
+    base("s2", "Polo en maille piquée 100% coton bio blanc", "Arket", 45, { rating: 4.4, reviews: 120 }),
+    base("s3", "Polo coton piqué épais blanc — fabriqué au Portugal", "Asphalte", 59),
+    base("s4", "Polo manches courtes coton piqué blanc", "Massimo Dutti", 39.95, { rating: 4.2, reviews: 64 }),
+    base("s5", "Polo piqué blanc coupe regular", "Celio", 22.99, { rating: 4.0, reviews: 230 }),
+    base("s6", "Polo blanc 65% coton 35% polyester", "Kiabi", 9, { rating: 4.1, reviews: 1500 }),
+    base("s7", "Polo Pacific manches courtes 100% coton, made in France", "Saint James", 79),
   ];
 }

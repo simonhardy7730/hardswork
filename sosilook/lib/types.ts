@@ -2,6 +2,9 @@ import { z } from "zod";
 
 export type Mode = "exact" | "style";
 
+/** Pour qui est la pièce : les boutiques séparent les rayons homme et femme. */
+export type Gender = "homme" | "femme" | "mixte";
+
 /** Une pièce repérée sur la photo. */
 export const GarmentAnalysisSchema = z.object({
   pin: z
@@ -10,6 +13,9 @@ export const GarmentAnalysisSchema = z.object({
   universe: z
     .enum(["vetement", "chaussures", "sac", "montre", "bijou", "lunettes", "accessoire"])
     .describe("Univers de l'article"),
+  gender: z
+    .enum(["homme", "femme", "mixte"])
+    .describe("Pour qui est la pièce : d'après la personne qui la porte, sinon la coupe ou le modèle. 'mixte' seulement si elle est vraiment unisexe"),
   category: z
     .string()
     .describe("Type de pièce en français, ex: 'polo', 'chemise oxford', 'montre plongée', 'sac cabas', 'lunettes aviateur'"),
@@ -124,6 +130,8 @@ export interface SearchRequest {
   brand: string | null;
   /** Modèle / référence confirmé par l'utilisateur. */
   model: string | null;
+  /** Pour qui, confirmé ou corrigé par l'utilisateur. */
+  gender?: Gender;
 }
 
 export interface SearchResponse {

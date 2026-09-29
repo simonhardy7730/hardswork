@@ -61,6 +61,10 @@ désactivée pour les personnes qui préfèrent moins d'animations, bouton « En
    ou répond « je ne connais pas la marque ». Puis il choisit : **la pièce exacte au meilleur prix** ou **son sosie, moins cher**.
 3. **Résultats** notés, triables (recommandé, prix, qualité), avec un **curseur de budget**.
 
+**Homme ou femme** : l'analyse déduit pour qui est chaque pièce (d'après la personne ou la coupe), l'utilisateur
+peut corriger (« C'est pour : Homme / Femme / Mixte », ou pour tout le look), et chaque recherche et chaque lien
+« Voir » précisent le rayon : sans cela, les boutiques mélangent homme et femme.
+
 **Le look complet** : sur la photo d'une personne, le site repère chaque pièce de la tête aux pieds
 (lunettes, veste, chemise, pantalon, montre, sac, chaussures…) et plante une épingle numérotée sur chacune.
 Pour chaque pièce : marque proposée à confirmer ou corriger, choix « exacte » ou « sosie » (ou tout d'un coup),

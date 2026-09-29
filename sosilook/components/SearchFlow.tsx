@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { AnalyzeResponse, GarmentAnalysis, Mode, SearchResponse } from "@/lib/types";
+import type { AnalyzeResponse, GarmentAnalysis, Gender, Mode, SearchResponse } from "@/lib/types";
 import { BRAND_STORES } from "@/lib/retailers";
-import { Ciseaux, DemoNotice, MetreRuban, UNIVERSE_LABEL } from "./ui";
+import { Ciseaux, DemoNotice, GenderPicker, MetreRuban, UNIVERSE_LABEL } from "./ui";
 import { Results } from "./Results";
 import { LookResults, LookSetup, initialChoices, type LookChoice, type LookResult } from "./Look";
 
@@ -75,6 +75,7 @@ export function SearchFlow({
   const [portrait, setPortrait] = useState(false);
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
+  const [gender, setGender] = useState<Gender>("mixte");
   const [result, setResult] = useState<SearchResponse | null>(null);
   const [resultKey, setResultKey] = useState(0); // remet à zéro tri et budget à chaque nouveau résultat
   const [busy, setBusy] = useState<null | "analyse" | Mode>(null);
@@ -91,6 +92,7 @@ export function SearchFlow({
     setAnalysis(reopen.result.analysis);
     setBrand(reopen.result.analysis.brand.name ?? "");
     setModel(reopen.result.analysis.model_guess ?? "");
+    setGender(reopen.result.analysis.gender ?? "mixte");
     setResult(reopen.result);
     setResultKey((k) => k + 1);
     setStep("resultats");
@@ -139,6 +141,7 @@ export function SearchFlow({
         setAnalysis(first);
         setBrand(first.brand.name ?? "");
         setModel(first.model_guess ?? "");
+        setGender(first.gender);
         setStep("marque");
       }
       scrollTop();
@@ -159,6 +162,7 @@ export function SearchFlow({
         mode,
         brand: brand.trim() || null,
         model: model.trim() || null,
+        gender,
       });
       setResult(res);
       setResultKey((k) => k + 1);
@@ -191,6 +195,7 @@ export function SearchFlow({
           mode: c.mode,
           brand: c.brand.trim() || null,
           model: c.model.trim() || null,
+          gender: c.gender,
         });
         next[i] = res;
         if (image) onSearched(res, image);
@@ -381,6 +386,8 @@ export function SearchFlow({
           setBrand={setBrand}
           model={model}
           setModel={setModel}
+          gender={gender}
+          setGender={setGender}
           busy={busy}
           error={error}
           onSearch={search}
@@ -489,6 +496,8 @@ function ConfirmBrand({
   setBrand,
   model,
   setModel,
+  gender,
+  setGender,
   busy,
   error,
   onSearch,
@@ -504,6 +513,8 @@ function ConfirmBrand({
   setBrand: (v: string) => void;
   model: string;
   setModel: (v: string) => void;
+  gender: Gender;
+  setGender: (g: Gender) => void;
   busy: null | "analyse" | Mode;
   error: string | null;
   onSearch: (m: Mode) => void;
@@ -581,6 +592,9 @@ function ConfirmBrand({
                 className="mt-1 w-full border-b-[1.5px] border-encre/25 bg-transparent py-2 text-lg outline-none focus:border-fil"
               />
             </div>
+          </div>
+          <div className="mt-5">
+            <GenderPicker value={gender} onChange={setGender} />
           </div>
           {brand && (
             <button type="button" onClick={() => { setBrand(""); setModel(""); }} className="mt-3 text-sm text-craie underline decoration-dashed underline-offset-4 hover:text-encre">

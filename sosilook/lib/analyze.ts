@@ -36,6 +36,8 @@ Si l'utilisateur précise ce qu'il cherche (« juste la veste »), ne garde que 
 Pour chaque pièce, avec l'œil d'un acheteur expérimenté (prêt-à-porter, maroquinerie, horlogerie, joaillerie, optique) :
 - Identifie la marque uniquement à partir d'indices visibles (logo, étiquette, broderie, boucle, coupe ou design signature). N'invente jamais : si tu n'es pas sûr, baisse la confiance ou mets null.
 - "pin" place une épingle au centre de la pièce sur la photo (fractions de 0 à 1).
+- "gender" : pour qui est la pièce (homme ou femme), d'après la personne qui la porte, sinon d'après la coupe et le modèle. "mixte" seulement pour une pièce vraiment unisexe.
+- Chaque requête de recherche contient « homme » ou « femme » (sauf pièce mixte) : sans cela, les boutiques mélangent les rayons.
 - Les requêtes de recherche sont en français, courtes, comme un acheteur les taperait sur Google Shopping France.
 - Les requêtes "style" ne contiennent JAMAIS de nom de marque ni de mot comme "dupe" ou "copie" : elles décrivent la pièce (matière, coupe, couleur, détails) pour trouver des alternatives légales, pas des contrefaçons.
 - La checklist qualité donne des critères vérifiables sur une fiche produit (composition, grammage, finitions, origine).

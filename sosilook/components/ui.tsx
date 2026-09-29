@@ -1,4 +1,5 @@
-import type { Impact, ImpactGrade, TrustTier } from "@/lib/types";
+import type { Gender, Impact, ImpactGrade, TrustTier } from "@/lib/types";
+import { GENDER_LABEL } from "@/lib/gender";
 
 export const euros = (n: number | null | undefined) =>
   n == null ? "—" : n.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
@@ -193,6 +194,40 @@ export function DemoNotice({
           </button>
         </form>
       )}
+    </div>
+  );
+}
+
+/** « C'est pour : Homme / Femme / Mixte ». `value` null = pièces de genres différents (look). */
+export function GenderPicker({
+  value,
+  onChange,
+  label = "C'est pour",
+  options = ["homme", "femme", "mixte"],
+}: {
+  value: Gender | null;
+  onChange: (g: Gender) => void;
+  label?: string;
+  options?: Gender[];
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-craie">{label}</span>
+      <div className="flex font-mono text-[11px] uppercase tracking-wider" role="group" aria-label={label}>
+        {options.map((g, i) => (
+          <button
+            key={g}
+            type="button"
+            onClick={() => onChange(g)}
+            aria-pressed={value === g}
+            className={`border border-denim px-3 py-1.5 ${i > 0 ? "-ml-px" : ""} ${
+              value === g ? "bg-denim text-[#F4EFE6]" : "text-denim hover:bg-denim/10"
+            }`}
+          >
+            {GENDER_LABEL[g]}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

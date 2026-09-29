@@ -45,7 +45,7 @@ ${css}
 .demo-ruban b{color:#D9822B;font-weight:600}
 </style>
 <script>try{if(sessionStorage.getItem("sosilook.intro")==="vue")document.documentElement.dataset.intro="skip"}catch(e){}document.documentElement.lang="fr";</script>
-<div class="demo-ruban"><b>Version démo</b> · résultats d'exemple quelle que soit ta photo : photo verticale = tenue complète, sinon une pièce seule</div>
+<div class="demo-ruban"><b>Version démo</b> · ta photo est vraiment analysée par Claude (autorise-le à la première photo) · les offres et les prix sont des exemples, « Voir l'offre » ouvre une vraie recherche</div>
 <div id="sosilook-root" class="min-h-screen font-sans text-encre antialiased"></div>
 <script>${code}</script>
 `;

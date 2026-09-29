@@ -3,7 +3,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { PhotoAnalysisSchema, type PhotoAnalysis } from "./types";
 import { demoPhotoAnalysis } from "./demo";
 
-const SYSTEM_PROMPT = `Tu es l'expert mode de Sosilook, un site français qui aide à retrouver des articles de mode vus en photo
+export const SYSTEM_PROMPT = `Tu es l'expert mode de Sosilook, un site français qui aide à retrouver des articles de mode vus en photo
 (vêtements, chaussures, sacs à main ou sacoches, montres, bijoux, lunettes de soleil, accessoires) :
 soit la pièce exacte au meilleur prix chez des vendeurs fiables, soit des alternatives au style très proche et moins chères.
 
@@ -56,11 +56,16 @@ export async function analyzePhoto(
   if (response.stop_reason === "refusal" || !response.parsed_output) {
     throw new Error("L'analyse de la photo n'a pas abouti. Essaie avec une photo plus nette.");
   }
-  const analysis = response.parsed_output;
-  // Garde-fous : 8 pièces au maximum, épingles ramenées dans la photo.
-  analysis.items = analysis.items.slice(0, 8).map((it) => ({
-    ...it,
-    pin: { x: Math.min(1, Math.max(0, it.pin.x)), y: Math.min(1, Math.max(0, it.pin.y)) },
-  }));
-  return { analysis, demo: false };
+  return { analysis: tidy(response.parsed_output), demo: false };
+}
+
+/** Garde-fous : 8 pièces au maximum, épingles ramenées dans la photo. */
+export function tidy(analysis: PhotoAnalysis): PhotoAnalysis {
+  return {
+    ...analysis,
+    items: analysis.items.slice(0, 8).map((it) => ({
+      ...it,
+      pin: { x: Math.min(1, Math.max(0, it.pin.x)), y: Math.min(1, Math.max(0, it.pin.y)) },
+    })),
+  };
 }

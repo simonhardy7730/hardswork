@@ -9,7 +9,10 @@ import { LookResults, LookSetup, initialChoices, type LookChoice, type LookResul
 
 type Step = "photo" | "marque" | "resultats" | "look" | "look-resultats";
 
-/** Réduit la photo côté navigateur (max 1280 px) pour un envoi rapide. */
+/** Côté le plus long de la photo envoyée : une image coûte environ (largeur × hauteur) / 750 tokens. */
+const MAX_SIDE = 896;
+
+/** Réduit la photo côté navigateur : envoi rapide et analyse moins chère. */
 async function toResizedDataUrl(file: File): Promise<{ dataUrl: string; portrait: boolean }> {
   const url = URL.createObjectURL(file);
   try {
@@ -19,7 +22,7 @@ async function toResizedDataUrl(file: File): Promise<{ dataUrl: string; portrait
       i.onerror = () => reject(new Error("Image illisible"));
       i.src = url;
     });
-    const scale = Math.min(1, 1280 / Math.max(img.width, img.height));
+    const scale = Math.min(1, MAX_SIDE / Math.max(img.width, img.height));
     const canvas = document.createElement("canvas");
     canvas.width = Math.round(img.width * scale);
     canvas.height = Math.round(img.height * scale);

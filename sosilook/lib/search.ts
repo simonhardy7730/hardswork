@@ -1,5 +1,10 @@
 import type { GarmentAnalysis, Mode, Offer } from "./types";
 import { demoOffers } from "./demo";
+import { TtlCache } from "./cache";
+import { merchantUrl } from "./links";
+
+/** Les prix bougent peu en quelques heures : une même requête n'est payée qu'une fois toutes les 6 h. */
+const shoppingCache = new TtlCache<SerpShoppingResult[]>(6 * 60 * 60 * 1000);
 
 interface SerpShoppingResult {
   position?: number;
@@ -25,12 +30,18 @@ async function googleShopping(query: string, origin: Mode, limit: number): Promi
     location: "France",
     api_key: process.env.SERPAPI_KEY ?? "",
   });
-  const res = await fetch(`https://serpapi.com/search.json?${params}`, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Recherche Shopping indisponible (${res.status})`);
-  const json = (await res.json()) as { shopping_results?: SerpShoppingResult[] };
+  let results = shoppingCache.get(query);
+  if (!results) {
+    const res = await fetch(`https://serpapi.com/search.json?${params}`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Recherche Shopping indisponible (${res.status})`);
+    const json = (await res.json()) as { shopping_results?: SerpShoppingResult[] };
+    results = json.shopping_results ?? [];
+    shoppingCache.set(query, results);
+  }
 
-  return (json.shopping_results ?? []).slice(0, limit).flatMap((r, i): Offer[] => {
-    const url = r.link ?? r.product_link;
+  return results.slice(0, limit).flatMap((r, i): Offer[] => {
+    // La fiche du vendeur si Google la donne ; sinon la recherche chez ce vendeur ; en dernier recours la fiche Google.
+    const url = r.link ?? (r.source ? merchantUrl(r.source, query) : r.product_link);
     if (!r.title || !url) return [];
     return [
       {

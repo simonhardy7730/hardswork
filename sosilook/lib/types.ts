@@ -14,7 +14,7 @@ export const GarmentAnalysisSchema = z.object({
     .string()
     .describe("Type de pièce en français, ex: 'polo', 'chemise oxford', 'montre plongée', 'sac cabas', 'lunettes aviateur'"),
   title: z.string().describe("Nom court et parlant de la pièce, ex: 'Polo piqué blanc à logo crocodile'"),
-  description: z.string().describe("2 phrases max décrivant la pièce (coupe, matière, détails)"),
+  description: z.string().describe("Une phrase courte décrivant la pièce (coupe, matière, détails)"),
   brand: z.object({
     name: z.string().nullable().describe("Marque identifiée, ou null si inconnue"),
     confidence: z.enum(["haute", "moyenne", "faible"]),
@@ -41,7 +41,7 @@ export const GarmentAnalysisSchema = z.object({
     .describe("Requête Google Shopping pour trouver la pièce EXACTE (marque + modèle + couleur)"),
   style_queries: z
     .array(z.string())
-    .describe("2 à 3 requêtes Google Shopping SANS marque pour trouver des pièces au style très proche"),
+    .describe("2 requêtes Google Shopping SANS marque pour trouver des pièces au style très proche"),
   quality_checklist: z
     .array(z.string())
     .describe("3 critères concrets et vérifiables sur une fiche produit pour juger la qualité d'une alternative (composition, grammage, mouvement, verre, type de cuir, protection UV...)"),

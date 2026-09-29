@@ -18,6 +18,9 @@ npm run dev                  # http://localhost:3100
 |---|---|---|
 | `ANTHROPIC_API_KEY` | Analyse de la photo par Claude | Analyse d'exemple (polo Lacoste) |
 | `SERPAPI_KEY` | Recherche Google Shopping France | Offres d'exemple, signalées à l'écran |
+| `SOSILOOK_MODEL` | Modèle d'analyse (`claude-haiku-4-5` par défaut, le moins cher) | — |
+
+Chaque analyse écrit son coût réel dans les journaux du serveur (`[sosilook] analyse …`), pour comparer les modèles sur de vraies photos.
 
 ## Organisation du code
 

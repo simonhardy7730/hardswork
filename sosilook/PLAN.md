@@ -171,18 +171,29 @@ La version gratuite reste généreuse (ex. 10 recherches par jour).
 - **Emplacements « Alternative mise en avant »**, toujours signalés comme sponsorisés et jamais devant une offre mieux notée.
 - **Tendances** : rapports anonymisés vendus aux marques (« les pièces les plus recherchées ce mois-ci, les prix que les gens trouvent trop chers »).
 
-### 4.5 L'équation économique (à surveiller dès le lancement)
-| Poste | Estimation par recherche |
-|---|---|
-| Analyse IA (Claude Opus 5, 1 photo) | ≈ 0,03 à 0,06 € |
-| Recherche Shopping (1 à 3 requêtes SerpApi) | ≈ 0,01 à 0,05 € |
-| **Coût total** | **≈ 0,05 à 0,10 €** |
-| Revenu moyen si 3 % des recherches mènent à un achat à 80 € avec 7 % de commission | ≈ 0,17 € |
+### 4.5 L'équation économique : dépenser le moins de tokens possible
+Estimations à partir des tarifs publics, à confirmer par des mesures dès qu'on a les clés.
 
-C'est rentable, mais avec peu de marge : d'où le **cache**, les **pages Look** (une analyse, des milliers de vues) et les créateurs.
-Si besoin, on pourra passer l'analyse sur un modèle Claude moins cher, **après avoir mesuré** que la qualité tient.
+| | Pièce seule | Tenue complète |
+|---|---|---|
+| Premier prototype (Claude Opus 5, réflexion, photo 1280 px) | ≈ 5 c | ≈ 12 c |
+| **Aujourd'hui** : Claude Haiku 4.5, sans réflexion, photo 896 px, réponse courte | **≈ 0,4 c** | **≈ 1 c** |
+| + cache (même photo, même recherche) et pages Look partagées | moins encore | moins encore |
 
----
+Déjà en place dans le code :
+- **Modèle réglable** (`SOSILOOK_MODEL`), Haiku 4.5 par défaut : environ 5 fois moins cher par token. L'utilisateur confirme la marque, donc une petite erreur coûte peu.
+- **Pas de réflexion** et des réponses courtes : ce que l'IA écrit coûte 5 fois plus cher que ce qu'elle lit.
+- **Photo réduite à 896 px** : une image coûte environ (largeur × hauteur) / 750 tokens.
+- **Cache** : même photo = même analyse pendant 24 h ; même recherche de prix = mêmes résultats pendant 6 h.
+- **Coût réel journalisé** à chaque analyse, pour décider sur des chiffres.
+
+Prochaines étapes :
+1. Test comparatif sur 50 vraies photos : Haiku 4.5 contre un plus gros modèle (qualité des marques, coût mesuré).
+2. Cache partagé entre serveurs (Vercel KV / Upstash) et pages Look publiques.
+3. **Google Lens d'abord** pour une pièce seule : zéro token Claude, Claude seulement pour découper une tenue.
+4. **Catalogues d'affiliation** (Awin, Effiliation…) stockés chez nous : la recherche de prix devient quasi gratuite, et chaque lien est affilié.
+
+Revenu moyen estimé : ≈ 17 c par recherche (3 % d'achat, panier de 80 €, 7 % de commission). Sous le centime d'analyse, la marge est confortable ; le plus gros coût restant est la recherche de prix, d'où les étapes 3 et 4.
 
 ## 5. Juridique (à ne pas négliger)
 - **Contrefaçon** : ne jamais proposer de copie portant un logo ou un motif protégé. Les requêtes « style » excluent les marques, et on signale les plateformes à risque.

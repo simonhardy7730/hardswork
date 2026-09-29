@@ -1,9 +1,10 @@
 import type { GarmentAnalysis, Mode, Offer, PhotoAnalysis } from "./types";
+import { merchantUrl } from "./links";
 
 /**
  * Données d'EXEMPLE utilisées quand les clés API ne sont pas configurées.
  * Elles servent à montrer le fonctionnement du site ; l'interface les signale clairement.
- * Les liens pointent vers une recherche Google Shopping, pas vers de fausses fiches produit.
+ * Les liens mènent à une vraie recherche de la pièce sur le site du vendeur, pas à de fausses fiches produit.
  */
 
 const DEMO_POLO: GarmentAnalysis = {
@@ -186,15 +187,14 @@ export function demoPhotoAnalysis(portrait: boolean): PhotoAnalysis {
     : { contains_fashion: true, is_outfit: false, items: [DEMO_POLO] };
 }
 
-const shop = (q: string) => `https://www.google.com/search?tbm=shop&hl=fr&gl=fr&q=${encodeURIComponent(q)}`;
-
 const base = (mode: Mode, id: string, title: string, seller: string, price: number, extra: Partial<Offer> = {}): Offer => ({
   id,
   title,
   seller,
   price: Math.round(price * 100) / 100,
   currency: "EUR",
-  url: shop(`${title} ${seller}`),
+  // On cherche la pièce elle-même, sans l'état ou le détail ajouté après le tiret.
+  url: merchantUrl(seller, title.split(" — ")[0]),
   origin: mode,
   ...extra,
 });
@@ -254,7 +254,7 @@ export function demoOffers(analysis: GarmentAnalysis, mode: Mode): Offer[] {
       base(mode, "e2", name, "Galeries Lafayette", retail),
       base(mode, "e3", name, "Zalando", retail * 0.88, { rating: 4.4, reviews: 90 }),
       base(mode, "e4", `${name} — très bon état`, "Vestiaire Collective", retail * 0.52, { secondHand: true }),
-      base(mode, "e5", `${name} porté quelques fois`, "Vinted", retail * 0.38, { secondHand: true }),
+      base(mode, "e5", `${name} — porté quelques fois`, "Vinted", retail * 0.38, { secondHand: true }),
     ];
   }
 

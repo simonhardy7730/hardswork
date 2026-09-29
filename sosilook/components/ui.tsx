@@ -132,8 +132,25 @@ export function ImpactBadge({ impact, compact }: { impact: Impact; compact?: boo
   );
 }
 
-/** Explique pourquoi l'analyse affichée est un exemple, et non celle de la photo. */
-export function DemoNotice({ notice, what }: { notice?: string; what: string }) {
+/** Explique pourquoi l'analyse affichée est un exemple, et propose de décrire la pièce quand c'est possible. */
+export function DemoNotice({
+  notice,
+  what,
+  demo = true,
+  canDescribe,
+  onDescribe,
+  busy,
+}: {
+  notice?: string;
+  what: string;
+  demo?: boolean;
+  canDescribe?: boolean;
+  onDescribe?: (text: string) => void;
+  busy?: boolean;
+}) {
+  if (!demo) {
+    return notice ? <p className="mb-5 border-l-2 border-fil pl-3 text-sm text-encre/80">{notice}</p> : null;
+  }
   if (!notice) {
     return (
       <p className="mb-5 inline-block bg-fil-clair px-3 py-1.5 font-mono text-xs text-fil-fonce">
@@ -143,8 +160,39 @@ export function DemoNotice({ notice, what }: { notice?: string; what: string }) 
   }
   return (
     <div className="mb-6 border-l-4 border-alerte bg-alerte/10 px-4 py-3 text-sm">
-      <p className="font-semibold text-alerte">Ta photo n&apos;a pas été analysée : ceci est un exemple.</p>
+      <p className="font-semibold text-alerte">
+        {canDescribe ? "Ta photo n'a pas pu être envoyée à Claude." : "Ta photo n'a pas été analysée : ceci est un exemple."}
+      </p>
       <p className="mt-1 text-encre/80">{notice}</p>
+      {canDescribe && onDescribe && (
+        <form
+          className="mt-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const text = String(new FormData(e.currentTarget).get("description") ?? "").trim();
+            if (text) onDescribe(text);
+          }}
+        >
+          <label htmlFor="description" className="font-mono text-[11px] uppercase tracking-[0.14em] text-encre/70">
+            Décris ce que tu vois sur la photo
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            rows={3}
+            required
+            placeholder="ex. veste en tweed gris à chevrons, pull col roulé taupe, pochette blanche, pantalon gris anthracite, chaussures noires"
+            className="mt-1 w-full resize-y border-[1.5px] border-encre/20 bg-white px-3 py-2 text-[15px] outline-none focus:border-fil"
+          />
+          <button
+            type="submit"
+            disabled={busy}
+            className="mt-2 bg-encre px-4 py-2.5 text-sm font-semibold text-[#F4EFE6] hover:bg-fil disabled:opacity-50"
+          >
+            {busy ? "Analyse en cours…" : "Analyser ma description"}
+          </button>
+        </form>
+      )}
     </div>
   );
 }

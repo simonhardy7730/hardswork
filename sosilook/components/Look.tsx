@@ -77,6 +77,8 @@ export function LookSetup({
   setChoices,
   demo,
   demoNotice,
+  canDescribe,
+  onDescribe,
   busy,
   error,
   onSearch,
@@ -88,6 +90,8 @@ export function LookSetup({
   setChoices: (c: LookChoice[]) => void;
   demo: boolean;
   demoNotice?: string;
+  canDescribe?: boolean;
+  onDescribe?: (text: string) => void;
   busy: boolean;
   error: string | null;
   onSearch: () => void;
@@ -109,7 +113,14 @@ export function LookSetup({
       </div>
 
       <div>
-        {demo && <DemoNotice notice={demoNotice} what="tenue d'exemple" />}
+        <DemoNotice
+          demo={demo}
+          notice={demoNotice}
+          what="tenue d'exemple"
+          canDescribe={canDescribe}
+          onDescribe={onDescribe}
+          busy={busy}
+        />
         <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-fil-fonce">Le look complet</p>
         <h2 className="display mt-1 text-3xl !leading-[1.04] text-denim sm:text-[44px]">
           {items.length} pièces repérées

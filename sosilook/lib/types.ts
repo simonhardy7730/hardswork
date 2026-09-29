@@ -111,8 +111,10 @@ export interface AnalyzeResponse {
   items: GarmentAnalysis[];
   isOutfit: boolean;
   demo: boolean;
-  /** Pourquoi l'analyse est un exemple (affiché à l'utilisateur). */
+  /** Pourquoi l'analyse est un exemple, ou comment elle a été faite (affiché à l'utilisateur). */
   notice?: string;
+  /** La photo n'a pas pu être envoyée, mais une description écrite peut être analysée. */
+  canDescribe?: boolean;
 }
 
 export interface SearchRequest {

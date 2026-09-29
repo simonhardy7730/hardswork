@@ -68,6 +68,8 @@ export function SearchFlow({
   const [openItem, setOpenItem] = useState<number | null>(null);
   const [demoAnalysis, setDemoAnalysis] = useState(false);
   const [demoNotice, setDemoNotice] = useState<string | undefined>(undefined);
+  const [canDescribe, setCanDescribe] = useState(false);
+  const [portrait, setPortrait] = useState(false);
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [result, setResult] = useState<SearchResponse | null>(null);
@@ -103,23 +105,25 @@ export function SearchFlow({
     try {
       const { dataUrl, portrait } = await toResizedDataUrl(file);
       setImage(dataUrl);
+      setPortrait(portrait);
       await analyse(dataUrl, portrait);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Impossible de lire cette image.");
     }
   }
 
-  async function analyse(dataUrl: string, portrait: boolean) {
+  async function analyse(dataUrl: string, portrait: boolean, description?: string) {
     setBusy("analyse");
     setError(null);
     try {
       const res = await postJson<AnalyzeResponse>("/api/analyze", {
         image: dataUrl,
-        hint: hint.trim() || undefined,
+        hint: (description ?? hint).trim() || undefined,
         portrait, // ne sert qu'au mode démo
       });
       setDemoAnalysis(res.demo);
       setDemoNotice(res.notice);
+      setCanDescribe(res.canDescribe === true);
       setItems(res.items);
       setIsOutfit(res.isOutfit);
       if (res.isOutfit) {
@@ -362,12 +366,14 @@ export function SearchFlow({
         </div>
       )}
 
-      {step === "marque" && analysis && (
+      {step === "marque" && analysis && !(demoAnalysis && canDescribe) && (
         <ConfirmBrand
           image={image}
           analysis={analysis}
           demo={demoAnalysis}
           demoNotice={demoNotice}
+          canDescribe={canDescribe}
+          onDescribe={(text) => image && analyse(image, portrait, text)}
           brand={brand}
           setBrand={setBrand}
           model={model}
@@ -379,7 +385,33 @@ export function SearchFlow({
         />
       )}
 
-      {step === "look" && (
+      {/* La photo n'a pas pu être envoyée : on demande une description plutôt que d'afficher l'exemple */}
+      {(step === "look" || step === "marque") && demoAnalysis && canDescribe && (
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,340px)_1fr]">
+          <div className="mx-auto w-full max-w-[340px]">
+            {image && (
+              <div className="bg-white p-2 shadow-etiquette">
+                <img src={image} alt="Ta photo" className="block w-full bg-patron" />
+              </div>
+            )}
+            <button type="button" onClick={restart} className="mt-3 w-full py-1 font-mono text-xs uppercase tracking-wider text-craie hover:text-fil-fonce">
+              ← Changer de photo
+            </button>
+          </div>
+          <div>
+            <DemoNotice
+              notice={demoNotice}
+              what="analyse d'exemple"
+              canDescribe
+              onDescribe={(text) => image && analyse(image, portrait, text)}
+              busy={busy === "analyse"}
+            />
+            {error && <p className="mt-4 border-l-2 border-alerte pl-3 text-sm text-alerte">{error}</p>}
+          </div>
+        </div>
+      )}
+
+      {step === "look" && !(demoAnalysis && canDescribe) && (
         <LookSetup
           image={image}
           items={items}
@@ -387,6 +419,8 @@ export function SearchFlow({
           setChoices={setChoices}
           demo={demoAnalysis}
           demoNotice={demoNotice}
+          canDescribe={canDescribe}
+          onDescribe={(text) => image && analyse(image, portrait, text)}
           busy={busy !== null}
           error={error}
           onSearch={searchLook}
@@ -446,6 +480,8 @@ function ConfirmBrand({
   analysis: a,
   demo,
   demoNotice,
+  canDescribe,
+  onDescribe,
   brand,
   setBrand,
   model,
@@ -459,6 +495,8 @@ function ConfirmBrand({
   analysis: GarmentAnalysis;
   demo: boolean;
   demoNotice?: string;
+  canDescribe?: boolean;
+  onDescribe?: (text: string) => void;
   brand: string;
   setBrand: (v: string) => void;
   model: string;
@@ -479,7 +517,14 @@ function ConfirmBrand({
       </div>
 
       <div>
-        {demo && <DemoNotice notice={demoNotice} what="analyse d'exemple" />}
+        <DemoNotice
+          demo={demo}
+          notice={demoNotice}
+          what="analyse d'exemple"
+          canDescribe={canDescribe}
+          onDescribe={onDescribe}
+          busy={busy === "analyse"}
+        />
         <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-craie">
           {UNIVERSE_LABEL[a.universe] ?? a.universe} · {a.category}
         </p>

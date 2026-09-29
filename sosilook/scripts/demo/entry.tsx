@@ -1,8 +1,9 @@
 /**
  * Version démo 100 % navigateur : le vrai site (même interface, mêmes calculs).
  * - /api/analyze : la photo est VRAIMENT analysée par Claude, via la capacité `sample`
- *   de la page publiée (mêmes consignes que le site). Si elle n'est pas disponible
- *   ou refusée, on retombe sur l'analyse d'exemple.
+ *   de la page publiée (mêmes consignes que le site). Si la page ne peut pas envoyer
+ *   d'image mais peut envoyer du texte, l'utilisateur décrit la pièce et Claude
+ *   analyse la description. Sinon, on retombe sur l'analyse d'exemple, en disant pourquoi.
  * - /api/search : exécutée dans la page, en mode démo (offres d'exemple construites
  *   à partir de la pièce, liens vers une vraie recherche Google Shopping).
  */
@@ -24,8 +25,8 @@ const SCHEMA = JSON.stringify(z.toJSONSchema(PhotoAnalysisSchema));
 
 const OPEN_IN_BROWSER = "Ouvre le lien dans un navigateur (Chrome ou Safari, sur claude.ai), connecté à ton compte Claude, puis réessaie.";
 
-/** La capacité « sample » avec images, ou la raison pour laquelle elle manque. */
-type SampleAccess = { sample: SampleFn; reason?: undefined } | { sample: null; reason: string };
+/** La capacité « sample » (avec ou sans images), ou la raison pour laquelle elle manque. */
+type SampleAccess = { sample: SampleFn; images: boolean; reason?: undefined } | { sample: null; reason: string };
 
 let accessPromise: Promise<SampleAccess> | null = null;
 function getSample(): Promise<SampleAccess> {
@@ -39,21 +40,21 @@ function getSample(): Promise<SampleAccess> {
         return { sample: null, reason: `Cette application ne laisse pas encore la page utiliser Claude. ${OPEN_IN_BROWSER}` };
       }
       const limits = await s.limits().catch(() => null);
-      if (!limits?.images) {
-        return { sample: null, reason: `Cette application ne permet pas encore d'envoyer une photo à Claude depuis une page. ${OPEN_IN_BROWSER}` };
-      }
-      return { sample: s };
+      return { sample: s, images: Boolean(limits?.images) };
     })
     .catch(() => ({ sample: null, reason: `Claude n'a pas répondu. ${OPEN_IN_BROWSER}` }));
   return accessPromise;
 }
 
 /** L'analyse d'exemple, avec la raison affichée à l'utilisateur. */
-async function exampleWithNotice(req: Request, notice: string): Promise<Response> {
+async function exampleWithNotice(req: Request, notice: string, canDescribe = false): Promise<Response> {
   const res = await analyzeDemo(req);
   if (!res.ok) return res;
-  return json({ ...((await res.json()) as AnalyzeResponse), notice });
+  return json({ ...((await res.json()) as AnalyzeResponse), notice, canDescribe });
 }
+
+const NO_IMAGES =
+  "Depuis cette page, ton compte Claude ne permet pas encore d'envoyer une photo. Décris-la en une phrase ci-dessous : Claude l'analysera à partir de ta description.";
 
 function dataUrlToBlob(dataUrl: string): Blob {
   const [head, data] = dataUrl.split(",");
@@ -71,15 +72,27 @@ async function analyze(req: Request): Promise<Response> {
   const sample = access.sample;
   if (!body.image) return analyzeDemo(req);
 
+  const hint = body.hint?.trim().slice(0, 600);
+  // Pas d'image possible : sans description, on la demande ; avec, on l'analyse.
+  if (!access.images && !hint) return exampleWithNotice(req, NO_IMAGES, true);
+
+  const source = access.images
+    ? `L'image jointe est la photo envoyée par l'utilisateur.${hint ? ` Précision de l'utilisateur : ${hint}` : ""}`
+    : `L'utilisateur n'a pas pu t'envoyer sa photo. Voici sa description de ce qu'elle montre : « ${hint} ».
+Travaille à partir de cette description. S'il décrit plusieurs pièces portées ensemble, c'est une tenue (is_outfit = true).
+Ne propose une marque que si elle est citée ou si un détail décrit la désigne clairement ; sinon mets null.
+Pour "pin", place chaque pièce à sa position habituelle sur une personne debout vue de face
+(lunettes y≈0.1, haut et veste y≈0.3 à 0.4, montre ou sac y≈0.5, pantalon y≈0.65, chaussures y≈0.93 ; x≈0.5).`;
+
   const prompt = `${SYSTEM_PROMPT}
 
-L'image jointe est la photo envoyée par l'utilisateur.${body.hint ? ` Précision de l'utilisateur : ${body.hint.slice(0, 300)}` : ""}
+${source}
 
 Réponds uniquement avec un objet JSON conforme à ce schéma JSON (tous les champs sont obligatoires) :
 ${SCHEMA}`;
 
   try {
-    const raw = await sample.json(prompt, { images: dataUrlToBlob(body.image) });
+    const raw = await sample.json(prompt, access.images ? { images: dataUrlToBlob(body.image) } : undefined);
     const parsed = PhotoAnalysisSchema.safeParse(raw);
     if (!parsed.success) {
       return json({ error: "L'analyse n'a pas donné un résultat lisible. Réessaie, ou essaie une photo plus nette." }, 500);
@@ -92,6 +105,7 @@ ${SCHEMA}`;
       items: analysis.items,
       isOutfit: analysis.is_outfit && analysis.items.length > 1,
       demo: false,
+      notice: access.images ? undefined : "Analyse faite par Claude à partir de ta description (la photo n'a pas pu lui être envoyée).",
     } satisfies AnalyzeResponse);
   } catch (e) {
     const code = (e as { code?: string })?.code;
@@ -102,8 +116,9 @@ ${SCHEMA}`;
     if (code === "sampling_disabled") {
       return exampleWithNotice(req, "Claude n'est pas disponible pour les pages publiées sur ton compte (ou ton organisation).");
     }
-    if (["not_declared", "capability_disabled", "capability_removed", "images_unavailable"].includes(code ?? "")) {
-      return exampleWithNotice(req, `Cette vue ne permet pas d'envoyer une photo à Claude. ${OPEN_IN_BROWSER}`);
+    if (code === "images_unavailable") return exampleWithNotice(req, NO_IMAGES, true);
+    if (["not_declared", "capability_disabled", "capability_removed"].includes(code ?? "")) {
+      return exampleWithNotice(req, `Cette vue ne permet pas d'utiliser Claude. ${OPEN_IN_BROWSER}`);
     }
     const messages: Record<string, string> = {
       rate_limited: "Trop de photos d'un coup : attends un peu avant de réessayer.",

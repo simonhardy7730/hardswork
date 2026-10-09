@@ -131,9 +131,20 @@ ${SCHEMA}`;
   }
 }
 
+// La page publiée n'a pas accès à Internet : les liens ne se lisent que sur le vrai site.
+const link = async () =>
+  json(
+    {
+      error:
+        "Dans cette démo, les liens ne peuvent pas être lus (la page n'a pas accès à Internet) ; sur le vrai site, si. Ici, dépose plutôt la vidéo ou une capture d'écran.",
+    },
+    422,
+  );
+
 const ROUTES: Record<string, (req: Request) => Promise<Response>> = {
   "/api/analyze": analyze,
   "/api/search": search,
+  "/api/link": link,
 };
 
 const realFetch = window.fetch.bind(window);

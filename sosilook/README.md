@@ -28,11 +28,14 @@ Chaque analyse écrit son coût réel dans les journaux du serveur (`[sosilook] 
 app/page.tsx                 En-tête, onglets, alertes et vestiaire
 app/api/analyze/route.ts     Étape 1 : la photo → ce qu'on voit (marque proposée…)
 app/api/search/route.ts      Étape 2 : marque confirmée → recherche → notation
+app/api/link/route.ts        Lien TikTok / YouTube / Pinterest → image de couverture
 components/ZipperIntro.tsx   L'intro « veste qui s'ouvre » (canvas)
 components/SearchFlow.tsx    Parcours Photo → Marque → Résultats
 components/Results.tsx       Étiquette de composition + étiquettes de prix
+components/Tenues.tsx        Plusieurs tenues : carrousel, analyse, « Tenue 2 / 5 »
 components/AlertsPanel.tsx   Onglet « Mes alertes »
 components/Wardrobe.tsx      Onglet « Mon vestiaire »
+lib/frames.ts                Repère les changements de tenue dans une vidéo (dans le navigateur)
 lib/storage.ts               Alertes et vestiaire (stockés dans le navigateur)
 lib/analyze.ts               Analyse de la photo par Claude (sortie structurée)
 lib/search.ts                Recherche Google Shopping (SerpApi)

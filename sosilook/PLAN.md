@@ -73,6 +73,18 @@ notre choix pour chaque pièce (la mieux notée chez un vendeur sûr), 3 offres 
 comparé aux prix boutique. Chaque pièce s'ouvre sur toutes ses offres, avec l'alerte promo.
 Coût : une seule analyse de photo pour tout le look, mais une recherche par pièce.
 
+**Plusieurs tenues (vidéo TikTok, Reels, carrousel)** : on dépose la vidéo (enregistrée depuis l'appli ou par
+enregistrement d'écran) ou plusieurs captures. Le navigateur lit la vidéo en accéléré et repère chaque changement
+de tenue en comparant les couleurs au centre de l'image (un mouvement de caméra ne compte pas, revenir sur une
+tenue déjà vue non plus), 8 tenues au maximum. Les tenues s'affichent en carrousel à faire défiler, on décoche celles
+qui n'intéressent pas, puis chaque tenue est analysée comme un look complet (une analyse par tenue). On passe
+d'un look à l'autre avec « Tenue 2 / 5 » ou en glissant du doigt.
+
+**Coller un lien** (TikTok, YouTube, Pinterest, Instagram) : les réseaux ne donnent officiellement accès qu'à
+l'image de couverture (oEmbed ou og:image), pas à la vidéo ; le site analyse donc cette image et explique comment
+avoir toutes les tenues. Télécharger la vidéo derrière un lien demanderait des outils non officiels, interdits par
+les conditions des réseaux. Le serveur n'interroge que ces sites et leurs serveurs d'images, redirections vérifiées.
+
 **Les onglets**
 - **Chercher** : le parcours ci-dessus.
 - **Mes alertes** : un bouton « M'alerter d'une promo » sur chaque recherche. Prix de départ, prix du jour,

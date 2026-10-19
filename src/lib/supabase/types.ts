@@ -143,6 +143,8 @@ export interface Application {
   availability_slots?: string[];
   interest_confirmed?: boolean;
   quick_apply?: boolean;
+  /** Ajouté côté serveur pour la vue « toutes les offres » */
+  job_title?: string;
 }
 
 export interface Subscription {

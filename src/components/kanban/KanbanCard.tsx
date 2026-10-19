@@ -20,6 +20,7 @@ interface Props {
   jobOfferId: string;
   hasSubscription: boolean;
   isDragging?: boolean;
+  onOpen?: (app: Application) => void;
 }
 
 /* Couleurs tags */
@@ -35,6 +36,7 @@ export default function KanbanCard({
   onNotesChange,
   hasSubscription,
   isDragging,
+  onOpen,
 }: Props) {
   const l = useL();
   const lang = useLang();
@@ -73,6 +75,7 @@ export default function KanbanCard({
       style={style}
       {...attributes}
       {...listeners}
+      onClick={() => onOpen?.(app)}
       className={`bg-white rounded-xl border border-ink-100 p-3 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-all select-none relative ${
         isSortableDragging || isDragging ? "opacity-50 shadow-lg rotate-1" : ""
       }`}
@@ -106,7 +109,7 @@ export default function KanbanCard({
           {/* Titre / métier */}
           {app.applicant_name && (
             <p className="text-[10px] text-ink-500 truncate mt-0.5">
-              {isLocked ? l("— Profil masqué —", "— Verborgen profiel —") : app.applicant_name}
+              {isLocked ? l("— Profil masqué —", "— Verborgen profiel —") : (app.job_title ?? app.applicant_name)}
             </p>
           )}
         </div>
@@ -188,6 +191,14 @@ export default function KanbanCard({
             <span className="text-[9px] font-bold text-ink-300 px-1 py-0.5">+{app.availability_slots!.length - 4}</span>
           )}
         </div>
+      )}
+
+      {/* ── Aperçu de la note ── */}
+      {!isLocked && app.notes && (
+        <p className="mt-2 flex items-start gap-1 text-[10px] text-amber-700 bg-amber-50 border border-amber-100 rounded-md px-1.5 py-1">
+          <StickyNote size={9} className="mt-0.5 shrink-0" />
+          <span className="line-clamp-2">{app.notes}</span>
+        </p>
       )}
 
       {/* ── Temps + disponibilité ── */}

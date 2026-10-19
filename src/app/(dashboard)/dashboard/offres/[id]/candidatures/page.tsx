@@ -6,6 +6,7 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import KanbanBoard from "@/components/kanban/KanbanBoard";
 import { labels } from "@/lib/utils";
 import { getLang } from "@/lib/i18n/server";
+import { purgeRefused } from "@/lib/purge-refused";
 import type { Application } from "@/lib/supabase/types";
 
 export default async function CandidaturesPage(
@@ -29,6 +30,8 @@ export default async function CandidaturesPage(
     .eq("id", user.id)
     .single();
   if (!profile) redirect("/onboarding");
+
+  await purgeRefused(profile.organization_id).catch(() => {});
 
   /* Accès (essai en cours ou abonnement) — horloge du serveur */
   const { hasAccess: hasSubscription } = await getOrgAccess(supabase, profile.organization_id);

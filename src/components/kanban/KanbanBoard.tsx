@@ -17,6 +17,7 @@ import {
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import KanbanColumn from "./KanbanColumn";
 import KanbanCard from "./KanbanCard";
+import ProfileModal from "./ProfileModal";
 import { Lock } from "lucide-react";
 import type { Application, ApplicationStatus } from "@/lib/supabase/types";
 import { useL } from "@/lib/i18n/context";
@@ -78,6 +79,7 @@ export default function KanbanBoard({
   const l = useL();
   const [apps, setApps]     = useState<Application[]>(initialApps);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -216,6 +218,7 @@ export default function KanbanBoard({
                       onNotesChange={updateNotes}
                       jobOfferId={jobOfferId}
                       hasSubscription={hasSubscription}
+                      onOpen={(a) => setOpenId(a.id)}
                     />
                   ))}
                 </SortableContext>
@@ -237,6 +240,15 @@ export default function KanbanBoard({
           )}
         </DragOverlay>
       </DndContext>
+
+      {openId && apps.find(a => a.id === openId) && (
+        <ProfileModal
+          application={apps.find(a => a.id === openId)!}
+          hasSubscription={hasSubscription}
+          onClose={() => setOpenId(null)}
+          onNotesChange={updateNotes}
+        />
+      )}
     </div>
   );
 }

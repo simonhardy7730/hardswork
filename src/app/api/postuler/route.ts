@@ -67,18 +67,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Offre introuvable" }, { status: 404 });
     }
 
-    // Déduplication : même offre + même téléphone dans les 24 h = déjà reçue (double clic, nouvel essai).
-    // On répond « succès » sans rien renvoyer ni envoyer d'email, pour ne rien révéler et éviter les doublons.
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { data: dup } = await supabaseAdmin
-      .from("applications")
-      .select("id")
-      .eq("job_offer_id", job_offer_id)
-      .eq("applicant_phone", applicant_phone)
-      .gte("applied_at", since)
-      .limit(1);
-    if (dup && dup.length > 0) {
-      return NextResponse.json({ success: true });
+    // Déjà candidaté à cette offre (même téléphone ou même e-mail) : refus automatique, rien n'est créé ni envoyé.
+    const { data: dupPhone } = await supabaseAdmin
+      .from("applications").select("id").eq("job_offer_id", job_offer_id).eq("applicant_phone", applicant_phone).limit(1);
+    const dupEmail = applicant_email
+      ? (await supabaseAdmin.from("applications").select("id").eq("job_offer_id", job_offer_id).ilike("applicant_email", applicant_email).limit(1)).data
+      : null;
+    if ((dupPhone && dupPhone.length > 0) || (dupEmail && dupEmail.length > 0)) {
+      return NextResponse.json({ error: "already_applied" }, { status: 409 });
     }
 
     // Insert application

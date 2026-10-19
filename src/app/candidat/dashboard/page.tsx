@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { formatRelative } from "@/lib/utils";
 import { getDict } from "@/lib/i18n/server";
+import CvRequests, { type CvRequestRow } from "@/components/candidat/CvRequests";
 
 export async function generateMetadata() {
   return { title: (await getDict()).lang === "nl" ? "Mijn dashboard — Wolko" : "Mon tableau de bord — Wolko" };
@@ -39,6 +40,13 @@ export default async function CandidatDashboardPage() {
 
   const apps = applications ?? [];
 
+  /* Demandes de CV reçues (vide si la migration 019 n'est pas encore lancée) */
+  const { data: cvReqRaw } = await supabase
+    .from("cv_requests")
+    .select("id, org_name, job_title, status, cv_name")
+    .order("created_at", { ascending: false });
+  const cvRequests = (cvReqRaw ?? []) as CvRequestRow[];
+
   /* Offres suggérées (récentes, tout secteur) */
   const { data: suggestedRaw } = await supabase
     .from("job_offers")
@@ -67,6 +75,8 @@ export default async function CandidatDashboardPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
+
+      <CvRequests userId={user.id} requests={cvRequests} />
 
       {/* ── WELCOME ─────────────────────────────────────── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">

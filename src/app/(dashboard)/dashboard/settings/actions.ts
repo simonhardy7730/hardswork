@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { sendInviteEmail } from "@/lib/email/invite";
 
 // ── Organisation ────────────────────────────────────────
 export async function updateOrganization(formData: FormData) {
@@ -187,8 +188,13 @@ export async function createInvite(email: string, role: "admin" | "recruiter" | 
   if (error || !token) {
     return { error: /forbidden/.test(error?.message ?? "") ? "Seul un administrateur peut inviter." : "Impossible de créer l'invitation (la migration 005 est-elle appliquée ?)." };
   }
+  // Mail d'invitation (échec toléré : le lien reste affiché pour être copié)
+  const { data: me } = await supabase.from("users").select("organizations(name)").eq("id", user.id).maybeSingle();
+  const o = me?.organizations as unknown as { name?: string } | { name?: string }[] | null;
+  const orgName = (Array.isArray(o) ? o[0]?.name : o?.name) ?? "votre équipe";
+  const emailed = await sendInviteEmail({ to: clean, orgName, token: token as string, role });
   revalidatePath("/dashboard/settings");
-  return { token: token as string };
+  return { token: token as string, emailed };
 }
 
 export async function revokeInvite(inviteId: string) {

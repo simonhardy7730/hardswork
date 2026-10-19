@@ -375,6 +375,9 @@ function TeamTab({
       const res = await createInvite(inviteEmail, inviteRole);
       if ("token" in res && res.token) {
         setInviteLink(`${window.location.origin}/signup?invite=${res.token}`);
+        setFeedback(("emailed" in res && res.emailed)
+          ? { type: "success", message: l(`Invitation envoyée par e-mail à ${inviteEmail}.`, `Uitnodiging per e-mail verzonden naar ${inviteEmail}.`) }
+          : { type: "error", message: l("L'e-mail n'a pas pu partir : copiez le lien ci-dessous et envoyez-le vous-même.", "De e-mail kon niet worden verzonden: kopieer de link hieronder en stuur hem zelf door.") });
         setInviteEmail("");
       } else {
         setFeedback({ type: "error", message: ("error" in res && res.error) || l("Une erreur est survenue.", "Er is een fout opgetreden.") });

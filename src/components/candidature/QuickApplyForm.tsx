@@ -58,6 +58,11 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
         quick_apply: true,
       }),
     });
+    if (res.status === 409) {
+      setError(l("Vous avez déjà postulé à cette offre.", "Je hebt al gesolliciteerd voor deze vacature."));
+      setLoading(false);
+      return;
+    }
     if (!res.ok) {
       setError(l("Une erreur est survenue. Réessayez.", "Er is een fout opgetreden. Probeer opnieuw."));
       setLoading(false);

@@ -302,16 +302,6 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
                 {l("Contrat", "Contract")} {CONTRACT_LABELS[offer.contract_type] ?? offer.contract_type}{salary ? ` — ${l("Salaire", "Loon")} : ${salary}` : ""}.
               </p>
             </div>
-
-            {/* Postuler — mobile uniquement */}
-            <Link
-              href={`/postuler/${offer.id}`}
-              className="md:hidden flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-display font-black uppercase py-4 rounded-xl transition text-[14px] w-full"
-              style={{ letterSpacing: "0.06em" }}
-            >
-              {l("Postuler maintenant", "Nu solliciteren")}
-              <ArrowRight size={15} />
-            </Link>
           </div>
 
           {/* ── SIDEBAR ─────────────────────────────────── */}

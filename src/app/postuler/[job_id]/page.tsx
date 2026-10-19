@@ -213,7 +213,8 @@ export default async function PostulerPage(
             </div>
 
             {/* Form header */}
-            <div className="mb-7">
+            <div className="mb-7 flex items-center justify-between gap-3">
+             <div className="min-w-0">
               <h2
                 className="font-display font-black text-ink uppercase leading-none mb-2"
                 style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", letterSpacing: "-0.02em" }}
@@ -224,6 +225,11 @@ export default async function PostulerPage(
               <p className="text-ink-500 text-sm">
                 {l("2 minutes · Sans compte · CV facultatif", "2 minuten · Zonder account · CV optioneel")}
               </p>
+             </div>
+             {/* Mascotte visible sur mobile (le panneau de gauche est masqué sous lg) */}
+             <div className="lg:hidden w-24 shrink-0">
+               <WolfBadge sign="POSTULE !" />
+             </div>
             </div>
 
             {/* Trust indicators */}

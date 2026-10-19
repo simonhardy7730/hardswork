@@ -37,7 +37,7 @@ export const COLUMNS: {
   {
     id: "nouveau",
     label: "Nouveaux",
-    color: "bg-[#FFFBF0] border-ink-100",
+    color: "bg-[#FFFBF2] border-ink-100",
     accent: "#3B82F6",
   },
   {

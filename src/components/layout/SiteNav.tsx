@@ -1,23 +1,35 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Menu, X } from "lucide-react";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
+import { NAV_LINKS } from "@/lib/brand";
 
 export function SiteNav() {
-  return (
-    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b border-white/[0.07]" style={{ background: "rgba(16,33,75,0.98)" }}>
-      <div className="max-w-7xl mx-auto px-6 h-[60px] flex items-center justify-between">
+  const [open, setOpen] = useState(false);
 
-        {/* Logo */}
-        <Link href="/">
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+  }, [open]);
+
+  return (
+    <header
+      className="brand-on-dark fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b border-white/[0.07]"
+      style={{ background: "rgba(16,31,67,0.97)" }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[60px] flex items-center justify-between gap-4">
+        <Link href="/" aria-label="Accueil" onClick={() => setOpen(false)}>
           <HardSworkLogo size="md" dark />
         </Link>
 
-        {/* Nav centre */}
-        <nav className="hidden md:flex items-center gap-7">
-          {[
-            { label: "Offres", href: "/jobs" },
-            { label: "Secteurs", href: "/#secteurs" },
-            { label: "Tarifs", href: "/tarifs" },
-          ].map((l) => (
+        {/* Navigation centrale (desktop) */}
+        <nav aria-label="Navigation principale" className="hidden lg:flex items-center gap-7">
+          {NAV_LINKS.map((l) => (
             <Link key={l.href} href={l.href}
               className="text-[13px] text-white/80 hover:text-white transition-colors font-semibold">
               {l.label}
@@ -25,30 +37,53 @@ export function SiteNav() {
           ))}
         </nav>
 
-        {/* Actions droite */}
-        <div className="flex items-center gap-2">
-          {/* Connexion — texte discret */}
-          <Link href="/login"
-            className="hidden sm:block text-[13px] text-white/70 hover:text-white transition-colors font-semibold px-2">
+        {/* Actions (desktop) */}
+        <div className="hidden lg:flex items-center gap-3">
+          <Link href="/login" className="text-[13px] text-white/80 hover:text-white transition-colors font-semibold px-2">
             Connexion
           </Link>
-
-          {/* Je cherche un emploi — ghost outline */}
-          <Link href="/signup/candidat"
-            className="hidden md:inline-flex items-center gap-1.5 border border-white/30 hover:border-white/60 text-white/85 hover:text-white transition-all rounded-lg font-semibold"
-            style={{ padding: "0.4375rem 0.875rem", fontSize: "0.75rem" }}>
-            Je cherche un emploi
-          </Link>
-
-          {/* Je recrute — brand CTA */}
-          <Link href="/recrute"
-            className="btn-brand"
-            style={{ padding: "0.5rem 1.125rem", fontSize: "0.8125rem" }}>
-            Je recrute
+          <Link href="/inscription" className="btn-brand" style={{ padding: "0.5rem 1.125rem", fontSize: "0.8125rem" }}>
+            Créer un compte
           </Link>
         </div>
 
+        {/* Menu mobile */}
+        <div className="flex lg:hidden items-center gap-2">
+          <Link href="/inscription" className="btn-brand" style={{ padding: "0.45rem 0.9rem", fontSize: "0.75rem" }}>
+            Créer un compte
+          </Link>
+          <button
+            type="button"
+            aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            onClick={() => setOpen((o) => !o)}
+            className="w-11 h-11 -mr-2 flex items-center justify-center text-white rounded-lg"
+          >
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
+
+      {open && (
+        <div id="mobile-menu" className="lg:hidden fixed inset-x-0 top-[60px] bottom-0 bg-[#0B1630] overflow-y-auto">
+          <nav aria-label="Menu mobile" className="px-4 py-6 flex flex-col">
+            {NAV_LINKS.map((l) => (
+              <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
+                className="py-4 text-lg font-display font-bold text-white border-b border-white/10">
+                {l.label}
+              </Link>
+            ))}
+            <Link href="/login" onClick={() => setOpen(false)}
+              className="py-4 text-lg font-display font-bold text-white/80 border-b border-white/10">
+              Connexion
+            </Link>
+            <Link href="/inscription" onClick={() => setOpen(false)} className="btn-brand mt-6 justify-center" style={{ padding: "0.9rem 1rem" }}>
+              Créer un compte
+            </Link>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

@@ -8,13 +8,13 @@ import type { SVGProps } from "react";
  */
 const WOLF_CSS = `.wf{--fur:#7E8A98;--fur-d:#66717F;--fur-l:#EEF1F5;display:block;overflow:visible}
 .wf-fur{fill:var(--fur)}.wf-fur-d{fill:var(--fur-d)}.wf-light{fill:var(--fur-l)}
-.wf-ink{fill:var(--ink,#10214B)}.wf-accent{fill:var(--accent,#FFB703)}.wf-paper{fill:var(--paper,#FFF8E5)}
+.wf-ink{fill:var(--ink,#101F43)}.wf-accent{fill:var(--accent,#FFB900)}.wf-paper{fill:var(--paper,#FFF8E5)}
 .wf-shadow{fill:rgba(0,0,0,.16)}
-.wf-blush{fill:var(--accent,#FFB703);opacity:.35}
-.wf-line{stroke:var(--ink,#10214B);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.wf-blush{fill:var(--accent,#FFB900);opacity:.35}
+.wf-line{stroke:var(--ink,#101F43);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .wf-arm{stroke:var(--fur);stroke-width:18;stroke-linecap:round;fill:none}
-.wf-board{stroke:var(--ink,#10214B);stroke-width:4}
-.wf-text{fill:var(--ink,#10214B);font-weight:900;font-size:22px;font-family:var(--font-display,'Arial Black',Impact,sans-serif)}
+.wf-board{stroke:var(--ink,#101F43);stroke-width:4}
+.wf-text{fill:var(--ink,#101F43);font-weight:900;font-size:22px;font-family:var(--font-display,'Arial Black',Impact,sans-serif)}
 .wf-tail,.wf-head,.wf-sign,.wf-ear-l,.wf-ear-r,.wf-eyes{transform-box:view-box}
 .wf-anim .wf-tail{transform-origin:168px 220px;animation:wf-wag 1.3s ease-in-out infinite}
 .wf-anim .wf-head{transform-origin:130px 142px;animation:wf-tilt 5s ease-in-out infinite}
@@ -117,7 +117,7 @@ export function WolfBadge({ className = "" }: { className?: string }) {
       <div
         aria-hidden="true"
         className="absolute left-1/2 top-[46%] aspect-square w-[92%] -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{ background: "radial-gradient(circle at 50% 38%, #FFD45E 0%, #FFB703 64%, #E5A000 100%)" }}
+        style={{ background: "radial-gradient(circle at 50% 38%, #FFD45E 0%, #FFB900 64%, #EAA600 100%)" }}
       />
       <WolfMascot className="relative block w-full h-auto drop-shadow-xl" />
     </div>

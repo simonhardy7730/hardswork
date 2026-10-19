@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
+import { BRAND } from "@/lib/brand";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
 const barlow = Barlow_Condensed({
@@ -12,8 +13,8 @@ const barlow = Barlow_Condensed({
 
 export const metadata: Metadata = {
   title: {
-    default: "HardSwork — Le recrutement pour tous les métiers",
-    template: "%s — HardSwork",
+    default: `${BRAND.name} — ${BRAND.tagline}`,
+    template: `%s — ${BRAND.name}`,
   },
   description:
     "La plateforme de recrutement pour tous les métiers : logistique, transport, industrie, construction, santé, restauration, nettoyage, sécurité et plus.",

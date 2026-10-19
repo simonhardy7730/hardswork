@@ -180,7 +180,7 @@ export default function CandidatSignupPage() {
       {/* ══════════════════════════════════════════
           PANNEAU GAUCHE — 40%
       ══════════════════════════════════════════ */}
-      <div className="hidden lg:flex lg:w-[40%] relative flex-col bg-[#10214B] overflow-hidden noise shrink-0">
+      <div className="hidden lg:flex lg:w-[40%] relative flex-col bg-[#101F43] overflow-hidden noise shrink-0">
 
         {/* Photo B&W */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -193,7 +193,7 @@ export default function CandidatSignupPage() {
 
         {/* Gradient overlay */}
         <div className="absolute inset-0"
-          style={{ background: "linear-gradient(to top, rgba(16,33,75,0.97) 0%, rgba(16,33,75,0.70) 40%, rgba(16,33,75,0.30) 100%)" }}
+          style={{ background: "linear-gradient(to top, rgba(16,31,67,0.97) 0%, rgba(16,31,67,0.70) 40%, rgba(16,31,67,0.30) 100%)" }}
         />
 
         {/* Contenu */}
@@ -209,7 +209,7 @@ export default function CandidatSignupPage() {
               style={{
                 fontSize: "clamp(2.4rem, 4vw, 3.4rem)",
                 letterSpacing: "-0.01em",
-                textShadow: "0 2px 20px rgba(16,33,75,0.6)",
+                textShadow: "0 2px 20px rgba(16,31,67,0.6)",
               }}
             >
               {left.headline.map((line, i) => (
@@ -233,7 +233,7 @@ export default function CandidatSignupPage() {
       {/* ══════════════════════════════════════════
           PANNEAU DROIT — 60%
       ══════════════════════════════════════════ */}
-      <div className="flex-1 bg-[#FFFBF0] flex flex-col overflow-y-auto">
+      <div className="flex-1 bg-[#FFFBF2] flex flex-col overflow-y-auto">
 
         {/* ── Barre de progression ──────────────── */}
         <div className="shrink-0">
@@ -298,7 +298,7 @@ export default function CandidatSignupPage() {
                         style={{ filter: `brightness(${isSelected ? 0.65 : 0.55})` }}
                       />
                       {/* Overlay gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#10214B]/90 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#101F43]/90 via-transparent to-transparent" />
 
                       {/* Check */}
                       {isSelected && (
@@ -544,7 +544,7 @@ export default function CandidatSignupPage() {
         </div>
 
         {/* ── Bas de page : Hardie + bouton ────── */}
-        <div className="shrink-0 px-8 pb-6 pt-3 border-t border-ink-100 bg-[#FFFBF0]">
+        <div className="shrink-0 px-8 pb-6 pt-3 border-t border-ink-100 bg-[#FFFBF2]">
           {/* Hardie + bulle */}
           <div className="flex items-center gap-3 mb-4">
             <div className="shrink-0">
@@ -619,7 +619,7 @@ export default function CandidatSignupPage() {
                   <div className="w-full border-t border-ink-100" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-[#FFFBF0] px-3 text-[10px] text-ink-300 uppercase tracking-widest">
+                  <span className="bg-[#FFFBF2] px-3 text-[10px] text-ink-300 uppercase tracking-widest">
                     ou
                   </span>
                 </div>

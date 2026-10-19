@@ -415,7 +415,7 @@ export default function CandidatsList({
 
         {/* CTA abonnement si non abonné */}
         {!hasSubscription && candidats.length > 0 && (
-          <div className="mt-5 bg-[#10214B] rounded-2xl p-5 flex items-center justify-between gap-4">
+          <div className="mt-5 bg-[#101F43] rounded-2xl p-5 flex items-center justify-between gap-4">
             <div>
               <p className="font-display font-black text-white text-base mb-0.5">
                 Débloquez tous les contacts

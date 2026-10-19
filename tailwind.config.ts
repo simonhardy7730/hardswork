@@ -11,7 +11,7 @@ const config: Config = {
     extend: {
       colors: {
         ink: {
-          DEFAULT: "#10214B",
+          DEFAULT: "#101F43",
           900: "#16295C",
           700: "#2B3A66",
           500: "#5A6585",
@@ -19,15 +19,18 @@ const config: Config = {
           100: "#EADFC4",
         },
         surface: {
-          DEFAULT: "#FFFBF0",
+          DEFAULT: "#FFFBF2",
           2: "#FBF1D8",
           3: "#E9E2D8",
         },
         brand: {
-          DEFAULT: "#FFB703",
-          dark: "#E5A000",
+          DEFAULT: "#FFB900",
+          dark: "#EAA600",
           light: "#FFC933",
         },
+        navy: { DEFAULT: "#101F43", deep: "#0B1630", 2: "#1C3058" },
+        cream: "#FFFBF2",
+        slate: { text: "#64748B", light: "#F1F5F9" },
         gold: "#B87C2A",
         success: "#1A8048",
       },

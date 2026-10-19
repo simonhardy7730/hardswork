@@ -3,7 +3,7 @@ import { HardSworkLogo } from "@/components/ui/HardieIcon";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#10214B] flex flex-col">
+    <div className="min-h-screen bg-[#101F43] flex flex-col">
       {/* Header */}
       <header className="py-5 px-6 border-b border-white/[0.06]">
         <Link href="/" className="w-fit block">

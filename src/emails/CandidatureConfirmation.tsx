@@ -54,7 +54,7 @@ export default function CandidatureConfirmationEmail({
         }}
       >
         {/* ── HEADER ─────────────────────────────────────── */}
-        <Section style={{ backgroundColor: "#10214B", padding: "20px 0" }}>
+        <Section style={{ backgroundColor: "#101F43", padding: "20px 0" }}>
           <Container
             style={{ maxWidth: "560px", margin: "0 auto", padding: "0 24px" }}
           >
@@ -66,7 +66,7 @@ export default function CandidatureConfirmationEmail({
                 letterSpacing: "-0.02em",
               }}
             >
-              <span style={{ color: "#FFB703" }}>HARD</span>
+              <span style={{ color: "#FFB900" }}>HARD</span>
               <span style={{ color: "#ffffff" }}>SWORK</span>
             </Text>
           </Container>
@@ -94,7 +94,7 @@ export default function CandidatureConfirmationEmail({
               style={{
                 fontSize: "22px",
                 fontWeight: "900",
-                color: "#10214B",
+                color: "#101F43",
                 textAlign: "center",
                 margin: "0 0 10px 0",
                 letterSpacing: "-0.02em",
@@ -112,7 +112,7 @@ export default function CandidatureConfirmationEmail({
               }}
             >
               Bonjour {firstName}, votre candidature a bien été transmise à{" "}
-              <strong style={{ color: "#10214B" }}>{orgName}</strong>.
+              <strong style={{ color: "#101F43" }}>{orgName}</strong>.
             </Text>
 
             <Hr
@@ -148,7 +148,7 @@ export default function CandidatureConfirmationEmail({
                 style={{
                   fontSize: "17px",
                   fontWeight: "800",
-                  color: "#10214B",
+                  color: "#101F43",
                   margin: "0 0 4px 0",
                   letterSpacing: "-0.01em",
                 }}
@@ -166,7 +166,7 @@ export default function CandidatureConfirmationEmail({
               style={{
                 fontSize: "11px",
                 fontWeight: "700",
-                color: "#10214B",
+                color: "#101F43",
                 margin: "0 0 14px 0",
                 textTransform: "uppercase",
                 letterSpacing: "0.06em",
@@ -241,8 +241,8 @@ export default function CandidatureConfirmationEmail({
             <Button
               href={`${appUrl}/jobs`}
               style={{
-                backgroundColor: "#FFB703",
-                color: "#10214B",
+                backgroundColor: "#FFB900",
+                color: "#101F43",
                 padding: "12px 28px",
                 borderRadius: "10px",
                 fontSize: "13px",

@@ -10,15 +10,15 @@
 
   body {
     font-family: var(--font-body), system-ui, sans-serif;
-    background-color: #FFFBF0;
-    color: #10214B;
+    background-color: #FFFBF2;
+    color: #101F43;
     font-feature-settings: "rlig" 1, "calt" 1, "kern" 1;
     -webkit-font-smoothing: antialiased;
   }
 
   ::selection {
-    background: #FFB703;
-    color: #FFFBF0;
+    background: #FFB900;
+    color: #FFFBF2;
   }
 }
 
@@ -45,10 +45,10 @@
 .hero-overlay {
   background: linear-gradient(
     105deg,
-    rgba(16,33,75,0.97) 0%,
-    rgba(16,33,75,0.88) 45%,
-    rgba(16,33,75,0.45) 75%,
-    rgba(16,33,75,0.15) 100%
+    rgba(16,31,67,0.97) 0%,
+    rgba(16,31,67,0.88) 45%,
+    rgba(16,31,67,0.45) 75%,
+    rgba(16,31,67,0.15) 100%
   );
 }
 
@@ -67,20 +67,20 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #FFB703;
-  color: #10214B;
+  background: #FFB900;
+  color: #101F43;
   font-family: var(--font-body), sans-serif;
   font-weight: 700;
   font-size: 0.875rem;
   padding: 0.875rem 1.75rem;
   border-radius: 0.75rem;
   transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 4px 16px rgba(255,183,3,0.28);
+  box-shadow: 0 4px 16px rgba(255,185,0,0.28);
 }
 .btn-brand:hover {
-  background: #E5A000;
+  background: #EAA600;
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(255,183,3,0.35);
+  box-shadow: 0 8px 24px rgba(255,185,0,0.35);
 }
 .btn-brand:active { transform: translateY(0); }
 
@@ -99,7 +99,7 @@
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 .btn-ghost-dark:hover {
-  color: #FFFBF0;
+  color: #FFFBF2;
   border-color: rgba(250,250,248,0.35);
   background: rgba(250,250,248,0.06);
 }
@@ -108,8 +108,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #10214B;
-  color: #FFFBF0;
+  background: #101F43;
+  color: #FFFBF2;
   font-family: var(--font-body), sans-serif;
   font-weight: 700;
   font-size: 0.875rem;
@@ -148,7 +148,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(16,33,75,0.9) 0%, rgba(16,33,75,0.3) 50%, transparent 100%);
+  background: linear-gradient(to top, rgba(16,31,67,0.9) 0%, rgba(16,31,67,0.3) 50%, transparent 100%);
   z-index: 1;
   transition: opacity 0.3s;
 }
@@ -163,7 +163,7 @@
   font-family: var(--font-display), sans-serif;
   font-weight: 700;
   font-size: clamp(1.25rem, 2.5vw, 1.875rem);
-  color: #10214B;
+  color: #101F43;
   letter-spacing: -0.01em;
 }
 .search-input::placeholder { color: #9AA5C4; }
@@ -256,21 +256,32 @@
 :root, body { --brand-text: #8A5D00; }
 
 .bg-ink, .bg-ink-900, .bg-ink-700, .bg-black,
-[class*="bg-[#10214B"], [class*="bg-[#16295C"],
-[style*="#10214B" i], [style*="rgb(16, 33, 75)"] { --brand-text: #FFB703; }
+[class*="bg-[#101F43"], [class*="bg-[#16295C"],
+[style*="#101F43" i], [style*="rgb(16, 33, 75)"] { --brand-text: #FFB900; }
 
 .bg-white, .bg-surface, .bg-surface-2, .bg-surface-3,
-[class*="bg-[#FFFBF0"], [class*="bg-[#FFF6DE"], [class*="bg-[#FBF1D8"] { --brand-text: #8A5D00; }
+[class*="bg-[#FFFBF2"], [class*="bg-[#FFF6DE"], [class*="bg-[#FBF1D8"] { --brand-text: #8A5D00; }
 
 html .text-brand, html .hover\:text-brand:hover, html .group:hover .group-hover\:text-brand { color: var(--brand-text); }
 
 /* Texte sur une surface jaune : toujours marine (le blanc est illisible sur le jaune) */
 html .bg-brand.text-white, html .bg-brand-dark.text-white, html .bg-brand .text-white, html .bg-brand-dark .text-white,
-html .bg-brand.text-\[\#FFFBF0\], html .bg-brand .text-\[\#FFFBF0\] { color: #10214B; }
-html .hover\:bg-brand-dark:hover.text-white { color: #10214B; }
+html .bg-brand.text-\[\#FFFBF2\], html .bg-brand .text-\[\#FFFBF2\] { color: #101F43; }
+html .hover\:bg-brand-dark:hover.text-white { color: #101F43; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
 
-.brand-on-dark { --brand-text: #FFB703; }
+.brand-on-dark { --brand-text: #FFB900; }
+
+/* ── Palette de marque (source : src/lib/brand.ts) ── */
+:root {
+  --navy: #101F43; --navy-deep: #0B1630; --navy-2: #1C3058;
+  --sun: #FFB900; --sun-hover: #EAA600;
+  --cream: #FFFBF2; --slate-text: #64748B; --slate-light: #F1F5F9;
+}
+/* Focus clavier visible partout */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, [role="tab"]:focus-visible {
+  outline: 3px solid var(--sun); outline-offset: 2px; border-radius: 6px;
+}

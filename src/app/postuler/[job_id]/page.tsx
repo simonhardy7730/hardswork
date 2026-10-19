@@ -60,7 +60,7 @@ export default async function PostulerPage({
           className="absolute inset-0 w-full h-full object-cover"
         />
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#10214B]/90 via-[#10214B]/70 to-[#10214B]/50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#101F43]/90 via-[#101F43]/70 to-[#101F43]/50" />
 
         {/* Content */}
         <div className="relative z-10 flex flex-col h-full p-10">
@@ -138,7 +138,7 @@ export default async function PostulerPage({
       </div>
 
       {/* ── RIGHT PANEL (form) ────────────────────────────── */}
-      <div className="flex-1 bg-[#FFFBF0] flex flex-col">
+      <div className="flex-1 bg-[#FFFBF2] flex flex-col">
         {/* Mobile nav */}
         <header className="lg:hidden px-5 h-14 flex items-center justify-between border-b border-ink-100 bg-white">
           <Link href="/"><HardSworkLogo size="sm" /></Link>

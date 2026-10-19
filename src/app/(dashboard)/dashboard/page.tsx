@@ -150,7 +150,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[#10214B]">
+          <h1 className="text-xl font-bold text-[#101F43]">
             Bonjour,{" "}
             {profile.full_name.split(" ")[0]} 👋
           </h1>
@@ -181,7 +181,7 @@ export default async function DashboardPage() {
             >
               <m.icon size={18} />
             </div>
-            <div className="text-2xl font-bold text-[#10214B] mb-0.5">
+            <div className="text-2xl font-bold text-[#101F43] mb-0.5">
               {m.value}
             </div>
             <div className="text-xs text-ink-500">{m.label}</div>
@@ -195,7 +195,7 @@ export default async function DashboardPage() {
       {/* Feed d'activité */}
       <div className="bg-white rounded-xl border border-ink-100">
         <div className="flex items-center justify-between px-5 py-4 border-b border-ink-100">
-          <h2 className="font-semibold text-[#10214B] text-sm">
+          <h2 className="font-semibold text-[#101F43] text-sm">
             Dernières candidatures
           </h2>
           <Link
@@ -247,7 +247,7 @@ export default async function DashboardPage() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-sm font-semibold text-[#10214B]">
+                      <span className="text-sm font-semibold text-[#101F43]">
                         {app.applicant_name}
                       </span>
                       <span
@@ -305,7 +305,7 @@ export default async function DashboardPage() {
             <Plus size={18} className="text-brand" />
           </div>
           <div>
-            <div className="text-sm font-medium text-[#10214B]">
+            <div className="text-sm font-medium text-[#101F43]">
               Nouvelle offre
             </div>
             <div className="text-xs text-ink-300">Publier en 2 minutes</div>
@@ -319,7 +319,7 @@ export default async function DashboardPage() {
             <Users size={18} className="text-purple-600" />
           </div>
           <div>
-            <div className="text-sm font-medium text-[#10214B]">
+            <div className="text-sm font-medium text-[#101F43]">
               Base candidats
             </div>
             <div className="text-xs text-ink-300">Gérer vos profils</div>
@@ -333,7 +333,7 @@ export default async function DashboardPage() {
             <UserCheck size={18} className="text-green-600" />
           </div>
           <div>
-            <div className="text-sm font-medium text-[#10214B]">
+            <div className="text-sm font-medium text-[#101F43]">
               Inviter l&apos;équipe
             </div>
             <div className="text-xs text-ink-300">Ajouter des recruteurs</div>

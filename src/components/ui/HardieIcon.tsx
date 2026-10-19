@@ -7,6 +7,7 @@
  */
 
 import { WolfHead, WolfMascot } from "./WolfMascot";
+import { BRAND } from "@/lib/brand";
 
 interface HardieIconProps {
   size?: number;
@@ -50,10 +51,10 @@ export function HardSworkLogo({ size = "md", dark = true }: LogoProps) {
       {/* Wordmark : Hard·S·work — le S en rouge */}
       <span
         className={`font-display font-black leading-none tracking-tight ${textClass} ${
-          dark ? "text-white" : "text-[#10214B]"
+          dark ? "text-white" : "text-[#101F43]"
         }`}
       >
-        Hard<span className="text-brand">S</span>work
+        {BRAND.wordmark[0]}<span className="text-brand">{BRAND.wordmark[1]}</span>{BRAND.wordmark[2]}
       </span>
     </div>
   );

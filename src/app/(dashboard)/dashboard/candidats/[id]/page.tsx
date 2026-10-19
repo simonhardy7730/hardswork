@@ -102,10 +102,10 @@ export default async function CandidatDetailPage({
 
   /* ─────────────────────────────────────────────────── */
   return (
-    <div className="min-h-screen bg-[#FFFBF0] font-body">
+    <div className="min-h-screen bg-[#FFFBF2] font-body">
 
       {/* ── HEADER PROFIL ──────────────────────────────── */}
-      <div className="bg-[#10214B] noise">
+      <div className="bg-[#101F43] noise">
         <div className="max-w-5xl mx-auto px-6 py-8">
 
           {/* Breadcrumb */}
@@ -121,7 +121,7 @@ export default async function CandidatDetailPage({
             <div className="shrink-0">
               <div
                 className="w-20 h-20 rounded-full flex items-center justify-center font-display font-black text-2xl text-white border-2 border-white/10"
-                style={{ background: "linear-gradient(135deg, #FFB703 0%, #E5A000 100%)" }}
+                style={{ background: "linear-gradient(135deg, #FFB900 0%, #EAA600 100%)" }}
               >
                 {initials}
               </div>
@@ -283,7 +283,7 @@ export default async function CandidatDetailPage({
           <div className="space-y-4">
 
             {/* CTA coordonnées — sticky */}
-            <div className="bg-[#10214B] rounded-2xl p-5 sticky top-20">
+            <div className="bg-[#101F43] rounded-2xl p-5 sticky top-20">
 
               {hasActiveSubscription ? (
                 /* ── COORDONNÉES DÉBLOQUÉES ── */

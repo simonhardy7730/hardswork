@@ -30,6 +30,7 @@ const SECTOR_CHIPS = [
 ];
 
 interface SearchParams {
+  lieu?: string;
   q?: string; secteur?: string; region?: string; contrat?: string;
 }
 
@@ -49,6 +50,9 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
   if (searchParams.region)  query = query.eq("region",        searchParams.region);
   if (searchParams.contrat) query = query.eq("contract_type", searchParams.contrat);
   if (searchParams.q)       query = query.ilike("title",      `%${searchParams.q}%`);
+  // Ville ou code postal : les offres n'ont pas (encore) de code postal, on filtre donc sur la ville uniquement.
+  const lieu = (searchParams.lieu ?? "").replace(/[%,()]/g, "").trim();
+  if (lieu && !/^\d+$/.test(lieu)) query = query.ilike("city", `%${lieu}%`);
 
   const { data: offersRaw } = await query;
   const offers = offersRaw ?? [];
@@ -69,14 +73,14 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
     .select("id", { count: "exact", head: true })
     .eq("status", "active");
 
-  const hasFilters = searchParams.secteur || searchParams.region || searchParams.q;
+  const hasFilters = searchParams.secteur || searchParams.region || searchParams.q || lieu;
 
   return (
     <div className="min-h-screen bg-[#F4F1EC] font-body pb-20">
       <SiteNav />
 
       {/* ══ HERO SOMBRE ════════════════════════════════════ */}
-      <div className="bg-[#10214B] pt-[60px]">
+      <div className="bg-[#101F43] pt-[60px]">
         <div className="max-w-7xl mx-auto px-6 pt-8 pb-6">
 
           {/* Headline */}
@@ -111,19 +115,16 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                 <option key={key} value={key}>{label}</option>
               ))}
             </select>
-            {/* Lieu */}
-            <div className="flex items-center gap-2 bg-white border border-white/10 rounded-xl px-4 h-12 min-w-[120px]">
+            {/* Lieu : ville ou code postal */}
+            <div className="flex items-center gap-2 bg-white border border-white/10 rounded-xl px-4 h-12 min-w-[170px]">
               <MapPin size={13} className="text-ink-300 shrink-0" />
-              <select
-                name="region"
-                defaultValue={searchParams.region ?? ""}
-                className="bg-transparent text-ink text-sm focus:outline-none appearance-none cursor-pointer flex-1"
-              >
-                <option value="">Lieu</option>
-                {Object.entries(REGION_LABELS).map(([v, l]) => (
-                  <option key={v} value={v}>{l}</option>
-                ))}
-              </select>
+              <input
+                name="lieu"
+                defaultValue={searchParams.lieu ?? ""}
+                placeholder="Ville ou code postal"
+                autoComplete="address-level2"
+                className="bg-transparent text-ink placeholder-ink-300 text-sm flex-1 min-w-0 focus:outline-none"
+              />
             </div>
             {/* Bouton */}
             <button
@@ -338,7 +339,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                   alt="Travailleur"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#10214B]/80 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#101F43]/80 to-transparent" />
               </div>
               <div className="bg-white p-4 text-center">
                 <p className="font-display font-black text-ink uppercase text-sm leading-tight mb-1">
@@ -359,7 +360,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
             </div>
 
             {/* CTA Recruteur sidebar */}
-            <div className="bg-[#10214B] rounded-2xl p-5">
+            <div className="bg-[#101F43] rounded-2xl p-5">
               <p className="font-display font-black text-white uppercase text-sm leading-tight mb-1">
                 Vous recrutez ?
               </p>
@@ -381,7 +382,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
       </div>
 
       {/* ══ BARRE STICKY BAS ════════════════════════════════ */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#10214B]/95 backdrop-blur-sm border-t border-white/10">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#101F43]/95 backdrop-blur-sm border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           <div>
             <p className="font-display font-black text-white uppercase text-sm leading-none">

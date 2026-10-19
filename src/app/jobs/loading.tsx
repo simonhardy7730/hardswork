@@ -2,7 +2,7 @@ export default function JobsLoading() {
   return (
     <div className="min-h-screen bg-[#F4F1EC] font-body">
       {/* Hero skeleton */}
-      <div className="bg-[#10214B] pt-[60px] pb-6">
+      <div className="bg-[#101F43] pt-[60px] pb-6">
         <div className="max-w-7xl mx-auto px-6 pt-8">
           <div className="h-12 w-80 bg-white/10 rounded-xl animate-pulse mb-6" />
           <div className="flex gap-2 mb-5">

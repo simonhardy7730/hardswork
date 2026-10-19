@@ -35,7 +35,7 @@ export default function QRCodeDisplay({ url, title }: Props) {
     ctx.drawImage(canvas, padding, padding, size - padding * 2, size - padding * 2);
 
     // Texte
-    ctx.fillStyle = "#10214B";
+    ctx.fillStyle = "#101F43";
     ctx.font = "bold 16px Inter, system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(title, size / 2, size + 22);
@@ -60,7 +60,7 @@ export default function QRCodeDisplay({ url, title }: Props) {
           size={200}
           level="M"
           includeMargin={false}
-          fgColor="#10214B"
+          fgColor="#101F43"
           bgColor="#FFFFFF"
         />
       </div>

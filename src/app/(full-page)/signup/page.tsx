@@ -69,7 +69,7 @@ function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#10214B] px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-[#101F43] px-4 py-12">
       <div className="w-full max-w-md bg-white/[0.04] rounded-2xl border border-white/[0.08] p-8">
         <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-6">
           <UserPlus size={18} className="shrink-0" style={{ color: "var(--brand-text)" }} />
@@ -97,14 +97,14 @@ function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
               <input
                 type={f.type} name={f.name} required value={formData[f.name as keyof typeof formData]}
                 onChange={handleChange} placeholder={f.placeholder} minLength={f.minLength}
-                className="w-full px-4 py-2.5 border border-white/10 rounded-xl text-sm bg-white/5 text-white placeholder-white/25 focus:outline-none focus:border-[#10214B] transition"
+                className="w-full px-4 py-2.5 border border-white/10 rounded-xl text-sm bg-white/5 text-white placeholder-white/25 focus:outline-none focus:border-[#101F43] transition"
               />
             </div>
           ))}
           {error && <p className="text-sm px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-red-700">{error}</p>}
           <button type="submit" disabled={loading}
             className="w-full py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition"
-            style={{ background: loading ? "#FFD97A" : "#FFB703" }}>
+            style={{ background: loading ? "#FFD97A" : "#FFB900" }}>
             {loading ? <Loader2 size={16} className="animate-spin" /> : <><span>Rejoindre l&apos;organisation</span><ArrowRight size={16} /></>}
           </button>
         </form>
@@ -173,7 +173,7 @@ function NormalSignup() {
     <div className="min-h-screen flex bg-white" style={{ fontFamily: "var(--font-body, sans-serif)" }}>
 
       {/* ── Colonne gauche ── */}
-      <div className="hidden lg:flex lg:w-[48%] xl:w-[52%] relative flex-col justify-end p-14 overflow-hidden" style={{ background: "#10214B" }}>
+      <div className="hidden lg:flex lg:w-[48%] xl:w-[52%] relative flex-col justify-end p-14 overflow-hidden" style={{ background: "#101F43" }}>
         <div className="absolute inset-0" style={{
           backgroundImage: "url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&q=75')",
           backgroundSize: "cover", backgroundPosition: "center",
@@ -226,7 +226,7 @@ function NormalSignup() {
                   return (
                     <button key={r.id} onClick={() => setOrgType(r.id)}
                       className="relative rounded-2xl overflow-hidden text-left transition-all duration-200 group"
-                      style={{ border: isSelected ? "2.5px solid #FFB703" : "2.5px solid #E5E7EB", boxShadow: isSelected ? "0 4px 20px rgba(255,183,3,0.15)" : "none" }}>
+                      style={{ border: isSelected ? "2.5px solid #FFB900" : "2.5px solid #E5E7EB", boxShadow: isSelected ? "0 4px 20px rgba(255,185,0,0.15)" : "none" }}>
                       {/* Photo */}
                       <div className="relative h-44 overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -235,7 +235,7 @@ function NormalSignup() {
                           style={{ filter: "brightness(0.55) saturate(0.8)" }} />
                         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)" }} />
                         {isSelected && (
-                          <span className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center z-10" style={{ background: "#FFB703" }}>
+                          <span className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center z-10" style={{ background: "#FFB900" }}>
                             <Check size={13} className="text-white" strokeWidth={3} />
                           </span>
                         )}
@@ -262,7 +262,7 @@ function NormalSignup() {
 
               <button onClick={() => orgType && setStep(2)} disabled={!orgType}
                 className="w-full py-4 rounded-xl font-black text-sm tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-200"
-                style={{ background: orgType ? "#FFB703" : "#F3F4F6", color: orgType ? "#10214B" : "#9CA3AF", cursor: orgType ? "pointer" : "not-allowed", fontFamily: "var(--font-display, sans-serif)" }}>
+                style={{ background: orgType ? "#FFB900" : "#F3F4F6", color: orgType ? "#101F43" : "#9CA3AF", cursor: orgType ? "pointer" : "not-allowed", fontFamily: "var(--font-display, sans-serif)" }}>
                 Continuer <ArrowRight size={16} strokeWidth={2.5} />
               </button>
 
@@ -300,14 +300,14 @@ function NormalSignup() {
                   </label>
                   <input type="text" name="org_name" required value={formData.org_name} onChange={handleChange}
                     placeholder={currentRole?.placeholder}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition-colors" />
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition-colors" />
                 </div>
 
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">Numéro de TVA</label>
                   <input type="text" placeholder="BE 0123.456.789 ou FR 12 345678901" name="vat_number" value={formData.vat_number} onChange={handleChange}
                     autoComplete="off" required
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition" />
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition" />
                 </div>
 
                 <div>
@@ -317,10 +317,10 @@ function NormalSignup() {
                   <div className="grid grid-cols-2 gap-3">
                     <input type="text" name="full_name" required value={formData.full_name} onChange={handleChange}
                       placeholder="Jean Dupont"
-                      className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition-colors" />
+                      className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition-colors" />
                     <input type="email" name="email" required value={formData.email} onChange={handleChange}
                       placeholder="jean.dupont@entreprise.be"
-                      className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition-colors" />
+                      className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition-colors" />
                   </div>
                 </div>
 
@@ -330,12 +330,12 @@ function NormalSignup() {
                   </label>
                   <input type="password" name="password" required minLength={8} value={formData.password} onChange={handleChange}
                     placeholder="Minimum 8 caractères"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition-colors" />
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition-colors" />
                 </div>
 
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input type="checkbox" checked={cgu} onChange={(e) => setCgu(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 shrink-0 rounded" style={{ accentColor: "#10214B" }} />
+                    className="mt-0.5 w-4 h-4 shrink-0 rounded" style={{ accentColor: "#101F43" }} />
                   <span className="text-xs text-gray-400 leading-relaxed">
                     J&apos;accepte les{" "}
                     <Link href="/legal/cgu" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">CGU</Link>{" "}
@@ -348,7 +348,7 @@ function NormalSignup() {
 
                 <button type="submit" disabled={loading}
                   className="w-full py-4 text-white font-black text-sm tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 transition-all"
-                  style={{ background: loading ? "#FFD97A" : "#FFB703", fontFamily: "var(--font-display, sans-serif)" }}>
+                  style={{ background: loading ? "#FFD97A" : "#FFB900", fontFamily: "var(--font-display, sans-serif)" }}>
                   {loading
                     ? <Loader2 size={16} className="animate-spin" />
                     : <><span>Créer mon compte gratuitement</span><ArrowRight size={15} strokeWidth={2.5} /></>}
@@ -381,7 +381,7 @@ function SignupRouter() {
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#10214B]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#101F43]" />}>
       <SignupRouter />
     </Suspense>
   );

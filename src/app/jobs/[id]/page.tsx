@@ -76,7 +76,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     .eq("job_offer_id", params.id);
 
   return (
-    <div className="min-h-screen bg-[#FFFBF0] font-body pb-24">
+    <div className="min-h-screen bg-[#FFFBF2] font-body pb-24">
       <SiteNav />
 
       {/* ══ HERO — image plein écran + titre overlaid ═════ */}
@@ -89,7 +89,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
             className="absolute inset-0 w-full h-full object-cover"
           />
           {/* Dégradé sombre vers le bas */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#10214B]/20 via-[#10214B]/55 to-[#10214B]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#101F43]/20 via-[#101F43]/55 to-[#101F43]" />
 
           {/* Contenu hero */}
           <div className="relative h-full max-w-6xl mx-auto px-6 flex flex-col justify-end pb-8">
@@ -144,7 +144,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
         </div>
 
         {/* ── STATS STRIP (fond sombre) ────────────────── */}
-        <div className="bg-[#10214B] border-b border-white/10">
+        <div className="bg-[#101F43] border-b border-white/10">
           <div className="max-w-6xl mx-auto px-6 py-3.5 flex flex-wrap items-center gap-x-7 gap-y-2">
             {salary && (
               <div className="flex items-center gap-2">
@@ -407,7 +407,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
       </div>
 
       {/* ══ STICKY BOTTOM BAR ═════════════════════════════ */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#10214B]/95 backdrop-blur-sm border-t border-white/10">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#101F43]/95 backdrop-blur-sm border-t border-white/10">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="font-display font-black text-white uppercase text-sm leading-none truncate">

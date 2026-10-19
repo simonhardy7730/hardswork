@@ -4,7 +4,7 @@ import { ArrowRight, Search } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[#10214B] font-body flex flex-col">
+    <div className="min-h-screen bg-[#101F43] font-body flex flex-col">
       {/* Nav minimal */}
       <header className="px-6 h-[60px] flex items-center border-b border-white/[0.07]">
         <Link href="/"><HardSworkLogo size="md" dark /></Link>

@@ -29,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p out
-          pg_dump "$SUPABASE_DB_URL" -Fc --no-owner --no-acl \
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" -Fc --no-owner --no-acl \
             --schema=public --schema=auth \
             -f out/db.dump
           ls -lh out/db.dump

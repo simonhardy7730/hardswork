@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { MapPin, Search, ArrowRight, Bell, ChevronRight } from "lucide-react";
+import { MapPin, Search, ArrowRight, Bell } from "lucide-react";
 import { labels } from "@/lib/utils";
 import { getDict } from "@/lib/i18n/server";
 import { HardieIcon } from "@/components/ui/HardieIcon";
@@ -80,9 +80,10 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
   if (debut) planned = planned.or(`work_date_from.gte.${debut},work_date_from.is.null`);
   if (salaire > 0) planned = planned.gte("salary_max", salaire);
 
-  let { data: offersRaw, error: offersErr } = await planned;
+  const { data: firstTry, error: offersErr } = await planned;
+  let offersRaw = firstTry;
   // Colonnes de planning absentes (migration 010 non appliquée) : on retombe sur la recherche simple.
-  if (offersErr && hasPlanningFilter) ({ data: offersRaw } = await query);
+  if (offersErr && hasPlanningFilter) offersRaw = (await query).data;
   const offers = offersRaw ?? [];
 
   /* ── Offres premium (urgentes ou récentes) pour sidebar ─ */
@@ -94,12 +95,6 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
     .order("created_at", { ascending: false })
     .limit(4);
   const premium = premiumRaw ?? [];
-
-  /* ── Total ──────────────────────────────────────────── */
-  const { count: total } = await supabase
-    .from("job_offers")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "active");
 
   const hasFilters = searchParams.secteur || searchParams.region || searchParams.q || searchParams.contrat || lieu || hasPlanningFilter;
 
@@ -314,8 +309,6 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
             {offers.length > 0 && (
               <div className="space-y-2">
                 {offers.map((offer) => {
-                  const orgArr = offer.organizations as { name: string; logo_url: string | null; primary_color: string | null }[] | null;
-                  const org = Array.isArray(orgArr) ? orgArr[0] ?? null : orgArr;
                   const salary = offer.show_salary && offer.salary_min
                     ? offer.salary_period === "heure"
                       ? `${offer.salary_min}–${offer.salary_max}€/h`
@@ -401,8 +394,6 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                 </div>
                 <div className="divide-y divide-ink-100">
                   {premium.map((p) => {
-                    const pOrgArr = p.organizations as unknown as { name: string }[] | { name: string } | null;
-                    const pOrg = Array.isArray(pOrgArr) ? (pOrgArr[0] ?? null) : pOrgArr;
                     const sectorPhoto = SECTOR_PHOTOS[p.sector] ?? SECTOR_PHOTOS.autre;
                     return (
                       <Link

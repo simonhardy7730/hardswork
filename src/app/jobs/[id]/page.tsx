@@ -3,11 +3,12 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
   MapPin, Euro, Briefcase, Clock, Users,
-  ArrowRight, CheckCircle, ChevronRight, Star,
+  ArrowRight, CheckCircle, ChevronRight,
 } from "lucide-react";
 import { labels } from "@/lib/utils";
 import { getDict } from "@/lib/i18n/server";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
+import type { JobPlanning } from "@/lib/supabase/types";
 
 /** Les descriptions viennent des recruteurs : on neutralise tout HTML avant affichage. */
 function escapeHtml(s: string) {
@@ -206,7 +207,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
 
             {/* Planning de la mission (étudiant, flexi-job, intérim) */}
             {(() => {
-              const o = offer as any;
+              const o = offer as typeof offer & JobPlanning;
               const days: string[] = o.days_needed ?? [];
               const slots: string[] = o.time_slots ?? [];
               const has = o.work_date_from || days.length || slots.length || o.schedule_note || o.recurrence || o.requirements || o.work_location || (o.positions_count ?? 1) > 1;

@@ -35,6 +35,7 @@ const isDate = (v: unknown): v is string => typeof v === "string" && /^\d{4}-\d{
 
 /** Liste blanche stricte avant toute écriture en base. */
 export function sanitizeAvailability(raw: unknown): AvailabilityState {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const r = (raw && typeof raw === "object" ? raw : {}) as Record<string, any>;
   const recurring = Array.from(
     new Set(
@@ -47,7 +48,9 @@ export function sanitizeAvailability(raw: unknown): AvailabilityState {
   );
   const exceptions: Exception[] = (Array.isArray(r.exceptions) ? r.exceptions : [])
     .slice(0, 50)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .filter((e: any) => e && (e.kind === "available" || e.kind === "unavailable") && isDate(e.date_from) && isDate(e.date_to) && e.date_to >= e.date_from)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .map((e: any) => ({
       kind: e.kind,
       date_from: e.date_from,

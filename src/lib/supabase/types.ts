@@ -110,6 +110,19 @@ export interface Candidate {
   updated_at: string;
 }
 
+/** Champs de planning d'une offre (migration 010), tous optionnels : absents tant que la migration n'est pas appliquée. */
+export interface JobPlanning {
+  work_date_from?: string | null;
+  work_date_to?: string | null;
+  days_needed?: string[];
+  time_slots?: string[];
+  schedule_note?: string | null;
+  positions_count?: number;
+  recurrence?: "ponctuelle" | "recurrente" | null;
+  requirements?: string | null;
+  work_location?: string | null;
+}
+
 export interface Application {
   id: string;
   job_offer_id: string;

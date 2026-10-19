@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2, Phone, User, Mail, CheckCircle2 } from "lucide-react";
 import { useL } from "@/lib/i18n/context";
+import Turnstile from "@/components/security/Turnstile";
 
 interface Props {
   jobId: string;
@@ -27,6 +28,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [captcha, setCaptcha] = useState("");
 
   const [form, setForm] = useState({
     first_name: "",
@@ -71,6 +73,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
         has_caces: form.has_caces,
         caces_types: form.caces_types,
         cover_message: form.cover_message || null,
+        turnstile_token: captcha,
       }),
     });
 
@@ -332,6 +335,8 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
           {form.cover_message.length}/300
         </p>
       </div>
+
+      <Turnstile onToken={setCaptcha} />
 
       {error && (
         <div className="text-sm px-4 py-3 rounded-xl bg-red-50 text-red-600 border border-red-200">

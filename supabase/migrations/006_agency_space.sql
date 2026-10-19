@@ -57,5 +57,5 @@ CREATE POLICY "agency_missions_all" ON agency_missions FOR ALL
   USING (organization_id = auth_user_organization_id() AND auth_user_is_agency())
   WITH CHECK (
     organization_id = auth_user_organization_id() AND auth_user_is_agency()
-    AND EXISTS (SELECT 1 FROM agency_clients c WHERE c.id = client_id AND c.organization_id = organization_id)
+    AND EXISTS (SELECT 1 FROM agency_clients c WHERE c.id = client_id AND c.organization_id = agency_missions.organization_id)
   );

@@ -27,15 +27,16 @@ export default async function DashboardLayout({
 
   if (!profile) redirect((await getSpace()) === "candidate" ? "/candidat/dashboard" : "/onboarding");
 
-  const access = await getOrgAccess(supabase, profile.organization_id);
-
-  // Cloche : candidatures « nouveau » (RLS : uniquement celles de l'organisation)
-  const { data: newApps, count: newCount } = await supabase
+  // Droit d'accès + cloche en parallèle (RLS : uniquement les candidatures de l'organisation)
+  const [access, { data: newApps, count: newCount }] = await Promise.all([
+    getOrgAccess(supabase, profile.organization_id),
+    supabase
     .from("applications")
     .select("id, applicant_name, applied_at, job_offer_id, job_offers(title)", { count: "exact" })
     .eq("status", "nouveau")
     .order("applied_at", { ascending: false })
-    .limit(5);
+    .limit(5),
+  ]);
   const notifications = (newApps ?? []).map((a) => {
     const j = a.job_offers as unknown as { title?: string } | { title?: string }[] | null;
     return {

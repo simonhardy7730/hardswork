@@ -7,6 +7,7 @@ import KanbanBoard from "@/components/kanban/KanbanBoard";
 import { labels } from "@/lib/utils";
 import { getLang } from "@/lib/i18n/server";
 import { purgeRefused } from "@/lib/purge-refused";
+import RetentionSelect from "@/components/kanban/RetentionSelect";
 import type { Application } from "@/lib/supabase/types";
 
 export default async function CandidaturesPage(
@@ -31,7 +32,7 @@ export default async function CandidaturesPage(
     .single();
   if (!profile) redirect("/onboarding");
 
-  await purgeRefused(profile.organization_id).catch(() => {});
+  const retentionDays = await purgeRefused(profile.organization_id).catch(() => 7);
 
   /* Accès (essai en cours ou abonnement) — horloge du serveur */
   const { hasAccess: hasSubscription } = await getOrgAccess(supabase, profile.organization_id);
@@ -96,6 +97,8 @@ export default async function CandidaturesPage(
           </Link>
         </div>
       </div>
+
+      <RetentionSelect days={retentionDays} />
 
       {/* Kanban */}
       <KanbanBoard

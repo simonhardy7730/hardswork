@@ -118,3 +118,15 @@ export async function deleteRefusedApplication(applicationId: string): Promise<{
   const { error } = await admin().from("applications").delete().eq("id", applicationId);
   return { ok: !error };
 }
+
+/** Choisit au bout de combien de jours les candidatures refusées sont supprimées (0 = jamais). */
+export async function setRefusedRetention(days: number): Promise<{ ok: boolean }> {
+  if (![1, 3, 7, 14, 30, 90, 0].includes(days)) return { ok: false };
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+  const { data: profile } = await supabase.from("users").select("organization_id, role").eq("id", user.id).single();
+  if (!profile || profile.role === "viewer") return { ok: false };
+  const { error } = await admin().from("organizations").update({ refused_retention_days: days }).eq("id", profile.organization_id);
+  return { ok: !error };
+}

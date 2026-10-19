@@ -5,6 +5,7 @@ import Link from "next/link";
 import KanbanBoard from "@/components/kanban/KanbanBoard";
 import { getLang } from "@/lib/i18n/server";
 import { purgeRefused } from "@/lib/purge-refused";
+import RetentionSelect from "@/components/kanban/RetentionSelect";
 import type { Application } from "@/lib/supabase/types";
 
 export default async function CandidaturesGlobalPage(props: {
@@ -21,7 +22,7 @@ export default async function CandidaturesGlobalPage(props: {
   if (!profile) redirect("/onboarding");
 
   // Candidatures refusées depuis plus de 30 jours : supprimées (échec toléré)
-  await purgeRefused(profile.organization_id).catch(() => {});
+  const retentionDays = await purgeRefused(profile.organization_id).catch(() => 7);
 
   const { hasAccess } = await getOrgAccess(supabase, profile.organization_id);
 
@@ -56,6 +57,8 @@ export default async function CandidaturesGlobalPage(props: {
           </Link>
         ))}
       </div>
+
+      <RetentionSelect days={retentionDays} />
 
       {titles.size === 0 ? (
         <p className="text-sm text-ink-500">{l("Publiez une offre pour recevoir des candidatures.", "Publiceer een vacature om sollicitaties te ontvangen.")}</p>

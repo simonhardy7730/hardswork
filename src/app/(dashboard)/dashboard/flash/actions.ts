@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { adminClient } from "@/lib/billing/lifecycle";
 import { flashQuote, FLASH_MAX_QTY, FLASH_TERMS_VERSION } from "@/lib/flash/pricing";
 import { sendFlashMail, flashRecipients } from "@/lib/email/flash";
+import { stripeEnabled, createCheckoutUrl } from "@/lib/flash/stripe";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -109,4 +110,23 @@ export async function publishFlashCredit(creditId: string, offerId: string): Pro
   revalidatePath("/dashboard/flash");
   revalidatePath("/dashboard/offres");
   return { ok: true };
+}
+
+/** Paiement en ligne (Stripe) d'une commande en attente. N'existe que si les clés Stripe sont configurées. */
+export async function startFlashCheckout(orderId: string): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
+  if (!stripeEnabled()) return { ok: false, error: "Le paiement en ligne n'est pas encore disponible. Payez par virement avec la facture." };
+  const ctx = await companyUser();
+  if (!ctx) return { ok: false, error: "Connexion requise." };
+  if (!UUID.test(orderId)) return { ok: false, error: "Commande invalide." };
+  // RLS : seule une commande de votre organisation est lisible.
+  const { data: order } = await ctx.supabase.from("flash_orders").select("*").eq("id", orderId).maybeSingle();
+  if (!order || order.organization_id !== ctx.orgId) return { ok: false, error: "Commande introuvable." };
+  if (order.status !== "awaiting_payment" || order.payment_status !== "pending") return { ok: false, error: "Cette commande n'est plus en attente de paiement." };
+  try {
+    const url = await createCheckoutUrl(adminClient(), order);
+    return { ok: true, url };
+  } catch (err) {
+    console.error("Stripe checkout error:", err);
+    return { ok: false, error: "Impossible d'ouvrir la page de paiement. Réessayez ou payez par virement." };
+  }
 }

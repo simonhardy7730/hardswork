@@ -5,13 +5,15 @@ import { getL, getLang } from "@/lib/i18n/server";
 import { formatEuro, daysLeft, CREDIT_LABEL, ORDER_LABEL, FLASH_DAYS, type CreditStatus, type OrderStatus } from "@/lib/flash/pricing";
 import { formatDay, brusselsDay } from "@/lib/billing/contract";
 import PublishCreditForm from "@/components/flash/PublishCreditForm";
+import PayOnlineButton from "@/components/flash/PayOnlineButton";
+import { stripeEnabled } from "@/lib/flash/stripe";
 
 const STATUS_CLS: Record<CreditStatus, string> = {
   pending: "bg-amber-100 text-amber-700", available: "bg-blue-100 text-blue-700", active: "bg-green-100 text-green-700",
   suspended: "bg-red-100 text-red-600", expired: "bg-gray-100 text-gray-600", lapsed: "bg-gray-100 text-gray-600", void: "bg-gray-100 text-gray-500",
 };
 
-export default async function FlashPage({ searchParams }: { searchParams: Promise<{ commande?: string }> }) {
+export default async function FlashPage({ searchParams }: { searchParams: Promise<{ commande?: string; paiement?: string }> }) {
   const sp = await searchParams;
   const l = await getL();
   const lang = await getLang();
@@ -22,6 +24,7 @@ export default async function FlashPage({ searchParams }: { searchParams: Promis
   const { data: profile } = await supabase.from("users").select("organization_id").eq("id", user.id).single();
   if (!profile) redirect("/onboarding");
   const orgId = profile.organization_id as string;
+  const stripeOn = stripeEnabled();
 
   const [{ data: orders, error: oErr }, { data: credits }, { data: drafts }] = await Promise.all([
     supabase.from("flash_orders").select("*").eq("organization_id", orgId).order("ordered_at", { ascending: false }),
@@ -61,6 +64,16 @@ export default async function FlashPage({ searchParams }: { searchParams: Promis
       {sp.commande === "ok" && (
         <p className="rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3" role="status">
           {l("Commande enregistrée. Vous recevez un e-mail de confirmation ; la facture suit. Vos annonces sont activées après confirmation du paiement.", "Bestelling geregistreerd. U ontvangt een bevestigingsmail; de factuur volgt. Uw advertenties worden geactiveerd na bevestiging van de betaling.")}
+        </p>
+      )}
+      {sp.paiement === "ok" && (
+        <p className="rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3" role="status">
+          {l("Paiement reçu, merci ! La confirmation est automatique : vos annonces sont activées dans quelques instants (rechargez la page si besoin). Votre facture vous est envoyée par e-mail.", "Betaling ontvangen, bedankt! De bevestiging is automatisch: uw advertenties worden binnen enkele ogenblikken geactiveerd (herlaad de pagina indien nodig). Uw factuur wordt per e-mail verstuurd.")}
+        </p>
+      )}
+      {sp.paiement === "annule" && (
+        <p className="rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3" role="status">
+          {l("Paiement annulé : aucun montant n'a été débité. Vous pouvez réessayer depuis « Mes commandes ».", "Betaling geannuleerd: er is niets afgeschreven. U kunt het opnieuw proberen via « Mijn bestellingen ».")}
         </p>
       )}
       {oErr && <p className="text-sm text-ink-500">{l("Le service Flash n'est pas encore activé sur ce compte.", "De Flash-dienst is nog niet geactiveerd op dit account.")}</p>}
@@ -148,6 +161,9 @@ export default async function FlashPage({ searchParams }: { searchParams: Promis
                   <p className="font-bold">{eur(o.total_ht_cents as number)} <span className="text-xs font-normal text-ink-400">HTVA</span></p>
                   {(o.discount_cents as number) > 0 && <p className="text-xs text-emerald-700">{l("Remise Flash Duo", "Flash Duo-korting")} {eur(-(o.discount_cents as number))}</p>}
                   <p className="text-xs text-ink-400">{eur(o.total_ttc_cents as number)} TVAC</p>
+                  {stripeOn && o.status === "awaiting_payment" && o.payment_status === "pending" && (
+                    <div className="mt-2 sm:flex sm:justify-end"><PayOnlineButton orderId={o.id as string} label={l("Payer en ligne", "Online betalen")} /></div>
+                  )}
                 </div>
               </div>
             ))}

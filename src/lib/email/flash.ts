@@ -12,7 +12,7 @@ const FLASH_URL = () => `${APP()}/dashboard/flash`;
 export type FlashMail =
   | { kind: "order_confirmation"; orgName: string; orderNumber: number; quantity: number; unitCents: number; discountCents: number; totalHtCents: number; vatCents: number; totalTtcCents: number }
   | { kind: "invoice_issued"; orderNumber: number; invoiceRef: string; totalHtCents: number; totalTtcCents: number }
-  | { kind: "payment_confirmed"; orderNumber: number; published: number; available: number }
+  | { kind: "payment_confirmed"; orderNumber: number; published: number; available: number; invoiceUrl?: string }
   | { kind: "reminder"; jobTitle: string; daysLeft: number; expiresAt: string }
   | { kind: "expired"; jobTitle: string }
   | { kind: "pro_proposal"; orgName: string }
@@ -44,6 +44,7 @@ ${li([
 ${li([
   m.published > 0 ? `${m.published} annonce(s) publiée(s) : leurs 30 jours démarrent aujourd'hui.` : `Aucune annonce publiée pour l'instant.`,
   ...(m.available > 0 ? [`${m.available} annonce(s) à activer quand vous le souhaitez, dans les 90 jours suivant l'achat. Les 30 jours démarrent à la publication.`] : []),
+  ...(m.invoiceUrl ? [`Votre facture acquittée : <a href="${esc(m.invoiceUrl)}">consulter / télécharger</a>.`] : []),
 ])}`, { label: "Voir mes annonces Flash", href: FLASH_URL() }),
       };
     case "reminder":

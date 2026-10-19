@@ -138,6 +138,16 @@ export default function PrivacyPage() {
               </p>
             </LegalSection>
 
+            <LegalSection title="7 bis. Mineurs">
+              <p>
+                Wolko s&apos;adresse aux personnes en âge de travailler. Si vous avez moins de 18 ans, vous ne pouvez
+                postuler qu&apos;à des offres compatibles avec la réglementation sur le travail des jeunes, et un
+                représentant légal peut exercer vos droits en notre nom en écrivant à{" "}
+                <a href="mailto:hello@wolko.be">hello@wolko.be</a>. Nous ne réutilisons jamais le profil d&apos;un mineur
+                pour du démarchage.
+              </p>
+            </LegalSection>
+
             <LegalSection title="8. Cookies">
               <p>
                 Wolko utilise uniquement des cookies strictement nécessaires au fonctionnement

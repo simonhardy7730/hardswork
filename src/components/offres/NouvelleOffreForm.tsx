@@ -12,11 +12,11 @@ import {
   Zap,
 } from "lucide-react";
 import {
-  SECTOR_LABELS,
-  CONTRACT_LABELS,
+  labels,
   SECTOR_TEMPLATES,
   JOB_TITLE_SUGGESTIONS,
 } from "@/lib/utils";
+import { useL, useLang } from "@/lib/i18n/context";
 import type { JobOfferInsert, Region, Sector, ContractType } from "@/lib/supabase/types";
 
 // ── Types ─────────────────────────────────────────────
@@ -47,15 +47,15 @@ interface FormData {
 const LICENSES = ["B", "C", "CE"];
 const CACES = ["CACES 1", "CACES 3", "CACES 5"];
 const LANGUAGES = [
-  { value: "fr", label: "Français" },
-  { value: "nl", label: "Néerlandais" },
-  { value: "en", label: "Anglais" },
+  { value: "fr", fr: "Français", nl: "Frans" },
+  { value: "nl", fr: "Néerlandais", nl: "Nederlands" },
+  { value: "en", fr: "Anglais", nl: "Engels" },
 ];
 
 const STEPS = [
-  { num: 1, label: "L'essentiel" },
-  { num: 2, label: "Les critères" },
-  { num: 3, label: "La description" },
+  { num: 1, fr: "L'essentiel", nl: "Het essentiële" },
+  { num: 2, fr: "Les critères", nl: "De criteria" },
+  { num: 3, fr: "La description", nl: "De beschrijving" },
 ];
 
 const SECTOR_ICONS: Record<string, string> = {
@@ -78,6 +78,9 @@ export default function NouvelleOffreForm({
   userId: string;
 }) {
   const router = useRouter();
+  const l = useL();
+  const lang = useLang();
+  const { sector: SECTOR_LABELS, contract: CONTRACT_LABELS, region: REGION_LABELS } = labels(lang);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -164,7 +167,7 @@ export default function NouvelleOffreForm({
 
     if (error || !data) {
       setLoading(false);
-      alert("Erreur lors de la création. Réessayez.");
+      alert(l("Erreur lors de la création. Réessayez.", "Fout bij het aanmaken. Probeer opnieuw."));
       return;
     }
 
@@ -192,7 +195,7 @@ export default function NouvelleOffreForm({
               <span
                 className={`text-sm font-medium ${step === s.num ? "text-ink" : "text-ink-300"}`}
               >
-                {s.label}
+                {l(s.fr, s.nl)}
               </span>
             </div>
             {i < STEPS.length - 1 && (
@@ -209,13 +212,13 @@ export default function NouvelleOffreForm({
         {step === 1 && (
           <div className="space-y-5">
             <h2 className="font-semibold text-ink">
-              L&apos;essentiel du poste
+              {l("L'essentiel du poste", "Het essentiële van de functie")}
             </h2>
 
             {/* Titre */}
             <div>
               <label className="block text-sm font-medium text-ink mb-1.5">
-                Titre du poste *
+                {l("Titre du poste *", "Functietitel *")}
               </label>
               <div className="relative">
                 <input
@@ -231,7 +234,7 @@ export default function NouvelleOffreForm({
                   onBlur={() =>
                     setTimeout(() => setShowSuggestions(false), 150)
                   }
-                  placeholder="ex: Cariste CACES 3, Chauffeur SPL..."
+                  placeholder={l("ex: Cariste CACES 3, Chauffeur SPL...", "bv. Heftruckchauffeur, Vrachtwagenchauffeur...")}
                   className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition"
                 />
                 {/* Suggestions */}
@@ -259,7 +262,7 @@ export default function NouvelleOffreForm({
             {/* Secteur */}
             <div>
               <label className="block text-sm font-medium text-ink mb-2">
-                Secteur *
+                {l("Secteur *", "Sector *")}
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {Object.entries(SECTOR_LABELS).map(([val, label]) => (
@@ -282,7 +285,7 @@ export default function NouvelleOffreForm({
             {/* Contrat */}
             <div>
               <label className="block text-sm font-medium text-ink mb-1.5">
-                Type de contrat *
+                {l("Type de contrat *", "Soort contract *")}
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {Object.entries(CONTRACT_LABELS).map(([val, label]) => (
@@ -305,28 +308,28 @@ export default function NouvelleOffreForm({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-ink mb-1.5">
-                  Ville *
+                  {l("Ville *", "Stad *")}
                 </label>
                 <input
                   type="text"
                   value={form.city}
                   onChange={(e) => set("city", e.target.value)}
-                  placeholder="Liège"
+                  placeholder={l("Liège", "Antwerpen")}
                   className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-ink mb-1.5">
-                  Région *
+                  {l("Région *", "Regio *")}
                 </label>
                 <select
                   value={form.region}
                   onChange={(e) => set("region", e.target.value as Region)}
                   className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition bg-white"
                 >
-                  <option value="wallonie">Wallonie</option>
-                  <option value="bruxelles">Bruxelles</option>
-                  <option value="flandre">Flandre</option>
+                  <option value="wallonie">{REGION_LABELS.wallonie}</option>
+                  <option value="bruxelles">{REGION_LABELS.bruxelles}</option>
+                  <option value="flandre">{REGION_LABELS.flandre}</option>
                 </select>
               </div>
             </div>
@@ -335,8 +338,8 @@ export default function NouvelleOffreForm({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-ink mb-1.5">
-                  Date de début
-                  <span className="text-ink-300 font-normal ml-1">(optionnel)</span>
+                  {l("Date de début", "Startdatum")}
+                  <span className="text-ink-300 font-normal ml-1">{l("(optionnel)", "(optioneel)")}</span>
                 </label>
                 <input
                   type="date"
@@ -347,7 +350,7 @@ export default function NouvelleOffreForm({
               </div>
               <div>
                 <label className="block text-sm font-medium text-ink mb-1.5">
-                  Urgence
+                  {l("Urgence", "Dringend")}
                 </label>
                 <button
                   onClick={() => set("is_urgent", !form.is_urgent)}
@@ -359,7 +362,7 @@ export default function NouvelleOffreForm({
                 >
                   <span className="flex items-center gap-2">
                     <AlertCircle size={15} />
-                    Poste urgent
+                    {l("Poste urgent", "Dringende functie")}
                   </span>
                   <div
                     className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${
@@ -382,14 +385,14 @@ export default function NouvelleOffreForm({
         {step === 2 && (
           <div className="space-y-5">
             <h2 className="font-semibold text-ink">
-              Critères du candidat
+              {l("Critères du candidat", "Criteria voor de kandidaat")}
             </h2>
 
             {/* Salaire */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium text-ink">
-                  Fourchette de salaire
+                  {l("Fourchette de salaire", "Loonschaal")}
                 </label>
                 <button
                   onClick={() => set("show_salary", !form.show_salary)}
@@ -406,7 +409,7 @@ export default function NouvelleOffreForm({
                       }`}
                     />
                   </div>
-                  Afficher le salaire
+                  {l("Afficher le salaire", "Loon tonen")}
                 </button>
               </div>
               {form.show_salary && (
@@ -427,15 +430,15 @@ export default function NouvelleOffreForm({
                     className="flex-1 px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                   />
                   <select
-                    value={form.salary_period}
+                    value={form.salary_period === "heure" ? l("h", "u") : form.salary_period === "jour" ? l("j", "dag") : l("mois", "maand")}
                     onChange={(e) =>
                       set("salary_period", e.target.value as "heure" | "jour" | "mois")
                     }
                     className="px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand bg-white transition"
                   >
                     <option value="heure">€/h</option>
-                    <option value="jour">€/j</option>
-                    <option value="mois">€/mois</option>
+                    <option value="jour">{l("€/j", "€/dag")}</option>
+                    <option value="mois">{l("€/mois", "€/maand")}</option>
                   </select>
                 </div>
               )}
@@ -444,14 +447,14 @@ export default function NouvelleOffreForm({
             {/* Horaires */}
             <div>
               <label className="block text-sm font-medium text-ink mb-2">
-                Type d&apos;horaire
+                {l("Type d'horaire", "Soort uurrooster")}
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
-                  { val: "jour", label: "☀️ Jour" },
-                  { val: "nuit", label: "🌙 Nuit" },
-                  { val: "week-end", label: "📅 Week-end" },
-                  { val: "flexible", label: "🔄 Flexible" },
+                  { val: "jour", label: "☀️ " + l("Jour", "Dag") },
+                  { val: "nuit", label: "🌙 " + l("Nuit", "Nacht") },
+                  { val: "week-end", label: "📅 " + l("Week-end", "Weekend") },
+                  { val: "flexible", label: "🔄 " + l("Flexible", "Flexibel") },
                 ].map((opt) => (
                   <button
                     key={opt.val}
@@ -471,7 +474,7 @@ export default function NouvelleOffreForm({
             {/* Permis */}
             <div>
               <label className="block text-sm font-medium text-ink mb-2">
-                Permis de conduire requis
+                {l("Permis de conduire requis", "Vereist rijbewijs")}
               </label>
               <div className="flex gap-2">
                 {LICENSES.map((lic) => (
@@ -493,7 +496,7 @@ export default function NouvelleOffreForm({
             {/* CACES */}
             <div>
               <label className="block text-sm font-medium text-ink mb-2">
-                CACES requis
+                {l("CACES requis", "Vereist CACES-attest")}
               </label>
               <div className="flex gap-2">
                 {CACES.map((c) => (
@@ -515,20 +518,20 @@ export default function NouvelleOffreForm({
             {/* Langues */}
             <div>
               <label className="block text-sm font-medium text-ink mb-2">
-                Langues requises
+                {l("Langues requises", "Vereiste talen")}
               </label>
               <div className="flex gap-2">
-                {LANGUAGES.map((lang) => (
+                {LANGUAGES.map((lg) => (
                   <button
-                    key={lang.value}
-                    onClick={() => toggleArray("required_languages", lang.value)}
+                    key={lg.value}
+                    onClick={() => toggleArray("required_languages", lg.value)}
                     className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition ${
-                      form.required_languages.includes(lang.value)
+                      form.required_languages.includes(lg.value)
                         ? "border-brand bg-blue-50 text-brand"
                         : "border-ink-100 text-ink-500 hover:border-brand/50"
                     }`}
                   >
-                    {lang.label}
+                    {l(lg.fr, lg.nl)}
                   </button>
                 ))}
               </div>
@@ -537,19 +540,19 @@ export default function NouvelleOffreForm({
             {/* Expérience */}
             <div>
               <label className="block text-sm font-medium text-ink mb-1.5">
-                Années d&apos;expérience minimum
+                {l("Années d'expérience minimum", "Minimaal aantal jaren ervaring")}
               </label>
               <select
                 value={form.experience_years}
                 onChange={(e) => set("experience_years", e.target.value)}
                 className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand bg-white transition"
               >
-                <option value="">Non précisé</option>
-                <option value="0">Débutant accepté</option>
-                <option value="1">1 an minimum</option>
-                <option value="2">2 ans minimum</option>
-                <option value="3">3 ans minimum</option>
-                <option value="5">5 ans minimum</option>
+                <option value="">{l("Non précisé", "Niet gespecificeerd")}</option>
+                <option value="0">{l("Débutant accepté", "Starter aanvaard")}</option>
+                <option value="1">{l("1 an minimum", "Minstens 1 jaar")}</option>
+                <option value="2">{l("2 ans minimum", "Minstens 2 jaar")}</option>
+                <option value="3">{l("3 ans minimum", "Minstens 3 jaar")}</option>
+                <option value="5">{l("5 ans minimum", "Minstens 5 jaar")}</option>
               </select>
             </div>
           </div>
@@ -559,15 +562,15 @@ export default function NouvelleOffreForm({
         {step === 3 && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-ink">Description</h2>
+              <h2 className="font-semibold text-ink">{l("Description", "Beschrijving")}</h2>
               <button
                 onClick={applyTemplate}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg text-xs font-medium hover:bg-amber-100 transition"
               >
                 <Zap size={13} />
                 {descriptionTemplateApplied
-                  ? "Modèle appliqué ✓"
-                  : `Appliquer le modèle ${SECTOR_LABELS[form.sector]}`}
+                  ? l("Modèle appliqué ✓", "Sjabloon toegepast ✓")
+                  : l(`Appliquer le modèle ${SECTOR_LABELS[form.sector]}`, `Sjabloon ${SECTOR_LABELS[form.sector]} toepassen`)}
               </button>
             </div>
 
@@ -575,14 +578,14 @@ export default function NouvelleOffreForm({
               value={form.description}
               onChange={(e) => set("description", e.target.value)}
               rows={12}
-              placeholder="Décrivez le poste, les missions et le profil recherché..."
+              placeholder={l("Décrivez le poste, les missions et le profil recherché...", "Beschrijf de functie, de taken en het gezochte profiel...")}
               className="w-full px-3 py-3 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition resize-none"
             />
 
             {/* Aperçu mini */}
             <div className="bg-surface rounded-lg border border-ink-100 p-4">
               <p className="text-xs font-semibold text-ink-500 mb-2 uppercase tracking-wide">
-                Aperçu de l&apos;offre
+                {l("Aperçu de l'offre", "Voorbeeld van de vacature")}
               </p>
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-lg bg-white border border-ink-100 flex items-center justify-center text-lg shrink-0">
@@ -590,7 +593,7 @@ export default function NouvelleOffreForm({
                 </div>
                 <div>
                   <h3 className="font-semibold text-ink text-sm">
-                    {form.title || "Titre du poste"}
+                    {form.title || l("Titre du poste", "Functietitel")}
                     {form.is_urgent && (
                       <span className="ml-2 text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-semibold">
                         URGENT
@@ -599,7 +602,7 @@ export default function NouvelleOffreForm({
                   </h3>
                   <p className="text-xs text-ink-500">
                     {SECTOR_LABELS[form.sector]} · {CONTRACT_LABELS[form.contract_type]} ·{" "}
-                    {form.city || "Ville"} ({form.region})
+                    {form.city || l("Ville", "Stad")} ({REGION_LABELS[form.region]})
                   </p>
                   {form.show_salary && form.salary_min && (
                     <p className="text-xs text-[#10B981] font-medium mt-1">
@@ -622,7 +625,7 @@ export default function NouvelleOffreForm({
               className="flex items-center gap-2 px-4 py-2 border border-ink-100 rounded-lg text-sm font-medium text-ink-500 hover:bg-surface-2 transition"
             >
               <ArrowLeft size={15} />
-              Retour
+              {l("Retour", "Terug")}
             </button>
           ) : (
             <div />
@@ -634,7 +637,7 @@ export default function NouvelleOffreForm({
               disabled={!canGoNext()}
               className="flex items-center gap-2 bg-brand text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-brand-dark transition disabled:opacity-40"
             >
-              Continuer
+              {l("Continuer", "Verder")}
               <ArrowRight size={15} />
             </button>
           ) : (
@@ -644,7 +647,7 @@ export default function NouvelleOffreForm({
                 disabled={loading || !canGoNext()}
                 className="flex items-center gap-2 px-4 py-2 border border-ink-100 rounded-lg text-sm font-medium text-ink-500 hover:bg-surface-2 transition disabled:opacity-40"
               >
-                Sauvegarder en brouillon
+                {l("Sauvegarder en brouillon", "Opslaan als concept")}
               </button>
               <button
                 onClick={() => handleSubmit("active")}
@@ -656,7 +659,7 @@ export default function NouvelleOffreForm({
                 ) : (
                   <Check size={15} />
                 )}
-                Publier l&apos;offre
+                {l("Publier l'offre", "Vacature publiceren")}
               </button>
             </div>
           )}

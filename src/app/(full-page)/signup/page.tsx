@@ -133,8 +133,11 @@ function NormalSignup() {
   const lang = useLang();
   const l: L = (fr, nl) => (lang === "nl" ? nl : fr);
   const ROLES = makeRoles(l);
-  const [step, setStep] = useState<1 | 2>(1);
-  const [orgType, setOrgType] = useState<OrgType | null>(null);
+  const typeParam = useSearchParams().get("type");
+  // ?type= ne fait que présélectionner le type d'organisation affiché ; aucun droit n'en découle.
+  const presetType: OrgType | null = typeParam === "agency" || typeParam === "company" ? typeParam : null;
+  const [step, setStep] = useState<1 | 2>(presetType ? 2 : 1);
+  const [orgType, setOrgType] = useState<OrgType | null>(presetType);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [cgu, setCgu] = useState(false);

@@ -8,15 +8,13 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient();
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
       // If a specific `next` was provided, honour it
-      if (next) return NextResponse.redirect(`${origin}${next}`);
+      if (next && next.startsWith("/") && !next.startsWith("//")) return NextResponse.redirect(`${origin}${next}`);
 
-      // Otherwise route by user_type stored in metadata
-      const userType = data.user?.user_metadata?.user_type;
-      const destination = userType === "candidate" ? "/candidat/dashboard" : "/dashboard";
-      return NextResponse.redirect(`${origin}${destination}`);
+      // Sinon : espace déterminé côté serveur à partir de la base
+      return NextResponse.redirect(`${origin}/auth/redirect`);
     }
   }
 

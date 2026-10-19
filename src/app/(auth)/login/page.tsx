@@ -28,19 +28,15 @@ export default function LoginPage() {
     const supabase = createClient();
 
     if (mode === "password") {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       if (error) {
         setMessage({ type: "error", text: l("Email ou mot de passe incorrect.", "Onjuist e-mailadres of wachtwoord.") });
       } else {
-        const userType = data.user?.user_metadata?.user_type;
-        if (userType === "candidate") {
-          router.push("/candidat/dashboard");
-        } else {
-          router.push("/dashboard");
-        }
+        // L'espace (candidat / entreprise / agence) est déterminé côté serveur.
+        router.push("/auth/redirect");
         router.refresh();
       }
     } else {

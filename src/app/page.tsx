@@ -90,6 +90,9 @@ export default async function HomePage() {
             <p className="text-white/80 text-base sm:text-lg leading-relaxed max-w-xl mb-8 animate-fade-up-2">
               {t.hero.sub}
             </p>
+            <p className="text-[#FFB900] text-xs sm:text-sm font-bold uppercase tracking-[0.14em] -mt-4 mb-8 animate-fade-up-2">
+              {t.hero.signature}
+            </p>
 
             <div className="grid sm:grid-cols-2 gap-3 animate-fade-up-3">
               {/* Candidat */}
@@ -112,7 +115,7 @@ export default async function HomePage() {
                 <p className="text-sm text-white/70 leading-relaxed mb-5 flex-1">
                   {t.hero.recText}
                 </p>
-                <Link href="/recrute" className="btn-ghost-dark justify-center">{t.hero.recCta} <ArrowRight size={15} /></Link>
+                <Link href="/inscription/recruteur" className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 font-bold text-[15px] bg-[#FFFBF2] text-[#101F43] border-2 border-[#FFB900] hover:bg-white transition-colors">{t.hero.recCta} <ArrowRight size={15} /></Link>
               </div>
             </div>
           </div>

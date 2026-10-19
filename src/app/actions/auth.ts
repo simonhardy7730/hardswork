@@ -15,7 +15,7 @@ export async function signIn(formData: FormData) {
     return { error: "Email ou mot de passe incorrect." };
   }
 
-  redirect("/dashboard");
+  redirect("/auth/redirect");
 }
 
 export async function signInWithMagicLink(formData: FormData) {

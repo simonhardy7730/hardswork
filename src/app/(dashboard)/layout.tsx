@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import DashboardSidebar from "@/components/dashboard/Sidebar";
 import DashboardTopbar from "@/components/dashboard/Topbar";
+import { getSpace } from "@/lib/auth/space";
 
 export default async function DashboardLayout({
   children,
@@ -21,7 +22,7 @@ export default async function DashboardLayout({
     .eq("id", user.id)
     .single();
 
-  if (!profile) redirect("/onboarding");
+  if (!profile) redirect((await getSpace()) === "candidate" ? "/candidat/dashboard" : "/onboarding");
 
   return (
     <div className="flex h-screen bg-surface overflow-hidden">

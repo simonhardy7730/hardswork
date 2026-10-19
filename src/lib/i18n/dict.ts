@@ -17,7 +17,8 @@ const fr = {
     h1a: "Le bon talent.", h1b: "La bonne ", h1c: "entreprise.",
     sub: "La plateforme belge qui rapproche les candidats, les entreprises et les agences d'intérim. Trouvez un emploi ou recrutez plus simplement, près de chez vous.",
     candTitle: "Je cherche un emploi", candText: "Découvrez les opportunités près de chez vous et postulez facilement.", candCta: "Trouver un emploi",
-    recTitle: "Je recrute", recText: "Publiez vos offres et rencontrez vos futurs collaborateurs.", recCta: "Publier une offre",
+    recTitle: "Je recrute", recText: "Publiez vos offres et rencontrez vos futurs collaborateurs.", recCta: "Je recrute",
+    signature: "WOLKO — Le recrutement a du flair.",
   },
   mosaic: { construction: "Construction", health: "Santé", transport: "Transport", industry: "Industrie", logistics: "Logistique", office: "Bureau" },
   search: {
@@ -68,9 +69,17 @@ const fr = {
   final: { title: "Prêt à vous lancer ?", text: "Candidat ou recruteur, créez votre compte en quelques minutes.", cand: "Je cherche un emploi", rec: "Je recrute" },
   signup: {
     title: "Créer un compte", ask: "Vous êtes plutôt…",
-    candTitle: "Je cherche un emploi", candText: "Créez votre profil et postulez facilement.", candCta: "Créer mon profil",
+    candTitle: "Candidat", candText: "Je recherche un emploi.", candCta: "Créer mon profil",
     recTitle: "Je recrute", recText: "Publiez vos offres et rencontrez vos futurs collaborateurs.", recCta: "Créer mon espace",
+    entTitle: "Entreprise / PME", entText: "Je recrute pour ma société.", entCta: "Créer mon espace entreprise",
+    agTitle: "Agence", agText: "Je recrute pour plusieurs entreprises clientes.", agCta: "Créer mon espace agence",
     already: "Déjà inscrit ?", login: "Connexion",
+  },
+  recruiterChoice: {
+    title: "Je recrute", ask: "Quel type de recruteur êtes-vous ?",
+    entTitle: "Je recrute pour mon entreprise", entText: "Publiez vos offres, centralisez vos candidatures et gérez vos recrutements depuis un espace unique.", entCta: "Créer mon espace entreprise",
+    agTitle: "Je recrute pour mes clients", agText: "Gérez vos candidats, vos entreprises clientes, vos missions et votre activité commerciale depuis un logiciel complet.", agCta: "Créer mon espace agence",
+    learn: "En savoir plus sur l'espace recruteurs",
   },
 };
 
@@ -94,7 +103,8 @@ const nl: Dict = {
     h1a: "Het juiste talent.", h1b: "Het juiste ", h1c: "bedrijf.",
     sub: "Het Belgische platform dat kandidaten, bedrijven en uitzendkantoren samenbrengt. Vind een job of werf eenvoudiger aan, dicht bij huis.",
     candTitle: "Ik zoek een job", candText: "Ontdek de kansen in je buurt en solliciteer eenvoudig.", candCta: "Vind een job",
-    recTitle: "Ik werf aan", recText: "Plaats je vacatures en ontmoet je toekomstige collega's.", recCta: "Plaats een vacature",
+    recTitle: "Ik werf aan", recText: "Plaats je vacatures en ontmoet je toekomstige collega's.", recCta: "Ik werf aan",
+    signature: "WOLKO — Recruteren met flair.",
   },
   mosaic: { construction: "Bouw", health: "Zorg", transport: "Transport", industry: "Industrie", logistics: "Logistiek", office: "Kantoor" },
   search: {
@@ -145,9 +155,17 @@ const nl: Dict = {
   final: { title: "Klaar om te starten?", text: "Kandidaat of werkgever, maak je account aan in enkele minuten.", cand: "Ik zoek een job", rec: "Ik werf aan" },
   signup: {
     title: "Account aanmaken", ask: "Je bent eerder…",
-    candTitle: "Ik zoek een job", candText: "Maak je profiel aan en solliciteer eenvoudig.", candCta: "Mijn profiel maken",
+    candTitle: "Kandidaat", candText: "Ik zoek een job.", candCta: "Mijn profiel maken",
     recTitle: "Ik werf aan", recText: "Plaats je vacatures en ontmoet je toekomstige collega's.", recCta: "Mijn omgeving maken",
+    entTitle: "Bedrijf / kmo", entText: "Ik werf aan voor mijn bedrijf.", entCta: "Mijn bedrijfsruimte maken",
+    agTitle: "Kantoor", agText: "Ik werf aan voor meerdere klantbedrijven.", agCta: "Mijn kantoorruimte maken",
     already: "Al een account?", login: "Inloggen",
+  },
+  recruiterChoice: {
+    title: "Ik werf aan", ask: "Wat voor werver ben je?",
+    entTitle: "Ik werf aan voor mijn bedrijf", entText: "Plaats je vacatures, centraliseer je sollicitaties en beheer je aanwervingen vanuit één ruimte.", entCta: "Mijn bedrijfsruimte maken",
+    agTitle: "Ik werf aan voor mijn klanten", agText: "Beheer je kandidaten, klantbedrijven, opdrachten en commerciële activiteit vanuit één volledige software.", agCta: "Mijn kantoorruimte maken",
+    learn: "Meer over de werkgeversruimte",
   },
 };
 

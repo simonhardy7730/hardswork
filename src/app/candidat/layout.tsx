@@ -5,12 +5,16 @@ import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { LayoutDashboard, Search, Bell, User, LogOut } from "lucide-react";
 import { LangSwitch } from "@/components/layout/LangSwitch";
 import { getL } from "@/lib/i18n/server";
+import { getSpace, SPACE_HOME } from "@/lib/auth/space";
 
 export default async function CandidatLayout({ children }: { children: React.ReactNode }) {
   const l = getL();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+  // Un compte entreprise/agence n'a pas accès à l'espace candidat.
+  const space = await getSpace();
+  if (space === "company" || space === "agency") redirect(SPACE_HOME[space]);
 
   const initials = (user.user_metadata?.full_name as string ?? user.email ?? "?")
     .split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase();

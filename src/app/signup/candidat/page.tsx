@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { friendlyAuthError } from "@/lib/auth-errors";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -93,6 +94,7 @@ export default function CandidatSignupPage() {
   const sectorLbl = labels(lang).sector;
   const [step, setStep]     = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
+  const submitting = useRef(false); // anti double-envoi (double clic / touche Entrée)
   const [error, setError]   = useState("");
 
   /* Étape 1 — secteurs */
@@ -118,6 +120,16 @@ export default function CandidatSignupPage() {
 
   /* ── Submit final ──────────────────────────────────── */
   async function handleSubmit() {
+    if (submitting.current) return;
+    submitting.current = true;
+    try {
+      await doSubmit();
+    } finally {
+      submitting.current = false;
+    }
+  }
+
+  async function doSubmit() {
     setLoading(true);
     setError("");
     const supabase = createClient();
@@ -133,7 +145,7 @@ export default function CandidatSignupPage() {
     });
 
     if (authError || !authData.user) {
-      setError(authError?.message ?? l("Erreur lors de l'inscription.", "Fout bij het registreren."));
+      setError(friendlyAuthError(authError?.message, l));
       setLoading(false);
       return;
     }

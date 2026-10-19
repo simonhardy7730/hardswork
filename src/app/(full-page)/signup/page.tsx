@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
+import { friendlyAuthError } from "@/lib/auth-errors";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -75,7 +76,7 @@ function InviteSignup({ token }: { token: string }) {
         emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/invite/accept?token=${token}`)}`,
       },
     });
-    if (authError || !authData.user) { setError(authError?.message ?? l("Erreur lors de l'inscription.", "Fout bij het registreren.")); setLoading(false); return; }
+    if (authError || !authData.user) { setError(friendlyAuthError(authError?.message, l)); setLoading(false); return; }
     if (authData.session) {
       // Session immédiate (confirmation e-mail désactivée) : on accepte tout de suite.
       const { error: acceptError } = await supabase.rpc("accept_team_invite", { p_token: token });
@@ -196,7 +197,7 @@ function NormalSignup() {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-    if (authError || !authData.user) { setError(authError?.message ?? l("Erreur lors de l'inscription.", "Fout bij het registreren.")); setLoading(false); return; }
+    if (authError || !authData.user) { setError(friendlyAuthError(authError?.message, l)); setLoading(false); return; }
     if (!authData.session) {
       setNotice(l("Compte créé ! Vérifiez votre boîte mail et cliquez sur le lien pour confirmer votre adresse.", "Account aangemaakt! Controleer je mailbox en klik op de link om je e-mailadres te bevestigen."));
       setLoading(false);

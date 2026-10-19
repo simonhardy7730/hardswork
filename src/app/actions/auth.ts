@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { isValidVat, normalizeVat } from "@/lib/vat";
 import { getLang } from "@/lib/i18n/server";
+import { friendlyAuthError } from "@/lib/auth-errors";
 
 export async function signIn(formData: FormData) {
   const email = formData.get("email") as string;
@@ -61,7 +62,8 @@ export async function signUp(formData: FormData) {
   });
 
   if (authError || !authData.user) {
-    return { error: authError?.message ?? "Erreur lors de l'inscription." };
+    const nl = getLang() === "nl";
+    return { error: friendlyAuthError(authError?.message, (fr, n) => (nl ? n : fr)) };
   }
 
   // Sans session (confirmation e-mail activée) : on demande de confirmer l'adresse.

@@ -97,7 +97,11 @@ export default function KanbanBoard({
     setActiveId(null);
     if (!over) return;
     const appId = active.id as string;
-    const newStatus = over.id as ApplicationStatus;
+    // Déposé sur une colonne → son id ; déposé sur une carte → le statut de la colonne de cette carte.
+    const overId = over.id as string;
+    const column = COLUMNS.find(c => c.id === overId);
+    const newStatus = (column ? column.id : apps.find(a => a.id === overId)?.status) as ApplicationStatus | undefined;
+    if (!newStatus) return;
     const app = apps.find(a => a.id === appId);
     if (!app || app.status === newStatus) return;
 

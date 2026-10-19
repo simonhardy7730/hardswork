@@ -64,9 +64,13 @@ export async function updateCustomization(formData: FormData) {
     return { error: "Seul un administrateur peut modifier ces informations." };
   }
 
+  const logo = ((formData.get("logo_url") as string) || "").trim();
+  const color = ((formData.get("primary_color") as string) || "").trim();
+  if (logo && !/^https:\/\//i.test(logo)) return { error: "Le logo doit être une adresse https." };
+  if (color && !/^#[0-9a-fA-F]{6}$/.test(color)) return { error: "Couleur invalide (format #RRGGBB)." };
   const updates = {
-    logo_url: (formData.get("logo_url") as string) || null,
-    primary_color: (formData.get("primary_color") as string) || null,
+    logo_url: logo || null,
+    primary_color: color || null,
   };
 
   const { error } = await supabase
@@ -98,6 +102,7 @@ export async function updateMemberRole(memberId: string, role: string) {
     return { error: "Seul un administrateur peut modifier les rôles." };
   }
 
+  if (!["admin", "recruiter", "viewer"].includes(role)) return { error: "Rôle invalide." };
   if (memberId === user.id) {
     return { error: "Vous ne pouvez pas modifier votre propre rôle." };
   }
@@ -190,7 +195,9 @@ export async function revokeInvite(inviteId: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-  const { error } = await supabase.from("team_invites").delete().eq("id", inviteId);
+  const { data: me } = await supabase.from("users").select("organization_id, role").eq("id", user.id).single();
+  if (!me || me.role !== "admin") return { error: "Seul un administrateur peut révoquer." };
+  const { error } = await supabase.from("team_invites").delete().eq("id", inviteId).eq("organization_id", me.organization_id);
   if (error) return { error: error.message };
   revalidatePath("/dashboard/settings");
   return { success: true };

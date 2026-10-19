@@ -30,11 +30,11 @@ export async function createAgencyClient(fd: FormData) {
 }
 
 export async function setClientStatus(fd: FormData) {
-  const { supabase } = await requireAgency();
+  const { supabase, orgId } = await requireAgency();
   const id = fd.get("id") as string;
   const status = fd.get("status") as string;
   if (!CLIENT_STATUS.includes(status)) return;
-  await supabase.from("agency_clients").update({ status }).eq("id", id);
+  await supabase.from("agency_clients").update({ status }).eq("id", id).eq("organization_id", orgId);
   revalidatePath("/dashboard/clients");
 }
 
@@ -45,6 +45,10 @@ export async function createMission(fd: FormData) {
   const client_id = s(fd, "client_id");
   if (!title || !client_id) redirect(`/dashboard/missions?error=${encodeURIComponent(l("Client et intitulé requis.", "Klant en titel zijn verplicht."))}`);
   const positions = Math.max(1, parseInt((fd.get("positions") as string) || "1", 10) || 1);
+  // Le client doit appartenir à la même organisation (pas de référence inter-agences).
+  const { data: ownClient } = await supabase
+    .from("agency_clients").select("id").eq("id", client_id).eq("organization_id", orgId).maybeSingle();
+  if (!ownClient) redirect(`/dashboard/missions?error=${encodeURIComponent(l("Client introuvable.", "Klant niet gevonden."))}`);
   const { error } = await supabase.from("agency_missions").insert({
     organization_id: orgId, created_by: userId, client_id, title, positions,
     start_date: s(fd, "start_date"), notes: s(fd, "notes"),
@@ -55,10 +59,10 @@ export async function createMission(fd: FormData) {
 }
 
 export async function setMissionStatus(fd: FormData) {
-  const { supabase } = await requireAgency();
+  const { supabase, orgId } = await requireAgency();
   const id = fd.get("id") as string;
   const status = fd.get("status") as string;
   if (!MISSION_STATUS.includes(status)) return;
-  await supabase.from("agency_missions").update({ status }).eq("id", id);
+  await supabase.from("agency_missions").update({ status }).eq("id", id).eq("organization_id", orgId);
   revalidatePath("/dashboard/missions");
 }

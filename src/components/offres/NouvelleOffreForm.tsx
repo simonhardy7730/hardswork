@@ -30,6 +30,7 @@ interface FormData {
   sector: Sector;
   contract_type: ContractType;
   city: string;
+  postal_code: string;
   region: Region;
   start_date: string;
   is_urgent: boolean;
@@ -93,6 +94,7 @@ export default function NouvelleOffreForm({
     sector: "logistique",
     contract_type: "interim",
     city: "",
+    postal_code: "",
     region: "wallonie",
     start_date: "",
     is_urgent: false,
@@ -129,7 +131,7 @@ export default function NouvelleOffreForm({
   }
 
   function canGoNext() {
-    if (step === 1) return form.title.trim() && form.city.trim();
+    if (step === 1) return form.title.trim() && form.city.trim() && /^\d{4}$/.test(form.postal_code);
     if (step === 2) return true;
     if (step === 3) return form.description.trim().length > 10;
     return false;
@@ -146,6 +148,7 @@ export default function NouvelleOffreForm({
       sector: form.sector,
       contract_type: form.contract_type,
       city: form.city,
+      postal_code: form.postal_code,
       region: regionForCity(form.city.trim()),
       start_date: form.start_date || null,
       is_urgent: form.is_urgent,
@@ -182,6 +185,12 @@ export default function NouvelleOffreForm({
       .insert({ ...payload, ...planningPayload })
       .select()
       .single();
+    // Code postal (migration 018) : tant que la colonne n'existe pas, on publie sans plutôt que d'échouer.
+    if (error && /postal_code/.test(error.message ?? "")) {
+      const { postal_code: _pc, ...withoutPostal } = payload;
+      void _pc;
+      ({ data, error } = await supabase.from("job_offers").insert({ ...withoutPostal, ...planningPayload }).select().single());
+    }
     if (error && hasPlanning && /work_date|days_needed|time_slots|schedule_note|positions_count|recurrence|requirements|work_location/.test(error.message ?? "")) {
       ({ data, error } = await supabase.from("job_offers").insert(payload).select().single());
     }
@@ -325,18 +334,34 @@ export default function NouvelleOffreForm({
               </div>
             </div>
 
-            {/* Ville (la région est déduite automatiquement) */}
-            <div>
-              <label className="block text-sm font-medium text-ink mb-1.5">
-                {l("Ville *", "Stad *")}
-              </label>
-              <input
-                type="text"
-                value={form.city}
-                onChange={(e) => set("city", e.target.value)}
-                placeholder={l("Tournai", "Gent")}
-                className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
-              />
+            {/* Code postal + ville (la région est déduite automatiquement) */}
+            <div className="grid grid-cols-[130px_1fr] gap-4">
+              <div>
+                <label className="block text-sm font-medium text-ink mb-1.5">
+                  {l("Code postal *", "Postcode *")}
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={4}
+                  value={form.postal_code}
+                  onChange={(e) => set("postal_code", e.target.value.replace(/\D/g, "").slice(0, 4))}
+                  placeholder="7500"
+                  className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-ink mb-1.5">
+                  {l("Ville *", "Stad *")}
+                </label>
+                <input
+                  type="text"
+                  value={form.city}
+                  onChange={(e) => set("city", e.target.value)}
+                  placeholder={l("Tournai", "Gent")}
+                  className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
+                />
+              </div>
             </div>
 
             {/* Date + Urgence */}
@@ -612,7 +637,7 @@ export default function NouvelleOffreForm({
                   </h3>
                   <p className="text-xs text-ink-500">
                     {SECTOR_LABELS[form.sector]} · {CONTRACT_LABELS[form.contract_type]} ·{" "}
-                    {form.city || l("Ville", "Stad")}
+                    {[form.postal_code, form.city].filter(Boolean).join(" ") || l("Ville", "Stad")}
                   </p>
                   {form.show_salary && form.salary_min && (
                     <p className="text-xs text-[#10B981] font-medium mt-1">

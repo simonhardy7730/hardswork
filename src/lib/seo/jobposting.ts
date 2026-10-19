@@ -1,6 +1,6 @@
 /** Données structurées « JobPosting » (schema.org) : permettent l'affichage dans Google Emplois. */
 export interface OfferForSeo {
-  id: string; title: string; description: string | null; contract_type: string; city: string; created_at: string;
+  id: string; title: string; description: string | null; contract_type: string; city: string; postal_code?: string | null; created_at: string;
   salary_min: number | null; salary_max: number | null; salary_period: string | null; show_salary: boolean | null;
 }
 
@@ -19,7 +19,7 @@ export function buildJobPosting(o: OfferForSeo, orgName: string, baseUrl = "http
     hiringOrganization: { "@type": "Organization", name: orgName },
     jobLocation: {
       "@type": "Place",
-      address: { "@type": "PostalAddress", addressLocality: o.city, addressCountry: "BE" },
+      address: { "@type": "PostalAddress", addressLocality: o.city, ...(o.postal_code ? { postalCode: o.postal_code } : {}), addressCountry: "BE" },
     },
     directApply: true,
     url: `${baseUrl}/jobs/${o.id}`,

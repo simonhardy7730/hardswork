@@ -191,6 +191,7 @@ export type JobOfferInsert = {
   contract_type: ContractType;
   sector: Sector;
   city: string;
+  postal_code?: string | null;
   region: Region;
   salary_min?: number | null;
   salary_max?: number | null;

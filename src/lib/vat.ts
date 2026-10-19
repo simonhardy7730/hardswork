@@ -33,7 +33,7 @@ export function isValidVat(raw: string): boolean {
   return EU_FORMAT.test(n);
 }
 
-/** Affichage lisible : BE 0123.456.789 */
+/** Affichage lisible : BE 0123.456.749 */
 export function formatVat(raw: string): string {
   const n = normalizeVat(raw);
   const m = /^BE(\d{4})(\d{3})(\d{3})$/.exec(n);

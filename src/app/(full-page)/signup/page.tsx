@@ -185,7 +185,7 @@ function NormalSignup() {
     if (!cgu) { setError(l("Veuillez accepter les CGU pour continuer.", "Aanvaard de algemene voorwaarden om verder te gaan.")); return; }
     setLoading(true);
     setError("");
-    if (!isValidVat(formData.vat_number)) { setError(l("Numéro de TVA invalide. Exemple : BE 0123.456.789", "Ongeldig btw-nummer. Voorbeeld: BE 0123.456.789")); setLoading(false); return; }
+    if (!isValidVat(formData.vat_number)) { setError(l("Numéro de TVA invalide. Exemple : BE 0123.456.749", "Ongeldig btw-nummer. Voorbeeld: BE 0123.456.749")); setLoading(false); return; }
     const supabase = createClient();
 
     // Organisation, profil admin et essai gratuit : créés côté base (trigger sécurisé, migration 012).
@@ -345,7 +345,7 @@ function NormalSignup() {
 
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">{l("Numéro de TVA", "Btw-nummer")}</label>
-                  <input type="text" placeholder="BE 0123.456.789" name="vat_number" value={formData.vat_number} onChange={handleChange}
+                  <input type="text" placeholder="BE 0123.456.749" name="vat_number" value={formData.vat_number} onChange={handleChange}
                     autoComplete="off" required
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition" />
                 </div>

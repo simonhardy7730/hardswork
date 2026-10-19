@@ -45,7 +45,7 @@ export async function signUp(formData: FormData) {
   const orgType = formData.get("org_type") as "agency" | "company";
   const orgName = formData.get("org_name") as string;
   const vatRaw = ((formData.get("vat_number") as string) ?? "").trim();
-  if (!isValidVat(vatRaw)) return { error: "Numéro de TVA invalide. Exemple : BE 0123.456.789" };
+  if (!isValidVat(vatRaw)) return { error: "Numéro de TVA invalide. Exemple : BE 0123.456.749" };
   const vatNumber = normalizeVat(vatRaw);
 
   const supabase = await createClient();

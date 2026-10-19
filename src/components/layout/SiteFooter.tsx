@@ -3,8 +3,8 @@ import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { BRAND } from "@/lib/brand";
 import { getDict } from "@/lib/i18n/server";
 
-export function SiteFooter() {
-  const { t } = getDict();
+export async function SiteFooter() {
+  const { t } = await getDict();
   const f = t.footer;
   const COLUMNS = [
     { title: f.candidates, links: [

@@ -6,8 +6,8 @@ import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Je recrute" };
 
-export default function RecruteurChoicePage() {
-  const { t } = getDict();
+export default async function RecruteurChoicePage() {
+  const { t } = await getDict();
   const L = t.recruiterChoice;
   return (
     <div className="bg-surface font-body min-h-screen flex flex-col">

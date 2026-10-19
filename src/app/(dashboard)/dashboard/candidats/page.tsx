@@ -12,11 +12,12 @@ interface SearchParams {
   lieu?: string;
 }
 
-export default async function CandidatsPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+export default async function CandidatsPage(
+  props: {
+    searchParams: Promise<SearchParams>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");

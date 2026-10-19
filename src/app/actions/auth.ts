@@ -56,13 +56,13 @@ export async function signUp(formData: FormData) {
     email,
     password,
     options: {
-      data: { full_name: fullName, signup_kind: "organization", lang: getLang(), org_name: orgName, org_type: orgType, vat_number: vatNumber },
+      data: { full_name: fullName, signup_kind: "organization", lang: await getLang(), org_name: orgName, org_type: orgType, vat_number: vatNumber },
       emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
     },
   });
 
   if (authError || !authData.user) {
-    const nl = getLang() === "nl";
+    const nl = await getLang() === "nl";
     return { error: friendlyAuthError(authError?.message, (fr, n) => (nl ? n : fr)) };
   }
 

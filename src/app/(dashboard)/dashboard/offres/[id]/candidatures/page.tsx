@@ -7,12 +7,13 @@ import { labels } from "@/lib/utils";
 import { getLang } from "@/lib/i18n/server";
 import type { Application } from "@/lib/supabase/types";
 
-export default async function CandidaturesPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const lang = getLang();
+export default async function CandidaturesPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
+  const lang = await getLang();
   const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
   const { contract: CONTRACT_LABELS, sector: SECTOR_LABELS } = labels(lang);
   const supabase = await createClient();

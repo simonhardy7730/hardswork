@@ -3,8 +3,8 @@ import Link from "next/link";
 import { getDict } from "@/lib/i18n/server";
 
 /** Formulaire GET natif vers /jobs : fonctionne sans JavaScript, paramètres conservés dans l'URL. */
-export function SearchModule() {
-  const { t } = getDict();
+export async function SearchModule() {
+  const { t } = await getDict();
   const L = t.search;
   return (
     <section id="recherche" className="bg-[#FFFBF2] border-b border-[#EADFC4]">

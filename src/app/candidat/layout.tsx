@@ -8,7 +8,7 @@ import { getL } from "@/lib/i18n/server";
 import { getSpace, SPACE_HOME } from "@/lib/auth/space";
 
 export default async function CandidatLayout({ children }: { children: React.ReactNode }) {
-  const l = getL();
+  const l = await getL();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");

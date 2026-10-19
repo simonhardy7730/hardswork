@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { getL } from "@/lib/i18n/server";
 
 export default async function NouvelleOfrePage() {
-  const l = getL();
+  const l = await getL();
   const supabase = await createClient();
   const {
     data: { user },

@@ -39,8 +39,9 @@ interface SearchParams {
 const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun", "holiday"];
 const SLOT_KEYS = ["morning", "afternoon", "evening", "night"];
 
-export default async function JobsPage({ searchParams }: { searchParams: SearchParams }) {
-  const { lang } = getDict();
+export default async function JobsPage(props: { searchParams: Promise<SearchParams> }) {
+  const searchParams = await props.searchParams;
+  const { lang } = await getDict();
   const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
   const LB = labels(lang);
   const CONTRACT_LABELS = LB.contract;

@@ -13,12 +13,13 @@ interface SearchParams {
   region?: string;
 }
 
-export default async function OffresPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
-  const l = getL();
+export default async function OffresPage(
+  props: {
+    searchParams: Promise<SearchParams>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const l = await getL();
   const supabase = await createClient();
   const {
     data: { user },

@@ -9,12 +9,12 @@ import { EMPTY_PREFERENCES, type Preferences } from "@/lib/candidate/preferences
 import { User, Mail, Phone, Lock, LogOut } from "lucide-react";
 import { getDict } from "@/lib/i18n/server";
 
-export function generateMetadata() {
-  return { title: getDict().lang === "nl" ? "Mijn account — Wolko" : "Mon compte — Wolko" };
+export async function generateMetadata() {
+  return { title: (await getDict()).lang === "nl" ? "Mijn account — Wolko" : "Mon compte — Wolko" };
 }
 
 export default async function ComptePage() {
-  const { lang } = getDict();
+  const { lang } = await getDict();
   const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
   const notSet = l("Non renseigné", "Niet ingevuld");
   const supabase = await createClient();

@@ -16,7 +16,7 @@ import { labels, formatRelative } from "@/lib/utils";
 import { getLang } from "@/lib/i18n/server";
 
 export default async function DashboardPage() {
-  const lang = getLang();
+  const lang = await getLang();
   const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
   const { sector: SECTOR_LABELS, status: STATUS_LABELS } = labels(lang);
   const supabase = await createClient();

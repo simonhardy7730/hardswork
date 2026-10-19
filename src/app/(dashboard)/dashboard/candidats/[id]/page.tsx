@@ -57,12 +57,13 @@ function buildSkills(candidate: {
 }
 
 /* ─── Page ───────────────────────────────────────────── */
-export default async function CandidatDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const lang = getLang();
+export default async function CandidatDetailPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
+  const lang = await getLang();
   const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
   const { sector: SECTOR_LABELS, status: STATUS_LABELS } = labels(lang);
   const supabase = await createClient();

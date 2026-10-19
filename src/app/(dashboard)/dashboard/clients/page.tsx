@@ -9,8 +9,9 @@ const STATUS_STYLE: Record<string, string> = {
   inactif: "bg-gray-100 text-gray-600",
 };
 
-export default async function ClientsPage({ searchParams }: { searchParams: { error?: string } }) {
-  const l = getL();
+export default async function ClientsPage(props: { searchParams: Promise<{ error?: string }> }) {
+  const searchParams = await props.searchParams;
+  const l = await getL();
   const { supabase, orgId } = await requireAgency();
   const STATUS_LABEL: Record<string, string> = {
     prospect: l("Prospect", "Prospect"), actif: l("Client actif", "Actieve klant"), inactif: l("Inactif", "Inactief"),

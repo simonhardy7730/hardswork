@@ -6,8 +6,9 @@ import { getL } from "@/lib/i18n/server";
 export const metadata = { title: "Invitation" };
 
 /** Accepte une invitation d'équipe pour l'utilisateur connecté (vérifié côté base). */
-export default async function AcceptInvitePage({ searchParams }: { searchParams: { token?: string } }) {
-  const l = getL();
+export default async function AcceptInvitePage(props: { searchParams: Promise<{ token?: string }> }) {
+  const searchParams = await props.searchParams;
+  const l = await getL();
   const token = searchParams.token;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

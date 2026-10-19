@@ -13,8 +13,8 @@ const FOUNDERS = [
   { name: "Johnny Dassonville", initials: "JD", photo: "/images/team/johnny.webp" },
 ];
 
-export default function AboutPage() {
-  const { t } = getDict();
+export default async function AboutPage() {
+  const { t } = await getDict();
   const A = t.about;
   return (
     <div className="bg-surface font-body min-h-screen flex flex-col">

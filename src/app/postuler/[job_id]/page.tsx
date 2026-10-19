@@ -10,8 +10,8 @@ import type { JobOffer, JobPlanning, Organization } from "@/lib/supabase/types";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { MapPin, Briefcase, Zap, CheckCircle, ArrowLeft } from "lucide-react";
 
-export function generateMetadata() {
-  const { lang } = getDict();
+export async function generateMetadata() {
+  const { lang } = await getDict();
   return lang === "nl"
     ? { title: "Solliciteren — Wolko", description: "Solliciteer in minder dan 2 minuten. Wolko brengt kandidaten en werkgevers samen." }
     : { title: "Postuler — Wolko", description: "Postulez en moins de 2 minutes. Wolko met en relation les candidats avec les employeurs." };
@@ -28,12 +28,13 @@ const SECTOR_PHOTOS: Record<string, string> = {
   autre:        "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=900&q=80",
 };
 
-export default async function PostulerPage({
-  params,
-}: {
-  params: { job_id: string };
-}) {
-  const { lang } = getDict();
+export default async function PostulerPage(
+  props: {
+    params: Promise<{ job_id: string }>;
+  }
+) {
+  const params = await props.params;
+  const { lang } = await getDict();
   const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
   const LB = labels(lang);
   const CONTRACT_LABELS = LB.contract, SECTOR_LABELS = LB.sector;

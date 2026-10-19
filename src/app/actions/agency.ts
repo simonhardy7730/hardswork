@@ -14,7 +14,7 @@ function s(fd: FormData, k: string) {
 }
 
 export async function createAgencyClient(fd: FormData) {
-  const l = getL();
+  const l = await getL();
   const { supabase, orgId, userId } = await requireAgency();
   const name = s(fd, "name");
   if (!name) redirect(`/dashboard/clients?error=${encodeURIComponent(l("Le nom est requis.", "De naam is verplicht."))}`);
@@ -39,7 +39,7 @@ export async function setClientStatus(fd: FormData) {
 }
 
 export async function createMission(fd: FormData) {
-  const l = getL();
+  const l = await getL();
   const { supabase, orgId, userId } = await requireAgency();
   const title = s(fd, "title");
   const client_id = s(fd, "client_id");

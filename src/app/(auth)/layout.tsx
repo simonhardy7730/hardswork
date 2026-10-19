@@ -3,8 +3,8 @@ import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { LangSwitch } from "@/components/layout/LangSwitch";
 import { getL } from "@/lib/i18n/server";
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const l = getL();
+export default async function AuthLayout({ children }: { children: React.ReactNode }) {
+  const l = await getL();
   return (
     <div className="min-h-screen bg-[#101F43] flex flex-col">
       {/* Header */}

@@ -49,14 +49,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang={getLang()} className={`${inter.variable} ${barlow.variable}`}>
-      <body className="antialiased"><LangProvider lang={getLang()}>{children}</LangProvider></body>
+    <html lang={await getLang()} className={`${inter.variable} ${barlow.variable}`}>
+      <body className="antialiased"><LangProvider lang={await getLang()}>{children}</LangProvider></body>
     </html>
   );
 }

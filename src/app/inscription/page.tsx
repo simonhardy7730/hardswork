@@ -6,8 +6,8 @@ import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Créer un compte" };
 
-export default function InscriptionPage() {
-  const { t } = getDict();
+export default async function InscriptionPage() {
+  const { t } = await getDict();
   const L = t.signup;
   return (
     <div className="bg-surface font-body min-h-screen flex flex-col">

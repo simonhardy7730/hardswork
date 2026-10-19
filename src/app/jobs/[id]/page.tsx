@@ -30,13 +30,14 @@ const SECTOR_PHOTOS: Record<string, string> = {
 };
 
 /* ─── Metadata ───────────────────────────────────────── */
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const supabase = await createClient();
   const { data } = await supabase
     .from("job_offers")
     .select("title, city, sector, organizations(name)")
     .eq("id", params.id).single();
-  const { lang } = getDict();
+  const { lang } = await getDict();
   const SECTOR_LABELS = labels(lang).sector;
   if (!data) return { title: lang === "nl" ? "Vacature niet gevonden — Wolko" : "Offre introuvable — Wolko" };
   const orgRaw = data.organizations as unknown as { name: string }[] | { name: string } | null;
@@ -50,8 +51,9 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 }
 
 /* ─── Page ───────────────────────────────────────────── */
-export default async function JobDetailPage({ params }: { params: { id: string } }) {
-  const { lang } = getDict();
+export default async function JobDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  const { lang } = await getDict();
   const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
   const LB = labels(lang);
   const CONTRACT_LABELS = LB.contract, SECTOR_LABELS = LB.sector, REGION_LABELS = LB.region;

@@ -8,8 +8,8 @@ import {
 import { formatRelative } from "@/lib/utils";
 import { getDict } from "@/lib/i18n/server";
 
-export function generateMetadata() {
-  return { title: getDict().lang === "nl" ? "Mijn dashboard — Wolko" : "Mon tableau de bord — Wolko" };
+export async function generateMetadata() {
+  return { title: (await getDict()).lang === "nl" ? "Mijn dashboard — Wolko" : "Mon tableau de bord — Wolko" };
 }
 
 const STATUS_CONFIG: Record<string, { label: string; nl: string; color: string; icon: React.ElementType }> = {
@@ -21,7 +21,7 @@ const STATUS_CONFIG: Record<string, { label: string; nl: string; color: string; 
 };
 
 export default async function CandidatDashboardPage() {
-  const { lang } = getDict();
+  const { lang } = await getDict();
   const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

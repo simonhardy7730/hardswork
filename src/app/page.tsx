@@ -65,8 +65,8 @@ const CONTRACT_STYLE: Record<string, string> = {
 const H2 = { fontSize: "clamp(2rem, 4.5vw, 3.5rem)", lineHeight: 0.95 } as const;
 
 export default async function HomePage() {
-  const { t } = getDict();
-  const l = getL();
+  const { t } = await getDict();
+  const l = await getL();
   const supabase = await createClient();
 
   /* Offres réelles uniquement — aucune offre factice n'est affichée. */

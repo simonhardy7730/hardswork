@@ -11,8 +11,9 @@ const STATUS_STYLE: Record<string, string> = {
   annulee: "bg-gray-100 text-gray-600",
 };
 
-export default async function MissionsPage({ searchParams }: { searchParams: { error?: string } }) {
-  const l = getL();
+export default async function MissionsPage(props: { searchParams: Promise<{ error?: string }> }) {
+  const searchParams = await props.searchParams;
+  const l = await getL();
   const { supabase, orgId } = await requireAgency();
   const STATUS_LABEL: Record<string, string> = {
     ouverte: l("Ouverte", "Open"), en_cours: l("En cours", "Lopend"), pourvue: l("Pourvue", "Ingevuld"), annulee: l("Annulée", "Geannuleerd"),

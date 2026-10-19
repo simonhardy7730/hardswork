@@ -4,8 +4,8 @@ import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { getDict } from "@/lib/i18n/server";
 
-export function generateMetadata() {
-  const { lang } = getDict();
+export async function generateMetadata() {
+  const { lang } = await getDict();
   return lang === "nl"
     ? { title: "Tarieven — Wolko", description: "Duidelijke wervingsplannen om de juiste profielen te vinden." }
     : { title: "Tarifs — Wolko", description: "Des plans de recrutement clairs pour trouver les bons profils." };
@@ -81,8 +81,8 @@ function makeFaqs(l: L) {
   ];
 }
 
-export default function TarifsPage() {
-  const { lang } = getDict();
+export default async function TarifsPage() {
+  const { lang } = await getDict();
   const l: L = (fr, nl) => (lang === "nl" ? nl : fr);
   const PLANS = makePlans(l);
   const FAQS = makeFaqs(l);

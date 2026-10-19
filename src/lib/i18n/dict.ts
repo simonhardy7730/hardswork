@@ -2,7 +2,7 @@
 const fr = {
   tagline: "Le bon talent. La bonne entreprise.",
   nav: {
-    jobs: "Trouver un emploi", recruit: "Recruter", pricing: "Nos tarifs", how: "Comment ça marche",
+    jobs: "Trouver un emploi", recruit: "Recruter", pricing: "Nos tarifs", how: "Comment ça marche", about: "Qui sommes-nous",
     login: "Connexion", signup: "Créer un compte", open: "Ouvrir le menu", close: "Fermer le menu",
     home: "Accueil", main: "Navigation principale", mobile: "Menu mobile", lang: "Langue",
   },
@@ -105,7 +105,7 @@ export type Dict = typeof fr;
 const nl: Dict = {
   tagline: "Het juiste talent. Het juiste bedrijf.",
   nav: {
-    jobs: "Vind een job", recruit: "Werven", pricing: "Onze tarieven", how: "Hoe het werkt",
+    jobs: "Vind een job", recruit: "Werven", pricing: "Onze tarieven", how: "Hoe het werkt", about: "Wie zijn wij",
     login: "Inloggen", signup: "Account aanmaken", open: "Menu openen", close: "Menu sluiten",
     home: "Home", main: "Hoofdnavigatie", mobile: "Mobiel menu", lang: "Taal",
   },

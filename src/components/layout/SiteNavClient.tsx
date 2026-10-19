@@ -7,7 +7,7 @@ import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { LangSwitcher } from "./LangSwitcher";
 import type { Dict, Lang } from "@/lib/i18n/dict";
 
-const hrefs = { jobs: "/jobs", recruit: "/recrute", pricing: "/tarifs", how: "/#comment-ca-marche" } as const;
+const hrefs = { jobs: "/jobs", recruit: "/recrute", pricing: "/tarifs", how: "/#comment-ca-marche", about: "/a-propos" } as const;
 
 export function SiteNavClient({ lang, t }: { lang: Lang; t: Dict["nav"] }) {
   const [open, setOpen] = useState(false);
@@ -32,7 +32,7 @@ export function SiteNavClient({ lang, t }: { lang: Lang; t: Dict["nav"] }) {
         </Link>
 
         {/* Navigation centrale (desktop) */}
-        <nav aria-label={t.main} className="hidden lg:flex items-center gap-7">
+        <nav aria-label={t.main} className="hidden lg:flex items-center gap-5 xl:gap-7">
           {NAV_LINKS.map((l) => (
             <Link key={l.href} href={l.href}
               className="text-[13px] text-white/80 hover:text-white transition-colors font-semibold">

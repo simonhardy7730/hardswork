@@ -15,18 +15,22 @@ import {
   Loader2,
   Sparkles,
 } from "lucide-react";
-import { SECTOR_LABELS } from "@/lib/utils";
+import { labels } from "@/lib/utils";
+import { useLang } from "@/lib/i18n/context";
 
 type Step = 1 | 2 | 3;
 
-const STEPS = [
-  { num: 1, label: "Votre organisation" },
-  { num: 2, label: "Votre équipe" },
-  { num: 3, label: "Première offre" },
-];
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const lang = useLang();
+  const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
+  const LB = labels(lang);
+  const STEPS = [
+    { num: 1, label: l("Votre organisation", "Je organisatie") },
+    { num: 2, label: l("Votre équipe", "Je team") },
+    { num: 3, label: l("Première offre", "Eerste vacature") },
+  ];
   const [step, setStep] = useState<Step>(1);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -113,9 +117,9 @@ export default function OnboardingPage() {
         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
           <Check size={32} className="text-green-600" />
         </div>
-        <h2 className="text-xl font-bold text-ink">C&apos;est prêt !</h2>
+        <h2 className="text-xl font-bold text-ink">{l("C'est prêt !", "Klaar!")}</h2>
         <p className="text-ink-500 text-sm">
-          Redirection vers votre tableau de bord...
+          {l("Redirection vers votre tableau de bord...", "Doorverwijzing naar je dashboard...")}
         </p>
         <Loader2 size={20} className="animate-spin text-brand mx-auto" />
       </div>
@@ -175,10 +179,10 @@ export default function OnboardingPage() {
               </div>
               <div>
                 <h2 className="font-bold text-ink">
-                  Votre organisation
+                  {l("Votre organisation", "Je organisatie")}
                 </h2>
                 <p className="text-xs text-ink-500">
-                  Complétez votre profil (optionnel)
+                  {l("Complétez votre profil (optionnel)", "Vul je profiel aan (optioneel)")}
                 </p>
               </div>
             </div>
@@ -186,7 +190,7 @@ export default function OnboardingPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-ink mb-1.5">
-                  Région
+                  {l("Région", "Regio")}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {(
@@ -203,7 +207,7 @@ export default function OnboardingPage() {
                           : "border-ink-100 text-ink-500 hover:border-brand"
                       }`}
                     >
-                      {r.charAt(0).toUpperCase() + r.slice(1)}
+                      {LB.region[r]}
                     </button>
                   ))}
                 </div>
@@ -212,7 +216,7 @@ export default function OnboardingPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-ink mb-1.5">
-                    Ville
+                    {l("Ville", "Stad")}
                   </label>
                   <div className="relative">
                     <MapPin
@@ -225,14 +229,14 @@ export default function OnboardingPage() {
                       onChange={(e) =>
                         setOrgData((p) => ({ ...p, city: e.target.value }))
                       }
-                      placeholder="Liège"
+                      placeholder={l("Liège", "Gent")}
                       className="w-full pl-9 pr-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-ink mb-1.5">
-                    Téléphone
+                    {l("Téléphone", "Telefoon")}
                   </label>
                   <div className="relative">
                     <Phone
@@ -254,8 +258,8 @@ export default function OnboardingPage() {
 
               <div>
                 <label className="block text-sm font-medium text-ink mb-1.5">
-                  Site web{" "}
-                  <span className="text-ink-300 font-normal">(optionnel)</span>
+                  {l("Site web", "Website")}{" "}
+                  <span className="text-ink-300 font-normal">({l("optionnel", "optioneel")})</span>
                 </label>
                 <div className="relative">
                   <Globe
@@ -268,7 +272,7 @@ export default function OnboardingPage() {
                     onChange={(e) =>
                       setOrgData((p) => ({ ...p, website: e.target.value }))
                     }
-                    placeholder="https://votre-site.be"
+                    placeholder={l("https://votre-site.be", "https://jouw-site.be")}
                     className="w-full pl-9 pr-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                   />
                 </div>
@@ -279,7 +283,7 @@ export default function OnboardingPage() {
               onClick={() => setStep(2)}
               className="w-full mt-6 bg-brand text-white py-2.5 rounded-lg font-medium text-sm hover:bg-brand-dark transition flex items-center justify-center gap-2"
             >
-              Continuer <ArrowRight size={16} />
+              {l("Continuer", "Verder")} <ArrowRight size={16} />
             </button>
           </>
         )}
@@ -293,10 +297,10 @@ export default function OnboardingPage() {
               </div>
               <div>
                 <h2 className="font-bold text-ink">
-                  Inviter des recruteurs
+                  {l("Inviter des recruteurs", "Recruiters uitnodigen")}
                 </h2>
                 <p className="text-xs text-ink-500">
-                  Vous pouvez le faire plus tard
+                  {l("Vous pouvez le faire plus tard", "Je kunt dit later doen")}
                 </p>
               </div>
             </div>
@@ -308,14 +312,14 @@ export default function OnboardingPage() {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addInvite()}
-                  placeholder="recruteur@example.be"
+                  placeholder={l("recruteur@example.be", "recruiter@voorbeeld.be")}
                   className="flex-1 px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                 />
                 <button
                   onClick={addInvite}
                   className="px-4 py-2.5 bg-surface-2 border border-ink-100 rounded-lg text-sm font-medium text-ink hover:bg-[#EADFC4] transition"
                 >
-                  Ajouter
+                  {l("Ajouter", "Toevoegen")}
                 </button>
               </div>
 
@@ -342,7 +346,7 @@ export default function OnboardingPage() {
 
               {invites.length === 0 && (
                 <p className="text-xs text-ink-300 text-center py-4">
-                  Vous inviterez vos collègues depuis les Paramètres.
+                  {l("Vous inviterez vos collègues depuis les Paramètres.", "Je nodigt je collega's uit via de Instellingen.")}
                 </p>
               )}
             </div>
@@ -352,13 +356,13 @@ export default function OnboardingPage() {
                 onClick={() => setStep(1)}
                 className="flex-1 py-2.5 border border-ink-100 rounded-lg text-sm font-medium text-ink-500 hover:bg-surface-2 transition"
               >
-                Retour
+                {l("Retour", "Terug")}
               </button>
               <button
                 onClick={() => setStep(3)}
                 className="flex-1 bg-brand text-white py-2.5 rounded-lg font-medium text-sm hover:bg-brand-dark transition flex items-center justify-center gap-2"
               >
-                Continuer <ArrowRight size={16} />
+                {l("Continuer", "Verder")} <ArrowRight size={16} />
               </button>
             </div>
           </>
@@ -373,10 +377,10 @@ export default function OnboardingPage() {
               </div>
               <div>
                 <h2 className="font-bold text-ink">
-                  Créer votre première offre
+                  {l("Créer votre première offre", "Je eerste vacature aanmaken")}
                 </h2>
                 <p className="text-xs text-ink-500">
-                  Enregistrée en brouillon, publiez quand vous voulez
+                  {l("Enregistrée en brouillon, publiez quand vous voulez", "Opgeslagen als concept, publiceer wanneer je wilt")}
                 </p>
               </div>
             </div>
@@ -385,7 +389,7 @@ export default function OnboardingPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-ink mb-1.5">
-                    Titre du poste
+                    {l("Titre du poste", "Functietitel")}
                   </label>
                   <input
                     type="text"
@@ -393,7 +397,7 @@ export default function OnboardingPage() {
                     onChange={(e) =>
                       setOfferData((p) => ({ ...p, title: e.target.value }))
                     }
-                    placeholder="ex: Cariste CACES 3, Chauffeur SPL..."
+                    placeholder={l("ex: Cariste CACES 3, Chauffeur SPL...", "bv. Heftruckchauffeur, Vrachtwagenchauffeur...")}
                     className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                   />
                 </div>
@@ -401,7 +405,7 @@ export default function OnboardingPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-ink mb-1.5">
-                      Secteur
+                      {l("Secteur", "Sector")}
                     </label>
                     <select
                       value={offerData.sector}
@@ -413,7 +417,7 @@ export default function OnboardingPage() {
                       }
                       className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition bg-white"
                     >
-                      {Object.entries(SECTOR_LABELS).map(([val, label]) => (
+                      {Object.entries(LB.sector).map(([val, label]) => (
                         <option key={val} value={val}>
                           {label}
                         </option>
@@ -422,7 +426,7 @@ export default function OnboardingPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-ink mb-1.5">
-                      Type de contrat
+                      {l("Type de contrat", "Soort contract")}
                     </label>
                     <select
                       value={offerData.contract_type}
@@ -434,17 +438,17 @@ export default function OnboardingPage() {
                       }
                       className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition bg-white"
                     >
-                      <option value="interim">Contrat intérimaire</option>
-                      <option value="cdi">CDI</option>
-                      <option value="cdd">CDD</option>
-                      <option value="apprentissage">Apprentissage</option>
+                      <option value="interim">{LB.contract.interim}</option>
+                      <option value="cdi">{LB.contract.cdi}</option>
+                      <option value="cdd">{LB.contract.cdd}</option>
+                      <option value="apprentissage">{LB.contract.apprentissage}</option>
                     </select>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-ink mb-1.5">
-                    Ville
+                    {l("Ville", "Stad")}
                   </label>
                   <input
                     type="text"
@@ -452,7 +456,7 @@ export default function OnboardingPage() {
                     onChange={(e) =>
                       setOfferData((p) => ({ ...p, city: e.target.value }))
                     }
-                    placeholder="Liège, Charleroi, Namur..."
+                    placeholder={l("Liège, Charleroi, Namur...", "Gent, Antwerpen, Brugge...")}
                     className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                   />
                 </div>
@@ -461,7 +465,7 @@ export default function OnboardingPage() {
                   onClick={() => setSkipOffer(true)}
                   className="text-xs text-ink-300 hover:text-ink-500 underline"
                 >
-                  Passer cette étape →
+                  {l("Passer cette étape →", "Deze stap overslaan →")}
                 </button>
               </div>
             ) : (
@@ -470,13 +474,13 @@ export default function OnboardingPage() {
                   <Sparkles size={24} className="text-green-600" />
                 </div>
                 <p className="text-sm text-ink-500">
-                  Vous créerez vos offres depuis le tableau de bord.
+                  {l("Vous créerez vos offres depuis le tableau de bord.", "Je maakt je vacatures aan via het dashboard.")}
                 </p>
                 <button
                   onClick={() => setSkipOffer(false)}
                   className="text-xs text-brand hover:underline"
                 >
-                  ← Créer une offre maintenant
+                  {l("← Créer une offre maintenant", "← Nu een vacature aanmaken")}
                 </button>
               </div>
             )}
@@ -486,7 +490,7 @@ export default function OnboardingPage() {
                 onClick={() => setStep(2)}
                 className="flex-1 py-2.5 border border-ink-100 rounded-lg text-sm font-medium text-ink-500 hover:bg-surface-2 transition"
               >
-                Retour
+                {l("Retour", "Terug")}
               </button>
               <button
                 onClick={handleFinish}
@@ -497,7 +501,7 @@ export default function OnboardingPage() {
                   <Loader2 size={16} className="animate-spin" />
                 ) : (
                   <>
-                    <Check size={16} /> Accéder au dashboard
+                    <Check size={16} /> {l("Accéder au dashboard", "Naar het dashboard")}
                   </>
                 )}
               </button>

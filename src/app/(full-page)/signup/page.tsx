@@ -34,25 +34,28 @@ function makeRoles(l: L) {
 }
 
 /* ─────────────────────────────────────────────────────────
-   Invite flow — rejoindre une org existante (?org=xxx)
+   Invite flow — rejoindre une org via un jeton d'invitation (?invite=xxx)
+   Le jeton est vérifié côté base (fonctions SQL) : l'organisation et le rôle
+   viennent de l'invitation, jamais de l'URL.
 ───────────────────────────────────────────────────────── */
-function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
+function InviteSignup({ token }: { token: string }) {
   const router = useRouter();
   const lang = useLang();
   const l: L = (fr, nl) => (lang === "nl" ? nl : fr);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [orgName, setOrgName] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ full_name: "", email: "", password: "" });
+  const [done, setDone] = useState(false);
+  const [info, setInfo] = useState<{ org_name: string; email: string; role: string } | null | undefined>(undefined);
+  const [formData, setFormData] = useState({ full_name: "", password: "" });
 
   useEffect(() => {
-    async function fetchOrg() {
+    async function fetchInfo() {
       const supabase = createClient();
-      const { data } = await supabase.from("organizations").select("name").eq("id", orgId).single();
-      if (data) setOrgName(data.name);
+      const { data } = await supabase.rpc("get_team_invite_info", { p_token: token });
+      setInfo(Array.isArray(data) && data.length > 0 ? data[0] : null);
     }
-    fetchOrg();
-  }, [orgId]);
+    fetchInfo();
+  }, [token]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -60,66 +63,93 @@ function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!info) return;
     setLoading(true);
     setError("");
     const supabase = createClient();
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: formData.email,
+      email: info.email,
       password: formData.password,
-      options: { data: { full_name: formData.full_name }, emailRedirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        data: { full_name: formData.full_name },
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/invite/accept?token=${token}`)}`,
+      },
     });
     if (authError || !authData.user) { setError(authError?.message ?? l("Erreur lors de l'inscription.", "Fout bij het registreren.")); setLoading(false); return; }
-    await supabase.from("users").insert({
-      id: authData.user.id, organization_id: orgId, email: formData.email, full_name: formData.full_name,
-      role: role === "admin" ? "admin" : role === "viewer" ? "viewer" : "recruiter",
-    });
-    router.push("/dashboard");
+    if (authData.session) {
+      // Session immédiate (confirmation e-mail désactivée) : on accepte tout de suite.
+      const { error: acceptError } = await supabase.rpc("accept_team_invite", { p_token: token });
+      if (acceptError) { setError(l("Invitation invalide ou expirée.", "Ongeldige of verlopen uitnodiging.")); setLoading(false); return; }
+      router.push("/auth/redirect");
+      return;
+    }
+    setDone(true);
+    setLoading(false);
   }
+
+  const roleLabel = info?.role === "admin" ? l("Administrateur", "Beheerder") : info?.role === "viewer" ? l("Observateur", "Waarnemer") : l("Recruteur", "Recruiter");
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#101F43] px-4 py-12">
       <div className="w-full max-w-md bg-white/[0.04] rounded-2xl border border-white/[0.08] p-8">
-        <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-6">
-          <UserPlus size={18} className="shrink-0" style={{ color: "var(--brand-text)" }} />
+        {info === undefined && <p className="text-white/60 text-sm">…</p>}
+        {info === null && (
           <div>
-            <p className="text-sm font-semibold text-white">{l("Vous avez été invité(e)", "Je bent uitgenodigd")}</p>
-            <p className="text-xs text-white/40">
-              {orgName ? l(`Rejoignez l'équipe de « ${orgName} »`, `Word lid van het team van « ${orgName} »`) : l("Créez votre compte pour rejoindre l'organisation.", "Maak je account aan om de organisatie te vervoegen.")}
-            </p>
+            <h1 className="text-2xl font-bold text-white mb-2">{l("Invitation invalide", "Ongeldige uitnodiging")}</h1>
+            <p className="text-white/60 text-sm mb-5">{l("Ce lien est invalide, expiré ou déjà utilisé. Demandez un nouveau lien à votre administrateur.", "Deze link is ongeldig, verlopen of al gebruikt. Vraag een nieuwe link aan je beheerder.")}</p>
+            <Link href="/" className="font-medium hover:underline" style={{ color: "var(--brand-text)" }}>{l("Retour à l'accueil", "Terug naar home")}</Link>
           </div>
-        </div>
-        <h1 className="text-2xl font-bold text-white mb-1">{l("Créer votre compte", "Maak je account aan")}</h1>
-        <p className="text-white/40 text-sm mb-6">
-          {l("Rôle", "Rol")} : <span className="font-medium" style={{ color: "var(--brand-text)" }}>
-            {role === "admin" ? l("Administrateur", "Beheerder") : role === "viewer" ? l("Observateur", "Waarnemer") : l("Recruteur", "Recruiter")}
-          </span>
-        </p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {[
-            { label: l("Nom complet", "Volledige naam"), name: "full_name", type: "text", placeholder: l("Jean-Pierre Dubois", "Jan Peeters") },
-            { label: l("Email professionnel", "Professioneel e-mailadres"), name: "email", type: "email", placeholder: l("vous@exemple.be", "jij@voorbeeld.be") },
-            { label: l("Mot de passe", "Wachtwoord"), name: "password", type: "password", placeholder: l("Minimum 8 caractères", "Minimum 8 tekens"), minLength: 8 },
-          ].map((f) => (
-            <div key={f.name}>
-              <label className="block text-sm font-medium text-white mb-1.5">{f.label}</label>
-              <input
-                type={f.type} name={f.name} required value={formData[f.name as keyof typeof formData]}
-                onChange={handleChange} placeholder={f.placeholder} minLength={f.minLength}
-                className="w-full px-4 py-2.5 border border-white/10 rounded-xl text-sm bg-white/5 text-white placeholder-white/25 focus:outline-none focus:border-[#101F43] transition"
-              />
+        )}
+        {info && done && (
+          <div>
+            <h1 className="text-2xl font-bold text-white mb-2">{l("Vérifiez vos e-mails", "Controleer je e-mail")}</h1>
+            <p className="text-white/60 text-sm">{l(`Un e-mail de confirmation a été envoyé à ${info.email}. Cliquez sur le lien pour rejoindre « ${info.org_name} ».`, `Er is een bevestigingsmail gestuurd naar ${info.email}. Klik op de link om « ${info.org_name} » te vervoegen.`)}</p>
+          </div>
+        )}
+        {info && !done && (
+          <>
+            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-6">
+              <UserPlus size={18} className="shrink-0" style={{ color: "var(--brand-text)" }} />
+              <div>
+                <p className="text-sm font-semibold text-white">{l("Vous avez été invité(e)", "Je bent uitgenodigd")}</p>
+                <p className="text-xs text-white/40">{l(`Rejoignez l'équipe de « ${info.org_name} »`, `Word lid van het team van « ${info.org_name} »`)}</p>
+              </div>
             </div>
-          ))}
-          {error && <p className="text-sm px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-red-700">{error}</p>}
-          <button type="submit" disabled={loading}
-            className="w-full py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition"
-            style={{ background: loading ? "#FFD97A" : "#FFB900" }}>
-            {loading ? <Loader2 size={16} className="animate-spin" /> : <><span>{l("Rejoindre l'organisation", "De organisatie vervoegen")}</span><ArrowRight size={16} /></>}
-          </button>
-        </form>
-        <p className="text-center text-sm text-white/40 mt-5">
-          {l("Déjà un compte ?", "Al een account?")}{" "}
-          <Link href="/login" className="font-medium hover:underline" style={{ color: "var(--brand-text)" }}>{l("Se connecter", "Inloggen")}</Link>
-        </p>
+            <h1 className="text-2xl font-bold text-white mb-1">{l("Créer votre compte", "Maak je account aan")}</h1>
+            <p className="text-white/40 text-sm mb-6">
+              {l("Rôle", "Rol")} : <span className="font-medium" style={{ color: "var(--brand-text)" }}>{roleLabel}</span>
+            </p>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-white mb-1.5">{l("Nom complet", "Volledige naam")}</label>
+                <input type="text" name="full_name" required value={formData.full_name} onChange={handleChange}
+                  placeholder={l("Jean-Pierre Dubois", "Jan Peeters")}
+                  className="w-full px-4 py-2.5 border border-white/10 rounded-xl text-sm bg-white/5 text-white placeholder-white/25 focus:outline-none focus:border-[#FFB900] transition" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-white mb-1.5">{l("Adresse e-mail (celle de l'invitation)", "E-mailadres (dat van de uitnodiging)")}</label>
+                <input type="email" value={info.email} disabled
+                  className="w-full px-4 py-2.5 border border-white/10 rounded-xl text-sm bg-white/5 text-white/60 cursor-not-allowed" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-white mb-1.5">{l("Mot de passe", "Wachtwoord")}</label>
+                <input type="password" name="password" required minLength={8} value={formData.password} onChange={handleChange}
+                  placeholder={l("Minimum 8 caractères", "Minimum 8 tekens")}
+                  className="w-full px-4 py-2.5 border border-white/10 rounded-xl text-sm bg-white/5 text-white placeholder-white/25 focus:outline-none focus:border-[#FFB900] transition" />
+              </div>
+              {error && <p className="text-sm px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-red-700">{error}</p>}
+              <button type="submit" disabled={loading}
+                className="w-full py-3 rounded-xl font-bold text-sm text-[#101F43] flex items-center justify-center gap-2 transition"
+                style={{ background: loading ? "#FFD97A" : "#FFB900" }}>
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <><span>{l("Rejoindre l'organisation", "De organisatie vervoegen")}</span><ArrowRight size={16} /></>}
+              </button>
+            </form>
+            <p className="text-center text-sm text-white/40 mt-5">
+              {l("Déjà un compte ?", "Al een account?")}{" "}
+              <Link href={`/login?next=${encodeURIComponent(`/invite/accept?token=${token}`)}`} className="font-medium hover:underline" style={{ color: "var(--brand-text)" }}>{l("Se connecter", "Inloggen")}</Link>
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
@@ -384,13 +414,13 @@ function NormalSignup() {
 }
 
 /* ─────────────────────────────────────────────────────────
-   Router — lit le param ?org= pour l'invite flow
+   Router — lit le jeton ?invite= pour l'invite flow
 ───────────────────────────────────────────────────────── */
 function SignupRouter() {
   const searchParams = useSearchParams();
-  const orgId = searchParams.get("org");
-  const role = searchParams.get("role") ?? "recruiter";
-  if (orgId) return <InviteSignup orgId={orgId} role={role} />;
+  // Ancien format ?org=<id> volontairement ignoré : il permettait de s'auto-rattacher à une organisation.
+  const inviteToken = searchParams.get("invite");
+  if (inviteToken) return <InviteSignup token={inviteToken} />;
   return <NormalSignup />;
 }
 

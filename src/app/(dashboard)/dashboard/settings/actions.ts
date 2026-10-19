@@ -167,3 +167,31 @@ export async function updateCurrentUserName(formData: FormData) {
   revalidatePath("/dashboard/settings");
   return { success: true };
 }
+
+// ── Invitations d'équipe (jeton à usage unique, validé côté base) ─────────
+export async function createInvite(email: string, role: "admin" | "recruiter" | "viewer") {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const clean = email.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) return { error: "Adresse e-mail invalide." };
+  if (!["admin", "recruiter", "viewer"].includes(role)) return { error: "Rôle invalide." };
+
+  const { data: token, error } = await supabase.rpc("create_team_invite", { p_email: clean, p_role: role });
+  if (error || !token) {
+    return { error: /forbidden/.test(error?.message ?? "") ? "Seul un administrateur peut inviter." : "Impossible de créer l'invitation (la migration 005 est-elle appliquée ?)." };
+  }
+  revalidatePath("/dashboard/settings");
+  return { token: token as string };
+}
+
+export async function revokeInvite(inviteId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const { error } = await supabase.from("team_invites").delete().eq("id", inviteId);
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/settings");
+  return { success: true };
+}

@@ -36,7 +36,9 @@ export default function LoginPage() {
         setMessage({ type: "error", text: l("Email ou mot de passe incorrect.", "Onjuist e-mailadres of wachtwoord.") });
       } else {
         // L'espace (candidat / entreprise / agence) est déterminé côté serveur.
-        router.push("/auth/redirect");
+        const next = new URLSearchParams(window.location.search).get("next");
+        const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "/auth/redirect";
+        router.push(safeNext);
         router.refresh();
       }
     } else {

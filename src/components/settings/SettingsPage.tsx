@@ -25,6 +25,8 @@ import {
   updateMemberRole,
   removeMember,
   updateCurrentUserName,
+  createInvite,
+  revokeInvite,
 } from "@/app/(dashboard)/dashboard/settings/actions";
 
 interface Props {
@@ -32,6 +34,7 @@ interface Props {
   currentUser: User;
   members: User[];
   subscription: Subscription | null;
+  invites: { id: string; email: string; role: string; expires_at: string }[];
 }
 
 type Tab = "organisation" | "equipe" | "abonnement" | "personnalisation";
@@ -348,11 +351,11 @@ function OrgTab({
 function TeamTab({
   members,
   currentUser,
-  orgId,
+  invites,
 }: {
   members: User[];
   currentUser: User;
-  orgId: string;
+  invites: { id: string; email: string; role: string; expires_at: string }[];
 }) {
   const l = useL();
   const ROLE_LABELS = roleLabels(l);
@@ -362,12 +365,27 @@ function TeamTab({
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const isAdmin = currentUser.role === "admin";
 
-  const inviteLink =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/signup?org=${orgId}&role=recruiter`
-      : `/signup?org=${orgId}&role=recruiter`;
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<"recruiter" | "viewer" | "admin">("recruiter");
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [invitePending, startInvite] = useTransition();
+
+  function handleInvite(e: React.FormEvent) {
+    e.preventDefault();
+    setFeedback(null);
+    startInvite(async () => {
+      const res = await createInvite(inviteEmail, inviteRole);
+      if ("token" in res && res.token) {
+        setInviteLink(`${window.location.origin}/signup?invite=${res.token}`);
+        setInviteEmail("");
+      } else {
+        setFeedback({ type: "error", message: ("error" in res && res.error) || l("Une erreur est survenue.", "Er is een fout opgetreden.") });
+      }
+    });
+  }
 
   async function copyInviteLink() {
+    if (!inviteLink) return;
     try {
       await navigator.clipboard.writeText(inviteLink);
       setCopied(true);
@@ -409,36 +427,57 @@ function TeamTab({
             {l("Inviter un membre", "Een lid uitnodigen")}
           </h2>
           <p className="text-sm text-ink-500 mb-4">
-            {l("Partagez ce lien avec votre collègue. Il devra créer un compte Wolko pour rejoindre votre organisation.", "Deel deze link met uw collega. Die moet een Wolko-account aanmaken om zich bij uw organisatie aan te sluiten.")}
+            {l("Indiquez l'adresse e-mail de votre collègue : un lien d'invitation personnel, valable 7 jours et utilisable une seule fois, sera généré. Seule cette adresse pourra l'utiliser.", "Geef het e-mailadres van je collega op: er wordt een persoonlijke uitnodigingslink gemaakt, 7 dagen geldig en slechts één keer bruikbaar. Alleen dat adres kan hem gebruiken.")}
           </p>
-          <div className="flex gap-2">
+          <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-2">
             <input
-              readOnly
-              value={inviteLink}
-              className="flex-1 px-3 py-2 text-sm border border-ink-100 rounded-lg bg-surface text-ink-500 font-mono"
+              type="email" required value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)}
+              placeholder={l("collegue@entreprise.be", "collega@bedrijf.be")}
+              className="flex-1 px-3 py-2 text-sm border border-ink-100 rounded-lg focus:outline-none focus:border-brand"
             />
-            <button
-              onClick={copyInviteLink}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition ${
-                copied
-                  ? "bg-green-100 text-green-700"
-                  : "bg-brand text-white hover:bg-brand-dark"
-              }`}
-            >
-              {copied ? (
-                <>
-                  <Check size={14} /> {l("Copié !", "Gekopieerd!")}
-                </>
-              ) : (
-                <>
-                  <Copy size={14} /> {l("Copier", "Kopiëren")}
-                </>
-              )}
+            <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value as "recruiter" | "viewer" | "admin")}
+              className="px-3 py-2 text-sm border border-ink-100 rounded-lg bg-white">
+              <option value="recruiter">{ROLE_LABELS.recruiter}</option>
+              <option value="viewer">{ROLE_LABELS.viewer}</option>
+              <option value="admin">{ROLE_LABELS.admin}</option>
+            </select>
+            <button type="submit" disabled={invitePending}
+              className="px-4 py-2 text-sm font-medium bg-brand text-white rounded-lg hover:bg-brand-dark disabled:opacity-50 transition flex items-center justify-center gap-2">
+              {invitePending && <RefreshCw size={14} className="animate-spin" />}
+              {l("Créer l'invitation", "Uitnodiging maken")}
             </button>
-          </div>
-          <p className="text-xs text-ink-300 mt-2">
-            {l("💡 Le lien pré-remplit le champ organisation lors de l'inscription.", "💡 De link vult het organisatieveld vooraf in bij de registratie.")}
-          </p>
+          </form>
+
+          {inviteLink && (
+            <div className="mt-4 p-3 rounded-lg bg-surface border border-ink-100">
+              <p className="text-xs text-ink-500 mb-2">{l("Copiez ce lien maintenant et envoyez-le à votre collègue (il ne sera plus affiché) :", "Kopieer deze link nu en stuur hem naar je collega (hij wordt niet meer getoond):")}</p>
+              <div className="flex gap-2">
+                <input readOnly value={inviteLink} className="flex-1 px-3 py-2 text-xs border border-ink-100 rounded-lg bg-white text-ink-500 font-mono" />
+                <button onClick={copyInviteLink}
+                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition ${copied ? "bg-green-100 text-green-700" : "bg-brand text-white hover:bg-brand-dark"}`}>
+                  {copied ? (<><Check size={14} /> {l("Copié !", "Gekopieerd!")}</>) : (<><Copy size={14} /> {l("Copier", "Kopiëren")}</>)}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {invites.length > 0 && (
+            <div className="mt-5">
+              <p className="text-xs font-semibold text-[#475569] mb-2">{l("Invitations en attente", "Openstaande uitnodigingen")}</p>
+              <ul className="divide-y divide-[#F1F5F9] border border-ink-100 rounded-lg">
+                {invites.map((inv) => (
+                  <li key={inv.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+                    <span className="truncate text-ink">{inv.email} <span className="text-xs text-ink-300">· {ROLE_LABELS[inv.role as UserRole] ?? inv.role}</span></span>
+                    <button
+                      onClick={async () => { await revokeInvite(inv.id); }}
+                      className="text-xs text-red-500 hover:underline shrink-0">
+                      {l("Annuler", "Annuleren")}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
@@ -954,7 +993,7 @@ function CustomizationTab({
 }
 
 // ── Main component ────────────────────────────────────────
-export default function SettingsPage({ org, currentUser, members, subscription }: Props) {
+export default function SettingsPage({ org, currentUser, members, subscription, invites }: Props) {
   const l = useL();
   const [activeTab, setActiveTab] = useState<Tab>("organisation");
 
@@ -991,7 +1030,7 @@ export default function SettingsPage({ org, currentUser, members, subscription }
         <OrgTab org={org} currentUser={currentUser} />
       )}
       {activeTab === "equipe" && (
-        <TeamTab members={members} currentUser={currentUser} orgId={org.id} />
+        <TeamTab members={members} currentUser={currentUser} invites={invites} />
       )}
       {activeTab === "abonnement" && (
         <SubscriptionTab subscription={subscription} />

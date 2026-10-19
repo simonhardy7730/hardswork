@@ -18,6 +18,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import KanbanColumn from "./KanbanColumn";
 import KanbanCard from "./KanbanCard";
 import ProfileModal from "./ProfileModal";
+import { deleteRefusedApplication } from "@/app/(dashboard)/dashboard/candidatures/actions";
 import { Lock } from "lucide-react";
 import type { Application, ApplicationStatus } from "@/lib/supabase/types";
 import { useL } from "@/lib/i18n/context";
@@ -128,6 +129,18 @@ export default function KanbanBoard({
     await supabase.from("applications").update({ notes }).eq("id", appId);
   }
 
+  async function deleteApp(appId: string) {
+    if (!window.confirm(l("Supprimer définitivement cette candidature ? Cette action est irréversible.", "Deze sollicitatie definitief verwijderen? Dit kan niet ongedaan worden gemaakt."))) return;
+    const res = await deleteRefusedApplication(appId);
+    if (res.ok) {
+      setApps(prev => prev.filter(a => a.id !== appId));
+      setOpenId(null);
+      router.refresh();
+    } else {
+      window.alert(l("Suppression impossible. Réessayez.", "Verwijderen mislukt. Probeer opnieuw."));
+    }
+  }
+
   const totalApps = apps.length;
 
   // Filtres recruteur : jour / plage horaire / candidature rapide (uniquement si des créneaux existent)
@@ -219,6 +232,7 @@ export default function KanbanBoard({
                       jobOfferId={jobOfferId}
                       hasSubscription={hasSubscription}
                       onOpen={(a) => setOpenId(a.id)}
+                      onDelete={deleteApp}
                     />
                   ))}
                 </SortableContext>
@@ -247,6 +261,7 @@ export default function KanbanBoard({
           hasSubscription={hasSubscription}
           onClose={() => setOpenId(null)}
           onNotesChange={updateNotes}
+          onDelete={deleteApp}
         />
       )}
     </div>

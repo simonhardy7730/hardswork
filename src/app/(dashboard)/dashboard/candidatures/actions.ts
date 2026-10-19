@@ -101,3 +101,20 @@ export async function getCvUrl(applicationId: string): Promise<string | null> {
   const { data: signed } = await db.storage.from("candidate-documents").createSignedUrl(data.cv_path, 60);
   return signed?.signedUrl ?? null;
 }
+
+/** Supprime définitivement une candidature REFUSÉE de son organisation. */
+export async function deleteRefusedApplication(applicationId: string): Promise<{ ok: boolean }> {
+  if (typeof applicationId !== "string" || !UUID.test(applicationId)) return { ok: false };
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+  const { data: profile } = await supabase.from("users").select("organization_id, role").eq("id", user.id).single();
+  if (!profile || profile.role === "viewer") return { ok: false };
+  // RLS : renvoie la candidature seulement si l'offre est à l'organisation
+  const { data: app } = await supabase
+    .from("applications").select("id, status, job_offers(organization_id)").eq("id", applicationId).single();
+  const job = app && (Array.isArray(app.job_offers) ? app.job_offers[0] : app.job_offers);
+  if (!app || app.status !== "refuse" || job?.organization_id !== profile.organization_id) return { ok: false };
+  const { error } = await admin().from("applications").delete().eq("id", applicationId);
+  return { ok: !error };
+}

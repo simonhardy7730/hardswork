@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Phone, Mail, FileText, Check, Loader2, Send, Clock } from "lucide-react";
+import { X, Trash2, Phone, Mail, FileText, Check, Loader2, Send, Clock } from "lucide-react";
 import type { Application } from "@/lib/supabase/types";
 import { useL } from "@/lib/i18n/context";
 import { getCvState, requestCv, getCvUrl, type CvState } from "@/app/(dashboard)/dashboard/candidatures/actions";
@@ -12,9 +12,10 @@ interface Props {
   hasSubscription: boolean;
   onClose: () => void;
   onNotesChange: (id: string, notes: string) => Promise<void>;
+  onDelete?: (id: string) => void;
 }
 
-export default function ProfileModal({ application: app, hasSubscription, onClose, onNotesChange }: Props) {
+export default function ProfileModal({ application: app, hasSubscription, onClose, onNotesChange, onDelete }: Props) {
   const l = useL();
   const [notes, setNotes] = useState(app.notes ?? "");
   const [saving, setSaving] = useState(false);
@@ -157,6 +158,12 @@ export default function ProfileModal({ application: app, hasSubscription, onClos
               {saving ? "…" : <><Check size={12} /> {saved ? l("Enregistré", "Opgeslagen") : l("Sauvegarder", "Opslaan")}</>}
             </button>
           </div>
+
+          {app.status === "refuse" && onDelete && (
+            <button onClick={() => onDelete(app.id)} className="flex items-center gap-1.5 text-xs font-bold text-red-600 border border-red-200 rounded-lg px-3 py-1.5 hover:bg-red-50 transition">
+              <Trash2 size={12} /> {l("Supprimer définitivement", "Definitief verwijderen")}
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
   Phone, Mail, Clock, Check, StickyNote,
-  MoreHorizontal, Lock, ChevronRight,
+  MoreHorizontal, Lock, ChevronRight, Trash2,
 } from "lucide-react";
 import { formatRelative } from "@/lib/utils";
 import type { Application, ApplicationStatus } from "@/lib/supabase/types";
@@ -21,6 +21,7 @@ interface Props {
   hasSubscription: boolean;
   isDragging?: boolean;
   onOpen?: (app: Application) => void;
+  onDelete?: (id: string) => void;
 }
 
 /* Couleurs tags */
@@ -37,6 +38,7 @@ export default function KanbanCard({
   hasSubscription,
   isDragging,
   onOpen,
+  onDelete,
 }: Props) {
   const l = useL();
   const lang = useLang();
@@ -131,6 +133,13 @@ export default function KanbanCard({
                   <ChevronRight size={10} className="text-brand" /> {l(col.label, col.nl)}
                 </button>
               ))}
+              {app.status === "refuse" && onDelete && (
+                <button
+                  onClick={() => { setShowMenu(false); onDelete(app.id); }}
+                  className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 transition">
+                  <Trash2 size={10} /> {l("Supprimer", "Verwijderen")}
+                </button>
+              )}
               <div className="border-t border-ink-100 mt-1 pt-1">
                 <button
                   onClick={() => { setShowNotes(!showNotes); setShowMenu(false); }}

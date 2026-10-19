@@ -63,3 +63,13 @@ Mis en place : export des données (`/api/account/export`), suppression du compt
 | Sauvegarde/restauration vérifiée | **Bloquant** |
 | Mise à jour de Next.js | **À faire avant ouverture** |
 | Paiement / facturation | Non opérationnel : ne pas vendre avant validation |
+
+## 6. Offre de lancement 2026 et essai gratuit (migration 015)
+
+- Tarifs : Pro 89 € (réf. 119 €) et Agence 249 € (réf. 349 €) HT/mois jusqu'au 31/12/2026 inclus ; **dès le 1er janvier 2027 00:00 (Bruxelles)** : 119 € / 349 €. Agence Réseau : dès 499 € sur devis. Source unique : `src/lib/billing/pricing.ts` (miroir SQL : fonctions `plan_price_cents`, `launch_offer_active`). La date vient toujours du serveur.
+- Essai gratuit de 7 jours à l'inscription entreprise/agence, une seule fois par organisation (même TVA = pas de 2e essai). À la fin : accès aux coordonnées des candidats et publication d'offres suspendus (policies `job_offers`), données conservées.
+- Tarif fondateur : souscription avant le 01/01/2027 => prix verrouillé 12 mois à compter de la souscription (`subscribe_organization`, `subscription_renewal_price_cents`, réservées au service_role).
+- **Paiement en ligne non branché** : la souscription est activée à la main par l'équipe (`select subscribe_organization('<org_id>', 'pro');` dans le SQL Editor). Aucun prélèvement automatique.
+- Tests : `npm test` (logique) et `npm run test:sql` (migration dans un Postgres embarqué).
+- ⚖️ CGU (art. 4) à faire relire : prix HT, tarif conservé 12 mois, reconduction.
+- Non affiché car non développé : CRM commercial, multi-sites, multi-agences.

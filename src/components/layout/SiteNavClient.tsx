@@ -28,7 +28,7 @@ export function SiteNavClient({ lang, t }: { lang: Lang; t: Dict["nav"] }) {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[60px] flex items-center justify-between gap-4">
         <Link href="/" aria-label={t.home} onClick={() => setOpen(false)}>
-          <HardSworkLogo size="md" dark />
+          <HardSworkLogo size="lg" dark />
         </Link>
 
         {/* Navigation centrale (desktop) */}

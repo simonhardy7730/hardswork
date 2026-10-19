@@ -35,9 +35,9 @@ interface LogoProps {
 }
 
 export function HardSworkLogo({ size = "md", dark = true }: LogoProps) {
-  const iconSize = size === "sm" ? 26 : size === "md" ? 34 : 46;
+  const iconSize = size === "sm" ? 26 : size === "md" ? 34 : 40;
   const textClass =
-    size === "sm" ? "text-xl" : size === "md" ? "text-3xl" : "text-4xl";
+    size === "sm" ? "text-xl" : size === "md" ? "text-3xl" : "text-[2.6rem]";
 
   return (
     <div className="flex items-center gap-2.5">

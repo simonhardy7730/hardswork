@@ -9,7 +9,7 @@ import { MapPin, Clock, Briefcase, Zap, CheckCircle, ArrowLeft } from "lucide-re
 
 export const metadata = {
   title: "Postuler — HardSwork",
-  description: "Postulez en moins de 2 minutes. HardSwork met en relation les travailleurs de terrain avec les meilleurs employeurs belges.",
+  description: "Postulez en moins de 2 minutes. HardSwork met en relation les candidats avec les meilleurs employeurs.",
 };
 
 const SECTOR_PHOTOS: Record<string, string> = {
@@ -113,7 +113,7 @@ export default async function PostulerPage({
 
             <div className="grid grid-cols-2 gap-2">
               {[
-                { icon: MapPin,     label: job.city ?? "Belgique" },
+                { icon: MapPin,     label: job.city ?? "Lieu non précisé" },
                 { icon: Briefcase,  label: contractLabel },
                 { icon: Clock,      label: "Réponse sous 48h" },
                 ...(job.is_urgent ? [{ icon: Zap, label: "Urgent" }] : []),
@@ -226,7 +226,7 @@ export default async function PostulerPage({
               <Link href="/" className="font-bold text-brand hover:text-brand-dark transition-colors">
                 HardSwork
               </Link>
-              {" "}· Plateforme de recrutement terrain en Belgique
+              {" "}· Plateforme de recrutement
             </p>
           </div>
         </div>

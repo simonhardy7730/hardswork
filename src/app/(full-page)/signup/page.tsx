@@ -22,7 +22,7 @@ const ROLES = [
     title: "ENTREPRISE\n/ PME",
     features: ["Recrutement direct", "Gestion d'équipe", "1 offre gratuite"],
     photo: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",
-    placeholder: "Ex: ConstructoTech Belgique",
+    placeholder: "Ex: ConstructoTech",
   },
 ];
 
@@ -182,7 +182,7 @@ function NormalSignup() {
                 RECRUTEZ LES<br /><span style={{ color: "var(--brand-text)" }}>[MEILLEURS].</span>
               </h1>
               <p className="text-white/45 mt-5 text-sm leading-relaxed max-w-xs">
-                La plateforme de recrutement pour les travailleurs de terrain et techniques.
+                La plateforme de recrutement pour tous les métiers.
               </p>
             </div>
           ) : (
@@ -192,7 +192,7 @@ function NormalSignup() {
                 CRÉEZ VOTRE<br /><span style={{ color: "var(--brand-text)" }}>[COMPTE].</span>
               </h1>
               <p className="text-white/45 mt-5 text-sm leading-relaxed max-w-xs">
-                Accédez aux meilleurs talents techniques de Belgique.
+                Accédez aux meilleurs talents.
               </p>
             </div>
           )}
@@ -349,7 +349,7 @@ function NormalSignup() {
             </div>
           )}
         </div>
-        <p className="text-xs text-gray-300 mt-12">© {new Date().getFullYear()} HardSwork · Belgique · Tous droits réservés</p>
+        <p className="text-xs text-gray-300 mt-12">© {new Date().getFullYear()} HardSwork · Tous droits réservés</p>
       </div>
     </div>
   );

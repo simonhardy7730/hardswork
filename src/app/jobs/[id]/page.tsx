@@ -98,7 +98,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               {[
                 { label: "Accueil", href: "/" },
                 { label: "Annonces", href: "/jobs" },
-                { label: "Belgique", href: "/jobs" },
+                { label: "Offres", href: "/jobs" },
               ].map((c, i, arr) => (
                 <span key={i} className="flex items-center gap-1.5">
                   {i > 0 && <ChevronRight size={9} className="text-white/20" />}
@@ -253,7 +253,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 {[
                   `Contrat ${CONTRACT_LABELS[offer.contract_type] ?? offer.contract_type}${salary ? ` — Salaire : ${salary}` : ""}.`,
                   "Intégration rapide au sein d'une équipe soudée.",
-                  "Environnement de travail dynamique, 100% belge.",
+                  "Environnement de travail dynamique.",
                   "Candidature traitée sous 48h — réponse garantie.",
                 ].map((point, i) => (
                   <li key={i} className="flex items-start gap-3 text-[15px] text-ink-600">
@@ -327,7 +327,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               </div>
 
               <p className="text-ink-500 text-xs leading-relaxed mb-4 line-clamp-3">
-                {org?.description ?? `Entreprise active dans le secteur ${sectorLabel.toLowerCase()} en Belgique. Recrutement en cours via HardSwork.`}
+                {org?.description ?? `Entreprise active dans le secteur ${sectorLabel.toLowerCase()}. Recrutement en cours via HardSwork.`}
               </p>
 
               <Link

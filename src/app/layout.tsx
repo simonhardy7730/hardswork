@@ -12,22 +12,22 @@ const barlow = Barlow_Condensed({
 
 export const metadata: Metadata = {
   title: {
-    default: "HardSwork — Pour ceux qui construisent la Belgique",
+    default: "HardSwork — Le recrutement pour tous les métiers",
     template: "%s — HardSwork",
   },
   description:
-    "La plateforme de recrutement B2B et B2C pensée pour les vrais professionnels du terrain en Belgique. Logistique, transport, industrie, construction, nettoyage, sécurité.",
+    "La plateforme de recrutement pour tous les métiers : logistique, transport, industrie, construction, santé, restauration, nettoyage, sécurité et plus.",
   keywords: [
-    "recrutement", "emploi", "Belgique", "logistique", "transport",
-    "industrie", "construction", "intérim", "ouvrier", "terrain",
+    "recrutement", "emploi", "Belgique", "France", "logistique", "transport",
+    "industrie", "construction", "intérim", "restauration", "santé",
   ],
   authors: [{ name: "HardSwork", url: "https://hardswork.be" }],
   creator: "HardSwork",
   metadataBase: new URL("https://hardswork.be"),
   openGraph: {
-    title: "HardSwork — Pour ceux qui construisent la Belgique",
+    title: "HardSwork — Le recrutement pour tous les métiers",
     description:
-      "Recrutement terrain en Belgique. Logistique, transport, industrie, construction, nettoyage, sécurité.",
+      "Recrutez tous les métiers : logistique, transport, industrie, construction, santé, restauration, sécurité.",
     url: "https://hardswork.be",
     siteName: "HardSwork",
     locale: "fr_BE",
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "HardSwork — Pour ceux qui construisent la Belgique",
+    title: "HardSwork — Le recrutement pour tous les métiers",
     description:
-      "Recrutement terrain en Belgique. Logistique, transport, industrie, construction.",
+      "Recrutez tous les métiers : logistique, transport, industrie, construction, santé.",
   },
   robots: {
     index: true,

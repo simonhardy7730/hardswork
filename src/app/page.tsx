@@ -194,7 +194,7 @@ export default async function HomePage() {
               <br />
               <em className="not-italic text-brand">meilleurs</em>
               <br />
-              du terrain.
+              talents.
             </h1>
 
             {/* Sub */}
@@ -203,8 +203,7 @@ export default async function HomePage() {
                 fontFamily: "var(--font-body)",
                 textShadow: "0 1px 12px rgba(16,33,75,0.8)",
               }}>
-              La plateforme de recrutement pensée pour les professionnels
-              du terrain belge — logistique, transport, construction, médical et plus.
+              La plateforme de recrutement pensée pour tous les métiers — logistique, transport, construction, santé, restauration, bureau et plus.
             </p>
 
             {/* CTAs */}
@@ -449,7 +448,7 @@ export default async function HomePage() {
               {
                 n: "02",
                 title: "Publiez vos offres",
-                body: "Décrivez le poste, les permis requis, le salaire. Formulaire adapté au terrain, pas au bureau.",
+                body: "Décrivez le poste, les permis requis, le salaire. Un formulaire simple, adapté à chaque métier.",
                 cta: "Voir un exemple",
                 href: "/jobs",
               },
@@ -683,7 +682,7 @@ export default async function HomePage() {
             commence ici.
           </h2>
           <p className="text-white/50 text-lg mb-10 max-w-xl mx-auto">
-            Rejoignez les centaines d&apos;entreprises belges qui font confiance à HardSwork.
+            Rejoignez HardSwork et trouvez les bons profils, plus vite.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/signup" className="btn-brand" style={{ fontSize: "1rem", padding: "1rem 2rem" }}>
@@ -706,7 +705,7 @@ export default async function HomePage() {
                 <HardSworkLogo size="md" dark={true} />
               </div>
               <p className="text-white/30 text-sm leading-relaxed max-w-xs">
-                La plateforme de recrutement pensée pour les professionnels du terrain en Belgique.
+                La plateforme de recrutement pensée pour tous les métiers.
               </p>
             </div>
 
@@ -754,7 +753,7 @@ export default async function HomePage() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-8 border-t border-white/[0.05]">
-            <p className="text-xs text-white/20">© 2026 HardSwork · Belgique 🇧🇪 · Tous droits réservés</p>
+            <p className="text-xs text-white/20">© 2026 HardSwork · Tous droits réservés</p>
             <div className="flex gap-5 text-xs text-white/20">
               <Link href="/legal/privacy" className="hover:text-white/50 transition-colors">Confidentialité</Link>
               <Link href="/legal/cgu" className="hover:text-white/50 transition-colors">Conditions d&apos;utilisation</Link>

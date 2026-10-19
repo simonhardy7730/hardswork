@@ -388,7 +388,7 @@ export default function NouvelleCandiatureRecruteurEmail({
                 lineHeight: "1.7",
               }}
             >
-              © 2026 HardSwork · Belgique 🇧🇪
+              © 2026 HardSwork
               <br />
               {orgName} reçoit cet email via la plateforme HardSwork.
               <br />

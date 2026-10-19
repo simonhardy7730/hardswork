@@ -4,7 +4,7 @@ import { SiteNav } from "@/components/layout/SiteNav";
 
 export const metadata = {
   title: "Tarifs — HardSwork",
-  description: "Des plans de recrutement clairs pour trouver les experts du terrain belge.",
+  description: "Des plans de recrutement clairs pour trouver les bons profils.",
 };
 
 const PLANS = [
@@ -69,7 +69,7 @@ const FAQS = [
   },
   {
     q: "Quels secteurs couvrez-vous ?",
-    a: "Construction, logistique, transport, industrie, médical, sécurité et nettoyage — tous les métiers du terrain belge.",
+    a: "Construction, logistique, transport, industrie, médical, sécurité et nettoyage — tous les métiers.",
   },
   {
     q: "Les candidats paient-ils quelque chose ?",
@@ -94,7 +94,7 @@ export default function TarifsPage() {
             <br />de recrutement.
           </h1>
           <p className="text-white/45 text-base max-w-lg mx-auto leading-relaxed">
-            Des outils de haute précision pour trouver les experts du terrain.
+            Des outils de haute précision pour trouver les bons profils.
             Pas de fioritures, juste la performance brute.
           </p>
         </div>
@@ -175,7 +175,7 @@ export default function TarifsPage() {
             {[
               { icon: "✅", label: "Sans engagement" },
               { icon: "🔒", label: "Données sécurisées" },
-              { icon: "🇧🇪", label: "100% belge" },
+              { icon: "🔒", label: "Données protégées (RGPD)" },
               { icon: "📞", label: "Support humain" },
             ].map(({ icon, label }) => (
               <div key={label} className="bg-white border border-ink-100 rounded-xl p-3 text-center">
@@ -235,7 +235,7 @@ export default function TarifsPage() {
         {/* ── FOOTER ───────────────────────────────────── */}
         <footer className="border-t border-ink-100 bg-[#FFFBF0] py-8 px-6">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-ink-300 text-xs">© 2026 HardSwork · Belgique · Tous droits réservés</p>
+            <p className="text-ink-300 text-xs">© 2026 HardSwork · Tous droits réservés</p>
             <div className="flex gap-6 text-ink-300 text-xs">
               <Link href="/legal/cgu" className="hover:text-ink transition">CGU</Link>
               <Link href="/legal/privacy" className="hover:text-ink transition">Confidentialité</Link>

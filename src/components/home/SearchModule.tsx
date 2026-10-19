@@ -85,7 +85,7 @@ export function SearchModule() {
                 className="appearance-none bg-transparent text-sm font-semibold text-[#2B3A66] pr-6 cursor-pointer focus:outline-none"
                 style={{ fontFamily: "var(--font-body)" }}
               >
-                <option value="">Toute la Belgique</option>
+                <option value="">Toutes les régions</option>
                 {Object.entries(REGION_LABELS).map(([v, l]) => (
                   <option key={v} value={v}>{l}</option>
                 ))}

@@ -182,7 +182,7 @@ export default function CandidatsList({
             onChange={e => update("region", e.target.value)}
             className="w-full text-xs border border-ink-100 rounded-lg px-2.5 py-2 focus:outline-none focus:border-brand transition bg-surface appearance-none"
           >
-            <option value="">Toute la Belgique</option>
+            <option value="">Toutes les régions</option>
             {Object.entries(REGION_LABELS).map(([v, l]) => (
               <option key={v} value={v}>{l}</option>
             ))}

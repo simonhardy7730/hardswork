@@ -56,8 +56,8 @@ const CITIES      = ["Liège", "Charleroi", "Namur", "Mons", "Bruxelles", "Bruge
 /* ─── Left-panel config par étape ────────────────────── */
 const LEFT = {
   1: {
-    headline: ["REJOIGNEZ LA", "[FORCE]", "DU TERRAIN."],
-    redLine: "[FORCE]",
+    headline: ["TROUVEZ", "[VOTRE]", "PROCHAIN JOB."],
+    redLine: "[VOTRE]",
     sub: "Trouvez un job qui respecte vos compétences.",
     hardie: "On commence par le plus important : votre expertise !",
   },
@@ -460,7 +460,7 @@ export default function CandidatSignupPage() {
                   style={{ fontSize: "clamp(1.6rem, 3vw, 2rem)", letterSpacing: "-0.01em" }}>
                   Votre compte
                 </h2>
-                <p className="text-ink-500 text-sm">100% gratuit · Trouvez un job en Belgique</p>
+                <p className="text-ink-500 text-sm">100% gratuit · Trouvez votre prochain job</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

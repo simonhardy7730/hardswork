@@ -236,7 +236,7 @@ export default function CandidatureConfirmationEmail({
                 margin: "0 0 16px 0",
               }}
             >
-              En attendant, découvrez d&apos;autres opportunités en Belgique
+              En attendant, découvrez d&apos;autres opportunités
             </Text>
             <Button
               href={`${appUrl}/jobs`}
@@ -267,7 +267,7 @@ export default function CandidatureConfirmationEmail({
                 lineHeight: "1.7",
               }}
             >
-              © 2026 HardSwork · Belgique 🇧🇪
+              © 2026 HardSwork
               <br />
               Vous recevez cet email car vous avez postulé via HardSwork.
               <br />

@@ -14,20 +14,20 @@ const ROLES = [
     title: "AGENCE DE\nRECRUTEMENT",
     features: ["Multi-sites", "Gestion d'intérim", "Sourcing illimité"],
     photo: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
-    placeholder: "Ex: Recrutement Pro Belgique",
+    placeholder: "Ex: Recrutement Pro",
   },
   {
     id: "company" as const,
     title: "ENTREPRISE\n/ PME",
     features: ["Recrutement direct", "Gestion d'équipe", "1 offre gratuite"],
     photo: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",
-    placeholder: "Ex: ConstructoTech Belgique",
+    placeholder: "Ex: ConstructoTech",
   },
 ];
 
 const STEPS = [
   { num: "01", title: "Publiez votre offre", desc: "En moins de 2 minutes. Secteur, profil recherché, salaire — simple et efficace." },
-  { num: "02", title: "Recevez des candidats", desc: "Notre base de travailleurs qualifiés belges est notifiée. Les profils correspondants postulent directement." },
+  { num: "02", title: "Recevez des candidats", desc: "Notre base de candidats qualifiés est notifiée. Les profils correspondants postulent directement." },
   { num: "03", title: "Contactez & recrutez", desc: "Accédez aux coordonnées complètes, CV, et échangez directement. Zéro intermédiaire." },
 ];
 
@@ -35,7 +35,7 @@ const FEATURES = [
   { icon: <Zap size={20} className="text-brand" />, title: "Publier en 2 min", desc: "Formulaire guidé, pas de jargon RH inutile." },
   { icon: <Users size={20} className="text-brand" />, title: "Candidats qualifiés", desc: "Profils vérifiés, motivés, disponibles maintenant." },
   { icon: <Clock size={20} className="text-brand" />, title: "Réponse sous 48h", desc: "Délai moyen de première candidature reçue." },
-  { icon: <Shield size={20} className="text-brand" />, title: "100% belge", desc: "Données hébergées en EU, conformité RGPD." },
+  { icon: <Shield size={20} className="text-brand" />, title: "Données protégées", desc: "Hébergées dans l'UE, conformité RGPD." },
 ];
 
 type OrgType = "agency" | "company";
@@ -124,11 +124,10 @@ export default function RecrutePage() {
                 style={{ fontSize: "clamp(3rem, 6vw, 5rem)", letterSpacing: "-0.02em" }}>
                 Recrutez les<br />
                 <span style={{ color: "var(--brand-text)" }}>[meilleurs]</span><br />
-                du terrain.
+                talents.
               </h1>
               <p className="text-white/80 text-lg leading-relaxed mb-10 max-w-md">
-                La plateforme de recrutement pensée pour les métiers techniques et manuels en Belgique.
-                Construction, logistique, transport, industrie et plus.
+                La plateforme de recrutement pour tous les métiers. Construction, logistique, transport, industrie, santé, restauration et plus.
               </p>
               <div className="flex flex-wrap gap-3">
                 <button
@@ -230,7 +229,7 @@ export default function RecrutePage() {
             <p className="text-[11px] font-black text-brand uppercase tracking-widest mb-3">Secteurs</p>
             <h2 className="font-display font-black text-ink uppercase mb-8"
               style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)", letterSpacing: "-0.02em" }}>
-              Tous les métiers du terrain.
+              Tous les métiers.
             </h2>
             <div className="flex flex-wrap gap-2 justify-center">
               {["Construction", "Logistique", "Transport", "Industrie", "Médical", "Sécurité", "Nettoyage", "Horeca", "Tech & IT"].map((s) => (
@@ -260,7 +259,7 @@ export default function RecrutePage() {
         <footer className="border-t border-ink-100 bg-[#FFFBF0] py-8 px-6">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <HardSworkLogo size="sm" dark={false} />
-            <p className="text-ink-300 text-xs">© 2026 HardSwork · Belgique · Tous droits réservés</p>
+            <p className="text-ink-300 text-xs">© 2026 HardSwork · Tous droits réservés</p>
             <div className="flex gap-6 text-ink-300 text-xs">
               <Link href="/legal/cgu" className="hover:text-ink transition">CGU</Link>
               <Link href="/legal/privacy" className="hover:text-ink transition">Confidentialité</Link>
@@ -297,8 +296,8 @@ export default function RecrutePage() {
           </h1>
           <p className="text-white/45 mt-5 text-sm leading-relaxed max-w-xs">
             {step === "select"
-              ? "La plateforme de recrutement pour les travailleurs de terrain et techniques."
-              : "Accédez aux meilleurs talents techniques de Belgique."}
+              ? "La plateforme de recrutement pour tous les métiers."
+              : "Accédez aux meilleurs talents."}
           </p>
         </div>
       </div>
@@ -420,7 +419,7 @@ export default function RecrutePage() {
             </div>
           )}
         </div>
-        <p className="text-xs text-gray-300 mt-12">© {new Date().getFullYear()} HardSwork · Belgique · Tous droits réservés</p>
+        <p className="text-xs text-gray-300 mt-12">© {new Date().getFullYear()} HardSwork · Tous droits réservés</p>
       </div>
     </div>
   );

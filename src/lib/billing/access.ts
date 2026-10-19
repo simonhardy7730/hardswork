@@ -5,7 +5,7 @@ import { evaluateAccess, type Access, type SubscriptionRow } from "./pricing";
 export async function getOrgAccess(supabase: SupabaseClient, orgId: string, now: Date = new Date()): Promise<Access> {
   const { data } = await supabase
     .from("subscriptions")
-    .select("plan, status, trial_ends_at, current_period_end")
+    .select("*") // "*" : reste valable même si la migration 023 n'est pas encore appliquée
     .eq("organization_id", orgId)
     .maybeSingle();
   return evaluateAccess((data as SubscriptionRow | null) ?? null, now);

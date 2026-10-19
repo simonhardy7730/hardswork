@@ -86,6 +86,11 @@ export const CONTENT = {
     ),
     launchBadge: (pct: number): Bi => b(`OFFRE DE LANCEMENT −${pct} %`, `LANCERINGSAANBOD −${pct} %`),
   },
+  /** Mention contractuelle affichée sous les offres. */
+  contractNote: b(
+    "7 jours d'essai gratuits, sans engagement. Puis abonnement professionnel avec engagement initial de 12 mois, facturé mensuellement. Préavis de 30 jours avant échéance. Après la première année, abonnement mensuel résiliable avec un préavis de 30 jours. Tarifs HTVA.",
+    "7 dagen gratis proefperiode, zonder verbintenis. Daarna professioneel abonnement met een initiële verbintenis van 12 maanden, maandelijks gefactureerd. Opzegtermijn van 30 dagen voor de vervaldatum. Na het eerste jaar maandelijks abonnement, opzegbaar met een opzegtermijn van 30 dagen. Prijzen excl. btw."
+  ),
   conditions: {
     title: b("Conditions de l'offre", "Voorwaarden van het aanbod"),
     launch: [
@@ -119,10 +124,10 @@ export const CONTENT = {
       ),
     },
     {
-      q: b("Puis-je changer de plan à tout moment ?", "Kan ik op elk moment van plan veranderen?"),
+      q: b("Quel est l'engagement de l'abonnement ?", "Wat is de verbintenis van het abonnement?"),
       a: b(
-        "Oui, sans frais de résiliation. Votre abonnement reste actif jusqu'à la fin de la période payée.",
-        "Ja, zonder opzegkosten. Je abonnement blijft actief tot het einde van de betaalde periode."
+        "L'abonnement payant comporte un engagement initial de 12 mois, facturé mensuellement. Pour ne pas poursuivre après ces 12 mois, demandez la non-reconduction au moins 30 jours avant l'échéance. Ensuite, l'abonnement continue à durée indéterminée, facturé mensuellement, et peut être résilié avec un préavis de 30 jours. Vous retrouvez toutes les dates dans « Mon abonnement ».",
+        "Het betalende abonnement heeft een initiële verbintenis van 12 maanden, maandelijks gefactureerd. Om na die 12 maanden niet verder te gaan, vraagt u de niet-verlenging minstens 30 dagen voor de vervaldatum aan. Daarna loopt het abonnement voor onbepaalde duur door, maandelijks gefactureerd, en kan het met 30 dagen opzegtermijn worden opgezegd. Alle data vindt u terug in « Mijn abonnement »."
       ),
     },
     {

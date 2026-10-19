@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
+import ContractSection from "./ContractSection";
 import {
   Building2,
   Users,
@@ -51,6 +52,13 @@ export interface BillingView {
   /** Tarif verrouillé de l'abonnement en cours (€), s'il existe */
   founderPrice: number | null;
   founderEndsAtIso: string | null;
+  /** Contrat d'engagement (migration 023), calculé côté serveur */
+  contract: {
+    startDay: string; endDay: string; noticeDeadlineDay: string; phase: "initial" | "indefinite";
+    nextBillingDay: string | null; priceAfterCents: number; termsVersion: string | null;
+    cancel: { requestedDay: string; lastDay: string; noticeRespected: boolean; effective: boolean } | null;
+  } | null;
+  history: { id: string; type: string; at: string }[];
 }
 
 type Tab = "organisation" | "equipe" | "abonnement" | "personnalisation";
@@ -608,7 +616,7 @@ function TeamTab({
 }
 
 // ── Tab: Abonnement ──────────────────────────────────────
-function SubscriptionTab({ subscription, billing }: { subscription: Subscription | null; billing: BillingView }) {
+function SubscriptionTab({ subscription, billing, isAdmin }: { subscription: Subscription | null; billing: BillingView; isAdmin: boolean }) {
   const l = useL();
   const lang = useLang();
   const locale = lang === "nl" ? "nl-BE" : "fr-BE";
@@ -748,7 +756,13 @@ function SubscriptionTab({ subscription, billing }: { subscription: Subscription
             );
           })}
         </div>
-        <p className="px-6 py-3 text-[11px] text-ink-400 border-t border-[#F1F5F9]">
+        <p className="px-6 py-3 text-[11px] text-ink-400 border-t border-[#F1F5F9]" data-testid="contract-note">
+          {l(
+            "7 jours d'essai gratuits, sans engagement. Puis abonnement professionnel avec engagement initial de 12 mois, facturé mensuellement. Préavis de 30 jours avant échéance. Après la première année, abonnement mensuel résiliable avec un préavis de 30 jours. Tarifs HTVA.",
+            "7 dagen gratis proefperiode, zonder verbintenis. Daarna professioneel abonnement met een initiële verbintenis van 12 maanden, maandelijks gefactureerd. Opzegtermijn van 30 dagen voor de vervaldatum. Na het eerste jaar maandelijks abonnement, opzegbaar met een opzegtermijn van 30 dagen. Prijzen excl. btw."
+          )}
+        </p>
+        <p className="px-6 pb-3 text-[11px] text-ink-400">
           {l(
             "Le paiement en ligne n'est pas encore activé : la souscription est finalisée avec notre équipe (hello@wolko.be). Aucun prélèvement sans votre accord explicite.",
             "Online betalen is nog niet actief: je abonnement wordt afgerond met ons team (hello@wolko.be). Geen afschrijving zonder jouw uitdrukkelijke toestemming."
@@ -756,17 +770,7 @@ function SubscriptionTab({ subscription, billing }: { subscription: Subscription
         </p>
       </div>
 
-      {(state === "active" || state === "cancelled_running") && (
-        <div className="bg-white rounded-xl border border-ink-100 p-6">
-          <h3 className="text-sm font-semibold text-ink mb-1">{l("Résiliation", "Opzegging")}</h3>
-          <p className="text-sm text-ink-500 mb-3">
-            {l("Vous pouvez résilier à tout moment. Votre accès reste actif jusqu'à la fin de la période facturée.", "U kunt op elk moment opzeggen. Uw toegang blijft actief tot het einde van de gefactureerde periode.")}
-          </p>
-          <a href={mailto(l("Résiliation de mon abonnement WOLKO", "Opzegging van mijn WOLKO-abonnement"))} className="text-sm text-red-500 hover:text-red-700 hover:underline transition">
-            {l("Demander la résiliation", "Opzegging aanvragen")}
-          </a>
-        </div>
-      )}
+      <ContractSection billing={billing} plan={plan} priceCents={subscription?.monthly_price_cents ?? null} isAdmin={isAdmin} />
     </div>
   );
 }
@@ -995,6 +999,13 @@ function CustomizationTab({
 export default function SettingsPage({ org, currentUser, members, subscription, invites, billing }: Props) {
   const l = useL();
   const [activeTab, setActiveTab] = useState<Tab>("organisation");
+  // Lien des e-mails : /dashboard/settings?tab=abonnement
+  useEffect(() => {
+    try {
+      const t = new URLSearchParams(window.location.search).get("tab");
+      if (t === "abonnement" || t === "equipe" || t === "organisation" || t === "personnalisation") setActiveTab(t);
+    } catch { /* ignoré */ }
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -1032,7 +1043,7 @@ export default function SettingsPage({ org, currentUser, members, subscription, 
         <TeamTab members={members} currentUser={currentUser} invites={invites} />
       )}
       {activeTab === "abonnement" && (
-        <SubscriptionTab subscription={subscription} billing={billing} />
+        <SubscriptionTab subscription={subscription} billing={billing} isAdmin={currentUser.role === "admin"} />
       )}
       {activeTab === "personnalisation" && (
         <CustomizationTab org={org} currentUser={currentUser} />

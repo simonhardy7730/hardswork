@@ -98,6 +98,8 @@ export type SubscriptionRow = {
   status: "trial" | "active" | "cancelled";
   trial_ends_at: string | null;
   current_period_end: string | null;
+  /** Fin d'accès demandée (migration 023) : après cet instant, plus d'accès. */
+  cancel_effective_at?: string | null;
 };
 
 export type AccessState = "trial" | "trial_expired" | "active" | "cancelled_running" | "ended" | "none";
@@ -117,6 +119,10 @@ export function evaluateAccess(sub: SubscriptionRow | null, now: Date): Access {
   const trialEnd = sub.trial_ends_at ? new Date(sub.trial_ends_at) : null;
   const periodEnd = sub.current_period_end ? new Date(sub.current_period_end) : null;
   const paidPlan = sub.plan === "pro" || sub.plan === "agency";
+  const cancelEnd = sub.cancel_effective_at ? new Date(sub.cancel_effective_at) : null;
+  if (cancelEnd && cancelEnd.getTime() <= t && sub.status !== "trial") {
+    return { hasAccess: false, state: "ended", trialDaysLeft: 0, trialEndsAt: trialEnd };
+  }
 
   if (sub.status === "trial") {
     const running = !!trialEnd && trialEnd.getTime() > t;

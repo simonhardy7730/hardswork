@@ -163,6 +163,27 @@ export interface Subscription {
   founder_price_cents?: number | null;
   founder_price_ends_at?: string | null;
   current_period_end: string | null;
+  /** Migration 023 : contrat */
+  commitment_ends_at?: string | null;
+  terms_version?: string | null;
+  consent_at?: string | null;
+  consent_proof?: string | null;
+  cancel_requested_at?: string | null;
+  cancel_effective_at?: string | null;
+  cancel_notice_respected?: boolean | null;
+  trial_reminder_sent_at?: string | null;
+  trial_expired_sent_at?: string | null;
+  confirmation_sent_at?: string | null;
+  renewal_reminder_sent_at?: string | null;
+  end_sent_at?: string | null;
+  created_at: string;
+}
+
+export interface SubscriptionEvent {
+  id: string;
+  organization_id: string;
+  event_type: string;
+  details: Record<string, unknown>;
   created_at: string;
 }
 

@@ -210,6 +210,8 @@ export default async function TarifsPage() {
             </div>
           </div>
 
+          <p className="mt-6 text-center text-[13px] text-ink-500 leading-relaxed max-w-3xl mx-auto" data-testid="contract-note">{t(C.contractNote)}</p>
+
           {/* ── CONDITIONS ── */}
           <div className="mt-6 mb-14 rounded-2xl bg-white border border-ink-100 p-5 sm:p-6" data-testid="conditions">
             <p className="font-display font-black text-[#101F43] uppercase text-[12px] tracking-widest mb-3">{t(C.conditions.title)}</p>

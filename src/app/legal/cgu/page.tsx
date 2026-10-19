@@ -91,8 +91,14 @@ export default function CGUPage() {
                 rétroactivement.
               </p>
               <p>
-                Vous pouvez résilier à tout moment. La résiliation prend effet à la fin de la période de facturation en
-                cours, sans remboursement au prorata.
+                <strong>Engagement et résiliation (abonnements professionnels).</strong> L&apos;abonnement payant comporte
+                un engagement initial de 12 mois à compter de son activation, facturé mensuellement. Pour ne pas
+                poursuivre après cet engagement, le client demande la non-reconduction au moins 30 jours avant
+                l&apos;échéance. À défaut, l&apos;abonnement se poursuit à durée indéterminée, facturé mensuellement, et peut
+                être résilié avec un préavis de 30 jours. Aucune période postérieure à la date de fin effective n&apos;est
+                facturée. Le tarif contractuel en vigueur à la souscription n&apos;est jamais modifié rétroactivement ; à
+                l&apos;issue de l&apos;engagement initial, tout changement de tarif est notifié au préalable. Les droits légaux
+                impératifs du client ne sont pas affectés.
               </p>
             </LegalSection>
 

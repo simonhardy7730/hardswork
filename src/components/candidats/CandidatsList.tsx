@@ -46,6 +46,7 @@ const FILTER_CERTIFS = [
   { key: "B",       label: "B",                    type: "permis" },
   { key: "C",       label: "C",                    type: "permis" },
   { key: "CE",      label: "CE",                   type: "permis" },
+  { key: "D",       label: "D",                    type: "permis" },
 ];
 
 const AVAILABILITY_OPTIONS = [

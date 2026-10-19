@@ -1,6 +1,6 @@
 import cities from "./be-cities.json";
 
-type City = { n: string; a: string[]; lat: number; lng: number };
+type City = { n: string; a: string[]; lat: number; lng: number; r?: "wallonie" | "bruxelles" | "flandre" };
 const CITIES = cities as City[];
 
 /** minuscules, sans accents ni ponctuation : « Saint-Ghislain » ≈ « st ghislain » n'est PAS géré, mais « Liège » = « liege ». */
@@ -59,4 +59,9 @@ export function citiesWithin(center: string, km: number): { center: City; names:
 /** Nettoie un nom pour un filtre PostgREST `or=(city.ilike.…)`. */
 export function safeIlikeValue(n: string): string {
   return n.replace(/[%,()*\\"'.:]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+/** Région déduite de la ville (le champ « région » n'est plus saisi) ; Wallonie par défaut si la ville est inconnue. */
+export function regionForCity(city: string): "wallonie" | "bruxelles" | "flandre" {
+  return findCity(city)?.r ?? "wallonie";
 }

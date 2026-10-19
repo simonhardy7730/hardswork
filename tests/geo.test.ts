@@ -13,3 +13,11 @@ test("rayon", () => {
   assert.ok(near.includes("Tournai") && !near.includes("Liège"));
   assert.ok(far.length > near.length);
 });
+
+import { regionForCity } from "../src/lib/geo/distance";
+test("région déduite de la ville", () => {
+  assert.equal(regionForCity("Tournai"), "wallonie");
+  assert.equal(regionForCity("Gent"), "flandre");
+  assert.equal(regionForCity("Ixelles"), "bruxelles");
+  assert.equal(regionForCity("Village inconnu"), "wallonie");
+});

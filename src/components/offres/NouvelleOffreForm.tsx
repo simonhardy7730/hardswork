@@ -1,5 +1,7 @@
 "use client";
 
+import { LANGUAGES } from "@/lib/languages";
+import { regionForCity } from "@/lib/geo/distance";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -45,13 +47,9 @@ interface FormData {
   description: string;
 }
 
-const LICENSES = ["B", "C", "CE"];
+const LICENSES = ["B", "C", "CE", "D"];
 const CACES = ["CACES 1", "CACES 3", "CACES 5"];
-const LANGUAGES = [
-  { value: "fr", fr: "Français", nl: "Frans" },
-  { value: "nl", fr: "Néerlandais", nl: "Nederlands" },
-  { value: "en", fr: "Anglais", nl: "Engels" },
-];
+
 
 const STEPS = [
   { num: 1, fr: "L'essentiel", nl: "Het essentiële" },
@@ -81,7 +79,7 @@ export default function NouvelleOffreForm({
   const router = useRouter();
   const l = useL();
   const lang = useLang();
-  const { sector: SECTOR_LABELS, contract: CONTRACT_LABELS, region: REGION_LABELS } = labels(lang);
+  const { sector: SECTOR_LABELS, contract: CONTRACT_LABELS } = labels(lang);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -148,7 +146,7 @@ export default function NouvelleOffreForm({
       sector: form.sector,
       contract_type: form.contract_type,
       city: form.city,
-      region: form.region,
+      region: regionForCity(form.city.trim()),
       start_date: form.start_date || null,
       is_urgent: form.is_urgent,
       salary_min: form.show_salary && form.salary_min ? parseInt(form.salary_min) : null,
@@ -327,34 +325,18 @@ export default function NouvelleOffreForm({
               </div>
             </div>
 
-            {/* Ville + Région */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-ink mb-1.5">
-                  {l("Ville *", "Stad *")}
-                </label>
-                <input
-                  type="text"
-                  value={form.city}
-                  onChange={(e) => set("city", e.target.value)}
-                  placeholder={l("Liège", "Antwerpen")}
-                  className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-ink mb-1.5">
-                  {l("Région *", "Regio *")}
-                </label>
-                <select
-                  value={form.region}
-                  onChange={(e) => set("region", e.target.value as Region)}
-                  className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition bg-white"
-                >
-                  <option value="wallonie">{REGION_LABELS.wallonie}</option>
-                  <option value="bruxelles">{REGION_LABELS.bruxelles}</option>
-                  <option value="flandre">{REGION_LABELS.flandre}</option>
-                </select>
-              </div>
+            {/* Ville (la région est déduite automatiquement) */}
+            <div>
+              <label className="block text-sm font-medium text-ink mb-1.5">
+                {l("Ville *", "Stad *")}
+              </label>
+              <input
+                type="text"
+                value={form.city}
+                onChange={(e) => set("city", e.target.value)}
+                placeholder={l("Tournai", "Gent")}
+                className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
+              />
             </div>
 
             {/* Date + Urgence */}
@@ -504,12 +486,12 @@ export default function NouvelleOffreForm({
               <label className="block text-sm font-medium text-ink mb-2">
                 {l("Permis de conduire requis", "Vereist rijbewijs")}
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {LICENSES.map((lic) => (
                   <button
                     key={lic}
                     onClick={() => toggleArray("required_licenses", lic)}
-                    className={`flex-1 py-2.5 rounded-lg border text-sm font-bold transition ${
+                    className={`flex-1 min-w-[56px] py-2.5 rounded-lg border text-sm font-bold transition ${
                       form.required_licenses.includes(lic)
                         ? "border-brand bg-brand text-white"
                         : "border-ink-100 text-ink-500 hover:border-brand/50"
@@ -548,12 +530,12 @@ export default function NouvelleOffreForm({
               <label className="block text-sm font-medium text-ink mb-2">
                 {l("Langues requises", "Vereiste talen")}
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {LANGUAGES.map((lg) => (
                   <button
                     key={lg.value}
                     onClick={() => toggleArray("required_languages", lg.value)}
-                    className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition ${
+                    className={`px-3.5 py-2.5 rounded-lg border text-sm font-medium transition ${
                       form.required_languages.includes(lg.value)
                         ? "border-brand bg-blue-50 text-brand"
                         : "border-ink-100 text-ink-500 hover:border-brand/50"
@@ -630,7 +612,7 @@ export default function NouvelleOffreForm({
                   </h3>
                   <p className="text-xs text-ink-500">
                     {SECTOR_LABELS[form.sector]} · {CONTRACT_LABELS[form.contract_type]} ·{" "}
-                    {form.city || l("Ville", "Stad")} ({REGION_LABELS[form.region]})
+                    {form.city || l("Ville", "Stad")}
                   </p>
                   {form.show_salary && form.salary_min && (
                     <p className="text-xs text-[#10B981] font-medium mt-1">

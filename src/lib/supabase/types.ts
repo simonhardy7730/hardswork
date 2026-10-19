@@ -32,7 +32,7 @@ export type ApplicationStatus =
   | "refuse";
 export type SubscriptionPlan = "starter" | "pro" | "agency";
 export type SubscriptionStatus = "trial" | "active" | "cancelled";
-export type License = "B" | "C" | "CE" | "CACES1" | "CACES3" | "CACES5";
+export type License = "B" | "C" | "CE" | "D" | "CACES1" | "CACES3" | "CACES5";
 export type Language = "fr" | "nl" | "en";
 
 // ── Row types (what the DB returns) ─────────────────

@@ -1,8 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { Check, Copy, ArrowRight, Users } from "lucide-react";
+import { Check, ArrowRight, Users } from "lucide-react";
 import QRCodeDisplay from "@/components/offres/QRCodeDisplay";
+import CopyLinkButton from "@/components/offres/CopyLinkButton";
 import { labels } from "@/lib/utils";
 import { getLang } from "@/lib/i18n/server";
 
@@ -62,7 +63,7 @@ export default async function ConfirmationPage(
               <div className="flex-1 px-3 py-2.5 bg-surface border border-ink-100 rounded-lg text-xs text-ink-500 font-mono truncate">
                 {candidatureUrl}
               </div>
-              <CopyButton url={candidatureUrl} />
+              <CopyLinkButton url={candidatureUrl} />
             </div>
             <p className="text-xs text-ink-300 mt-1.5">
               {l("Partagez ce lien par email, WhatsApp, ou affichez-le sur un flyer.", "Deel deze link via e-mail, WhatsApp of toon hem op een flyer.")}
@@ -97,19 +98,5 @@ export default async function ConfirmationPage(
         </div>
       </div>
     </div>
-  );
-}
-
-// Composant client pour le bouton de copie
-function CopyButton({ url }: { url: string }) {
-  return (
-    <button
-      className="shrink-0 w-9 h-9 border border-ink-100 rounded-lg flex items-center justify-center text-ink-500 hover:bg-surface-2 transition"
-      onClick={() => {}}
-      data-url={url}
-      id="copy-btn"
-    >
-      <Copy size={15} />
-    </button>
   );
 }

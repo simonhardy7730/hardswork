@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import DocumentsUpload from "@/components/candidat/DocumentsUpload";
+import PreferencesEditor from "@/components/candidat/PreferencesEditor";
+import { EMPTY_PREFERENCES, type Preferences } from "@/lib/candidate/preferences";
 import { User, Mail, Phone, Lock, LogOut } from "lucide-react";
 import { getDict } from "@/lib/i18n/server";
 
@@ -16,13 +18,28 @@ export default async function ComptePage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // Préférences (migration 008). Si les colonnes n'existent pas encore, on affiche un formulaire vide.
+  const { data: cand } = await supabase
+    .from("candidates")
+    .select("job_types, is_student, student_profile, flexi_profile")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+  const initialPrefs: Preferences = cand
+    ? {
+        job_types: (cand.job_types as string[]) ?? [],
+        is_student: !!cand.is_student,
+        student_profile: { avail_school_year: [], ...((cand.student_profile as object) ?? {}) },
+        flexi_profile: (cand.flexi_profile as object) ?? {},
+      }
+    : EMPTY_PREFERENCES;
+
   const fullName = (user.user_metadata?.full_name as string) ?? "";
   const initials = fullName
     .split(" ").map((n: string) => n[0] ?? "").join("").slice(0, 2).toUpperCase()
     || user.email?.[0]?.toUpperCase() || "?";
 
   return (
-    <div className="space-y-6 max-w-xl">
+    <div className="space-y-6 max-w-2xl">
       {/* Header */}
       <div>
         <h1
@@ -108,6 +125,9 @@ export default async function ComptePage() {
           </p>
         </div>
       </div>
+
+      {/* Mes recherches d'emploi (types d'emploi, profil étudiant / flexi-job) */}
+      <PreferencesEditor initial={initialPrefs} />
 
       {/* Diplômes & permis */}
       <DocumentsUpload userId={user.id} />

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { sanitizePreferences } from "@/lib/candidate/preferences";
 
 const supabaseAdmin = () =>
   createClient(
@@ -25,6 +26,7 @@ export async function POST(req: NextRequest) {
       experience_years,
       sectors,
       cv_url,
+      preferences,
     } = body;
 
     if (!auth_user_id || !first_name || !phone || !email) {
@@ -64,11 +66,20 @@ export async function POST(req: NextRequest) {
 
     // postal_code : colonne ajoutée par la migration 004 ; tant qu'elle n'est pas appliquée,
     // on enregistre le profil sans (aucune inscription ne doit échouer à cause de ça).
+    // Préférences (migration 008) : même principe, l'inscription ne doit jamais échouer à cause d'elles.
+    const prefs = sanitizePreferences(preferences);
     let { data, error } = await admin
       .from("candidates")
-      .insert({ ...row, postal_code: postal_code || null })
+      .insert({ ...row, postal_code: postal_code || null, ...prefs })
       .select()
       .single();
+    if (error && /job_types|is_student|student_profile|flexi_|eligibility/.test(error.message ?? "")) {
+      ({ data, error } = await admin
+        .from("candidates")
+        .insert({ ...row, postal_code: postal_code || null })
+        .select()
+        .single());
+    }
     if (error && /postal_code/.test(error.message ?? "")) {
       ({ data, error } = await admin.from("candidates").insert(row).select().single());
     }

@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { HardSworkLogo, HardieIcon } from "@/components/ui/HardieIcon";
 import GoogleButton from "@/components/auth/GoogleButton";
+import PreferencesFields from "@/components/candidat/PreferencesFields";
+import { EMPTY_PREFERENCES, type Preferences } from "@/lib/candidate/preferences";
 import { useLang } from "@/lib/i18n/context";
 import { labels } from "@/lib/utils";
 
@@ -107,6 +109,9 @@ export default function CandidatSignupPage() {
     experience_years: "",
   });
 
+  /* Étape 2 — types d'emploi recherchés (multi-choix, profil étudiant / flexi-job) */
+  const [prefs, setPrefs] = useState<Preferences>(EMPTY_PREFERENCES);
+
   /* Étape 3 — compte + CV */
   const [auth, setAuth]     = useState({ full_name: "", email: "", password: "", phone: "" });
   const [cvFile, setCvFile] = useState<File | null>(null);
@@ -164,6 +169,7 @@ export default function CandidatSignupPage() {
         has_caces: profile.has_caces,
         caces_types: profile.caces_types,
         experience_years: profile.experience_years || null,
+        preferences: prefs,
         sectors: selectedSectors,
         cv_url: cvUrl,
       }),
@@ -453,6 +459,8 @@ export default function CandidatSignupPage() {
                   </div>
                 )}
               </div>
+
+              <PreferencesFields value={prefs} onChange={setPrefs} />
             </div>
           )}
 

@@ -47,7 +47,7 @@ export default function NouvelleCandiatureRecruteurEmail({
   cacesTypes = [],
   coverMessage,
   orgName = "Wolko",
-  dashboardUrl = "https://hardswork.vercel.app/dashboard",
+  dashboardUrl = "https://wolko.be/dashboard",
 }: Props) {
   return (
     <Html lang="fr" dir="ltr">
@@ -393,7 +393,7 @@ export default function NouvelleCandiatureRecruteurEmail({
               {orgName} reçoit cet email via la plateforme Wolko.
               <br />
               <a
-                href="https://hardswork.vercel.app/legal/privacy"
+                href="https://wolko.be/legal/privacy"
                 style={{ color: "#9B9B90" }}
               >
                 Politique de confidentialité

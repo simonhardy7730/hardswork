@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     const org = Array.isArray(orgRaw) ? orgRaw[0] : orgRaw;
     const orgName: string = org?.name ?? "Wolko";
     const orgEmail: string | undefined = org?.email;
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://hardswork.vercel.app";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://wolko.be";
     const dashboardUrl = `${appUrl}/dashboard/offres/${job_offer_id}/candidatures`;
 
     // Send recruiter notification (fire-and-forget, don't block response)

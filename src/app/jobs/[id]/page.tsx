@@ -373,7 +373,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 {l("Partager", "Delen")}
               </p>
               <ShareButtons
-                url={`https://hardswork.vercel.app/jobs/${offer.id}`}
+                url={`https://wolko.be/jobs/${offer.id}`}
                 title={offer.title}
               />
             </div>

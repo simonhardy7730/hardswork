@@ -36,7 +36,7 @@ export default function CandidatureConfirmationEmail({
   availability = "immediate",
 }: Props) {
   const firstName = candidateName.split(" ")[0];
-  const appUrl = "https://hardswork.vercel.app";
+  const appUrl = "https://wolko.be";
 
   return (
     <Html lang="fr" dir="ltr">

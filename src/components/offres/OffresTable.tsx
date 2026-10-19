@@ -15,6 +15,7 @@ import {
   Eye,
   MoreVertical,
   X,
+  Trash2,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { labels, formatDate } from "@/lib/utils";
@@ -61,7 +62,7 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
   const router = useRouter();
   const l = useL();
   const lang = useLang();
-  const { contract: CONTRACT_LABELS, sector: SECTOR_LABELS, region: REGION_LABELS } = labels(lang);
+  const { contract: CONTRACT_LABELS, sector: SECTOR_LABELS } = labels(lang);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -87,6 +88,20 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
       .update({ status: "closed" })
       .eq("id", id);
     setOpenMenu(null);
+    router.refresh();
+  }
+
+  async function deleteOffer(offre: JobOffer) {
+    setOpenMenu(null);
+    const n = offre.applications_count ?? 0;
+    const msg = n > 0
+      ? l(`Supprimer définitivement « ${offre.title} » et ses ${n} candidature(s) ? Cette action est irréversible. (Pour la garder en archive, utilisez plutôt « Clôturer ».)`,
+          `« ${offre.title} » en de ${n} sollicitatie(s) definitief verwijderen? Dit kan niet ongedaan gemaakt worden. (Gebruik liever « Afsluiten » om te archiveren.)`)
+      : l(`Supprimer définitivement « ${offre.title} » ? Cette action est irréversible.`, `« ${offre.title} » definitief verwijderen? Dit kan niet ongedaan gemaakt worden.`);
+    if (!window.confirm(msg)) return;
+    const supabase = createClient();
+    const { error } = await supabase.from("job_offers").delete().eq("id", offre.id);
+    if (error) { window.alert(l("Suppression impossible : ", "Verwijderen mislukt: ") + error.message); return; }
     router.refresh();
   }
 
@@ -118,9 +133,9 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-ink-100 overflow-hidden">
+    <div className="bg-white rounded-xl border border-ink-100">
       {/* Header table */}
-      <div className="hidden lg:grid grid-cols-[2fr_1fr_1fr_1fr_80px_100px_120px] gap-3 px-5 py-3 bg-surface border-b border-ink-100 text-xs font-semibold text-ink-500 uppercase tracking-wide">
+      <div className="hidden lg:grid grid-cols-[2fr_1fr_1fr_1fr_80px_100px_120px] gap-3 px-5 py-3 bg-surface border-b border-ink-100 rounded-t-xl text-xs font-semibold text-ink-500 uppercase tracking-wide">
         <span>{l("Poste", "Functie")}</span>
         <span>{l("Secteur", "Sector")}</span>
         <span>{l("Ville", "Stad")}</span>
@@ -159,7 +174,7 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
                     )}
                   </div>
                   <div className="text-[11px] text-ink-300 mt-0.5">
-                    {formatDate(offre.created_at, lang)} · {REGION_LABELS[offre.region]}
+                    {formatDate(offre.created_at, lang)}
                   </div>
                 </div>
               </div>
@@ -269,12 +284,19 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
                         {l("Voir l'offre publique", "Openbare vacature bekijken")}
                       </a>
                       <Link
-                        href={`/dashboard/offres/${offre.id}/qrcode`}
+                        href={`/dashboard/offres/${offre.id}/confirmation`}
                         className="flex items-center gap-2 px-3 py-2 text-sm text-ink hover:bg-surface-2 transition"
                       >
                         <ChevronRight size={14} />
                         QR Code
                       </Link>
+                      <button
+                        onClick={() => deleteOffer(offre)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition w-full"
+                      >
+                        <Trash2 size={14} />
+                        {l("Supprimer", "Verwijderen")}
+                      </button>
                       {offre.status !== "closed" && (
                         <button
                           onClick={() => closeOffer(offre.id)}

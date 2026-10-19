@@ -5,7 +5,7 @@ import { labels } from "@/lib/utils";
 import { useL, useLang } from "@/lib/i18n/context";
 
 interface Props {
-  searchParams: { secteur?: string; statut?: string; region?: string };
+  searchParams: { secteur?: string; statut?: string };
   counts: { total: number; active: number; draft: number; paused: number };
 }
 
@@ -70,18 +70,7 @@ export default function OffresFilters({ searchParams }: Props) {
           ))}
         </select>
 
-        <select
-          value={searchParams.region ?? ""}
-          onChange={(e) => update("region", e.target.value)}
-          className="px-3 py-1.5 border border-ink-100 rounded-lg text-sm text-ink-500 bg-white focus:outline-none focus:border-brand transition"
-        >
-          <option value="">{l("Toutes les régions", "Alle regio's")}</option>
-          <option value="wallonie">{l("Wallonie", "Wallonië")}</option>
-          <option value="bruxelles">{l("Bruxelles", "Brussel")}</option>
-          <option value="flandre">{l("Flandre", "Vlaanderen")}</option>
-        </select>
-
-        {(searchParams.secteur || searchParams.region) && (
+        {searchParams.secteur && (
           <button
             onClick={() => router.push(pathname)}
             className="px-3 py-1.5 text-sm text-red-500 hover:text-red-700 transition"

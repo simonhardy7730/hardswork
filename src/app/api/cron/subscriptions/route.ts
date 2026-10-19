@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { adminClient, runSubscriptionLifecycle } from "@/lib/billing/lifecycle";
+import { adminClient, runSubscriptionLifecycle, runFlashLifecycle } from "@/lib/billing/lifecycle";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -11,8 +11,10 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   try {
-    const stats = await runSubscriptionLifecycle(adminClient());
-    return NextResponse.json({ ok: true, ...stats });
+    const db = adminClient();
+    const stats = await runSubscriptionLifecycle(db);
+    const flash = await runFlashLifecycle(db).catch((e) => { console.error('flash lifecycle', e); return { errors: 1 }; });
+    return NextResponse.json({ ok: true, ...stats, flash });
   } catch (e) {
     console.error("cron subscriptions:", e);
     return NextResponse.json({ error: "failed" }, { status: 500 });

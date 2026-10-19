@@ -91,6 +91,18 @@ export default function CGUPage() {
                 rétroactivement.
               </p>
               <p>
+                <strong>WOLKO Flash et Flash Duo (annonces ponctuelles).</strong> WOLKO Flash permet de publier une
+                annonce pendant 30 jours calendaires à compter de sa publication, au prix de 149 € HTVA, payable en une
+                fois sur facture par virement bancaire. WOLKO Flash Duo : deux annonces au prix de 223,50 € HTVA (remise de
+                50 % sur la deuxième annonce, accordée une seule fois par commande ; les annonces supplémentaires sont
+                facturées 149 € HTVA chacune). Chaque annonce doit être activée dans les 90 jours suivant l&apos;achat.
+                Les annonces sont activées après confirmation de la réception du paiement ou après accord exprès de
+                Wolko ; une facture envoyée ne vaut pas paiement. Aucun abonnement, aucun engagement et aucun
+                renouvellement automatique ; le renouvellement est un nouvel achat volontaire. Flash donne accès aux
+                candidatures reçues sur l&apos;annonce concernée, et non à la candidathèque générale. L&apos;intitulé d&apos;une
+                annonce publiée ne peut plus être modifié : une annonce correspond à un seul recrutement.
+              </p>
+              <p>
                 <strong>Engagement et résiliation (abonnements professionnels).</strong> L&apos;abonnement payant comporte
                 un engagement initial de 12 mois à compter de son activation, facturé mensuellement. Pour ne pas
                 poursuivre après cet engagement, le client demande la non-reconduction au moins 30 jours avant

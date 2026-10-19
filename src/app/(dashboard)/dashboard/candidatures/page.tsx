@@ -1,4 +1,5 @@
 import { getOrgAccess } from "@/lib/billing/access";
+import { flashUnlockedOfferIds } from "@/lib/flash/access";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -24,7 +25,7 @@ export default async function CandidaturesGlobalPage(props: {
   // Candidatures refusées depuis plus de 30 jours : supprimées (échec toléré)
   const retentionDays = await purgeRefused(profile.organization_id).catch(() => 7);
 
-  const { hasAccess } = await getOrgAccess(supabase, profile.organization_id);
+  const [{ hasAccess }, flashIds] = await Promise.all([getOrgAccess(supabase, profile.organization_id), flashUnlockedOfferIds(supabase, profile.organization_id)]);
 
   const { data: offers } = await supabase
     .from("job_offers")
@@ -40,7 +41,7 @@ export default async function CandidaturesGlobalPage(props: {
 
   const apps = ((applications ?? []) as Application[]).map((a) => {
     const withTitle = { ...a, job_title: titles.get(a.job_offer_id) };
-    return hasAccess ? withTitle : { ...withTitle, applicant_email: null, applicant_phone: "" };
+    return hasAccess || flashIds.has(a.job_offer_id) ? withTitle : { ...withTitle, applicant_email: null, applicant_phone: "" };
   });
 
   return (
@@ -63,7 +64,7 @@ export default async function CandidaturesGlobalPage(props: {
       {titles.size === 0 ? (
         <p className="text-sm text-ink-500">{l("Publiez une offre pour recevoir des candidatures.", "Publiceer een vacature om sollicitaties te ontvangen.")}</p>
       ) : (
-        <KanbanBoard key={selected} applications={apps} jobOfferId={selected} candidatureUrl="" hasSubscription={hasAccess} />
+        <KanbanBoard key={selected} applications={apps} jobOfferId={selected} candidatureUrl="" hasSubscription={hasAccess} unlockedOfferIds={Array.from(flashIds)} />
       )}
     </div>
   );

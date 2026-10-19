@@ -3,6 +3,7 @@
 import { createClient as createAdmin } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { getOrgAccess } from "@/lib/billing/access";
+import { flashUnlockedOfferIds } from "@/lib/flash/access";
 import { sendCvRequestEmail } from "@/lib/email/cv-request";
 
 export type CvState =
@@ -25,16 +26,17 @@ async function authorize(applicationId: string) {
   const { data: profile } = await supabase.from("users").select("organization_id").eq("id", user.id).single();
   if (!profile) return null;
   const { hasAccess } = await getOrgAccess(supabase, profile.organization_id);
-  if (!hasAccess) return null;
   // RLS : ne renvoie la candidature que si l'offre est à l'organisation.
   const { data: app } = await supabase
     .from("applications")
-    .select("id, applicant_name, applicant_email, job_offers(title, organization_id, organizations(name))")
+    .select("id, job_offer_id, applicant_name, applicant_email, job_offers(title, organization_id, organizations(name))")
     .eq("id", applicationId)
     .single();
   if (!app) return null;
   const job = Array.isArray(app.job_offers) ? app.job_offers[0] : app.job_offers;
   if (!job || job.organization_id !== profile.organization_id) return null;
+  // Droit d'accès : abonnement/essai, OU crédit Flash sur l'annonce de cette candidature (jamais sur les autres).
+  if (!hasAccess && !(await flashUnlockedOfferIds(supabase, profile.organization_id)).has(app.job_offer_id as string)) return null;
   const orgRaw = job.organizations as unknown as { name?: string } | { name?: string }[] | null;
   const org = Array.isArray(orgRaw) ? orgRaw[0] : orgRaw;
   return {

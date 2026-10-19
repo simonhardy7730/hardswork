@@ -1,4 +1,5 @@
 import { getOrgAccess } from "@/lib/billing/access";
+import { flashUnlockedOfferIds } from "@/lib/flash/access";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
@@ -35,7 +36,8 @@ export default async function CandidaturesPage(
   const retentionDays = await purgeRefused(profile.organization_id).catch(() => 7);
 
   /* Accès (essai en cours ou abonnement) — horloge du serveur */
-  const { hasAccess: hasSubscription } = await getOrgAccess(supabase, profile.organization_id);
+  const [{ hasAccess: orgAccess }, flashIds] = await Promise.all([getOrgAccess(supabase, profile.organization_id), flashUnlockedOfferIds(supabase, profile.organization_id)]);
+  const hasSubscription = orgAccess || flashIds.has(params.id); // abonnement/essai, ou crédit Flash sur CETTE annonce
 
   const { data: offre } = await supabase
     .from("job_offers")

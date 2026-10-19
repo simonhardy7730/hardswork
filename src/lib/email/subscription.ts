@@ -2,11 +2,11 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { resend, FROM_EMAIL, FROM_NAME } from "@/lib/resend";
 import { formatDay, type Ymd } from "@/lib/billing/contract";
 
-const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+export const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
 const APP = () => process.env.NEXT_PUBLIC_APP_URL ?? "https://wolko.be";
 const eur = (cents: number) => `${(cents / 100).toLocaleString("fr-BE")} € HTVA/mois`;
 
-function layout(title: string, bodyHtml: string, cta?: { label: string; href: string }): string {
+export function layout(title: string, bodyHtml: string, cta?: { label: string; href: string }): string {
   return `<div style="background:#FFF6DE;padding:24px 0;font-family:Arial,Helvetica,sans-serif">
 <div style="max-width:560px;margin:0 auto">
   <div style="background:#101F43;padding:16px 24px;border-radius:12px 12px 0 0">
@@ -22,7 +22,7 @@ function layout(title: string, bodyHtml: string, cta?: { label: string; href: st
 </div></div>`;
 }
 
-const li = (items: string[]) => `<ul style="padding-left:18px;margin:10px 0">${items.map((i) => `<li style="margin:4px 0">${i}</li>`).join("")}</ul>`;
+export const li = (items: string[]) => `<ul style="padding-left:18px;margin:10px 0">${items.map((i) => `<li style="margin:4px 0">${i}</li>`).join("")}</ul>`;
 const link = () => `${APP()}/dashboard/settings?tab=abonnement`;
 
 export type SubscriptionMail =

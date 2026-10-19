@@ -29,6 +29,8 @@ interface Props {
   jobOfferId: string;
   candidatureUrl: string;
   hasSubscription: boolean;
+  /** Offres dont les contacts/CV sont débloqués par un crédit WOLKO Flash (sans abonnement) */
+  unlockedOfferIds?: string[];
 }
 
 /* ─── Colonnes pipeline ──────────────────────────────── */
@@ -75,10 +77,14 @@ export default function KanbanBoard({
   applications: initialApps,
   jobOfferId,
   hasSubscription,
+  unlockedOfferIds = [],
 }: Props) {
   const router   = useRouter();
   const l = useL();
   const [apps, setApps]     = useState<Application[]>(initialApps);
+  const unlockedSet = new Set(unlockedOfferIds);
+  const isUnlocked = (a: Application) => hasSubscription || unlockedSet.has(a.job_offer_id);
+  const allUnlocked = hasSubscription || (apps.length > 0 && apps.every(isUnlocked));
   const [activeId, setActiveId] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -176,7 +182,7 @@ export default function KanbanBoard({
         </div>
 
         {/* Bouton DÉBLOQUER TOUT si non abonné */}
-        {!hasSubscription && (
+        {!allUnlocked && (
           <Link href="/#tarifs"
             className="flex items-center gap-2 font-display font-black uppercase tracking-wide text-white bg-brand hover:bg-brand-dark transition rounded-xl px-4 py-2.5 text-[13px] shadow-md shadow-brand/20">
             <Lock size={13} />
@@ -184,7 +190,7 @@ export default function KanbanBoard({
           </Link>
         )}
 
-        {hasSubscription && (
+        {allUnlocked && (
           <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             {l("Contacts débloqués", "Contacten ontgrendeld")}
@@ -234,7 +240,7 @@ export default function KanbanBoard({
                       onStatusChange={updateStatus}
                       onNotesChange={updateNotes}
                       jobOfferId={jobOfferId}
-                      hasSubscription={hasSubscription}
+                      hasSubscription={isUnlocked(app)}
                       onOpen={(a) => setOpenId(a.id)}
                       onDelete={deleteApp}
                     />
@@ -252,7 +258,7 @@ export default function KanbanBoard({
               onStatusChange={async () => {}}
               onNotesChange={async () => {}}
               jobOfferId={jobOfferId}
-              hasSubscription={hasSubscription}
+              hasSubscription={isUnlocked(activeApp)}
               isDragging
             />
           )}
@@ -262,7 +268,7 @@ export default function KanbanBoard({
       {openId && apps.find(a => a.id === openId) && (
         <ProfileModal
           application={apps.find(a => a.id === openId)!}
-          hasSubscription={hasSubscription}
+          hasSubscription={isUnlocked(apps.find(a => a.id === openId)!)}
           onClose={() => setOpenId(null)}
           onNotesChange={updateNotes}
           onDelete={deleteApp}

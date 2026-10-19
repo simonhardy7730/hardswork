@@ -84,6 +84,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Offre introuvable" }, { status: 404 });
     }
 
+    // Annonce WOLKO Flash expirée : plus de nouvelles candidatures (contrôle serveur, indépendant du cron)
+    const expiresAt = (jobData as { expires_at?: string | null }).expires_at;
+    if (expiresAt && new Date(expiresAt).getTime() <= Date.now()) {
+      return NextResponse.json({ error: "Offre introuvable" }, { status: 404 });
+    }
+
     // Déjà candidaté à cette offre (même téléphone ou même e-mail) : refus automatique, rien n'est créé ni envoyé.
     const { data: dupPhone } = await supabaseAdmin
       .from("applications").select("id").eq("job_offer_id", job_offer_id).eq("applicant_phone", applicant_phone).limit(1);

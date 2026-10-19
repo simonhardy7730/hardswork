@@ -4,6 +4,7 @@ import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { getDict } from "@/lib/i18n/server";
 import { CONTENT, type Bi } from "@/lib/billing/pricing-content";
+import { flashQuote, formatEuro } from "@/lib/flash/pricing";
 import { NETWORK_FROM_EUR, publicPrice, isLaunchOfferActive, type BillablePlan } from "@/lib/billing/pricing";
 
 // Les prix dépendent de la date : jamais de page figée, toujours l'horloge du serveur.
@@ -27,6 +28,9 @@ export default async function TarifsPage() {
   const t = (x: Bi) => (lang === "nl" ? x.nl : x.fr);
   const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
   const C = CONTENT;
+  const loc = lang === "nl" ? "nl-BE" : "fr-BE";
+  const flash1 = flashQuote(1);
+  const flash2 = flashQuote(2);
 
   const paid: { id: BillablePlan; featured: boolean }[] = [
     { id: "pro", featured: true },
@@ -101,6 +105,55 @@ export default async function TarifsPage() {
             </div>
           </div>
 
+          {/* ── WOLKO FLASH / FLASH DUO : recrutement ponctuel sans abonnement ── */}
+          <div className="mb-10" data-testid="flash-section">
+            <p className="font-display font-black text-[#101F43] uppercase text-[12px] tracking-widest mb-1">{l("Recrutement ponctuel — sans abonnement", "Eenmalige werving — zonder abonnement")}</p>
+            <p className="text-ink-500 text-sm mb-5">{l("Un poste à pourvoir ? Publiez une annonce 30 jours, payez une seule fois sur facture.", "Een vacature? Publiceer 30 dagen, betaal eenmalig op factuur.")}</p>
+            <div className="grid md:grid-cols-2 gap-5">
+              <div data-testid="plan-flash" className="rounded-2xl bg-white border border-ink-100 p-6 flex flex-col">
+                <p className="font-display font-black text-ink-500 uppercase text-[11px] tracking-widest mb-3 min-h-[28px]">WOLKO Flash</p>
+                <div className="flex items-end gap-1.5 mb-1">
+                  <span className="font-display font-black text-[#101F43] leading-none whitespace-nowrap" style={{ fontSize: "clamp(2.2rem, 5vw, 3.6rem)" }}>{formatEuro(flash1.totalHtCents, loc).replace(",00", "")}</span>
+                  <span className="text-ink-500 text-sm mb-1.5">{l("HTVA · paiement unique", "excl. btw · eenmalig")}</span>
+                </div>
+                <p className="text-[12px] text-transparent select-none mb-1" aria-hidden>.</p>
+                <ul className="space-y-2.5 mb-7 mt-3 flex-1">
+                  {[l("1 annonce pendant 30 jours", "1 advertentie gedurende 30 dagen"), l("Gestion des candidatures", "Beheer van sollicitaties"), l("Sans abonnement", "Zonder abonnement"), l("Sans engagement", "Zonder verbintenis"), l("Sans renouvellement automatique", "Zonder automatische verlenging")].map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-ink-700"><Check size={14} className="text-brand shrink-0 mt-0.5" strokeWidth={3} /> {f}</li>
+                  ))}
+                </ul>
+                <Link href="/login?next=/dashboard/flash/commander" className="flex items-center justify-center gap-2 bg-[#101F43] hover:bg-[#1C3058] text-white font-display font-black uppercase text-[13px] py-3.5 rounded-xl transition w-full text-center" style={{ letterSpacing: "0.05em" }}>
+                  {l("Publier une annonce", "Een advertentie publiceren")} <ArrowRight size={13} />
+                </Link>
+              </div>
+
+              <div data-testid="plan-flash-duo" className="rounded-2xl overflow-hidden flex flex-col bg-white border border-brand shadow-xl shadow-brand/15">
+                <div className="bg-brand text-[#101F43] text-[10px] font-black uppercase tracking-widest text-center py-2.5">{l("Flash Duo — 2e annonce à −50 %", "Flash Duo — 2e advertentie aan −50 %")}</div>
+                <div className="p-6 flex flex-col flex-1">
+                  <p className="font-display font-black text-ink-500 uppercase text-[11px] tracking-widest mb-3 min-h-[28px]">WOLKO Flash Duo</p>
+                  <p className="text-ink-300 text-sm"><span className="line-through decoration-2" aria-label={l("Prix normal", "Normale prijs")}>{formatEuro(flash2.grossCents, loc).replace(",00", "")}</span></p>
+                  <div className="flex items-end gap-1.5 mb-1">
+                    <span className="font-display font-black text-[#101F43] leading-none whitespace-nowrap" style={{ fontSize: "clamp(2.2rem, 5vw, 3.6rem)" }}>{formatEuro(flash2.totalHtCents, loc)}</span>
+                    <span className="text-ink-500 text-sm mb-1.5">{l("HTVA · paiement unique", "excl. btw · eenmalig")}</span>
+                  </div>
+                  <p className="text-[12px] font-bold text-[#B87C2A] mb-1">{l(`Économie : ${formatEuro(flash2.discountCents, loc)}`, `Besparing: ${formatEuro(flash2.discountCents, loc)}`)}</p>
+                  <ul className="space-y-2.5 mb-7 mt-3 flex-1">
+                    {[l("2 annonces pendant 30 jours chacune", "2 advertenties gedurende elk 30 dagen"), l(`1re annonce ${formatEuro(flash2.unitCents, loc).replace(",00", "")} · 2e annonce ${formatEuro(flash2.unitCents - flash2.discountCents, loc)} (−50 %)`, `1e advertentie ${formatEuro(flash2.unitCents, loc).replace(",00", "")} · 2e advertentie ${formatEuro(flash2.unitCents - flash2.discountCents, loc)} (−50 %)`), l("Sans abonnement, sans engagement annuel", "Zonder abonnement, zonder jaarverbintenis"), l("Sans renouvellement automatique", "Zonder automatische verlenging")].map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm text-ink-700"><Check size={14} className="text-brand shrink-0 mt-0.5" strokeWidth={3} /> {f}</li>
+                    ))}
+                  </ul>
+                  <Link href="/login?next=/dashboard/flash/commander%3Fqty%3D2" className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-[#101F43] font-display font-black uppercase text-[13px] py-3.5 rounded-xl transition w-full text-center" style={{ letterSpacing: "0.05em" }}>
+                    {l("Publier deux annonces", "Twee advertenties publiceren")} <ArrowRight size={13} />
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <p className="text-[12.5px] text-ink-500 leading-relaxed mt-4" data-testid="flash-note">
+              {l("Trois annonces ou plus : la réduction de 50 % s'applique uniquement à la deuxième annonce de la même commande ; les annonces supplémentaires sont facturées 149 € HTVA chacune. Paiement par virement sur facture, sans carte bancaire. Flash ne donne pas accès à la candidathèque. Tarifs HTVA.",
+                 "Drie of meer advertenties: de korting van 50 % geldt enkel voor de tweede advertentie van dezelfde bestelling; bijkomende advertenties kosten 149 € excl. btw per stuk. Betaling per overschrijving op factuur, zonder bankkaart. Flash geeft geen toegang tot de kandidatendatabank. Prijzen excl. btw.")}
+            </p>
+          </div>
+
           {/* ── PLANS ── */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 pb-4">
             {paid.map(({ id, featured }) => {
@@ -156,14 +209,8 @@ export default async function TarifsPage() {
                       ))}
                     </ul>
 
-                    <a
-                      href={mailto(
-                        l(`Souscription ${id === "pro" ? "Pro" : "Agence"} — WOLKO`, `Abonnement ${id === "pro" ? "Pro" : "Kantoor"} — WOLKO`),
-                        l(
-                          `Bonjour, je souhaite souscrire à l'offre ${id === "pro" ? "Pro" : "Agence"}${price.launch ? " au tarif de lancement" : ""}.\nNom de l'entreprise :\nN° de TVA :`,
-                          `Dag, ik wil graag het ${id === "pro" ? "Pro" : "Kantoor"}-abonnement nemen${price.launch ? " tegen het lanceringstarief" : ""}.\nNaam van het bedrijf:\nBtw-nummer:`
-                        )
-                      )}
+                    <Link
+                      href="/recrute"
                       className={`flex items-center justify-center gap-2 font-display font-black uppercase text-[13px] py-3.5 rounded-xl transition w-full text-center ${
                         featured
                           ? "bg-brand hover:bg-brand-dark text-[#101F43]"
@@ -171,8 +218,8 @@ export default async function TarifsPage() {
                       }`}
                       style={{ letterSpacing: "0.05em" }}
                     >
-                      {price.launch ? t(P.launchCta) : t(P.standardCta)} <ArrowRight size={13} />
-                    </a>
+                      {t(P.cta)} <ArrowRight size={13} />
+                    </Link>
                   </div>
                 </div>
               );

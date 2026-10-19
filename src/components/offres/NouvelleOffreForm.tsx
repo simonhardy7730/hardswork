@@ -195,6 +195,20 @@ export default function NouvelleOffreForm({
       ({ data, error } = await supabase.from("job_offers").insert(payload).select().single());
     }
 
+    // Publication refusée par le serveur (ni essai ni abonnement en cours) : l'offre est gardée en brouillon
+    // et on propose WOLKO Flash (annonce ponctuelle sans abonnement) pour la publier.
+    if (error && status === "active" && error.code === "42501") {
+      const { data: draft } = await supabase
+        .from("job_offers")
+        .insert({ ...payload, ...planningPayload, status: "draft" })
+        .select()
+        .single();
+      if (draft) {
+        router.push(`/dashboard/flash/commander?offre=${draft.id}`);
+        return;
+      }
+    }
+
     if (error || !data) {
       setLoading(false);
       alert(l("Erreur lors de la création. Réessayez.", "Fout bij het aanmaken. Probeer opnieuw."));

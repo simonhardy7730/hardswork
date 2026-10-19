@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Briefcase, Kanban, Users, Settings, LogOut, Building2, ClipboardList, Search,
+  LayoutDashboard, Briefcase, Kanban, Users, Settings, LogOut, Building2, ClipboardList, Search, Zap,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { href: "/dashboard",          icon: LayoutDashboard, fr: "Tableau de bord", nl: "Dashboard",     exact: true },
   { href: "/dashboard/offres",   icon: Briefcase,       fr: "Offres d'emploi", nl: "Vacatures",     exact: false },
   { href: "/dashboard/candidatures", icon: Kanban,    fr: "Candidatures",    nl: "Sollicitaties", exact: false },
+  { href: "/dashboard/flash",   icon: Zap,             fr: "WOLKO Flash",     nl: "WOLKO Flash",   exact: false },
   { href: "/dashboard/candidats",icon: Users,           fr: "Candidats",       nl: "Kandidaten",    exact: false },
   { href: "/dashboard/settings", icon: Settings,        fr: "Paramètres",      nl: "Instellingen",  exact: false },
 ];
@@ -69,10 +70,10 @@ export default function DashboardSidebar({ org, showPool = false }: { org: Organ
       {/* Nav */}
       <nav className="flex-1 px-3 py-3 space-y-0.5">
         {[
-          ...NAV_ITEMS.slice(0, 4),
+          ...NAV_ITEMS.slice(0, 5),
           ...(showPool ? [POOL_ITEM] : []),
           ...(org?.type === "agency" ? AGENCY_ITEMS : []),
-          ...NAV_ITEMS.slice(4),
+          ...NAV_ITEMS.slice(5),
         ].map(({ href, icon: Icon, fr, nl, exact }) => {
           const isActive = exact ? pathname === href : pathname.startsWith(href);
           return (

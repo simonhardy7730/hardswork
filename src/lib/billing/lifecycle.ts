@@ -83,3 +83,69 @@ export async function runSubscriptionLifecycle(db: SupabaseClient, now: Date = n
   }
   return stats;
 }
+
+// ─── WOLKO Flash : expirations, rappels, propositions (idempotent, aucun renouvellement ni commande automatique) ───
+import { sendFlashMail, flashRecipients, type FlashMail } from "@/lib/email/flash";
+
+type CreditFlag = "reminder7_sent_at" | "reminder2_sent_at" | "expired_sent_at";
+
+async function claimCreditMail(db: SupabaseClient, creditId: string, orgId: string, billingEmail: string | undefined, flag: CreditFlag, mail: FlashMail, now: Date) {
+  const { data: claimed } = await db.from("flash_credits").update({ [flag]: now.toISOString() }).eq("id", creditId).is(flag, null).select("id");
+  if (!claimed || claimed.length === 0) return false;
+  const ok = await sendFlashMail(await flashRecipients(db, orgId, billingEmail), mail);
+  if (!ok) { await db.from("flash_credits").update({ [flag]: null }).eq("id", creditId); return false; }
+  return true;
+}
+
+export async function runFlashLifecycle(db: SupabaseClient, now: Date = new Date()) {
+  const stats = { expired: 0, lapsed: 0, reminder7: 0, reminder2: 0, pro_proposal: 0, errors: 0 };
+
+  // 1. Expiration (la visibilité publique est déjà coupée par expires_at ; ceci met à jour les statuts et ferme l'offre)
+  const { error: expErr } = await db.rpc("flash_expire_due");
+  if (expErr) { console.error("flash_expire_due:", expErr.message); return { ...stats, errors: 1 }; }
+
+  const { data: credits } = await db.from("flash_credits")
+    .select("id, organization_id, status, job_offer_id, expires_at, reminder7_sent_at, reminder2_sent_at, expired_sent_at, flash_orders(billing)")
+    .in("status", ["active", "expired"]);
+  const titleIds = (credits ?? []).map((c) => c.job_offer_id as string | null).filter(Boolean) as string[];
+  const { data: offers } = titleIds.length ? await db.from("job_offers").select("id, title").in("id", titleIds) : { data: [] as { id: string; title: string }[] };
+  const titles = new Map((offers ?? []).map((o) => [o.id as string, o.title as string]));
+
+  for (const c of credits ?? []) {
+    try {
+      const ord = c.flash_orders as unknown as { billing?: { email?: string } } | { billing?: { email?: string } }[] | null;
+      const email = (Array.isArray(ord) ? ord[0] : ord)?.billing?.email;
+      const title = titles.get(c.job_offer_id as string) ?? "Votre annonce";
+      const exp = c.expires_at ? new Date(c.expires_at) : null;
+      if (c.status === "expired") {
+        if (!c.expired_sent_at && exp && now.getTime() - exp.getTime() < 14 * DAY &&
+            await claimCreditMail(db, c.id, c.organization_id, email, "expired_sent_at", { kind: "expired", jobTitle: title }, now)) stats.expired++;
+        continue;
+      }
+      if (!exp) continue;
+      const left = exp.getTime() - now.getTime();
+      if (left > 0 && left <= 2 * DAY && !c.reminder2_sent_at) {
+        if (await claimCreditMail(db, c.id, c.organization_id, email, "reminder2_sent_at", { kind: "reminder", jobTitle: title, daysLeft: 2, expiresAt: exp.toISOString() }, now)) stats.reminder2++;
+      } else if (left > 2 * DAY && left <= 7 * DAY && !c.reminder7_sent_at) {
+        if (await claimCreditMail(db, c.id, c.organization_id, email, "reminder7_sent_at", { kind: "reminder", jobTitle: title, daysLeft: 7, expiresAt: exp.toISOString() }, now)) stats.reminder7++;
+      }
+    } catch (e) { stats.errors++; console.error("flash lifecycle", c.id, e); }
+  }
+
+  // 2. Proposition de passage à Pro : 14 jours après la confirmation du paiement, une seule fois, si pas déjà abonné
+  const { data: orders } = await db.from("flash_orders").select("id, organization_id, billing, paid_at, organizations(name)")
+    .eq("payment_status", "confirmed").is("pro_proposal_sent_at", null).lte("paid_at", new Date(now.getTime() - 14 * DAY).toISOString());
+  for (const o of orders ?? []) {
+    try {
+      const { data: sub } = await db.from("subscriptions").select("status, plan, subscribed_at").eq("organization_id", o.organization_id).maybeSingle();
+      const alreadyPro = sub?.status === "active" && sub.subscribed_at && (sub.plan === "pro" || sub.plan === "agency");
+      const { data: claimed } = await db.from("flash_orders").update({ pro_proposal_sent_at: now.toISOString() }).eq("id", o.id).is("pro_proposal_sent_at", null).select("id");
+      if (!claimed?.length || alreadyPro) continue;
+      const org = o.organizations as unknown as { name?: string } | { name?: string }[] | null;
+      const name = (Array.isArray(org) ? org[0]?.name : org?.name) ?? "votre entreprise";
+      const ok = await sendFlashMail(await flashRecipients(db, o.organization_id, (o.billing as { email?: string })?.email), { kind: "pro_proposal", orgName: name });
+      if (ok) stats.pro_proposal++; else await db.from("flash_orders").update({ pro_proposal_sent_at: null }).eq("id", o.id);
+    } catch (e) { stats.errors++; console.error("flash pro proposal", o.id, e); }
+  }
+  return stats;
+}

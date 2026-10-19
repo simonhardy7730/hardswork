@@ -7,6 +7,12 @@ import {
 } from "lucide-react";
 import { labels } from "@/lib/utils";
 import { getDict } from "@/lib/i18n/server";
+import { DAYS, SLOTS } from "@/lib/candidate/availability";
+
+/** Les descriptions viennent des recruteurs : on neutralise tout HTML avant affichage. */
+function escapeHtml(s: string) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
 import { SiteNav } from "@/components/layout/SiteNav";
 import ShareButtons from "@/components/jobs/ShareButtons";
 
@@ -198,6 +204,45 @@ export default async function JobDetailPage({ params }: { params: { id: string }
           {/* ── COLONNE PRINCIPALE ──────────────────────── */}
           <div className="space-y-5">
 
+            {/* Planning de la mission (étudiant, flexi-job, intérim) */}
+            {(() => {
+              const o = offer as any;
+              const days: string[] = o.days_needed ?? [];
+              const slots: string[] = o.time_slots ?? [];
+              const has = o.work_date_from || days.length || slots.length || o.schedule_note || o.recurrence || o.requirements || o.work_location || (o.positions_count ?? 1) > 1;
+              if (!has) return null;
+              const fmt = (d: string) => new Date(d + "T00:00:00").toLocaleDateString(lang === "nl" ? "nl-BE" : "fr-BE");
+              const rows: [string, string][] = [];
+              if (o.work_date_from) rows.push([l("Dates", "Data"), o.work_date_to && o.work_date_to !== o.work_date_from ? `${fmt(o.work_date_from)} → ${fmt(o.work_date_to)}` : fmt(o.work_date_from)]);
+              if (o.recurrence) rows.push([l("Mission", "Opdracht"), o.recurrence === "recurrente" ? l("Récurrente", "Terugkerend") : l("Ponctuelle", "Eenmalig")]);
+              if (days.length) rows.push([l("Jours", "Dagen"), DAYS.filter((d) => days.includes(d.key)).map((d) => l(d.frLong, d.nlLong)).join(", ")]);
+              if (slots.length || o.schedule_note) rows.push([l("Horaires", "Uren"), [SLOTS.filter((s) => slots.includes(s.key)).map((s) => l(s.fr, s.nl)).join(", "), o.schedule_note].filter(Boolean).join(" · ")]);
+              if ((o.positions_count ?? 1) > 1) rows.push([l("Postes", "Plaatsen"), String(o.positions_count)]);
+              if (o.work_location) rows.push([l("Lieu", "Plaats"), o.work_location]);
+              if (o.requirements) rows.push([l("Conditions", "Voorwaarden"), o.requirements]);
+              return (
+                <div className="bg-white border border-ink-100 rounded-2xl p-6">
+                  <h2 className="font-display font-black text-ink uppercase tracking-wide text-[13px] mb-4 flex items-center gap-2.5">
+                    <span className="w-1 h-5 bg-brand rounded-full shrink-0" />
+                    {l("Planning", "Planning")}
+                  </h2>
+                  <dl className="grid sm:grid-cols-[120px_1fr] gap-x-4 gap-y-2 text-sm">
+                    {rows.map(([k, v]) => (
+                      <div key={k} className="contents">
+                        <dt className="font-bold text-ink-500">{k}</dt>
+                        <dd className="text-ink">{v}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  {o.contract_type === "flexi" && (
+                    <p className="mt-4 text-xs text-ink-500 bg-surface rounded-xl p-3">
+                      {l("Flexi-job : des conditions légales belges s'appliquent. L'éligibilité du candidat est à confirmer avec l'employeur.", "Flexi-job: er gelden Belgische wettelijke voorwaarden. De geschiktheid van de kandidaat wordt met de werkgever bevestigd.")}
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
+
             {/* Notre mission */}
             <div className="bg-white border border-ink-100 rounded-2xl p-6">
               <h2 className="font-display font-black text-ink uppercase tracking-wide text-[13px] mb-5 flex items-center gap-2.5">
@@ -207,7 +252,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               {offer.description ? (
                 <div
                   className="text-ink-600 text-[15px] leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: offer.description.replace(/\n/g, "<br />") }}
+                  dangerouslySetInnerHTML={{ __html: escapeHtml(offer.description).replace(/\n/g, "<br />") }}
                 />
               ) : (
                 <p className="text-[15px] text-ink-500">

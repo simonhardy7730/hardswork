@@ -179,6 +179,16 @@ export type JobOfferInsert = {
   start_date?: string | null;
   is_urgent?: boolean;
   status?: JobStatus;
+  // Planning (migration 010)
+  work_date_from?: string | null;
+  work_date_to?: string | null;
+  days_needed?: string[];
+  time_slots?: string[];
+  schedule_note?: string | null;
+  positions_count?: number;
+  recurrence?: "ponctuelle" | "recurrente" | null;
+  requirements?: string | null;
+  work_location?: string | null;
 };
 
 export type CandidateInsert = {

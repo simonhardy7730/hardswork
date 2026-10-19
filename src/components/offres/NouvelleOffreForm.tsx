@@ -18,6 +18,7 @@ import {
 } from "@/lib/utils";
 import { useL, useLang } from "@/lib/i18n/context";
 import type { JobOfferInsert, Region, Sector, ContractType } from "@/lib/supabase/types";
+import OfferPlanningFields, { EMPTY_PLANNING, type OfferPlanning } from "@/components/offres/OfferPlanningFields";
 
 // ── Types ─────────────────────────────────────────────
 
@@ -86,6 +87,8 @@ export default function NouvelleOffreForm({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [descriptionTemplateApplied, setDescriptionTemplateApplied] =
     useState(false);
+
+  const [planning, setPlanning] = useState<OfferPlanning>(EMPTY_PLANNING);
 
   const [form, setForm] = useState<FormData>({
     title: "",
@@ -159,11 +162,31 @@ export default function NouvelleOffreForm({
       status,
     };
 
-    const { data, error } = await supabase
+    // Planning (migration 010) : uniquement pour les types concernés ; si les colonnes n'existent
+    // pas encore, on enregistre l'offre sans planning plutôt que d'échouer.
+    const hasPlanning = ["etudiant", "flexi", "interim"].includes(form.contract_type);
+    const planningPayload: Partial<JobOfferInsert> = hasPlanning
+      ? {
+          work_date_from: planning.work_date_from || null,
+          work_date_to: planning.work_date_to || null,
+          days_needed: planning.days_needed,
+          time_slots: planning.time_slots,
+          schedule_note: planning.schedule_note.trim() || null,
+          positions_count: Math.min(999, Math.max(1, parseInt(planning.positions_count) || 1)),
+          recurrence: planning.recurrence || null,
+          requirements: planning.requirements.trim() || null,
+          work_location: planning.work_location.trim() || null,
+        }
+      : {};
+
+    let { data, error } = await supabase
       .from("job_offers")
-      .insert(payload)
+      .insert({ ...payload, ...planningPayload })
       .select()
       .single();
+    if (error && hasPlanning && /work_date|days_needed|time_slots|schedule_note|positions_count|recurrence|requirements|work_location/.test(error.message ?? "")) {
+      ({ data, error } = await supabase.from("job_offers").insert(payload).select().single());
+    }
 
     if (error || !data) {
       setLoading(false);
@@ -470,6 +493,11 @@ export default function NouvelleOffreForm({
                 ))}
               </div>
             </div>
+
+            {/* Planning de la mission (job étudiant, flexi-job, intérim) */}
+            {["etudiant", "flexi", "interim"].includes(form.contract_type) && (
+              <OfferPlanningFields value={planning} onChange={setPlanning} flexi={form.contract_type === "flexi"} />
+            )}
 
             {/* Permis */}
             <div>

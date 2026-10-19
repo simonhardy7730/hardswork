@@ -8,6 +8,7 @@ import { getDict } from "@/lib/i18n/server";
 import { LangSwitch } from "@/components/layout/LangSwitch";
 import type { JobOffer, JobPlanning, Organization } from "@/lib/supabase/types";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
+import { WolfBadge } from "@/components/ui/WolfMascot";
 import { MapPin, Briefcase, Zap, CheckCircle, ArrowLeft } from "lucide-react";
 
 export async function generateMetadata() {
@@ -17,16 +18,6 @@ export async function generateMetadata() {
     : { title: "Postuler — Wolko", description: "Postulez en moins de 2 minutes. Wolko met en relation les candidats avec les employeurs." };
 }
 
-const SECTOR_PHOTOS: Record<string, string> = {
-  logistique:   "https://images.unsplash.com/photo-1553413077-190dd305871c?w=900&q=80",
-  transport:    "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=900&q=80",
-  construction: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&q=80",
-  industrie:    "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=900&q=80",
-  nettoyage:    "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=900&q=80",
-  securite:     "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80",
-  medical:      "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=900&q=80",
-  autre:        "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=900&q=80",
-};
 
 export default async function PostulerPage(
   props: {
@@ -81,7 +72,6 @@ export default async function PostulerPage(
     }
   }
 
-  const sectorPhoto = SECTOR_PHOTOS[job.sector] ?? SECTOR_PHOTOS.autre;
   const sectorLabel = SECTOR_LABELS[job.sector] ?? job.sector;
   const contractLabel = CONTRACT_LABELS[job.contract_type] ?? job.contract_type;
 
@@ -90,15 +80,14 @@ export default async function PostulerPage(
 
       {/* ── LEFT PANEL (photo + info) ─────────────────────── */}
       <div className="brand-on-dark hidden lg:flex lg:w-[42%] relative flex-col">
-        {/* Background photo */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={sectorPhoto}
-          alt={sectorLabel}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        {/* Fond de marque + mascotte (plus de photo de secteur hors-sujet) */}
+        <div className="absolute inset-0 bg-[#101F43]" />
+        <div className="absolute -top-24 -right-24 w-[420px] h-[420px] rounded-full bg-brand/10 blur-3xl" />
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#101F43]/90 via-[#101F43]/70 to-[#101F43]/50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#101F43] via-[#101F43] to-[#16275A]" />
+        <div className="absolute right-8 top-1/2 -translate-y-[62%] w-36 xl:w-44 z-10">
+          <WolfBadge sign="POSTULE !" />
+        </div>
 
         {/* Content */}
         <div className="relative z-10 flex flex-col h-full p-10">
@@ -125,9 +114,7 @@ export default async function PostulerPage(
             </h1>
             <p className="text-white/50 text-sm max-w-xs leading-relaxed">
               {l("Postulez en moins de 2 minutes.", "Solliciteer in minder dan 2 minuten.")}
-              {org?.name
-                ? l(` ${org.name} vous contactera directement.`, ` ${org.name} neemt rechtstreeks contact met je op.`)
-                : l(" L'employeur vous contactera directement.", " De werkgever neemt rechtstreeks contact met je op.")}
+              {l(" Sans compte, sans prise de tête.", " Zonder account, zonder gedoe.")}
             </p>
           </div>
 
@@ -235,7 +222,7 @@ export default async function PostulerPage(
                 <span className="text-brand">{l("[candidature].", "[sollicitatie] in.")}</span>
               </h2>
               <p className="text-ink-500 text-sm">
-                {l("2 minutes · Sans compte", "2 minuten · Zonder account")} · {org?.name ?? "Wolko"} {l("vous contacte directement.", "neemt rechtstreeks contact met je op.")}
+                {l("2 minutes · Sans compte · CV facultatif", "2 minuten · Zonder account · CV optioneel")}
               </p>
             </div>
 

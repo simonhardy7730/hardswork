@@ -32,11 +32,11 @@ const WOLF_CSS = `.wf{--fur:#7E8A98;--fur-d:#66717F;--fur-l:#EEF1F5;display:bloc
 @keyframes wf-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
 @media (prefers-reduced-motion:reduce){.wf-anim *{animation:none!important}}`;
 
-type Props = Omit<SVGProps<SVGSVGElement>, "children"> & { animated?: boolean };
+type Props = Omit<SVGProps<SVGSVGElement>, "children"> & { animated?: boolean; /** Texte de la pancarte (défaut : JE RECRUTE) */ sign?: string };
 
-export function WolfMascot({ animated = true, className, ...rest }: Props) {
+export function WolfMascot({ animated = true, className, sign = "JE RECRUTE", ...rest }: Props) {
   return (
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 290" className={`wf ${animated ? "wf-anim" : ""} ${className ?? ""}`} {...rest} role="img" aria-label="Mascotte loup Wolko tenant une pancarte Je recrute">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 290" className={`wf ${animated ? "wf-anim" : ""} ${className ?? ""}`} {...rest} role="img" aria-label={`Mascotte loup Wolko tenant une pancarte ${sign}`}>
 <style>{WOLF_CSS}</style>
 <ellipse className="wf-shadow" cx="130" cy="276" rx="74" ry="8"/>
 <g className="wf-tail">
@@ -84,7 +84,7 @@ export function WolfMascot({ animated = true, className, ...rest }: Props) {
 <path className="wf-arm" d="M98 156 Q70 160 62 180"/>
 <path className="wf-arm" d="M162 156 Q190 160 198 180"/>
 <rect className="wf-paper wf-board" x="46" y="176" width="168" height="78" rx="10"/>
-<text className="wf-text" x="130" y="224" textAnchor="middle" textLength="140" lengthAdjust="spacingAndGlyphs">JE RECRUTE</text>
+<text className="wf-text" x="130" y="224" textAnchor="middle" textLength="140" lengthAdjust="spacingAndGlyphs">{sign}</text>
 <rect className="wf-accent" x="72" y="234" width="116" height="6" rx="3"/>
 <ellipse className="wf-fur" cx="57" cy="184" rx="14" ry="12"/>
 <ellipse className="wf-fur" cx="203" cy="184" rx="14" ry="12"/>
@@ -111,7 +111,7 @@ export function WolfHead(props: Omit<Props, "animated" | "viewBox">) {
  * sur les photos et les fonds sombres. La taille se règle sur le conteneur
  * (ex. className="w-40"), la hauteur suit toute seule.
  */
-export function WolfBadge({ className = "" }: { className?: string }) {
+export function WolfBadge({ className = "", sign }: { className?: string; sign?: string }) {
   return (
     <div className={`relative ${className}`}>
       <div
@@ -119,7 +119,7 @@ export function WolfBadge({ className = "" }: { className?: string }) {
         className="absolute left-1/2 top-[46%] aspect-square w-[92%] -translate-x-1/2 -translate-y-1/2 rounded-full"
         style={{ background: "radial-gradient(circle at 50% 38%, #FFD45E 0%, #FFB900 64%, #EAA600 100%)" }}
       />
-      <WolfMascot className="relative block w-full h-auto drop-shadow-xl" />
+      <WolfMascot sign={sign} className="relative block w-full h-auto drop-shadow-xl" />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
   Row,
   Column,
   Preview,
+  Img,
 } from "@react-email/components";
 import * as React from "react";
 
@@ -78,8 +79,9 @@ export default function NouvelleCandiatureRecruteurEmail({
                     letterSpacing: "-0.02em",
                   }}
                 >
-                  <span style={{ color: "#FFB900" }}>HARD</span>
-                  <span style={{ color: "#ffffff" }}>SWORK</span>
+                  <Img src="https://wolko.be/images/email/wolf-head.png" width="44" height="42" alt="Wolko" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "10px" }} />
+              <span style={{ color: "#FFB900", verticalAlign: "middle" }}>WOL</span>
+              <span style={{ color: "#ffffff", verticalAlign: "middle" }}>KO</span>
                 </Text>
               </Column>
               <Column style={{ textAlign: "right" }}>

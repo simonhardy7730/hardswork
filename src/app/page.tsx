@@ -113,15 +113,6 @@ export default async function HomePage() {
     .order("created_at", { ascending: false })
     .limit(8);
 
-  const { count: totalJobs } = await supabase
-    .from("job_offers")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "active");
-
-  const { count: totalCandidates } = await supabase
-    .from("candidates")
-    .select("id", { count: "exact", head: true });
-
   // Compteurs par secteur
   const sectorKeys = ["logistique","transport","industrie","construction","nettoyage","securite","medical"];
   const sectorCountsRaw = await Promise.all(
@@ -149,9 +140,6 @@ export default async function HomePage() {
     { id: "5", title: "Opérateur de production alimentaire", city: "Leuven", sector: "industrie", contract_type: "cdi", salary_min: 2000, salary_max: 2300, salary_period: "mois", show_salary: true, is_urgent: false, organizations: { name: "AB InBev", primary_color: null } },
     { id: "6", title: "Agent de sécurité SSIAP 1", city: "Anvers", sector: "securite", contract_type: "interim", salary_min: 15, salary_max: 17, salary_period: "heure", show_salary: true, is_urgent: false, organizations: { name: "SecuBelgique", primary_color: null } },
   ];
-
-  const statsJobs   = (totalJobs ?? 0) > 0 ? `${(totalJobs ?? 0).toLocaleString("fr-BE")}` : "500";
-  const statsCands  = (totalCandidates ?? 0) > 0 ? `${(totalCandidates ?? 0).toLocaleString("fr-BE")}` : "2 400";
 
   return (
     <div className="bg-surface font-body">
@@ -231,29 +219,6 @@ export default async function HomePage() {
       {/* ── SEARCH MODULE ─────────────────────────────── */}
       <SearchModule />
 
-
-      {/* ── NUMBERS ──────────────────────────────────── */}
-      <section className="bg-[#0F0E0D] py-20 noise">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-            {[
-              { num: `${statsJobs}+`, label: "offres actives", sub: "en Belgique" },
-              { num: `${statsCands}+`, label: "candidats inscrits", sub: "prêts à être contactés" },
-              { num: "48h", label: "délai moyen", sub: "première candidature reçue" },
-              { num: "7", label: "secteurs couverts", sub: "du terrain à la gestion" },
-            ].map((s, i) => (
-              <div key={i} className="animate-fade-up" style={{ animationDelay: `${i * 0.1}s` }}>
-                <div className="font-display font-black text-white mb-2"
-                  style={{ fontSize: "clamp(2.5rem, 4vw, 4rem)", lineHeight: 1 }}>
-                  {s.num}
-                </div>
-                <div className="text-sm font-bold text-white/80 mb-1">{s.label}</div>
-                <div className="text-xs text-white/35">{s.sub}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── SECTORS ──────────────────────────────────── */}
       <section id="secteurs" className="bg-[#0F0E0D] pb-24">

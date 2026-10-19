@@ -147,20 +147,6 @@ export default function RecrutePage() {
                   Voir les tarifs
                 </Link>
               </div>
-
-              {/* Social proof mini */}
-              <div className="flex items-center gap-6 mt-10 pt-8 border-t border-white/10">
-                {[
-                  { val: "500+", label: "offres publiées" },
-                  { val: "2 400+", label: "candidats actifs" },
-                  { val: "48h", label: "délai moyen" },
-                ].map(({ val, label }) => (
-                  <div key={label}>
-                    <p className="font-display font-black text-white text-xl leading-none">{val}</p>
-                    <p className="text-white/30 text-xs mt-0.5">{label}</p>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* Mini-form card droite */}

@@ -32,7 +32,7 @@ export default function CandidatureConfirmationEmail({
   candidateName = "Jean",
   jobTitle = "Chauffeur PL",
   jobCity = "Bruxelles",
-  orgName = "HardSwork",
+  orgName = "Wolko",
   availability = "immediate",
 }: Props) {
   const firstName = candidateName.split(" ")[0];
@@ -267,9 +267,9 @@ export default function CandidatureConfirmationEmail({
                 lineHeight: "1.7",
               }}
             >
-              © 2026 HardSwork
+              © 2026 Wolko
               <br />
-              Vous recevez cet email car vous avez postulé via HardSwork.
+              Vous recevez cet email car vous avez postulé via Wolko.
               <br />
               <a
                 href={`${appUrl}/legal/privacy`}

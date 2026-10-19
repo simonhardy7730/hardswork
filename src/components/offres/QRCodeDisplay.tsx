@@ -41,7 +41,7 @@ export default function QRCodeDisplay({ url, title }: Props) {
     ctx.fillText(title, size / 2, size + 22);
     ctx.font = "12px Inter, system-ui, sans-serif";
     ctx.fillStyle = "#5A6585";
-    ctx.fillText("Postulez via HardSwork", size / 2, size + 42);
+    ctx.fillText("Postulez via Wolko", size / 2, size + 42);
 
     const link = document.createElement("a");
     link.download = `qr-${title.toLowerCase().replace(/\s+/g, "-")}.png`;

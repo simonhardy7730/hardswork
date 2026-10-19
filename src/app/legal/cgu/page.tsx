@@ -2,8 +2,8 @@ import Link from "next/link";
 import { SiteNav } from "@/components/layout/SiteNav";
 
 export const metadata = {
-  title: "Conditions Générales d'Utilisation — HardSwork",
-  description: "Conditions générales d'utilisation de la plateforme de recrutement HardSwork.",
+  title: "Conditions Générales d'Utilisation — Wolko",
+  description: "Conditions générales d'utilisation de la plateforme de recrutement Wolko.",
 };
 
 export default function CGUPage() {
@@ -34,12 +34,12 @@ export default function CGUPage() {
             <LegalSection title="1. Objet">
               <p>
                 Les présentes Conditions Générales d&apos;Utilisation (CGU) régissent l&apos;accès et
-                l&apos;utilisation de la plateforme HardSwork, accessible à l&apos;adresse{" "}
-                <strong>hardswork.be</strong>, éditée par la société HardSwork SRL (en cours de
+                l&apos;utilisation de la plateforme Wolko, accessible à l&apos;adresse{" "}
+                <strong>hardswork.be</strong>, éditée par la société Wolko SRL (en cours de
                 constitution), Belgique.
               </p>
               <p>
-                HardSwork est une plateforme de mise en relation entre recruteurs (entreprises et agences)
+                Wolko est une plateforme de mise en relation entre recruteurs (entreprises et agences)
                 et candidats à la recherche d&apos;un emploi dans les secteurs techniques et manuels en Belgique.
                 L&apos;utilisation de la Plateforme implique l&apos;acceptation pleine et entière des présentes CGU.
               </p>
@@ -66,14 +66,14 @@ export default function CGUPage() {
                 correspondant pas à un poste réel sera supprimée sans préavis.
               </p>
               <p>
-                HardSwork agit en tant qu&apos;intermédiaire technique et n&apos;est pas partie aux contrats
+                Wolko agit en tant qu&apos;intermédiaire technique et n&apos;est pas partie aux contrats
                 conclus entre recruteurs et candidats.
               </p>
             </LegalSection>
 
             <LegalSection title="4. Abonnements et paiement">
               <p>
-                HardSwork propose des plans d&apos;abonnement payants (Pro et Agence) dont les tarifs sont
+                Wolko propose des plans d&apos;abonnement payants (Pro et Agence) dont les tarifs sont
                 indiqués en euros TTC sur la page{" "}
                 <Link href="/tarifs">/tarifs</Link>.
                 Les abonnements sont mensuels et renouvelables automatiquement.
@@ -88,7 +88,7 @@ export default function CGUPage() {
               <p>
                 Le traitement de vos données personnelles est régi par notre{" "}
                 <Link href="/legal/privacy">Politique de Confidentialité</Link>.
-                En utilisant HardSwork, vous acceptez cette politique. Vos données sont hébergées
+                En utilisant Wolko, vous acceptez cette politique. Vos données sont hébergées
                 en Union Européenne (Supabase EU) et traitées conformément au RGPD.
               </p>
             </LegalSection>
@@ -103,7 +103,7 @@ export default function CGUPage() {
 
             <LegalSection title="7. Responsabilité">
               <p>
-                La Plateforme est fournie « en l&apos;état ». HardSwork ne saurait être tenu responsable
+                La Plateforme est fournie « en l&apos;état ». Wolko ne saurait être tenu responsable
                 des dommages indirects ou pertes résultant de l&apos;utilisation de la Plateforme, du
                 contenu des offres publiées par les recruteurs, ni des candidatures soumises.
               </p>
@@ -111,7 +111,7 @@ export default function CGUPage() {
 
             <LegalSection title="8. Modifications des CGU">
               <p>
-                HardSwork se réserve le droit de modifier les présentes CGU à tout moment. Les
+                Wolko se réserve le droit de modifier les présentes CGU à tout moment. Les
                 utilisateurs seront notifiés par email au moins 30 jours avant l&apos;entrée en vigueur
                 de toute modification substantielle.
               </p>
@@ -140,7 +140,7 @@ export default function CGUPage() {
 
         <footer className="border-t border-ink-100 bg-white py-8 px-6">
           <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-ink-300 text-xs">© 2026 HardSwork · Belgique · Tous droits réservés</p>
+            <p className="text-ink-300 text-xs">© 2026 Wolko · Belgique · Tous droits réservés</p>
             <div className="flex gap-6 text-xs">
               <Link href="/legal/cgu" className="text-brand font-semibold">CGU</Link>
               <Link href="/legal/privacy" className="text-ink-300 hover:text-ink transition">Confidentialité</Link>

@@ -28,12 +28,12 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
     .from("job_offers")
     .select("title, city, sector, organizations(name)")
     .eq("id", params.id).single();
-  if (!data) return { title: "Offre introuvable — HardSwork" };
+  if (!data) return { title: "Offre introuvable — Wolko" };
   const orgRaw = data.organizations as unknown as { name: string }[] | { name: string } | null;
   const org = Array.isArray(orgRaw) ? (orgRaw[0] ?? null) : orgRaw;
   return {
-    title: `${data.title} — ${org?.name ?? ""} | HardSwork`,
-    description: `Offre ${SECTOR_LABELS[data.sector] ?? data.sector} à ${data.city}. Postulez maintenant sur HardSwork.`,
+    title: `${data.title} — ${org?.name ?? ""} | Wolko`,
+    description: `Offre ${SECTOR_LABELS[data.sector] ?? data.sector} à ${data.city}. Postulez maintenant sur Wolko.`,
   };
 }
 
@@ -327,7 +327,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               </div>
 
               <p className="text-ink-500 text-xs leading-relaxed mb-4 line-clamp-3">
-                {org?.description ?? `Entreprise active dans le secteur ${sectorLabel.toLowerCase()}. Recrutement en cours via HardSwork.`}
+                {org?.description ?? `Entreprise active dans le secteur ${sectorLabel.toLowerCase()}. Recrutement en cours via Wolko.`}
               </p>
 
               <Link

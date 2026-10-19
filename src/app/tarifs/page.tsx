@@ -3,7 +3,7 @@ import { Check, ArrowRight, ChevronDown } from "lucide-react";
 import { SiteNav } from "@/components/layout/SiteNav";
 
 export const metadata = {
-  title: "Tarifs — HardSwork",
+  title: "Tarifs — Wolko",
   description: "Des plans de recrutement clairs pour trouver les bons profils.",
 };
 
@@ -73,7 +73,7 @@ const FAQS = [
   },
   {
     q: "Les candidats paient-ils quelque chose ?",
-    a: "Non — HardSwork est 100% gratuit pour les candidats. Ils créent leur profil, postulent aux offres, et vous les contactez directement.",
+    a: "Non — Wolko est 100% gratuit pour les candidats. Ils créent leur profil, postulent aux offres, et vous les contactez directement.",
   },
 ];
 
@@ -235,7 +235,7 @@ export default function TarifsPage() {
         {/* ── FOOTER ───────────────────────────────────── */}
         <footer className="border-t border-ink-100 bg-[#FFFBF2] py-8 px-6">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-ink-300 text-xs">© 2026 HardSwork · Tous droits réservés</p>
+            <p className="text-ink-300 text-xs">© 2026 Wolko · Tous droits réservés</p>
             <div className="flex gap-6 text-ink-300 text-xs">
               <Link href="/legal/cgu" className="hover:text-ink transition">CGU</Link>
               <Link href="/legal/privacy" className="hover:text-ink transition">Confidentialité</Link>

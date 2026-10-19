@@ -2,8 +2,8 @@ import Link from "next/link";
 import { SiteNav } from "@/components/layout/SiteNav";
 
 export const metadata = {
-  title: "Politique de Confidentialité — HardSwork",
-  description: "Politique de confidentialité et protection des données de la plateforme HardSwork.",
+  title: "Politique de Confidentialité — Wolko",
+  description: "Politique de confidentialité et protection des données de la plateforme Wolko.",
 };
 
 export default function PrivacyPage() {
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
 
             <LegalSection title="1. Responsable du traitement">
               <p>
-                HardSwork SRL (en cours de constitution), Belgique.
+                Wolko SRL (en cours de constitution), Belgique.
                 <br />
                 Email de contact RGPD :{" "}
                 <a href="mailto:privacy@hardswork.be">privacy@hardswork.be</a>
@@ -120,7 +120,7 @@ export default function PrivacyPage() {
 
             <LegalSection title="8. Cookies">
               <p>
-                HardSwork utilise uniquement des cookies strictement nécessaires au fonctionnement
+                Wolko utilise uniquement des cookies strictement nécessaires au fonctionnement
                 du service (session, authentification). Nous n&apos;utilisons pas de cookies tiers à des
                 fins publicitaires ou analytiques sans votre consentement explicite.
               </p>
@@ -148,7 +148,7 @@ export default function PrivacyPage() {
 
         <footer className="border-t border-ink-100 bg-white py-8 px-6">
           <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-ink-300 text-xs">© 2026 HardSwork · Belgique · Tous droits réservés</p>
+            <p className="text-ink-300 text-xs">© 2026 Wolko · Belgique · Tous droits réservés</p>
             <div className="flex gap-6 text-xs">
               <Link href="/legal/cgu" className="text-ink-300 hover:text-ink transition">CGU</Link>
               <Link href="/legal/privacy" className="text-brand font-semibold">Confidentialité</Link>

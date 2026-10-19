@@ -118,7 +118,7 @@ function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
 }
 
 /* ─────────────────────────────────────────────────────────
-   Normal signup — style HardSwork split-screen
+   Normal signup — style Wolko split-screen
 ───────────────────────────────────────────────────────── */
 function NormalSignup() {
   const router = useRouter();
@@ -362,7 +362,7 @@ function NormalSignup() {
             </div>
           )}
         </div>
-        <p className="text-xs text-gray-300 mt-12">© {new Date().getFullYear()} HardSwork · Tous droits réservés</p>
+        <p className="text-xs text-gray-300 mt-12">© {new Date().getFullYear()} Wolko · Tous droits réservés</p>
       </div>
     </div>
   );

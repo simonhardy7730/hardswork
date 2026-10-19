@@ -74,7 +74,7 @@ export default function LoginPage() {
           style={{ fontSize: "clamp(1.8rem, 4vw, 2.4rem)", lineHeight: 1 }}>
           Bon retour.
         </h1>
-        <p className="text-white/40 text-sm">Connectez-vous à votre espace HardSwork</p>
+        <p className="text-white/40 text-sm">Connectez-vous à votre espace Wolko</p>
       </div>
 
       <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-7">

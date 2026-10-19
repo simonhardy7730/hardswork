@@ -1,5 +1,5 @@
 /**
- * HardieIcon — Logo & mascotte HardSwork
+ * HardieIcon — Logo & mascotte Wolko
  *
  * La mascotte est le loup (voir WolfMascot). Plus de bonhomme.
  *   ≤ 64px  → tête de loup

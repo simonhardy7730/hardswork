@@ -46,7 +46,7 @@ export default function NouvelleCandiatureRecruteurEmail({
   hasCaces = false,
   cacesTypes = [],
   coverMessage,
-  orgName = "HardSwork",
+  orgName = "Wolko",
   dashboardUrl = "https://hardswork.vercel.app/dashboard",
 }: Props) {
   return (
@@ -371,7 +371,7 @@ export default function NouvelleCandiatureRecruteurEmail({
                 marginBottom: 0,
               }}
             >
-              Gérez toutes vos candidatures sur HardSwork
+              Gérez toutes vos candidatures sur Wolko
             </Text>
           </Section>
 
@@ -388,9 +388,9 @@ export default function NouvelleCandiatureRecruteurEmail({
                 lineHeight: "1.7",
               }}
             >
-              © 2026 HardSwork
+              © 2026 Wolko
               <br />
-              {orgName} reçoit cet email via la plateforme HardSwork.
+              {orgName} reçoit cet email via la plateforme Wolko.
               <br />
               <a
                 href="https://hardswork.vercel.app/legal/privacy"

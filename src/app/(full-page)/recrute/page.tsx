@@ -212,7 +212,7 @@ export default function RecrutePage() {
           <div className="max-w-5xl mx-auto">
             <h2 className="font-display font-black text-white uppercase leading-[0.9] mb-12"
               style={{ fontSize: "clamp(2rem, 4vw, 3rem)", letterSpacing: "-0.02em" }}>
-              Pourquoi <span style={{ color: "var(--brand-text)" }}>[HardSwork]</span>&nbsp;?
+              Pourquoi <span style={{ color: "var(--brand-text)" }}>[Wolko]</span>&nbsp;?
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
               {FEATURES.map((f) => (
@@ -262,7 +262,7 @@ export default function RecrutePage() {
         <footer className="border-t border-ink-100 bg-[#FFFBF2] py-8 px-6">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <HardSworkLogo size="sm" dark={false} />
-            <p className="text-ink-300 text-xs">© 2026 HardSwork · Tous droits réservés</p>
+            <p className="text-ink-300 text-xs">© 2026 Wolko · Tous droits réservés</p>
             <div className="flex gap-6 text-ink-300 text-xs">
               <Link href="/legal/cgu" className="hover:text-ink transition">CGU</Link>
               <Link href="/legal/privacy" className="hover:text-ink transition">Confidentialité</Link>
@@ -428,7 +428,7 @@ export default function RecrutePage() {
             </div>
           )}
         </div>
-        <p className="text-xs text-gray-300 mt-12">© {new Date().getFullYear()} HardSwork · Tous droits réservés</p>
+        <p className="text-xs text-gray-300 mt-12">© {new Date().getFullYear()} Wolko · Tous droits réservés</p>
       </div>
     </div>
   );

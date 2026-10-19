@@ -1,7 +1,7 @@
 import type { SVGProps } from "react";
 
 /**
- * Mascotte HardSwork — loup original, animé en CSS pur.
+ * Mascotte Wolko — loup original, animé en CSS pur.
  * Couleurs pilotées par variables CSS (--ink, --accent, --paper, --fur…) :
  * on change la palette sans retoucher le dessin.
  * Animations coupées si l'utilisateur a activé « réduire les animations ».
@@ -36,7 +36,7 @@ type Props = Omit<SVGProps<SVGSVGElement>, "children"> & { animated?: boolean };
 
 export function WolfMascot({ animated = true, className, ...rest }: Props) {
   return (
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 290" className={`wf ${animated ? "wf-anim" : ""} ${className ?? ""}`} {...rest} role="img" aria-label="Mascotte loup HardSwork tenant une pancarte Je recrute">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 290" className={`wf ${animated ? "wf-anim" : ""} ${className ?? ""}`} {...rest} role="img" aria-label="Mascotte loup Wolko tenant une pancarte Je recrute">
 <style>{WOLF_CSS}</style>
 <ellipse className="wf-shadow" cx="130" cy="276" rx="74" ry="8"/>
 <g className="wf-tail">

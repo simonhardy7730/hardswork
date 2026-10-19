@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import DocumentsUpload from "@/components/candidat/DocumentsUpload";
 import { User, Mail, Phone, Lock, LogOut } from "lucide-react";
 
-export const metadata = { title: "Mon compte — HardSwork" };
+export const metadata = { title: "Mon compte — Wolko" };
 
 export default async function ComptePage() {
   const supabase = await createClient();

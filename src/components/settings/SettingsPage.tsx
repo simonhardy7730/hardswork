@@ -403,7 +403,7 @@ function TeamTab({
             Inviter un membre
           </h2>
           <p className="text-sm text-ink-500 mb-4">
-            Partagez ce lien avec votre collègue. Il devra créer un compte HardSwork
+            Partagez ce lien avec votre collègue. Il devra créer un compte Wolko
             pour rejoindre votre organisation.
           </p>
           <div className="flex gap-2">

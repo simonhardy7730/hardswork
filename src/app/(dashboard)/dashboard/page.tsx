@@ -155,7 +155,7 @@ export default async function DashboardPage() {
             {profile.full_name.split(" ")[0]} 👋
           </h1>
           <p className="text-sm text-ink-500 mt-0.5">
-            Voici ce qui se passe sur votre espace HardSwork
+            Voici ce qui se passe sur votre espace Wolko
           </p>
         </div>
         <Link

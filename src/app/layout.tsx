@@ -23,21 +23,21 @@ export const metadata: Metadata = {
     "recrutement", "emploi", "Belgique", "logistique", "transport",
     "industrie", "construction", "intérim", "restauration", "santé",
   ],
-  authors: [{ name: "HardSwork", url: "https://hardswork.be" }],
-  creator: "HardSwork",
+  authors: [{ name: "Wolko", url: "https://hardswork.be" }],
+  creator: "Wolko",
   metadataBase: new URL("https://hardswork.be"),
   openGraph: {
-    title: "HardSwork — Le recrutement pour tous les métiers",
+    title: "Wolko — Le recrutement pour tous les métiers",
     description:
       "Recrutez tous les métiers : logistique, transport, industrie, construction, santé, restauration, sécurité.",
     url: "https://hardswork.be",
-    siteName: "HardSwork",
+    siteName: "Wolko",
     locale: "fr_BE",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "HardSwork — Le recrutement pour tous les métiers",
+    title: "Wolko — Le recrutement pour tous les métiers",
     description:
       "Recrutez tous les métiers : logistique, transport, industrie, construction, santé.",
   },

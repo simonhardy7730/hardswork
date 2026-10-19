@@ -3,9 +3,9 @@
  * (Le logo/wordmark, le header, le footer et les métadonnées de la page d'accueil lisent ce fichier.)
  */
 export const BRAND = {
-  name: "HardsWork",
+  name: "Wolko",
   /** Wordmark en 3 morceaux : le 2e est mis en jaune. */
-  wordmark: ["Hard", "S", "work"] as const,
+  wordmark: ["Wolk", "o", ""] as const,
   tagline: "Le bon talent. La bonne entreprise.",
   description:
     "La plateforme qui rapproche les candidats, les entreprises et les agences d'intérim. Trouvez un emploi ou recrutez plus simplement, près de chez vous.",

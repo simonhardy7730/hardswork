@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { formatRelative } from "@/lib/utils";
 
-export const metadata = { title: "Mon tableau de bord — HardSwork" };
+export const metadata = { title: "Mon tableau de bord — Wolko" };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   nouveau:   { label: "En attente",   color: "text-blue-600 bg-blue-50 border-blue-200",    icon: Clock       },

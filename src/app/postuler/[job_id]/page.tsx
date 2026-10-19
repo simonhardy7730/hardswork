@@ -8,8 +8,8 @@ import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { MapPin, Clock, Briefcase, Zap, CheckCircle, ArrowLeft } from "lucide-react";
 
 export const metadata = {
-  title: "Postuler — HardSwork",
-  description: "Postulez en moins de 2 minutes. HardSwork met en relation les candidats avec les meilleurs employeurs.",
+  title: "Postuler — Wolko",
+  description: "Postulez en moins de 2 minutes. Wolko met en relation les candidats avec les meilleurs employeurs.",
 };
 
 const SECTOR_PHOTOS: Record<string, string> = {
@@ -101,7 +101,7 @@ export default async function PostulerPage({
                 </span>
               </div>
               <div>
-                <p className="text-white font-bold text-sm">{org?.name ?? "HardSwork"}</p>
+                <p className="text-white font-bold text-sm">{org?.name ?? "Wolko"}</p>
                 <p className="text-white/40 text-xs">Employeur vérifié</p>
               </div>
             </div>
@@ -169,7 +169,7 @@ export default async function PostulerPage({
                   </span>
                 </div>
                 <div>
-                  <p className="font-bold text-ink text-xs">{org?.name ?? "HardSwork"}</p>
+                  <p className="font-bold text-ink text-xs">{org?.name ?? "Wolko"}</p>
                   <p className="text-ink-300 text-[10px]">Employeur vérifié</p>
                 </div>
               </div>
@@ -197,7 +197,7 @@ export default async function PostulerPage({
                 <span className="text-brand">[candidature].</span>
               </h2>
               <p className="text-ink-500 text-sm">
-                2 minutes · Sans compte · {org?.name ?? "HardSwork"} vous contacte directement.
+                2 minutes · Sans compte · {org?.name ?? "Wolko"} vous contacte directement.
               </p>
             </div>
 
@@ -217,14 +217,14 @@ export default async function PostulerPage({
 
             {/* The form itself */}
             <div className="bg-white border border-ink-100 rounded-2xl p-6 shadow-sm">
-              <CandidatureForm jobId={job.id} orgName={org?.name ?? "HardSwork"} />
+              <CandidatureForm jobId={job.id} orgName={org?.name ?? "Wolko"} />
             </div>
 
             {/* Footer */}
             <p className="text-center text-[11px] text-ink-300 mt-6">
               Propulsé par{" "}
               <Link href="/" className="font-bold text-brand hover:text-brand-dark transition-colors">
-                HardSwork
+                Wolko
               </Link>
               {" "}· Plateforme de recrutement
             </p>

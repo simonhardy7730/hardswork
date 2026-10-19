@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
 
     const orgRaw = jobData.organizations;
     const org = Array.isArray(orgRaw) ? orgRaw[0] : orgRaw;
-    const orgName: string = org?.name ?? "HardSwork";
+    const orgName: string = org?.name ?? "Wolko";
     const orgEmail: string | undefined = org?.email;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://hardswork.vercel.app";
     const dashboardUrl = `${appUrl}/dashboard/offres/${job_offer_id}/candidatures`;

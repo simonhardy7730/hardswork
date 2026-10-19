@@ -14,7 +14,7 @@ export function postBody(data: unknown, cv: File | null): { body: BodyInit; head
   return { body: fd };
 }
 
-/** Dépôt de CV facultatif (PDF ou Word, 4 Mo max). */
+/** Dépôt de CV facultatif (PDF, Word, JPG ou PNG, 4 Mo max). */
 export default function CvPicker({ file, onChange }: { file: File | null; onChange: (f: File | null) => void }) {
   const l = useL();
   const [err, setErr] = useState("");
@@ -24,7 +24,7 @@ export default function CvPicker({ file, onChange }: { file: File | null; onChan
     e.target.value = "";
     if (!f) return;
     const ext = (f.name.split(".").pop() ?? "").toLowerCase();
-    if (!["pdf", "doc", "docx"].includes(ext)) return setErr(l("Format accepté : PDF ou Word.", "Toegelaten formaten: PDF of Word."));
+    if (!["pdf", "doc", "docx", "jpg", "jpeg", "png"].includes(ext)) return setErr(l("Format accepté : PDF, Word, JPG ou PNG.", "Toegelaten formaten: PDF, Word, JPG of PNG."));
     if (f.size > MAX) return setErr(l("Fichier trop lourd (4 Mo maximum).", "Bestand te zwaar (max. 4 MB)."));
     setErr(""); onChange(f);
   }
@@ -32,7 +32,7 @@ export default function CvPicker({ file, onChange }: { file: File | null; onChan
   return (
     <div>
       <label className="block text-sm font-medium text-ink mb-1.5">
-        {l("CV", "CV")} <span className="text-ink-300 font-normal">({l("optionnel · PDF ou Word, 4 Mo max", "optioneel · PDF of Word, max. 4 MB")})</span>
+        {l("CV", "CV")} <span className="text-ink-300 font-normal">({l("optionnel · PDF, Word, JPG ou PNG, 4 Mo max", "optioneel · PDF, Word, JPG of PNG, max. 4 MB")})</span>
       </label>
       {file ? (
         <div className="flex items-center justify-between gap-2 border border-ink-100 rounded-xl px-3 py-2.5 text-sm">
@@ -42,7 +42,7 @@ export default function CvPicker({ file, onChange }: { file: File | null; onChan
       ) : (
         <label className="flex items-center justify-center gap-2 border border-dashed border-ink-100 rounded-xl px-3 py-3 text-sm text-ink-500 cursor-pointer hover:border-brand hover:text-brand transition">
           <FileText size={15} />{l("Ajouter mon CV", "Mijn CV toevoegen")}
-          <input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={pick} />
+          <input type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" className="hidden" onChange={pick} />
         </label>
       )}
       {err && <p className="text-xs text-red-600 mt-1">{err}</p>}

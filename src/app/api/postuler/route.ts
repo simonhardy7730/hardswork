@@ -126,13 +126,17 @@ export async function POST(req: NextRequest) {
         const CV_TYPES: Record<string, string> = {
           pdf: "application/pdf", doc: "application/msword",
           docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png",
         };
         const ext = (cvFile.name.split(".").pop() ?? "").toLowerCase();
         const head = new Uint8Array(await cvFile.slice(0, 4).arrayBuffer());
         const isPdf = head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46; // %PDF
         const isZip = head[0] === 0x50 && head[1] === 0x4b; // docx
         const isOle = head[0] === 0xd0 && head[1] === 0xcf; // doc
-        const okType = (ext === "pdf" && isPdf) || (ext === "docx" && isZip) || (ext === "doc" && isOle);
+        const isJpg = head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff;
+        const isPng = head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47;
+        const okType = (ext === "pdf" && isPdf) || (ext === "docx" && isZip) || (ext === "doc" && isOle)
+          || ((ext === "jpg" || ext === "jpeg") && isJpg) || (ext === "png" && isPng);
         if (okType && cvFile.size <= 4 * 1024 * 1024 && CV_TYPES[ext]) {
           const safe = cvFile.name.replace(/[^\w.\-]+/g, "_").slice(-80);
           const path = `applications/${application.id}/${Date.now()}_${safe}`;

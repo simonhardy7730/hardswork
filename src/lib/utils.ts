@@ -5,8 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number, period: string): string {
-  const formatted = new Intl.NumberFormat("fr-BE", {
+type LangCode = "fr" | "nl";
+const LOCALE = (lang: LangCode) => (lang === "nl" ? "nl-BE" : "fr-BE");
+
+export function formatCurrency(amount: number, period: string, lang: LangCode = "fr"): string {
+  const formatted = new Intl.NumberFormat(LOCALE(lang), {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
@@ -14,28 +17,35 @@ export function formatCurrency(amount: number, period: string): string {
 
   const periodLabel: Record<string, string> = {
     heure: "/h",
-    jour: "/j",
-    mois: "/mois",
+    jour: lang === "nl" ? "/dag" : "/j",
+    mois: lang === "nl" ? "/maand" : "/mois",
   };
 
   return `${formatted}${periodLabel[period] ?? ""}`;
 }
 
-export function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("fr-BE", {
+export function formatDate(dateStr: string, lang: LangCode = "fr"): string {
+  return new Date(dateStr).toLocaleDateString(LOCALE(lang), {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
 }
 
-export function formatRelative(dateStr: string): string {
+export function formatRelative(dateStr: string, lang: LangCode = "fr"): string {
   const now = new Date();
   const date = new Date(dateStr);
   const diffMs = now.getTime() - date.getTime();
   const diffHours = Math.floor(diffMs / 3_600_000);
   const diffDays = Math.floor(diffMs / 86_400_000);
 
+  if (lang === "nl") {
+    if (diffHours < 1) return "Minder dan een uur geleden";
+    if (diffHours < 24) return `${diffHours} u geleden`;
+    if (diffDays === 1) return "Gisteren";
+    if (diffDays < 7) return `${diffDays} dagen geleden`;
+    return formatDate(dateStr, lang);
+  }
   if (diffHours < 1) return "Il y a moins d'une heure";
   if (diffHours < 24) return `Il y a ${diffHours}h`;
   if (diffDays === 1) return "Hier";
@@ -84,6 +94,28 @@ export const AVAILABILITY_LABELS: Record<string, string> = {
   "1_semaine": "Dans 1 semaine",
   "1_mois": "Dans 1 mois",
 };
+
+/** Libellés néerlandais + accès par langue : labels("nl").sector[key] */
+const NL = {
+  contract: { interim: "Interimcontract", cdi: "Onbepaalde duur", cdd: "Bepaalde duur", apprentissage: "Leercontract" },
+  sector: { logistique: "Logistiek", industrie: "Industrie", construction: "Bouw", transport: "Transport", nettoyage: "Schoonmaak", securite: "Beveiliging", medical: "Medisch", autre: "Andere" },
+  region: { wallonie: "Wallonië", bruxelles: "Brussel", flandre: "Vlaanderen" },
+  status: { nouveau: "Nieuw", contacte: "Gecontacteerd", entretien: "Gesprek", place: "Geplaatst", refuse: "Geweigerd", draft: "Concept", active: "Actief", paused: "Gepauzeerd", closed: "Afgesloten" },
+  availability: { immediate: "Onmiddellijk", "1_semaine": "Binnen 1 week", "1_mois": "Binnen 1 maand" },
+} as const;
+
+export function labels(lang: LangCode = "fr") {
+  if (lang === "nl") {
+    return {
+      contract: NL.contract as Record<string, string>,
+      sector: NL.sector as Record<string, string>,
+      region: NL.region as Record<string, string>,
+      status: NL.status as Record<string, string>,
+      availability: NL.availability as Record<string, string>,
+    };
+  }
+  return { contract: CONTRACT_LABELS, sector: SECTOR_LABELS, region: REGION_LABELS, status: STATUS_LABELS, availability: AVAILABILITY_LABELS };
+}
 
 export const JOB_TITLE_SUGGESTIONS = [
   "Cariste",

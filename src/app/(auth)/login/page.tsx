@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
 import GoogleButton from "@/components/auth/GoogleButton";
+import { useL } from "@/lib/i18n/context";
 
 export default function LoginPage() {
   const router = useRouter();
+  const l = useL();
   const [mode, setMode] = useState<"password" | "magic">("password");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +33,7 @@ export default function LoginPage() {
         password,
       });
       if (error) {
-        setMessage({ type: "error", text: "Email ou mot de passe incorrect." });
+        setMessage({ type: "error", text: l("Email ou mot de passe incorrect.", "Onjuist e-mailadres of wachtwoord.") });
       } else {
         const userType = data.user?.user_metadata?.user_type;
         if (userType === "candidate") {
@@ -51,12 +53,12 @@ export default function LoginPage() {
       if (error) {
         setMessage({
           type: "error",
-          text: "Impossible d'envoyer le lien. Réessayez.",
+          text: l("Impossible d'envoyer le lien. Réessayez.", "De link kon niet worden verstuurd. Probeer opnieuw."),
         });
       } else {
         setMessage({
           type: "success",
-          text: "✅ Lien envoyé ! Vérifiez votre boîte mail.",
+          text: l("✅ Lien envoyé ! Vérifiez votre boîte mail.", "✅ Link verstuurd! Controleer je mailbox."),
         });
       }
     }
@@ -72,9 +74,9 @@ export default function LoginPage() {
       <div className="text-center mb-8">
         <h1 className="font-display font-black text-white mb-2"
           style={{ fontSize: "clamp(1.8rem, 4vw, 2.4rem)", lineHeight: 1 }}>
-          Bon retour.
+          {l("Bon retour.", "Welkom terug.")}
         </h1>
-        <p className="text-white/40 text-sm">Connectez-vous à votre espace Wolko</p>
+        <p className="text-white/40 text-sm">{l("Connectez-vous à votre espace Wolko", "Log in op je Wolko-ruimte")}</p>
       </div>
 
       <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-7">
@@ -87,7 +89,7 @@ export default function LoginPage() {
                   ? "bg-white text-ink shadow-sm"
                   : "text-white/40 hover:text-white/70"
               }`}>
-              {m === "password" ? "Mot de passe" : "Lien magique"}
+              {m === "password" ? l("Mot de passe", "Wachtwoord") : l("Lien magique", "Magische link")}
             </button>
           ))}
         </div>
@@ -95,12 +97,12 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
           <div>
-            <label className={labelClass}>Adresse email</label>
+            <label className={labelClass}>{l("Adresse email", "E-mailadres")}</label>
             <div className="relative">
               <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
               <input type="email" required value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="vous@exemple.be"
+                placeholder={l("vous@exemple.be", "jij@voorbeeld.be")}
                 className={inputClass} />
             </div>
           </div>
@@ -109,9 +111,9 @@ export default function LoginPage() {
           {mode === "password" && (
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className={labelClass}>Mot de passe</label>
+                <label className={labelClass}>{l("Mot de passe", "Wachtwoord")}</label>
                 <Link href="/forgot-password" className="text-[11px] text-brand hover:text-brand-light transition-colors">
-                  Mot de passe oublié ?
+                  {l("Mot de passe oublié ?", "Wachtwoord vergeten?")}
                 </Link>
               </div>
               <div className="relative">
@@ -141,7 +143,7 @@ export default function LoginPage() {
             style={{ padding: "0.875rem", fontSize: "0.9375rem" }}>
             {loading
               ? <Loader2 size={16} className="animate-spin" />
-              : <>{mode === "password" ? "Se connecter" : "Recevoir le lien"} <ArrowRight size={15} /></>
+              : <>{mode === "password" ? l("Se connecter", "Inloggen") : l("Recevoir le lien", "Link ontvangen")} <ArrowRight size={15} /></>
             }
           </button>
         </form>
@@ -152,7 +154,7 @@ export default function LoginPage() {
           </div>
           <div className="relative flex justify-center">
             <span className="bg-transparent px-3 text-[11px] text-white/25 uppercase tracking-widest">
-              ou
+              {l("ou", "of")}
             </span>
           </div>
         </div>
@@ -160,9 +162,9 @@ export default function LoginPage() {
         <GoogleButton redirectTo="/dashboard" />
 
         <p className="text-center text-sm text-white/30 mt-5">
-          Pas encore de compte ?{" "}
+          {l("Pas encore de compte ?", "Nog geen account?")}{" "}
           <Link href="/signup" className="text-brand hover:text-brand-light font-semibold transition-colors">
-            Démarrer gratuitement
+            {l("Démarrer gratuitement", "Gratis starten")}
           </Link>
         </p>
       </div>

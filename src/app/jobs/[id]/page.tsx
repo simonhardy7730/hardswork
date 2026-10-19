@@ -5,7 +5,8 @@ import {
   MapPin, Euro, Briefcase, Clock, Users,
   ArrowRight, CheckCircle, ChevronRight, Star,
 } from "lucide-react";
-import { CONTRACT_LABELS, SECTOR_LABELS, REGION_LABELS } from "@/lib/utils";
+import { labels } from "@/lib/utils";
+import { getDict } from "@/lib/i18n/server";
 import { SiteNav } from "@/components/layout/SiteNav";
 import ShareButtons from "@/components/jobs/ShareButtons";
 
@@ -28,17 +29,26 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
     .from("job_offers")
     .select("title, city, sector, organizations(name)")
     .eq("id", params.id).single();
-  if (!data) return { title: "Offre introuvable — Wolko" };
+  const { lang } = getDict();
+  const SECTOR_LABELS = labels(lang).sector;
+  if (!data) return { title: lang === "nl" ? "Vacature niet gevonden — Wolko" : "Offre introuvable — Wolko" };
   const orgRaw = data.organizations as unknown as { name: string }[] | { name: string } | null;
   const org = Array.isArray(orgRaw) ? (orgRaw[0] ?? null) : orgRaw;
   return {
     title: `${data.title} — ${org?.name ?? ""} | Wolko`,
-    description: `Offre ${SECTOR_LABELS[data.sector] ?? data.sector} à ${data.city}. Postulez maintenant sur Wolko.`,
+    description: lang === "nl"
+      ? `Vacature ${SECTOR_LABELS[data.sector] ?? data.sector} in ${data.city}. Solliciteer nu op Wolko.`
+      : `Offre ${SECTOR_LABELS[data.sector] ?? data.sector} à ${data.city}. Postulez maintenant sur Wolko.`,
   };
 }
 
 /* ─── Page ───────────────────────────────────────────── */
 export default async function JobDetailPage({ params }: { params: { id: string } }) {
+  const { lang } = getDict();
+  const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
+  const LB = labels(lang);
+  const CONTRACT_LABELS = LB.contract, SECTOR_LABELS = LB.sector, REGION_LABELS = LB.region;
+  const numLocale = lang === "nl" ? "nl-BE" : "fr-BE";
   const supabase = await createClient();
 
   const { data: offer } = await supabase
@@ -57,7 +67,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
   const salary = offer.show_salary && offer.salary_min
     ? offer.salary_period === "heure"
       ? `${offer.salary_min}–${offer.salary_max}€/h`
-      : `${offer.salary_min?.toLocaleString("fr-BE")}–${offer.salary_max?.toLocaleString("fr-BE")}€/mois`
+      : `${offer.salary_min?.toLocaleString(numLocale)}–${offer.salary_max?.toLocaleString(numLocale)}€/${l("mois", "maand")}`
     : null;
 
   const heroPhoto = SECTOR_PHOTOS[offer.sector] ?? SECTOR_PHOTOS.default;
@@ -96,9 +106,9 @@ export default async function JobDetailPage({ params }: { params: { id: string }
             {/* Breadcrumb */}
             <nav className="flex items-center gap-1.5 text-white/40 text-[11px] mb-4 flex-wrap">
               {[
-                { label: "Accueil", href: "/" },
-                { label: "Annonces", href: "/jobs" },
-                { label: "Offres", href: "/jobs" },
+                { label: l("Accueil", "Home"), href: "/" },
+                { label: l("Annonces", "Advertenties"), href: "/jobs" },
+                { label: l("Offres", "Vacatures"), href: "/jobs" },
               ].map((c, i, arr) => (
                 <span key={i} className="flex items-center gap-1.5">
                   {i > 0 && <ChevronRight size={9} className="text-white/20" />}
@@ -114,7 +124,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               <div>
                 {offer.is_urgent && (
                   <span className="inline-block text-[10px] font-black text-brand bg-brand/15 border border-brand/30 px-3 py-1 rounded-full uppercase tracking-widest mb-3">
-                    🔴 Offre urgente
+                    🔴 {l("Offre urgente", "Dringende vacature")}
                   </span>
                 )}
                 <h1
@@ -136,7 +146,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 className="hidden md:inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-display font-black uppercase px-7 py-3.5 rounded-xl transition text-[13px] shrink-0"
                 style={{ letterSpacing: "0.06em" }}
               >
-                Postuler maintenant
+                {l("Postuler maintenant", "Nu solliciteren")}
                 <ArrowRight size={14} />
               </Link>
             </div>
@@ -156,7 +166,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               <div className="flex items-center gap-2">
                 <Clock size={12} className="text-white/30" />
                 <span className="text-white/60 text-sm font-semibold">
-                  {offer.experience_years} an{offer.experience_years > 1 ? "s" : ""} min.
+                  {offer.experience_years} {lang === "nl" ? "jaar" : `an${offer.experience_years > 1 ? "s" : ""}`} min.
                 </span>
               </div>
             )}
@@ -192,7 +202,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
             <div className="bg-white border border-ink-100 rounded-2xl p-6">
               <h2 className="font-display font-black text-ink uppercase tracking-wide text-[13px] mb-5 flex items-center gap-2.5">
                 <span className="w-1 h-5 bg-brand rounded-full shrink-0" />
-                Notre mission
+                {l("Notre mission", "Onze opdracht")}
               </h2>
               {offer.description ? (
                 <div
@@ -200,19 +210,9 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                   dangerouslySetInnerHTML={{ __html: offer.description.replace(/\n/g, "<br />") }}
                 />
               ) : (
-                <ul className="space-y-3">
-                  {[
-                    `Exercer le métier de ${offer.title} dans un environnement professionnel et exigeant.`,
-                    "Respecter les consignes de sécurité et les procédures qualité en vigueur.",
-                    "Travailler en équipe et rendre compte à votre responsable hiérarchique.",
-                    "Contribuer à l'amélioration continue des processus de production ou de service.",
-                  ].map((point, i) => (
-                    <li key={i} className="flex items-start gap-3 text-[15px] text-ink-600">
-                      <CheckCircle size={15} className="text-brand shrink-0 mt-0.5" />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
+                <p className="text-[15px] text-ink-500">
+                  {l("Aucune description détaillée pour le moment. Postulez pour en savoir plus auprès de l'employeur.", "Nog geen gedetailleerde beschrijving. Solliciteer om meer te weten te komen bij de werkgever.")}
+                </p>
               )}
             </div>
 
@@ -220,19 +220,15 @@ export default async function JobDetailPage({ params }: { params: { id: string }
             <div className="bg-white border border-ink-100 rounded-2xl p-6">
               <h2 className="font-display font-black text-ink uppercase tracking-wide text-[13px] mb-5 flex items-center gap-2.5">
                 <span className="w-1 h-5 bg-brand rounded-full shrink-0" />
-                Compétences requises
+                {l("Compétences requises", "Vereiste vaardigheden")}
               </h2>
               <div className="flex flex-wrap gap-2">
-                {(offer.caces_types?.length > 0 || offer.licenses?.length > 0 ? [
+                {[
                   ...(offer.caces_types ?? []).map((c: string) => `CACES ${c}`),
-                  ...(offer.licenses ?? []).map((l: string) => `Permis ${l}`),
-                ] : [
+                  ...(offer.licenses ?? []).map((lic: string) => `${l("Permis", "Rijbewijs")} ${lic}`),
                   sectorLabel,
                   CONTRACT_LABELS[offer.contract_type] ?? offer.contract_type,
-                  "Travail d'équipe",
-                  "Rigueur",
-                  "Autonomie",
-                ]).map((skill: string) => (
+                ].map((skill: string) => (
                   <span
                     key={skill}
                     className="text-[11px] font-black bg-[#FBF1D8] border border-ink-100 text-ink-600 px-3.5 py-2 rounded-lg uppercase tracking-wide"
@@ -243,25 +239,16 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               </div>
             </div>
 
-            {/* Ce qu'on offre */}
+            {/* Contrat & salaire */}
             <div className="bg-white border border-ink-100 rounded-2xl p-6">
               <h2 className="font-display font-black text-ink uppercase tracking-wide text-[13px] mb-5 flex items-center gap-2.5">
                 <span className="w-1 h-5 bg-brand rounded-full shrink-0" />
-                Ce qu&apos;on vous offre
+                {l("Contrat et salaire", "Contract en loon")}
               </h2>
-              <ul className="space-y-3">
-                {[
-                  `Contrat ${CONTRACT_LABELS[offer.contract_type] ?? offer.contract_type}${salary ? ` — Salaire : ${salary}` : ""}.`,
-                  "Intégration rapide au sein d'une équipe soudée.",
-                  "Environnement de travail dynamique.",
-                  "Candidature traitée sous 48h — réponse garantie.",
-                ].map((point, i) => (
-                  <li key={i} className="flex items-start gap-3 text-[15px] text-ink-600">
-                    <CheckCircle size={15} className="text-brand shrink-0 mt-0.5" />
-                    {point}
-                  </li>
-                ))}
-              </ul>
+              <p className="flex items-start gap-3 text-[15px] text-ink-600">
+                <CheckCircle size={15} className="text-brand shrink-0 mt-0.5" />
+                {l("Contrat", "Contract")} {CONTRACT_LABELS[offer.contract_type] ?? offer.contract_type}{salary ? ` — ${l("Salaire", "Loon")} : ${salary}` : ""}.
+              </p>
             </div>
 
             {/* Postuler — mobile uniquement */}
@@ -270,7 +257,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               className="md:hidden flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-display font-black uppercase py-4 rounded-xl transition text-[14px] w-full"
               style={{ letterSpacing: "0.06em" }}
             >
-              Postuler maintenant
+              {l("Postuler maintenant", "Nu solliciteren")}
               <ArrowRight size={15} />
             </Link>
           </div>
@@ -285,18 +272,18 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 className="flex items-center justify-center gap-2 font-display font-black uppercase text-white bg-brand hover:bg-brand-dark transition rounded-xl py-3.5 text-[14px] w-full"
                 style={{ letterSpacing: "0.05em" }}
               >
-                Postuler maintenant
+                {l("Postuler maintenant", "Nu solliciteren")}
                 <ArrowRight size={14} />
               </Link>
               <p className="text-ink-300 text-[11px] text-center mt-3">
-                Gratuit · Sans engagement · Réponse sous 48h
+                {l("Gratuit · Sans engagement", "Gratis · Vrijblijvend")}
               </p>
             </div>
 
             {/* Carte entreprise */}
             <div className="bg-white border border-ink-100 rounded-2xl p-5">
               <p className="text-[10px] font-black text-ink-300 uppercase tracking-widest mb-4">
-                Entreprise
+                {l("Entreprise", "Bedrijf")}
               </p>
 
               <div className="flex items-center gap-3 mb-3">
@@ -312,42 +299,34 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 </div>
                 <div>
                   <p className="font-display font-black text-ink uppercase text-sm">
-                    {org?.name ?? "Entreprise"}
+                    {org?.name ?? l("Entreprise", "Bedrijf")}
                   </p>
                   {org?.city && <p className="text-ink-400 text-xs">{org.city}</p>}
                 </div>
               </div>
 
-              {/* Étoiles */}
-              <div className="flex items-center gap-1 mb-3">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} size={11} className={s <= 4 ? "text-amber-400 fill-amber-400" : "text-ink-100"} />
-                ))}
-                <span className="text-ink-300 text-[11px] ml-1">4.0 / 5</span>
-              </div>
-
               <p className="text-ink-500 text-xs leading-relaxed mb-4 line-clamp-3">
-                {org?.description ?? `Entreprise active dans le secteur ${sectorLabel.toLowerCase()}. Recrutement en cours via Wolko.`}
+                {org?.description ?? (lang === "nl" ? `Bedrijf actief in de sector ${sectorLabel.toLowerCase()}. Werft aan via Wolko.` : `Entreprise active dans le secteur ${sectorLabel.toLowerCase()}. Recrutement en cours via Wolko.`)}
               </p>
 
               <Link
                 href={`/jobs?secteur=${offer.sector}`}
                 className="block text-center w-full border border-ink-200 hover:border-brand text-ink-500 hover:text-brand font-display font-black uppercase text-[11px] py-2.5 rounded-xl transition tracking-widest"
               >
-                Voir les offres similaires
+                {l("Voir les offres similaires", "Bekijk vergelijkbare vacatures")}
               </Link>
             </div>
 
             {/* Infos pratiques */}
             <div className="bg-white border border-ink-100 rounded-2xl p-5">
               <p className="text-[10px] font-black text-ink-300 uppercase tracking-widest mb-3">
-                Infos pratiques
+                {l("Infos pratiques", "Praktische info")}
               </p>
               <div className="space-y-2.5">
                 {(nbCandidatures ?? 0) > 0 && (
                   <div className="flex items-center gap-2.5 text-xs text-ink-500">
                     <Users size={12} className="text-ink-300 shrink-0" />
-                    {nbCandidatures} candidature{(nbCandidatures ?? 0) > 1 ? "s" : ""} déposée{(nbCandidatures ?? 0) > 1 ? "s" : ""}
+                    {lang === "nl" ? `${nbCandidatures} ${(nbCandidatures ?? 0) > 1 ? "sollicitaties" : "sollicitatie"} ingediend` : `${nbCandidatures} candidature${(nbCandidatures ?? 0) > 1 ? "s" : ""} déposée${(nbCandidatures ?? 0) > 1 ? "s" : ""}`}
                   </div>
                 )}
                 {offer.city && (
@@ -356,10 +335,6 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                     {offer.city}{offer.region ? ` · ${REGION_LABELS[offer.region as string] ?? offer.region}` : ""}
                   </div>
                 )}
-                <div className="flex items-center gap-2.5 text-xs text-ink-500">
-                  <Clock size={12} className="text-ink-300 shrink-0" />
-                  Réponse garantie sous 48h
-                </div>
               </div>
             </div>
 
@@ -367,7 +342,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
             {(similar ?? []).length > 0 && (
               <div className="bg-white border border-ink-100 rounded-2xl p-5">
                 <p className="text-[10px] font-black text-ink-300 uppercase tracking-widest mb-3">
-                  Offres similaires
+                  {l("Offres similaires", "Vergelijkbare vacatures")}
                 </p>
                 <div className="divide-y divide-ink-50">
                   {(similar ?? []).map(s => {
@@ -395,7 +370,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
             {/* Partager */}
             <div className="bg-white border border-ink-100 rounded-2xl p-5">
               <p className="text-[10px] font-black text-ink-300 uppercase tracking-widest mb-3">
-                Partager
+                {l("Partager", "Delen")}
               </p>
               <ShareButtons
                 url={`https://hardswork.vercel.app/jobs/${offer.id}`}
@@ -423,7 +398,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
             className="bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-sm px-7 py-2.5 rounded-xl transition shrink-0"
             style={{ letterSpacing: "0.06em" }}
           >
-            Postuler
+            {l("Postuler", "Solliciteren")}
           </Link>
         </div>
       </div>

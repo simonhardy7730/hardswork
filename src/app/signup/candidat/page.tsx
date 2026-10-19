@@ -12,39 +12,41 @@ import {
 } from "lucide-react";
 import { HardSworkLogo, HardieIcon } from "@/components/ui/HardieIcon";
 import GoogleButton from "@/components/auth/GoogleButton";
+import { useLang } from "@/lib/i18n/context";
+import { labels } from "@/lib/utils";
 
 /* ─── Données secteurs ────────────────────────────────── */
 const SECTORS_DATA = [
   {
-    key: "logistique",   label: "Logistique",  Icon: Package,
+    key: "logistique",   Icon: Package,
     photo: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&auto=format&fit=crop&q=70",
   },
   {
-    key: "construction", label: "Construction", Icon: HardHat,
+    key: "construction", Icon: HardHat,
     photo: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&auto=format&fit=crop&q=70",
   },
   {
-    key: "industrie",    label: "Industrie",   Icon: Factory,
+    key: "industrie",    Icon: Factory,
     photo: "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=400&auto=format&fit=crop&q=70",
   },
   {
-    key: "transport",    label: "Transport",   Icon: Truck,
+    key: "transport",    Icon: Truck,
     photo: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=400&auto=format&fit=crop&q=70",
   },
   {
-    key: "medical",      label: "Médical",     Icon: Stethoscope,
+    key: "medical",      Icon: Stethoscope,
     photo: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&auto=format&fit=crop&q=70",
   },
   {
-    key: "securite",     label: "Sécurité",    Icon: Shield,
+    key: "securite",     Icon: Shield,
     photo: "https://images.unsplash.com/photo-1582139329536-e7284fece509?w=400&auto=format&fit=crop&q=70",
   },
   {
-    key: "nettoyage",    label: "Nettoyage",   Icon: Sparkles,
+    key: "nettoyage",    Icon: Sparkles,
     photo: "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=400&auto=format&fit=crop&q=70",
   },
   {
-    key: "autre",        label: "Autre",       Icon: Briefcase,
+    key: "autre",        Icon: Briefcase,
     photo: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400&auto=format&fit=crop&q=70",
   },
 ];
@@ -53,26 +55,29 @@ const LICENSES    = ["B", "C", "CE", "D"];
 const CACES_TYPES = ["CACES 1", "CACES 3", "CACES 5", "CACES 6", "CACES R489"];
 
 /* ─── Left-panel config par étape ────────────────────── */
-const LEFT = {
-  1: {
-    headline: ["TROUVEZ", "[VOTRE]", "PROCHAIN JOB."],
-    redLine: "[VOTRE]",
-    sub: "Trouvez un job qui respecte vos compétences.",
-    hardie: "On commence par le plus important : votre expertise !",
-  },
-  2: {
-    headline: ["VOTRE PROFIL,", "VOTRE", "[VALEUR]."],
-    redLine: "[VALEUR]",
-    sub: "Plus votre profil est complet, plus vite vous serez contacté.",
-    hardie: "Ces infos sont visibles par les recruteurs abonnés.",
-  },
-  3: {
-    headline: ["PRESQUE", "[TERMINÉ]."],
-    redLine: "[TERMINÉ]",
-    sub: "Créez votre compte gratuit pour finaliser votre profil.",
-    hardie: "C'est 100% gratuit pour les candidats. Toujours.",
-  },
-};
+type L = (fr: string, nl: string) => string;
+function makeLeft(l: L) {
+  return {
+    1: {
+      headline: [l("TROUVEZ", "VIND"), l("[VOTRE]", "[JE]"), l("PROCHAIN JOB.", "VOLGENDE JOB.")],
+      redLine: l("[VOTRE]", "[JE]"),
+      sub: l("Trouvez un job qui respecte vos compétences.", "Vind een job die je vaardigheden respecteert."),
+      hardie: l("On commence par le plus important : votre expertise !", "We beginnen met het belangrijkste: jouw expertise!"),
+    },
+    2: {
+      headline: [l("VOTRE PROFIL,", "JOUW PROFIEL,"), l("VOTRE", "JOUW"), l("[VALEUR].", "[WAARDE].")],
+      redLine: l("[VALEUR].", "[WAARDE]."),
+      sub: l("Plus votre profil est complet, plus vite vous serez contacté.", "Hoe completer je profiel, hoe sneller je gecontacteerd wordt."),
+      hardie: l("Ces infos sont visibles par les recruteurs abonnés.", "Deze info is zichtbaar voor werkgevers met een abonnement."),
+    },
+    3: {
+      headline: [l("PRESQUE", "BIJNA"), l("[TERMINÉ].", "[KLAAR].")],
+      redLine: l("[TERMINÉ].", "[KLAAR]."),
+      sub: l("Créez votre compte gratuit pour finaliser votre profil.", "Maak je gratis account aan om je profiel af te ronden."),
+      hardie: l("C'est 100% gratuit pour les candidats. Toujours.", "Voor kandidaten is het 100% gratis. Altijd."),
+    },
+  };
+}
 
 function toggleArr<T>(arr: T[], item: T): T[] {
   return arr.includes(item) ? arr.filter(x => x !== item) : [...arr, item];
@@ -81,6 +86,9 @@ function toggleArr<T>(arr: T[], item: T): T[] {
 /* ─── Page principale ─────────────────────────────────── */
 export default function CandidatSignupPage() {
   const router  = useRouter();
+  const lang = useLang();
+  const l: L = (fr, nl) => (lang === "nl" ? nl : fr);
+  const sectorLbl = labels(lang).sector;
   const [step, setStep]     = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError]   = useState("");
@@ -120,7 +128,7 @@ export default function CandidatSignupPage() {
     });
 
     if (authError || !authData.user) {
-      setError(authError?.message ?? "Erreur lors de l'inscription.");
+      setError(authError?.message ?? l("Erreur lors de l'inscription.", "Fout bij het registreren."));
       setLoading(false);
       return;
     }
@@ -162,7 +170,7 @@ export default function CandidatSignupPage() {
     });
 
     if (!res.ok) {
-      setError("Erreur lors de la création du profil. Réessayez.");
+      setError(l("Erreur lors de la création du profil. Réessayez.", "Fout bij het aanmaken van je profiel. Probeer opnieuw."));
       setLoading(false);
       return;
     }
@@ -170,7 +178,7 @@ export default function CandidatSignupPage() {
     router.push("/candidat/dashboard");
   }
 
-  const left = LEFT[step];
+  const left = makeLeft(l)[step];
   const inputCls = "w-full pl-9 pr-4 py-3 bg-white border border-ink-100 rounded-xl text-ink text-sm placeholder-ink-300 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/15 transition";
   const labelCls = "block text-[11px] font-bold text-ink-500 uppercase tracking-widest mb-1.5";
 
@@ -247,7 +255,7 @@ export default function CandidatSignupPage() {
           {/* Label étape */}
           <div className="flex items-center justify-between px-8 py-3">
             <span className="text-[11px] font-bold text-ink-300 uppercase tracking-widest">
-              Étape {step} sur 3
+              {l("Étape", "Stap")} {step} {l("sur", "van")} 3
             </span>
             {/* Logo mobile (hidden on lg) */}
             <Link href="/" className="lg:hidden">
@@ -272,13 +280,14 @@ export default function CandidatSignupPage() {
             <div>
               <h2 className="font-display font-black text-ink uppercase mb-1"
                 style={{ fontSize: "clamp(1.6rem, 3vw, 2rem)", letterSpacing: "-0.01em" }}>
-                Votre métier
+                {l("Votre métier", "Jouw beroep")}
               </h2>
-              <p className="text-ink-500 text-sm mb-6">Sélectionnez un ou plusieurs secteurs.</p>
+              <p className="text-ink-500 text-sm mb-6">{l("Sélectionnez un ou plusieurs secteurs.", "Selecteer een of meer sectoren.")}</p>
 
               {/* Grille secteurs */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {SECTORS_DATA.map(({ key, label, Icon, photo }) => {
+                {SECTORS_DATA.map(({ key, Icon, photo }) => {
+                  const label = sectorLbl[key];
                   const isSelected = selectedSectors.includes(key);
                   return (
                     <button
@@ -327,25 +336,25 @@ export default function CandidatSignupPage() {
               <div>
                 <h2 className="font-display font-black text-ink uppercase mb-1"
                   style={{ fontSize: "clamp(1.6rem, 3vw, 2rem)", letterSpacing: "-0.01em" }}>
-                  Votre profil
+                  {l("Votre profil", "Jouw profiel")}
                 </h2>
-                <p className="text-ink-500 text-sm">Ces infos sont visibles par les recruteurs.</p>
+                <p className="text-ink-500 text-sm">{l("Ces infos sont visibles par les recruteurs.", "Deze info is zichtbaar voor werkgevers.")}</p>
               </div>
 
               {/* Localisation : ville + code postal */}
               <div className="grid grid-cols-[1fr_120px] gap-3">
                 <div>
-                  <label className={labelCls}>Ville</label>
+                  <label className={labelCls}>{l("Ville", "Stad")}</label>
                   <div className="relative">
                     <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
-                    <input type="text" autoComplete="address-level2" placeholder="Ex : Tournai"
+                    <input type="text" autoComplete="address-level2" placeholder={l("Ex : Tournai", "Bv. Gent")}
                       value={profile.city}
                       onChange={e => setProfile(p => ({ ...p, city: e.target.value }))}
                       className={inputCls} />
                   </div>
                 </div>
                 <div>
-                  <label className={labelCls}>Code postal</label>
+                  <label className={labelCls}>{l("Code postal", "Postcode")}</label>
                   <input type="text" inputMode="numeric" autoComplete="postal-code" placeholder="7500"
                     maxLength={5} pattern="\d{4,5}"
                     value={profile.postal_code}
@@ -356,12 +365,12 @@ export default function CandidatSignupPage() {
 
               {/* Disponibilité */}
               <div>
-                <label className={labelCls}>Disponibilité</label>
+                <label className={labelCls}>{l("Disponibilité", "Beschikbaarheid")}</label>
                 <div className="flex gap-2 flex-wrap">
                   {[
-                    { value: "immediate", label: "Immédiatement" },
-                    { value: "1_semaine", label: "Dans 1 semaine" },
-                    { value: "1_mois",    label: "Dans 1 mois" },
+                    { value: "immediate", label: l("Immédiatement", "Onmiddellijk") },
+                    { value: "1_semaine", label: l("Dans 1 semaine", "Binnen 1 week") },
+                    { value: "1_mois",    label: l("Dans 1 mois", "Binnen 1 maand") },
                   ].map(({ value, label }) => (
                     <button key={value} type="button"
                       onClick={() => setProfile(p => ({ ...p, availability: value }))}
@@ -378,14 +387,14 @@ export default function CandidatSignupPage() {
 
               {/* Expérience */}
               <div>
-                <label className={labelCls}>Expérience</label>
+                <label className={labelCls}>{l("Expérience", "Ervaring")}</label>
                 <div className="flex gap-2 flex-wrap">
                   {[
-                    { value: "0", label: "Débutant" },
-                    { value: "1", label: "1 an" },
-                    { value: "2", label: "2–4 ans" },
-                    { value: "5", label: "5–9 ans" },
-                    { value: "10", label: "10 ans+" },
+                    { value: "0", label: l("Débutant", "Starter") },
+                    { value: "1", label: l("1 an", "1 jaar") },
+                    { value: "2", label: l("2–4 ans", "2–4 jaar") },
+                    { value: "5", label: l("5–9 ans", "5–9 jaar") },
+                    { value: "10", label: l("10 ans+", "10+ jaar") },
                   ].map(({ value, label }) => (
                     <button key={value} type="button"
                       onClick={() => setProfile(p => ({ ...p, experience_years: value }))}
@@ -402,17 +411,17 @@ export default function CandidatSignupPage() {
 
               {/* Permis */}
               <div>
-                <label className={labelCls}>Permis de conduire</label>
+                <label className={labelCls}>{l("Permis de conduire", "Rijbewijs")}</label>
                 <div className="flex gap-2">
-                  {LICENSES.map(l => (
-                    <button key={l} type="button"
-                      onClick={() => setProfile(p => ({ ...p, licenses: toggleArr(p.licenses, l) }))}
+                  {LICENSES.map(lic => (
+                    <button key={lic} type="button"
+                      onClick={() => setProfile(p => ({ ...p, licenses: toggleArr(p.licenses, lic) }))}
                       className={`w-14 py-2 rounded-lg text-xs font-bold border transition ${
-                        profile.licenses.includes(l)
+                        profile.licenses.includes(lic)
                           ? "bg-brand text-white border-brand"
                           : "bg-white text-ink-500 border-ink-100 hover:border-brand/50"
                       }`}>
-                      {l}
+                      {lic}
                     </button>
                   ))}
                 </div>
@@ -453,14 +462,14 @@ export default function CandidatSignupPage() {
               <div>
                 <h2 className="font-display font-black text-ink uppercase mb-1"
                   style={{ fontSize: "clamp(1.6rem, 3vw, 2rem)", letterSpacing: "-0.01em" }}>
-                  Votre compte
+                  {l("Votre compte", "Jouw account")}
                 </h2>
-                <p className="text-ink-500 text-sm">100% gratuit · Trouvez votre prochain job</p>
+                <p className="text-ink-500 text-sm">{l("100% gratuit · Trouvez votre prochain job", "100% gratis · Vind je volgende job")}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>Nom complet</label>
+                  <label className={labelCls}>{l("Nom complet", "Volledige naam")}</label>
                   <div className="relative">
                     <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
                     <input value={auth.full_name}
@@ -470,7 +479,7 @@ export default function CandidatSignupPage() {
                   </div>
                 </div>
                 <div>
-                  <label className={labelCls}>Téléphone</label>
+                  <label className={labelCls}>{l("Téléphone", "Telefoon")}</label>
                   <div className="relative">
                     <Phone size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
                     <input value={auth.phone}
@@ -481,29 +490,29 @@ export default function CandidatSignupPage() {
               </div>
 
               <div>
-                <label className={labelCls}>Email</label>
+                <label className={labelCls}>{l("Email", "E-mail")}</label>
                 <div className="relative">
                   <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
                   <input value={auth.email}
                     onChange={e => setAuth(p => ({ ...p, email: e.target.value }))}
-                    placeholder="vous@exemple.be" type="email" required className={inputCls} />
+                    placeholder={l("vous@exemple.be", "jij@voorbeeld.be")} type="email" required className={inputCls} />
                 </div>
               </div>
 
               <div>
-                <label className={labelCls}>Mot de passe</label>
+                <label className={labelCls}>{l("Mot de passe", "Wachtwoord")}</label>
                 <div className="relative">
                   <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
                   <input value={auth.password}
                     onChange={e => setAuth(p => ({ ...p, password: e.target.value }))}
-                    placeholder="Minimum 8 caractères" type="password" minLength={8}
+                    placeholder={l("Minimum 8 caractères", "Minimum 8 tekens")} type="password" minLength={8}
                     required className={inputCls} />
                 </div>
               </div>
 
               {/* Upload CV */}
               <div>
-                <label className={labelCls}>CV (optionnel)</label>
+                <label className={labelCls}>{l("CV (optionnel)", "Cv (optioneel)")}</label>
                 <label className={`block border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition ${
                   cvFile
                     ? "border-brand bg-brand/5"
@@ -516,21 +525,21 @@ export default function CandidatSignupPage() {
                       <span className="text-2xl">📄</span>
                       <div className="text-left">
                         <p className="text-sm font-bold text-brand">{cvFile.name}</p>
-                        <p className="text-xs text-ink-300">{(cvFile.size / 1024).toFixed(0)} KB · Cliquez pour changer</p>
+                        <p className="text-xs text-ink-300">{(cvFile.size / 1024).toFixed(0)} KB · {l("Cliquez pour changer", "Klik om te wijzigen")}</p>
                       </div>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center gap-3">
                       <Upload size={18} className="text-ink-300" />
                       <div className="text-left">
-                        <p className="text-sm font-bold text-ink-700">Déposez votre CV ici</p>
-                        <p className="text-xs text-ink-300">PDF, DOC — 5 MB max</p>
+                        <p className="text-sm font-bold text-ink-700">{l("Déposez votre CV ici", "Sleep je cv hierheen")}</p>
+                        <p className="text-xs text-ink-300">{l("PDF, DOC — 5 MB max", "PDF, DOC — max. 5 MB")}</p>
                       </div>
                     </div>
                   )}
                 </label>
                 <p className="text-xs text-ink-400 mt-2">
-                  Vos diplômes et permis ? Vous pourrez les ajouter depuis votre compte, une fois inscrit.
+                  {l("Vos diplômes et permis ? Vous pourrez les ajouter depuis votre compte, une fois inscrit.", "Je diploma's en rijbewijzen? Je kunt ze toevoegen vanuit je account, zodra je ingeschreven bent.")}
                 </p>
               </div>
 
@@ -568,7 +577,7 @@ export default function CandidatSignupPage() {
               <button onClick={() => setStep(s => (s - 1) as 1 | 2 | 3)}
                 className="flex items-center gap-1.5 text-ink-500 hover:text-ink font-semibold text-sm transition shrink-0">
                 <ArrowLeft size={14} />
-                Retour
+                {l("Retour", "Terug")}
               </button>
             )}
 
@@ -576,7 +585,7 @@ export default function CandidatSignupPage() {
               <button
                 onClick={() => {
                   if (step === 1 && selectedSectors.length === 0) {
-                    setError("Sélectionnez au moins un secteur.");
+                    setError(l("Sélectionnez au moins un secteur.", "Selecteer minstens één sector."));
                     return;
                   }
                   setError("");
@@ -585,7 +594,7 @@ export default function CandidatSignupPage() {
                 className="flex-1 flex items-center justify-center gap-2 font-display font-black uppercase tracking-wide text-white bg-brand hover:bg-brand-dark transition h-14 rounded-xl text-lg"
                 style={{ letterSpacing: "0.05em" }}
               >
-                Continuer
+                {l("Continuer", "Verder")}
                 <ArrowRight size={18} />
               </button>
             ) : (
@@ -597,7 +606,7 @@ export default function CandidatSignupPage() {
               >
                 {loading
                   ? <Loader2 size={20} className="animate-spin" />
-                  : <>Créer mon profil <ArrowRight size={18} /></>
+                  : <>{l("Créer mon profil", "Mijn profiel aanmaken")} <ArrowRight size={18} /></>
                 }
               </button>
             )}
@@ -605,9 +614,9 @@ export default function CandidatSignupPage() {
 
           {step === 1 && (
             <p className="text-center text-ink-300 text-xs mt-3">
-              Vous êtes recruteur ?{" "}
+              {l("Vous êtes recruteur ?", "Ben je werkgever?")}{" "}
               <Link href="/signup" className="text-brand hover:text-brand-dark font-semibold transition-colors">
-                Créer un compte recruteur
+                {l("Créer un compte recruteur", "Een werkgeversaccount aanmaken")}
               </Link>
             </p>
           )}
@@ -620,11 +629,11 @@ export default function CandidatSignupPage() {
                 </div>
                 <div className="relative flex justify-center">
                   <span className="bg-[#FFFBF2] px-3 text-[10px] text-ink-300 uppercase tracking-widest">
-                    ou
+                    {l("ou", "of")}
                   </span>
                 </div>
               </div>
-              <GoogleButton redirectTo="/candidat/dashboard" label="Inscription avec Google" dark={false} />
+              <GoogleButton redirectTo="/candidat/dashboard" label={l("Inscription avec Google", "Registreren met Google")} dark={false} />
             </>
           )}
 

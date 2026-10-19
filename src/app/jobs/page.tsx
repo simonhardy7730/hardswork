@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { MapPin, Search, ArrowRight, Bell, ChevronRight } from "lucide-react";
-import { CONTRACT_LABELS, SECTOR_LABELS, REGION_LABELS } from "@/lib/utils";
+import { labels } from "@/lib/utils";
+import { getDict } from "@/lib/i18n/server";
 import { HardieIcon } from "@/components/ui/HardieIcon";
 import { SiteNav } from "@/components/layout/SiteNav";
 
@@ -35,6 +36,11 @@ interface SearchParams {
 }
 
 export default async function JobsPage({ searchParams }: { searchParams: SearchParams }) {
+  const { lang } = getDict();
+  const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
+  const LB = labels(lang);
+  const CONTRACT_LABELS = LB.contract;
+  const numLocale = lang === "nl" ? "nl-BE" : "fr-BE";
   const supabase = await createClient();
 
   /* ── Requête offres principales ─────────────────────── */
@@ -88,8 +94,8 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
             className="font-display font-black text-white uppercase leading-none mb-6"
             style={{ fontSize: "clamp(2.2rem, 5vw, 3.8rem)", letterSpacing: "-0.02em" }}
           >
-            Votre prochain job est{" "}
-            <span className="text-brand">[ici].</span>
+            {l("Votre prochain job est", "Je volgende job is")}{" "}
+            <span className="text-brand">{l("[ici].", "[hier].")}</span>
           </h1>
 
           {/* Barre de recherche */}
@@ -100,7 +106,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
               <input
                 name="q"
                 defaultValue={searchParams.q}
-                placeholder="Mots-clés, chauffeur SPL, soudeur..."
+                placeholder={l("Mots-clés, chauffeur SPL, soudeur...", "Trefwoorden, vrachtwagenchauffeur, lasser...")}
                 className="bg-transparent text-ink placeholder-ink-300 text-sm flex-1 focus:outline-none"
               />
             </div>
@@ -110,9 +116,9 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
               defaultValue={searchParams.secteur ?? ""}
               className="bg-white border border-white/10 text-ink text-sm px-4 h-12 rounded-xl focus:outline-none appearance-none cursor-pointer min-w-[130px]"
             >
-              <option value="">Secteur</option>
+              <option value="">{l("Secteur", "Sector")}</option>
               {SECTOR_CHIPS.map(({ key, label }) => (
-                <option key={key} value={key}>{label}</option>
+                <option key={key} value={key}>{key === "autre" ? l(label, "Horeca / Andere") : LB.sector[key] ?? label}</option>
               ))}
             </select>
             {/* Lieu : ville ou code postal */}
@@ -121,7 +127,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
               <input
                 name="lieu"
                 defaultValue={searchParams.lieu ?? ""}
-                placeholder="Ville ou code postal"
+                placeholder={l("Ville ou code postal", "Stad of postcode")}
                 autoComplete="address-level2"
                 className="bg-transparent text-ink placeholder-ink-300 text-sm flex-1 min-w-0 focus:outline-none"
               />
@@ -132,7 +138,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
               className="h-12 px-7 bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-sm rounded-xl transition-colors shrink-0"
               style={{ letterSpacing: "0.05em" }}
             >
-              Rechercher
+              {l("Rechercher", "Zoeken")}
             </button>
           </form>
 
@@ -146,7 +152,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                   : "border border-white/20 text-white/60 hover:text-white hover:border-white/40"
               }`}
             >
-              Tous secteurs
+              {l("Tous secteurs", "Alle sectoren")}
             </Link>
             {SECTOR_CHIPS.map(({ key, label }) => (
               <Link
@@ -158,7 +164,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                     : "border border-white/20 text-white/60 hover:text-white hover:border-white/40"
                 }`}
               >
-                {label}
+                {key === "autre" ? l(label, "Horeca / Andere") : LB.sector[key] ?? label}
               </Link>
             ))}
           </div>
@@ -174,12 +180,12 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
             {/* Compteur + filtres actifs */}
             <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
               <p className="text-sm text-ink-500">
-                <span className="font-black text-ink">{offers.length}</span> offre{offers.length !== 1 ? "s" : ""}
-                {hasFilters && <span className="text-ink-300"> · filtres actifs</span>}
+                <span className="font-black text-ink">{offers.length}</span> {lang === "nl" ? (offers.length !== 1 ? "vacatures" : "vacature") : `offre${offers.length !== 1 ? "s" : ""}`}
+                {hasFilters && <span className="text-ink-300"> · {l("filtres actifs", "actieve filters")}</span>}
               </p>
               {hasFilters && (
                 <Link href="/jobs" className="text-[11px] text-brand hover:underline font-bold">
-                  Effacer les filtres
+                  {l("Effacer les filtres", "Filters wissen")}
                 </Link>
               )}
             </div>
@@ -189,13 +195,13 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
               <div className="bg-white rounded-2xl border border-ink-100 py-16 text-center">
                 <HardieIcon size={80} />
                 <p className="font-display font-black text-ink text-xl mt-4 mb-2">
-                  Aucune offre trouvée
+                  {l("Aucune offre trouvée", "Geen vacatures gevonden")}
                 </p>
                 <p className="text-sm text-ink-500 mb-5">
-                  Essayez d&apos;autres critères ou élargissez votre recherche.
+                  {l("Essayez d'autres critères ou élargissez votre recherche.", "Probeer andere criteria of verruim je zoekopdracht.")}
                 </p>
                 <Link href="/jobs" className="bg-brand text-white font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-brand-dark transition-colors inline-flex items-center gap-2">
-                  Voir toutes les offres <ArrowRight size={14} />
+                  {l("Voir toutes les offres", "Bekijk alle vacatures")} <ArrowRight size={14} />
                 </Link>
               </div>
             )}
@@ -209,8 +215,8 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                   const salary = offer.show_salary && offer.salary_min
                     ? offer.salary_period === "heure"
                       ? `${offer.salary_min}–${offer.salary_max}€/h`
-                      : `${offer.salary_min?.toLocaleString("fr-BE")}–${offer.salary_max?.toLocaleString("fr-BE")}€/mois`
-                    : "Salaire : Compétitif";
+                      : `${offer.salary_min?.toLocaleString(numLocale)}–${offer.salary_max?.toLocaleString(numLocale)}€/${l("mois", "maand")}`
+                    : l("Salaire : Compétitif", "Loon: Competitief");
 
                   const sectorPhoto = SECTOR_PHOTOS[offer.sector] ?? SECTOR_PHOTOS.autre;
 
@@ -237,7 +243,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           {offer.is_urgent && (
                             <span className="text-[9px] font-black text-white bg-brand px-1.5 py-0.5 rounded uppercase tracking-wide">
-                              Urgent
+                              {l("Urgent", "Dringend")}
                             </span>
                           )}
                           <h2 className="font-display font-black text-ink uppercase text-sm tracking-tight group-hover:text-brand transition-colors">
@@ -249,12 +255,12 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                             {CONTRACT_LABELS[offer.contract_type] ?? offer.contract_type}
                           </span>
                           <span className="text-[11px] bg-ink-100 text-ink-600 font-bold px-2 py-0.5 rounded">
-                            Salaire : {offer.show_salary && offer.salary_min ? salary : "Compétitif"}
+                            {l("Salaire", "Loon")} : {offer.show_salary && offer.salary_min ? salary : l("Compétitif", "Competitief")}
                           </span>
                           {offer.city && (
                             <span className="flex items-center gap-1 text-[11px] bg-ink-100 text-ink-600 font-bold px-2 py-0.5 rounded">
                               <MapPin size={9} />
-                              Lieu : {offer.city}
+                              {l("Lieu", "Plaats")} : {offer.city}
                             </span>
                           )}
                         </div>
@@ -267,7 +273,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                           className="bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-[11px] px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
                           style={{ letterSpacing: "0.05em" }}
                         >
-                          Postuler
+                          {l("Postuler", "Solliciteren")}
                         </Link>
                       </div>
                     </div>
@@ -286,7 +292,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
               <div className="bg-white rounded-2xl border border-ink-100 overflow-hidden">
                 <div className="px-4 py-3 border-b border-ink-100">
                   <p className="font-display font-black text-ink uppercase text-xs tracking-widest">
-                    Offres Premium
+                    {l("Offres Premium", "Premium vacatures")}
                   </p>
                 </div>
                 <div className="divide-y divide-ink-100">
@@ -313,10 +319,10 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                           </p>
                           {p.show_salary && p.salary_min ? (
                             <p className="text-[10px] text-emerald-600 font-bold mt-0.5">
-                              {p.salary_period === "heure" ? `${p.salary_min}–${p.salary_max}€/h` : "Salaire compétitif"}
+                              {p.salary_period === "heure" ? `${p.salary_min}–${p.salary_max}€/h` : l("Salaire compétitif", "Competitief loon")}
                             </p>
                           ) : (
-                            <p className="text-[10px] text-ink-300 mt-0.5">Salaire : Compétitif</p>
+                            <p className="text-[10px] text-ink-300 mt-0.5">{l("Salaire : Compétitif", "Loon: Competitief")}</p>
                           )}
                           <span className="inline-block text-[9px] font-black bg-ink-100 text-ink-500 px-2 py-0.5 rounded-full uppercase mt-1">
                             {CONTRACT_LABELS[p.contract_type] ?? p.contract_type}
@@ -336,17 +342,17 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=600&auto=format&fit=crop&q=80"
-                  alt="Travailleur"
+                  alt={l("Travailleur", "Werknemer")}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#101F43]/80 to-transparent" />
               </div>
               <div className="bg-white p-4 text-center">
                 <p className="font-display font-black text-ink uppercase text-sm leading-tight mb-1">
-                  Nous recherchons les meilleures offres pour vous.
+                  {l("Nous recherchons les meilleures offres pour vous.", "Wij zoeken de beste vacatures voor jou.")}
                 </p>
                 <p className="text-[11px] text-ink-500 mb-4">
-                  Recevez les nouvelles offres qui correspondent à votre profil.
+                  {l("Recevez les nouvelles offres qui correspondent à votre profil.", "Ontvang nieuwe vacatures die bij je profiel passen.")}
                 </p>
                 <Link
                   href="/signup/candidat"
@@ -354,7 +360,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                   style={{ letterSpacing: "0.04em" }}
                 >
                   <Bell size={12} />
-                  Créer une alerte email
+                  {l("Créer une alerte email", "E-mailalert aanmaken")}
                 </Link>
               </div>
             </div>
@@ -362,18 +368,18 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
             {/* CTA Recruteur sidebar */}
             <div className="bg-[#101F43] rounded-2xl p-5">
               <p className="font-display font-black text-white uppercase text-sm leading-tight mb-1">
-                Vous recrutez ?
+                {l("Vous recrutez ?", "Werf je aan?")}
               </p>
               <p className="text-white/40 text-[11px] mb-4 leading-relaxed">
-                Publiez votre offre en 2 minutes.<br />
-                Les candidats viennent à vous.
+                {l("Publiez votre offre en 2 minutes.", "Plaats je vacature in 2 minuten.")}<br />
+                {l("Les candidats viennent à vous.", "De kandidaten komen naar jou.")}
               </p>
               <Link
                 href="/recrute"
                 className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-[12px] py-2.5 rounded-xl transition-colors w-full"
                 style={{ letterSpacing: "0.04em" }}
               >
-                Publier une offre
+                {l("Publier une offre", "Plaats een vacature")}
                 <ArrowRight size={12} />
               </Link>
             </div>
@@ -386,10 +392,10 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           <div>
             <p className="font-display font-black text-white uppercase text-sm leading-none">
-              Vous recrutez ? Publiez votre offre en 2 minutes.
+              {l("Vous recrutez ? Publiez votre offre en 2 minutes.", "Werf je aan? Plaats je vacature in 2 minuten.")}
             </p>
             <p className="text-white/45 text-xs mt-0.5">
-              Les candidats viennent à vous.
+              {l("Les candidats viennent à vous.", "De kandidaten komen naar jou.")}
             </p>
           </div>
           <Link
@@ -397,7 +403,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
             className="bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-sm px-6 py-2.5 rounded-xl transition-colors shrink-0"
             style={{ letterSpacing: "0.04em" }}
           >
-            Publier une offre
+            {l("Publier une offre", "Plaats een vacature")}
           </Link>
         </div>
       </div>

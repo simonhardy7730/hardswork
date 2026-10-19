@@ -10,3 +10,9 @@ export function getDict(): { lang: Lang; t: Dict } {
   const lang = getLang();
   return { lang, t: DICTS[lang] };
 }
+
+/** Composants serveur : const l = getL(); l("Texte FR", "Nederlandse tekst") */
+export function getL() {
+  const lang = getLang();
+  return (fr: string, nl: string) => (lang === "nl" ? nl : fr);
+}

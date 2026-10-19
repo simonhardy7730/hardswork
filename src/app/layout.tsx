@@ -3,6 +3,7 @@ import { Inter, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
 import { BRAND } from "@/lib/brand";
 import { getLang } from "@/lib/i18n/server";
+import { LangProvider } from "@/lib/i18n/context";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
 const barlow = Barlow_Condensed({
@@ -55,7 +56,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang={getLang()} className={`${inter.variable} ${barlow.variable}`}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased"><LangProvider lang={getLang()}>{children}</LangProvider></body>
     </html>
   );
 }

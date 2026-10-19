@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2 } from "lucide-react";
+import { useL } from "@/lib/i18n/context";
 
 interface Props {
   redirectTo?: string;
@@ -12,9 +13,11 @@ interface Props {
 
 export default function GoogleButton({
   redirectTo = "/dashboard",
-  label = "Continuer avec Google",
+  label,
   dark = true,
 }: Props) {
+  const l = useL();
+  const text = label ?? l("Continuer avec Google", "Doorgaan met Google");
   const [loading, setLoading] = useState(false);
 
   async function handleGoogle() {
@@ -41,7 +44,7 @@ export default function GoogleButton({
         ) : (
           <GoogleIcon />
         )}
-        {label}
+        {text}
       </button>
     );
   }
@@ -57,7 +60,7 @@ export default function GoogleButton({
       ) : (
         <GoogleIcon />
       )}
-      {label}
+      {text}
     </button>
   );
 }

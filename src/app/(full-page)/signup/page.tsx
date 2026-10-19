@@ -7,31 +7,39 @@ import { createClient } from "@/lib/supabase/client";
 import { Loader2, ArrowRight, ArrowLeft, Check, UserPlus } from "lucide-react";
 import { isValidVat } from "@/lib/vat";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
+import { useLang } from "@/lib/i18n/context";
+import { LangSwitch } from "@/components/layout/LangSwitch";
 
 type OrgType = "agency" | "company";
 
-const ROLES = [
-  {
-    id: "agency" as OrgType,
-    title: "AGENCE DE\nRECRUTEMENT",
-    features: ["Multi-sites", "Gestion d'intérim", "Sourcing illimité"],
-    photo: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
-    placeholder: "Ex: Interim Solutions Wallonie",
-  },
-  {
-    id: "company" as OrgType,
-    title: "ENTREPRISE\n/ PME",
-    features: ["Recrutement direct", "Gestion d'équipe", "1 offre gratuite"],
-    photo: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",
-    placeholder: "Ex: ConstructoTech",
-  },
-];
+type L = (fr: string, nl: string) => string;
+
+function makeRoles(l: L) {
+  return [
+    {
+      id: "agency" as OrgType,
+      title: l("AGENCE DE\nRECRUTEMENT", "WERVINGS-\nKANTOOR"),
+      features: [l("Multi-sites", "Meerdere vestigingen"), l("Gestion d'intérim", "Interimbeheer"), l("Sourcing illimité", "Onbeperkt sourcen")],
+      photo: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
+      placeholder: l("Ex: Interim Solutions Wallonie", "Bv. Interim Solutions Vlaanderen"),
+    },
+    {
+      id: "company" as OrgType,
+      title: l("ENTREPRISE\n/ PME", "BEDRIJF\n/ KMO"),
+      features: [l("Recrutement direct", "Rechtstreeks werven"), l("Gestion d'équipe", "Teambeheer"), l("Candidatures centralisées", "Gecentraliseerde sollicitaties")],
+      photo: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",
+      placeholder: l("Ex: ConstructoTech", "Bv. BouwTech"),
+    },
+  ];
+}
 
 /* ─────────────────────────────────────────────────────────
    Invite flow — rejoindre une org existante (?org=xxx)
 ───────────────────────────────────────────────────────── */
 function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
   const router = useRouter();
+  const lang = useLang();
+  const l: L = (fr, nl) => (lang === "nl" ? nl : fr);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [orgName, setOrgName] = useState<string | null>(null);
@@ -60,7 +68,7 @@ function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
       password: formData.password,
       options: { data: { full_name: formData.full_name }, emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
-    if (authError || !authData.user) { setError(authError?.message ?? "Erreur lors de l'inscription."); setLoading(false); return; }
+    if (authError || !authData.user) { setError(authError?.message ?? l("Erreur lors de l'inscription.", "Fout bij het registreren.")); setLoading(false); return; }
     await supabase.from("users").insert({
       id: authData.user.id, organization_id: orgId, email: formData.email, full_name: formData.full_name,
       role: role === "admin" ? "admin" : role === "viewer" ? "viewer" : "recruiter",
@@ -74,23 +82,23 @@ function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
         <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-6">
           <UserPlus size={18} className="shrink-0" style={{ color: "var(--brand-text)" }} />
           <div>
-            <p className="text-sm font-semibold text-white">Vous avez été invité(e)</p>
+            <p className="text-sm font-semibold text-white">{l("Vous avez été invité(e)", "Je bent uitgenodigd")}</p>
             <p className="text-xs text-white/40">
-              {orgName ? `Rejoignez l'équipe de « ${orgName} »` : "Créez votre compte pour rejoindre l'organisation."}
+              {orgName ? l(`Rejoignez l'équipe de « ${orgName} »`, `Word lid van het team van « ${orgName} »`) : l("Créez votre compte pour rejoindre l'organisation.", "Maak je account aan om de organisatie te vervoegen.")}
             </p>
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-white mb-1">Créer votre compte</h1>
+        <h1 className="text-2xl font-bold text-white mb-1">{l("Créer votre compte", "Maak je account aan")}</h1>
         <p className="text-white/40 text-sm mb-6">
-          Rôle : <span className="font-medium" style={{ color: "var(--brand-text)" }}>
-            {role === "admin" ? "Administrateur" : role === "viewer" ? "Observateur" : "Recruteur"}
+          {l("Rôle", "Rol")} : <span className="font-medium" style={{ color: "var(--brand-text)" }}>
+            {role === "admin" ? l("Administrateur", "Beheerder") : role === "viewer" ? l("Observateur", "Waarnemer") : l("Recruteur", "Recruiter")}
           </span>
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           {[
-            { label: "Nom complet", name: "full_name", type: "text", placeholder: "Jean-Pierre Dubois" },
-            { label: "Email professionnel", name: "email", type: "email", placeholder: "vous@exemple.be" },
-            { label: "Mot de passe", name: "password", type: "password", placeholder: "Minimum 8 caractères", minLength: 8 },
+            { label: l("Nom complet", "Volledige naam"), name: "full_name", type: "text", placeholder: l("Jean-Pierre Dubois", "Jan Peeters") },
+            { label: l("Email professionnel", "Professioneel e-mailadres"), name: "email", type: "email", placeholder: l("vous@exemple.be", "jij@voorbeeld.be") },
+            { label: l("Mot de passe", "Wachtwoord"), name: "password", type: "password", placeholder: l("Minimum 8 caractères", "Minimum 8 tekens"), minLength: 8 },
           ].map((f) => (
             <div key={f.name}>
               <label className="block text-sm font-medium text-white mb-1.5">{f.label}</label>
@@ -105,12 +113,12 @@ function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
           <button type="submit" disabled={loading}
             className="w-full py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition"
             style={{ background: loading ? "#FFD97A" : "#FFB900" }}>
-            {loading ? <Loader2 size={16} className="animate-spin" /> : <><span>Rejoindre l&apos;organisation</span><ArrowRight size={16} /></>}
+            {loading ? <Loader2 size={16} className="animate-spin" /> : <><span>{l("Rejoindre l'organisation", "De organisatie vervoegen")}</span><ArrowRight size={16} /></>}
           </button>
         </form>
         <p className="text-center text-sm text-white/40 mt-5">
-          Déjà un compte ?{" "}
-          <Link href="/login" className="font-medium hover:underline" style={{ color: "var(--brand-text)" }}>Se connecter</Link>
+          {l("Déjà un compte ?", "Al een account?")}{" "}
+          <Link href="/login" className="font-medium hover:underline" style={{ color: "var(--brand-text)" }}>{l("Se connecter", "Inloggen")}</Link>
         </p>
       </div>
     </div>
@@ -122,6 +130,9 @@ function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
 ───────────────────────────────────────────────────────── */
 function NormalSignup() {
   const router = useRouter();
+  const lang = useLang();
+  const l: L = (fr, nl) => (lang === "nl" ? nl : fr);
+  const ROLES = makeRoles(l);
   const [step, setStep] = useState<1 | 2>(1);
   const [orgType, setOrgType] = useState<OrgType | null>(null);
   const [loading, setLoading] = useState(false);
@@ -136,10 +147,10 @@ function NormalSignup() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!orgType) return;
-    if (!cgu) { setError("Veuillez accepter les CGU pour continuer."); return; }
+    if (!cgu) { setError(l("Veuillez accepter les CGU pour continuer.", "Aanvaard de algemene voorwaarden om verder te gaan.")); return; }
     setLoading(true);
     setError("");
-    if (!isValidVat(formData.vat_number)) { setError("Numéro de TVA invalide. Exemple : BE 0123.456.789"); setLoading(false); return; }
+    if (!isValidVat(formData.vat_number)) { setError(l("Numéro de TVA invalide. Exemple : BE 0123.456.789", "Ongeldig btw-nummer. Voorbeeld: BE 0123.456.789")); setLoading(false); return; }
     const supabase = createClient();
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -147,7 +158,7 @@ function NormalSignup() {
       password: formData.password,
       options: { data: { full_name: formData.full_name }, emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
-    if (authError || !authData.user) { setError(authError?.message ?? "Erreur lors de l'inscription."); setLoading(false); return; }
+    if (authError || !authData.user) { setError(authError?.message ?? l("Erreur lors de l'inscription.", "Fout bij het registreren.")); setLoading(false); return; }
 
     let { data: org, error: orgError } = await supabase.from("organizations")
       .insert({ name: formData.org_name, type: orgType, vat_number: formData.vat_number.trim() }).select().single();
@@ -155,7 +166,7 @@ function NormalSignup() {
       ({ data: org, error: orgError } = await supabase.from("organizations")
         .insert({ name: formData.org_name, type: orgType }).select().single());
     }
-    if (orgError || !org) { setError("Erreur lors de la création de l'organisation."); setLoading(false); return; }
+    if (orgError || !org) { setError(l("Erreur lors de la création de l'organisation.", "Fout bij het aanmaken van de organisatie.")); setLoading(false); return; }
 
     await supabase.from("users").insert({ id: authData.user.id, organization_id: org.id, email: formData.email, full_name: formData.full_name, role: "admin" });
     await supabase.from("subscriptions").insert({
@@ -180,25 +191,26 @@ function NormalSignup() {
           filter: "brightness(0.28) saturate(0.7)",
         }} />
         <div className="absolute top-10 left-12 z-10"><HardSworkLogo size="md" dark /></div>
+        <div className="absolute top-10 right-12 z-10"><LangSwitch /></div>
         <div className="relative z-10">
           {step === 1 ? (
             <div>
               <h1 className="font-black text-white uppercase leading-none"
                 style={{ fontFamily: "var(--font-display, sans-serif)", fontSize: "clamp(2.8rem, 4.5vw, 4.2rem)", textShadow: "0 2px 20px rgba(0,0,0,0.8)" }}>
-                RECRUTEZ LES<br /><span style={{ color: "var(--brand-text)" }}>[MEILLEURS].</span>
+                {l("RECRUTEZ LES", "WERF DE")}<br /><span style={{ color: "var(--brand-text)" }}>{l("[MEILLEURS].", "[BESTE].")}</span>
               </h1>
               <p className="text-white/45 mt-5 text-sm leading-relaxed max-w-xs">
-                La plateforme de recrutement pour tous les métiers.
+                {l("La plateforme de recrutement pour tous les métiers.", "Het wervingsplatform voor alle beroepen.")}
               </p>
             </div>
           ) : (
             <div>
               <h1 className="font-black text-white uppercase leading-none"
                 style={{ fontFamily: "var(--font-display, sans-serif)", fontSize: "clamp(2.8rem, 4.5vw, 4.2rem)", textShadow: "0 2px 20px rgba(0,0,0,0.8)" }}>
-                CRÉEZ VOTRE<br /><span style={{ color: "var(--brand-text)" }}>[COMPTE].</span>
+                {l("CRÉEZ VOTRE", "MAAK JE")}<br /><span style={{ color: "var(--brand-text)" }}>{l("[COMPTE].", "[ACCOUNT] AAN.")}</span>
               </h1>
               <p className="text-white/45 mt-5 text-sm leading-relaxed max-w-xs">
-                Accédez aux meilleurs talents.
+                {l("Accédez aux meilleurs talents.", "Krijg toegang tot de beste talenten.")}
               </p>
             </div>
           )}
@@ -207,7 +219,7 @@ function NormalSignup() {
 
       {/* ── Colonne droite ── */}
       <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-white min-h-screen overflow-y-auto">
-        <div className="lg:hidden mb-8"><HardSworkLogo size="md" dark={false} /></div>
+        <div className="lg:hidden mb-8 flex items-center gap-4"><HardSworkLogo size="md" dark={false} /><LangSwitch tone="light" /></div>
         <div className="w-full max-w-[540px]">
 
           {/* ÉTAPE 1 — Sélection du rôle */}
@@ -216,9 +228,9 @@ function NormalSignup() {
               <div className="mb-8">
                 <h1 className="font-black text-gray-900 uppercase leading-none text-3xl mb-2"
                   style={{ fontFamily: "var(--font-display, sans-serif)" }}>
-                  Je suis une<br /><span style={{ color: "var(--brand-text)" }}>entreprise ou agence ?</span>
+                  {l("Je suis une", "Ik ben een")}<br /><span style={{ color: "var(--brand-text)" }}>{l("entreprise ou agence ?", "bedrijf of kantoor?")}</span>
                 </h1>
-                <p className="text-gray-400 text-sm">Sélectionnez votre profil pour commencer.</p>
+                <p className="text-gray-400 text-sm">{l("Sélectionnez votre profil pour commencer.", "Kies je profiel om te starten.")}</p>
               </div>
               <div className="grid grid-cols-2 gap-5 mb-8 w-full">
                 {ROLES.map((r) => {
@@ -263,12 +275,12 @@ function NormalSignup() {
               <button onClick={() => orgType && setStep(2)} disabled={!orgType}
                 className="w-full py-4 rounded-xl font-black text-sm tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-200"
                 style={{ background: orgType ? "#FFB900" : "#F3F4F6", color: orgType ? "#101F43" : "#9CA3AF", cursor: orgType ? "pointer" : "not-allowed", fontFamily: "var(--font-display, sans-serif)" }}>
-                Continuer <ArrowRight size={16} strokeWidth={2.5} />
+                {l("Continuer", "Verder")} <ArrowRight size={16} strokeWidth={2.5} />
               </button>
 
               <p className="text-center text-sm text-gray-400 mt-5">
-                Déjà un compte ?{" "}
-                <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>Se connecter</Link>
+                {l("Déjà un compte ?", "Al een account?")}{" "}
+                <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>{l("Se connecter", "Inloggen")}</Link>
               </p>
             </div>
           )}
@@ -278,17 +290,17 @@ function NormalSignup() {
             <div>
               <div className="flex items-center gap-3 mb-7">
                 <button onClick={() => { setStep(1); setError(""); }}
-                  className="text-gray-300 hover:text-gray-600 transition-colors p-1" aria-label="Retour">
+                  className="text-gray-300 hover:text-gray-600 transition-colors p-1" aria-label={l("Retour", "Terug")}>
                   <ArrowLeft size={20} />
                 </button>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-0.5">
-                    {currentRole?.id === "agency" ? "Agence de recrutement" : "Entreprise / PME"}
+                    {currentRole?.id === "agency" ? l("Agence de recrutement", "Wervingskantoor") : l("Entreprise / PME", "Bedrijf / KMO")}
                   </p>
                   <h2 className="font-black text-xl text-gray-900 uppercase leading-tight"
                     style={{ fontFamily: "var(--font-display, sans-serif)" }}>
-                    Formulaire Inscription —{" "}
-                    <span style={{ color: "var(--brand-text)" }}>{currentRole?.id === "agency" ? "Agence" : "Entreprise"}</span>
+                    {l("Formulaire Inscription", "Registratieformulier")} —{" "}
+                    <span style={{ color: "var(--brand-text)" }}>{currentRole?.id === "agency" ? l("Agence", "Kantoor") : l("Entreprise", "Bedrijf")}</span>
                   </h2>
                 </div>
               </div>
@@ -296,7 +308,7 @@ function NormalSignup() {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">
-                    1. Nom de l&apos;entreprise
+                    1. {l("Nom de l'entreprise", "Naam van het bedrijf")}
                   </label>
                   <input type="text" name="org_name" required value={formData.org_name} onChange={handleChange}
                     placeholder={currentRole?.placeholder}
@@ -304,7 +316,7 @@ function NormalSignup() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">Numéro de TVA</label>
+                  <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">{l("Numéro de TVA", "Btw-nummer")}</label>
                   <input type="text" placeholder="BE 0123.456.789" name="vat_number" value={formData.vat_number} onChange={handleChange}
                     autoComplete="off" required
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition" />
@@ -312,24 +324,24 @@ function NormalSignup() {
 
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">
-                    2. Votre identité
+                    2. {l("Votre identité", "Jouw gegevens")}
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <input type="text" name="full_name" required value={formData.full_name} onChange={handleChange}
-                      placeholder="Jean Dupont"
+                      placeholder={l("Jean Dupont", "Jan Peeters")}
                       className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition-colors" />
                     <input type="email" name="email" required value={formData.email} onChange={handleChange}
-                      placeholder="jean.dupont@entreprise.be"
+                      placeholder={l("jean.dupont@entreprise.be", "jan.peeters@bedrijf.be")}
                       className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition-colors" />
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">
-                    3. Sécurité
+                    3. {l("Sécurité", "Beveiliging")}
                   </label>
                   <input type="password" name="password" required minLength={8} value={formData.password} onChange={handleChange}
-                    placeholder="Minimum 8 caractères"
+                    placeholder={l("Minimum 8 caractères", "Minimum 8 tekens")}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition-colors" />
                 </div>
 
@@ -337,10 +349,10 @@ function NormalSignup() {
                   <input type="checkbox" checked={cgu} onChange={(e) => setCgu(e.target.checked)}
                     className="mt-0.5 w-4 h-4 shrink-0 rounded" style={{ accentColor: "#101F43" }} />
                   <span className="text-xs text-gray-400 leading-relaxed">
-                    J&apos;accepte les{" "}
-                    <Link href="/legal/cgu" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">CGU</Link>{" "}
-                    et la{" "}
-                    <Link href="/legal/privacy" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">politique de confidentialité</Link>.
+                    {l("J'accepte les", "Ik aanvaard de")}{" "}
+                    <Link href="/legal/cgu" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">{l("CGU", "algemene voorwaarden")}</Link>{" "}
+                    {l("et la", "en het")}{" "}
+                    <Link href="/legal/privacy" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">{l("politique de confidentialité", "privacybeleid")}</Link>.
                   </span>
                 </label>
 
@@ -351,18 +363,18 @@ function NormalSignup() {
                   style={{ background: loading ? "#FFD97A" : "#FFB900", fontFamily: "var(--font-display, sans-serif)" }}>
                   {loading
                     ? <Loader2 size={16} className="animate-spin" />
-                    : <><span>Créer mon compte gratuitement</span><ArrowRight size={15} strokeWidth={2.5} /></>}
+                    : <><span>{l("Créer mon compte gratuitement", "Mijn account gratis aanmaken")}</span><ArrowRight size={15} strokeWidth={2.5} /></>}
                 </button>
 
                 <p className="text-center text-sm text-gray-400">
-                  Déjà un compte ?{" "}
-                  <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>Se connecter</Link>
+                  {l("Déjà un compte ?", "Al een account?")}{" "}
+                  <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>{l("Se connecter", "Inloggen")}</Link>
                 </p>
               </form>
             </div>
           )}
         </div>
-        <p className="text-xs text-gray-300 mt-12">© {new Date().getFullYear()} Wolko · Tous droits réservés</p>
+        <p className="text-xs text-gray-300 mt-12">© {new Date().getFullYear()} Wolko · {l("Tous droits réservés", "Alle rechten voorbehouden")}</p>
       </div>
     </div>
   );

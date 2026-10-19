@@ -4,8 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { useL } from "@/lib/i18n/context";
 
 export default function ForgotPasswordPage() {
+  const l = useL();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -22,7 +24,7 @@ export default function ForgotPasswordPage() {
     });
 
     if (err) {
-      setError("Impossible d'envoyer l'email. Vérifiez l'adresse saisie.");
+      setError(l("Impossible d'envoyer l'email. Vérifiez l'adresse saisie.", "De e-mail kon niet worden verstuurd. Controleer het ingevoerde adres."));
     } else {
       setSent(true);
     }
@@ -41,10 +43,10 @@ export default function ForgotPasswordPage() {
           className="font-display font-black text-white mb-2"
           style={{ fontSize: "clamp(1.8rem, 4vw, 2.4rem)", lineHeight: 1 }}
         >
-          Mot de passe oublié.
+          {l("Mot de passe oublié.", "Wachtwoord vergeten.")}
         </h1>
         <p className="text-white/40 text-sm">
-          Recevez un lien de réinitialisation par email.
+          {l("Recevez un lien de réinitialisation par email.", "Ontvang een link om je wachtwoord opnieuw in te stellen.")}
         </p>
       </div>
 
@@ -52,23 +54,22 @@ export default function ForgotPasswordPage() {
         {sent ? (
           <div className="text-center py-4 space-y-4">
             <CheckCircle2 size={48} className="text-emerald-400 mx-auto" />
-            <p className="text-white font-semibold">Email envoyé !</p>
+            <p className="text-white font-semibold">{l("Email envoyé !", "E-mail verstuurd!")}</p>
             <p className="text-white/40 text-sm leading-relaxed">
-              Consultez votre boîte mail et cliquez sur le lien pour
-              réinitialiser votre mot de passe.
+              {l("Consultez votre boîte mail et cliquez sur le lien pour réinitialiser votre mot de passe.", "Controleer je mailbox en klik op de link om je wachtwoord opnieuw in te stellen.")}
             </p>
             <Link
               href="/login"
               className="inline-flex items-center gap-2 text-brand hover:text-brand-light text-sm font-semibold transition-colors"
             >
               <ArrowLeft size={14} />
-              Retour à la connexion
+              {l("Retour à la connexion", "Terug naar inloggen")}
             </Link>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className={labelClass}>Adresse email</label>
+              <label className={labelClass}>{l("Adresse email", "E-mailadres")}</label>
               <div className="relative">
                 <Mail
                   size={15}
@@ -79,7 +80,7 @@ export default function ForgotPasswordPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="vous@exemple.be"
+                  placeholder={l("vous@exemple.be", "jij@voorbeeld.be")}
                   className={inputClass}
                 />
               </div>
@@ -100,7 +101,7 @@ export default function ForgotPasswordPage() {
               {loading ? (
                 <Loader2 size={16} className="animate-spin" />
               ) : (
-                "Envoyer le lien"
+                l("Envoyer le lien", "Link versturen")
               )}
             </button>
 
@@ -110,7 +111,7 @@ export default function ForgotPasswordPage() {
                 className="inline-flex items-center gap-1.5 text-white/40 hover:text-white/70 transition-colors"
               >
                 <ArrowLeft size={13} />
-                Retour à la connexion
+                {l("Retour à la connexion", "Terug naar inloggen")}
               </Link>
             </p>
           </form>

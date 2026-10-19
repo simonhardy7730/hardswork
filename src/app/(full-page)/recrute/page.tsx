@@ -6,43 +6,58 @@ import { ArrowRight, ArrowLeft, Check, Loader2, Zap, Users, Clock, Shield } from
 import { isValidVat } from "@/lib/vat";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { signUp } from "@/app/actions/auth";
+import { useLang } from "@/lib/i18n/context";
+import { LangSwitch } from "@/components/layout/LangSwitch";
 
 import { WolfBadge } from "@/components/ui/WolfMascot";
+type L = (fr: string, nl: string) => string;
+
 /* ─── Rôles ──────────────────────────────────────────────── */
-const ROLES = [
-  {
-    id: "agency" as const,
-    title: "AGENCE DE\nRECRUTEMENT",
-    features: ["Multi-sites", "Gestion d'intérim", "Sourcing illimité"],
-    photo: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
-    placeholder: "Ex: Recrutement Pro",
-  },
-  {
-    id: "company" as const,
-    title: "ENTREPRISE\n/ PME",
-    features: ["Recrutement direct", "Gestion d'équipe", "1 offre gratuite"],
-    photo: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",
-    placeholder: "Ex: ConstructoTech",
-  },
-];
+function makeRoles(l: L) {
+  return [
+    {
+      id: "agency" as const,
+      title: l("AGENCE DE\nRECRUTEMENT", "WERVINGS-\nKANTOOR"),
+      features: [l("Multi-sites", "Meerdere vestigingen"), l("Gestion d'intérim", "Interimbeheer"), l("Sourcing illimité", "Onbeperkt sourcen")],
+      photo: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
+      placeholder: l("Ex: Recrutement Pro", "Bv. Werving Pro"),
+    },
+    {
+      id: "company" as const,
+      title: l("ENTREPRISE\n/ PME", "BEDRIJF\n/ KMO"),
+      features: [l("Recrutement direct", "Rechtstreeks werven"), l("Gestion d'équipe", "Teambeheer"), l("Candidatures centralisées", "Gecentraliseerde sollicitaties")],
+      photo: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",
+      placeholder: l("Ex: ConstructoTech", "Bv. BouwTech"),
+    },
+  ];
+}
 
-const STEPS = [
-  { num: "01", title: "Publiez votre offre", desc: "En moins de 2 minutes. Secteur, profil recherché, salaire — simple et efficace." },
-  { num: "02", title: "Recevez des candidats", desc: "Notre base de candidats qualifiés est notifiée. Les profils correspondants postulent directement." },
-  { num: "03", title: "Contactez & recrutez", desc: "Accédez aux coordonnées complètes, CV, et échangez directement. Zéro intermédiaire." },
-];
+function makeSteps(l: L) {
+  return [
+    { num: "01", title: l("Publiez votre offre", "Plaats je vacature"), desc: l("En moins de 2 minutes. Secteur, profil recherché, salaire — simple et efficace.", "In minder dan 2 minuten. Sector, gezocht profiel, loon — eenvoudig en efficiënt.") },
+    { num: "02", title: l("Recevez des candidats", "Ontvang kandidaten"), desc: l("Les candidats qui correspondent peuvent postuler directement à votre offre.", "Kandidaten die passen, kunnen rechtstreeks op je vacature solliciteren.") },
+    { num: "03", title: l("Contactez & recrutez", "Contacteer & werf aan"), desc: l("Consultez les candidatures, les CV, et échangez directement. Zéro intermédiaire.", "Bekijk de sollicitaties en cv's en neem rechtstreeks contact op. Geen tussenpersoon.") },
+  ];
+}
 
-const FEATURES = [
-  { icon: <Zap size={20} className="text-brand" />, title: "Publier en 2 min", desc: "Formulaire guidé, pas de jargon RH inutile." },
-  { icon: <Users size={20} className="text-brand" />, title: "Candidats qualifiés", desc: "Profils vérifiés, motivés, disponibles maintenant." },
-  { icon: <Clock size={20} className="text-brand" />, title: "Réponse sous 48h", desc: "Délai moyen de première candidature reçue." },
-  { icon: <Shield size={20} className="text-brand" />, title: "Données protégées", desc: "Hébergées dans l'UE, conformité RGPD." },
-];
+function makeFeatures(l: L) {
+  return [
+    { icon: <Zap size={20} className="text-brand" />, title: l("Publier en 2 min", "Plaatsen in 2 min"), desc: l("Formulaire guidé, pas de jargon RH inutile.", "Begeleid formulier, geen nutteloos HR-jargon.") },
+    { icon: <Users size={20} className="text-brand" />, title: l("Des candidats près de chez vous", "Kandidaten in je buurt"), desc: l("Des profils de tous les métiers, dans votre région.", "Profielen van alle beroepen, in jouw regio.") },
+    { icon: <Clock size={20} className="text-brand" />, title: l("Tout au même endroit", "Alles op één plek"), desc: l("Toutes vos candidatures dans un seul tableau de bord.", "Al je sollicitaties in één dashboard.") },
+    { icon: <Shield size={20} className="text-brand" />, title: l("Vos données", "Je gegevens"), desc: l("Traitées selon notre politique de confidentialité.", "Verwerkt volgens ons privacybeleid.") },
+  ];
+}
 
 type OrgType = "agency" | "company";
 type Step = "select" | "register";
 
 export default function RecrutePage() {
+  const lang = useLang();
+  const l: L = (fr, nl) => (lang === "nl" ? nl : fr);
+  const ROLES = makeRoles(l);
+  const STEPS = makeSteps(l);
+  const FEATURES = makeFeatures(l);
   const [showForm, setShowForm] = useState(false);
   const [step, setStep]         = useState<Step>("select");
   const [selected, setSelected] = useState<OrgType | null>(null);
@@ -57,9 +72,9 @@ export default function RecrutePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.cgu) { setError("Veuillez accepter les CGU pour continuer."); return; }
+    if (!form.cgu) { setError(l("Veuillez accepter les CGU pour continuer.", "Aanvaard de algemene voorwaarden om verder te gaan.")); return; }
     if (!selected) return;
-    if (!isValidVat(form.vat)) { setError("Numéro de TVA invalide. Exemple : BE 0123.456.789"); return; }
+    if (!isValidVat(form.vat)) { setError(l("Numéro de TVA invalide. Exemple : BE 0123.456.789", "Ongeldig btw-nummer. Voorbeeld: BE 0123.456.789")); return; }
     setError("");
     setLoading(true);
     try {
@@ -73,7 +88,7 @@ export default function RecrutePage() {
       const result = await signUp(fd);
       if (result?.error) setError(result.error);
     } catch {
-      setError("Une erreur est survenue. Réessayez.");
+      setError(l("Une erreur est survenue. Réessayez.", "Er is een fout opgetreden. Probeer opnieuw."));
     } finally {
       setLoading(false);
     }
@@ -92,15 +107,16 @@ export default function RecrutePage() {
           <div className="max-w-6xl mx-auto px-6 h-[60px] flex items-center justify-between">
             <Link href="/"><HardSworkLogo size="md" dark /></Link>
             <div className="flex items-center gap-3">
+              <LangSwitch />
               <Link href="/login" className="text-[13px] text-white/60 hover:text-white transition font-semibold px-2">
-                Connexion
+                {l("Connexion", "Inloggen")}
               </Link>
               <button
                 onClick={() => setShowForm(true)}
                 className="font-display font-black uppercase text-white text-[13px] px-5 py-2.5 rounded-xl transition"
                 style={{ background: "#FFB900", letterSpacing: "0.05em" }}
               >
-                Commencer
+                {l("Commencer", "Starten")}
               </button>
             </div>
           </div>
@@ -125,12 +141,12 @@ export default function RecrutePage() {
               <WolfBadge className="lg:hidden w-36 mb-5" />
               <h1 className="font-display font-black text-white uppercase leading-[0.88] mb-6"
                 style={{ fontSize: "clamp(3rem, 6vw, 5rem)", letterSpacing: "-0.02em" }}>
-                Recrutez les<br />
-                <span style={{ color: "var(--brand-text)" }}>[meilleurs]</span><br />
-                talents.
+                {l("Recrutez les", "Werf de")}<br />
+                <span style={{ color: "var(--brand-text)" }}>{l("[meilleurs]", "[beste]")}</span><br />
+                {l("talents.", "talenten aan.")}
               </h1>
               <p className="text-white/80 text-lg leading-relaxed mb-10 max-w-md">
-                La plateforme de recrutement pour tous les métiers. Construction, logistique, transport, industrie, santé, restauration et plus.
+                {l("La plateforme de recrutement pour tous les métiers. Construction, logistique, transport, industrie, santé, restauration et plus.", "Het wervingsplatform voor alle beroepen. Bouw, logistiek, transport, industrie, zorg, horeca en meer.")}
               </p>
               <div className="flex flex-wrap gap-3">
                 <button
@@ -138,13 +154,13 @@ export default function RecrutePage() {
                   className="inline-flex items-center gap-2 font-display font-black uppercase text-white px-8 py-4 rounded-xl transition text-[14px]"
                   style={{ background: "#FFB900", letterSpacing: "0.06em" }}
                 >
-                  Je recrute gratuitement
+                  {l("Je recrute gratuitement", "Gratis aanwerven")}
                   <ArrowRight size={15} />
                 </button>
                 <Link href="/tarifs"
                   className="inline-flex items-center gap-2 font-display font-black uppercase text-white/60 hover:text-white border border-white/15 hover:border-white/30 px-8 py-4 rounded-xl transition text-[14px]"
                   style={{ letterSpacing: "0.06em" }}>
-                  Voir les tarifs
+                  {l("Voir les tarifs", "Bekijk de tarieven")}
                 </Link>
               </div>
             </div>
@@ -154,7 +170,7 @@ export default function RecrutePage() {
               <WolfBadge className="self-end mr-6 w-[200px] -mb-3 relative z-10" />
               <div className="bg-white rounded-2xl p-7 shadow-2xl">
                 <p className="font-display font-black text-[#101F43] uppercase text-sm mb-5">
-                  Commencez maintenant — c&apos;est gratuit
+                  {l("Commencez maintenant — c'est gratuit", "Start nu — het is gratis")}
                 </p>
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   {ROLES.map((r) => (
@@ -176,10 +192,10 @@ export default function RecrutePage() {
                 <button onClick={() => setShowForm(true)}
                   className="w-full py-3.5 text-white font-display font-black uppercase text-[13px] rounded-xl"
                   style={{ background: "#FFB900", letterSpacing: "0.05em" }}>
-                  Créer mon compte →
+                  {l("Créer mon compte →", "Mijn account aanmaken →")}
                 </button>
                 <p className="text-center text-xs text-gray-400 mt-3">
-                  Déjà un compte ? <Link href="/login" className="text-brand font-semibold hover:underline">Se connecter</Link>
+                  {l("Déjà un compte ?", "Al een account?")} <Link href="/login" className="text-brand font-semibold hover:underline">{l("Se connecter", "Inloggen")}</Link>
                 </p>
               </div>
             </div>
@@ -189,10 +205,10 @@ export default function RecrutePage() {
         {/* ── COMMENT ÇA MARCHE ────────────────────────────── */}
         <div className="bg-[#FFFBF2] py-20 px-6">
           <div className="max-w-5xl mx-auto">
-            <p className="text-[11px] font-black text-brand uppercase tracking-widest mb-3">Processus</p>
+            <p className="text-[11px] font-black text-brand uppercase tracking-widest mb-3">{l("Processus", "Werkwijze")}</p>
             <h2 className="font-display font-black text-ink uppercase leading-[0.9] mb-14"
               style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", letterSpacing: "-0.02em" }}>
-              En 3 étapes,<br /><span className="text-brand">[recrutez].</span>
+              {l("En 3 étapes,", "In 3 stappen")}<br /><span className="text-brand">{l("[recrutez].", "[werf aan].")}</span>
             </h2>
             <div className="grid md:grid-cols-3 gap-8">
               {STEPS.map((s) => (
@@ -212,7 +228,7 @@ export default function RecrutePage() {
           <div className="max-w-5xl mx-auto">
             <h2 className="font-display font-black text-white uppercase leading-[0.9] mb-12"
               style={{ fontSize: "clamp(2rem, 4vw, 3rem)", letterSpacing: "-0.02em" }}>
-              Pourquoi <span style={{ color: "var(--brand-text)" }}>[Wolko]</span>&nbsp;?
+              {l("Pourquoi", "Waarom")} <span style={{ color: "var(--brand-text)" }}>[Wolko]</span>&nbsp;?
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
               {FEATURES.map((f) => (
@@ -229,13 +245,13 @@ export default function RecrutePage() {
         {/* ── SECTEURS COUVERTS ────────────────────────────── */}
         <div className="bg-[#FFFBF2] py-16 px-6">
           <div className="max-w-5xl mx-auto text-center">
-            <p className="text-[11px] font-black text-brand uppercase tracking-widest mb-3">Secteurs</p>
+            <p className="text-[11px] font-black text-brand uppercase tracking-widest mb-3">{l("Secteurs", "Sectoren")}</p>
             <h2 className="font-display font-black text-ink uppercase mb-8"
               style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)", letterSpacing: "-0.02em" }}>
-              Tous les métiers.
+              {l("Tous les métiers.", "Alle beroepen.")}
             </h2>
             <div className="flex flex-wrap gap-2 justify-center">
-              {["Construction", "Logistique", "Transport", "Industrie", "Médical", "Sécurité", "Nettoyage", "Horeca", "Tech & IT"].map((s) => (
+              {[l("Construction", "Bouw"), l("Logistique", "Logistiek"), "Transport", l("Industrie", "Industrie"), l("Médical", "Medisch"), l("Sécurité", "Beveiliging"), l("Nettoyage", "Schoonmaak"), "Horeca", "Tech & IT"].map((s) => (
                 <span key={s} className="font-display font-black uppercase text-[12px] text-ink-600 bg-white border border-ink-100 px-4 py-2 rounded-xl">
                   {s}
                 </span>
@@ -248,12 +264,12 @@ export default function RecrutePage() {
         <div style={{ background: "#FFB900" }} className="py-20 px-6 text-center">
           <h2 className="font-display font-black text-white uppercase leading-[0.9] mb-6"
             style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", letterSpacing: "-0.02em" }}>
-            Prêt à trouver<br />vos talents&nbsp;?
+            {l("Prêt à trouver", "Klaar om")}<br />{l("vos talents", "je talenten te vinden")}&nbsp;?
           </h2>
           <button onClick={() => setShowForm(true)}
             className="inline-flex items-center gap-3 bg-white font-display font-black uppercase px-10 py-4 rounded-xl transition text-[14px] hover:bg-white/90"
             style={{ color: "var(--brand-text)", letterSpacing: "0.08em" }}>
-            Commencer gratuitement
+            {l("Commencer gratuitement", "Gratis starten")}
             <ArrowRight size={16} />
           </button>
         </div>
@@ -262,10 +278,10 @@ export default function RecrutePage() {
         <footer className="border-t border-ink-100 bg-[#FFFBF2] py-8 px-6">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <HardSworkLogo size="sm" dark={false} />
-            <p className="text-ink-300 text-xs">© 2026 Wolko · Tous droits réservés</p>
+            <p className="text-ink-300 text-xs">© 2026 Wolko · {l("Tous droits réservés", "Alle rechten voorbehouden")}</p>
             <div className="flex gap-6 text-ink-300 text-xs">
-              <Link href="/legal/cgu" className="hover:text-ink transition">CGU</Link>
-              <Link href="/legal/privacy" className="hover:text-ink transition">Confidentialité</Link>
+              <Link href="/legal/cgu" className="hover:text-ink transition">{l("CGU", "Voorwaarden")}</Link>
+              <Link href="/legal/privacy" className="hover:text-ink transition">{l("Confidentialité", "Privacy")}</Link>
               <Link href="mailto:hello@hardswork.be" className="hover:text-ink transition">Contact</Link>
             </div>
           </div>
@@ -294,13 +310,13 @@ export default function RecrutePage() {
         <div className="relative z-10">
           <h1 className="font-black text-white uppercase leading-none"
             style={{ fontFamily: "var(--font-display, sans-serif)", fontSize: "clamp(2.8rem, 4.5vw, 4.2rem)" }}>
-            {step === "select" ? <>RECRUTEZ LES<br /><span style={{ color: "var(--brand-text)" }}>[MEILLEURS].</span></>
-              : <>CRÉEZ VOTRE<br /><span style={{ color: "var(--brand-text)" }}>[COMPTE].</span></>}
+            {step === "select" ? <>{l("RECRUTEZ LES", "WERF DE")}<br /><span style={{ color: "var(--brand-text)" }}>{l("[MEILLEURS].", "[BESTE].")}</span></>
+              : <>{l("CRÉEZ VOTRE", "MAAK JE")}<br /><span style={{ color: "var(--brand-text)" }}>{l("[COMPTE].", "[ACCOUNT] AAN.")}</span></>}
           </h1>
           <p className="text-white/45 mt-5 text-sm leading-relaxed max-w-xs">
             {step === "select"
-              ? "La plateforme de recrutement pour tous les métiers."
-              : "Accédez aux meilleurs talents."}
+              ? l("La plateforme de recrutement pour tous les métiers.", "Het wervingsplatform voor alle beroepen.")
+              : l("Accédez aux meilleurs talents.", "Krijg toegang tot de beste talenten.")}
           </p>
         </div>
       </div>
@@ -318,7 +334,7 @@ export default function RecrutePage() {
             <div>
               <button onClick={() => setShowForm(false)}
                 className="flex items-center gap-2 text-gray-400 hover:text-gray-700 text-sm mb-6 transition">
-                <ArrowLeft size={14} /> Retour
+                <ArrowLeft size={14} /> {l("Retour", "Terug")}
               </button>
               <div className="grid grid-cols-2 gap-4 mb-7">
                 {ROLES.map((r) => {
@@ -357,10 +373,10 @@ export default function RecrutePage() {
               <button onClick={() => selected && setStep("register")} disabled={!selected}
                 className="w-full py-4 rounded-xl font-bold text-sm tracking-widest uppercase flex items-center justify-center gap-2 transition"
                 style={{ background: selected ? "#FFB900" : "#F3F4F6", color: selected ? "#101F43" : "#9CA3AF", fontFamily: "var(--font-display)", cursor: selected ? "pointer" : "not-allowed" }}>
-                Continuer <ArrowRight size={16} />
+                {l("Continuer", "Verder")} <ArrowRight size={16} />
               </button>
               <p className="text-center text-sm text-gray-400 mt-5">
-                Déjà un compte ? <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>Se connecter</Link>
+                {l("Déjà un compte ?", "Al een account?")} <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>{l("Se connecter", "Inloggen")}</Link>
               </p>
             </div>
           )}
@@ -374,61 +390,61 @@ export default function RecrutePage() {
                 </button>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-0.5">
-                    {currentRole?.id === "agency" ? "Agence de recrutement" : "Entreprise / PME"}
+                    {currentRole?.id === "agency" ? l("Agence de recrutement", "Wervingskantoor") : l("Entreprise / PME", "Bedrijf / KMO")}
                   </p>
                   <h2 className="font-black text-xl text-gray-900 uppercase leading-tight" style={{ fontFamily: "var(--font-display)" }}>
-                    Inscription — <span style={{ color: "var(--brand-text)" }}>{currentRole?.id === "agency" ? "Agence" : "Entreprise"}</span>
+                    {l("Inscription", "Registratie")} — <span style={{ color: "var(--brand-text)" }}>{currentRole?.id === "agency" ? l("Agence", "Kantoor") : l("Entreprise", "Bedrijf")}</span>
                   </h2>
                 </div>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">1. Nom de l&apos;entreprise</label>
+                  <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">1. {l("Nom de l'entreprise", "Naam van het bedrijf")}</label>
                   <input type="text" placeholder={currentRole?.placeholder} value={form.orgName} onChange={set("orgName")} required
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">Numéro de TVA</label>
+                  <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">{l("Numéro de TVA", "Btw-nummer")}</label>
                   <input type="text" placeholder="BE 0123.456.789" value={form.vat} onChange={set("vat")}
                     autoComplete="off" required
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">2. Votre identité</label>
+                  <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">2. {l("Votre identité", "Jouw gegevens")}</label>
                   <div className="grid grid-cols-2 gap-3">
-                    <input type="text" placeholder="Jean Dupont" value={form.fullName} onChange={set("fullName")} required
+                    <input type="text" placeholder={l("Jean Dupont", "Jan Peeters")} value={form.fullName} onChange={set("fullName")} required
                       className="border border-gray-200 rounded-xl px-4 py-3 text-sm placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition" />
-                    <input type="email" placeholder="jean@entreprise.be" value={form.email} onChange={set("email")} required
+                    <input type="email" placeholder={l("jean@entreprise.be", "jan@bedrijf.be")} value={form.email} onChange={set("email")} required
                       className="border border-gray-200 rounded-xl px-4 py-3 text-sm placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">3. Mot de passe</label>
-                  <input type="password" placeholder="Minimum 8 caractères" value={form.password} onChange={set("password")} required minLength={8}
+                  <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">3. {l("Mot de passe", "Wachtwoord")}</label>
+                  <input type="password" placeholder={l("Minimum 8 caractères", "Minimum 8 tekens")} value={form.password} onChange={set("password")} required minLength={8}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition" />
                 </div>
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input type="checkbox" checked={form.cgu} onChange={set("cgu")} className="mt-0.5 w-4 h-4 shrink-0 rounded" style={{ accentColor: "#101F43" }} />
                   <span className="text-xs text-gray-400 leading-relaxed">
-                    J&apos;accepte les <Link href="/legal/cgu" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">CGU</Link>{" "}
-                    et la <Link href="/legal/privacy" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">politique de confidentialité</Link>.
+                    {l("J'accepte les", "Ik aanvaard de")} <Link href="/legal/cgu" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">{l("CGU", "algemene voorwaarden")}</Link>{" "}
+                    {l("et la", "en het")} <Link href="/legal/privacy" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">{l("politique de confidentialité", "privacybeleid")}</Link>.
                   </span>
                 </label>
                 {error && <p className="text-xs rounded-xl px-4 py-3 bg-red-50 border border-red-100" style={{ color: "#B91C1C" }}>{error}</p>}
                 <button type="submit" disabled={loading}
                   className="w-full py-4 text-white font-black text-sm tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 transition"
                   style={{ background: loading ? "#FFD97A" : "#FFB900", fontFamily: "var(--font-display)" }}>
-                  {loading ? <Loader2 size={16} className="animate-spin" /> : <><span>Créer mon compte gratuitement</span><ArrowRight size={15} /></>}
+                  {loading ? <Loader2 size={16} className="animate-spin" /> : <><span>{l("Créer mon compte gratuitement", "Mijn account gratis aanmaken")}</span><ArrowRight size={15} /></>}
                 </button>
                 <p className="text-center text-sm text-gray-400">
-                  Déjà un compte ? <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>Se connecter</Link>
+                  {l("Déjà un compte ?", "Al een account?")} <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>{l("Se connecter", "Inloggen")}</Link>
                 </p>
               </form>
             </div>
           )}
         </div>
-        <p className="text-xs text-gray-300 mt-12">© {new Date().getFullYear()} Wolko · Tous droits réservés</p>
+        <p className="text-xs text-gray-300 mt-12">© {new Date().getFullYear()} Wolko · {l("Tous droits réservés", "Alle rechten voorbehouden")}</p>
       </div>
     </div>
   );

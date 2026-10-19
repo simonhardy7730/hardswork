@@ -1,14 +1,18 @@
 import Link from "next/link";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
+import { LangSwitch } from "@/components/layout/LangSwitch";
+import { getL } from "@/lib/i18n/server";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const l = getL();
   return (
     <div className="min-h-screen bg-[#101F43] flex flex-col">
       {/* Header */}
-      <header className="py-5 px-6 border-b border-white/[0.06]">
+      <header className="py-5 px-6 border-b border-white/[0.06] flex items-center justify-between">
         <Link href="/" className="w-fit block">
           <HardSworkLogo size="md" dark />
         </Link>
+        <LangSwitch />
       </header>
 
       {/* Content */}
@@ -18,7 +22,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       {/* Footer */}
       <footer className="py-5 text-center text-xs text-white/20 border-t border-white/[0.06]">
-        © 2026 Wolko · Tous droits réservés
+        © 2026 Wolko · {l("Tous droits réservés", "Alle rechten voorbehouden")}
       </footer>
     </div>
   );

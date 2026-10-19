@@ -29,7 +29,7 @@ export default async function ConfirmationPage({
   if (!offre) notFound();
 
   const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://hardswork.be";
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://wolko.be";
   const candidatureUrl = `${appUrl}/postuler/${offre.id}`;
 
   return (

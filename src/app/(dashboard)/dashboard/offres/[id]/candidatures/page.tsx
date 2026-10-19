@@ -53,7 +53,7 @@ export default async function CandidaturesPage({
     .order("applied_at", { ascending: false });
 
   const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://hardswork.be";
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://wolko.be";
 
   return (
     <div className="space-y-5">

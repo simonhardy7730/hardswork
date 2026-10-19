@@ -782,7 +782,7 @@ function CustomizationTab({
         </div>
         <p className="text-sm text-ink-500 mb-5">
           Ces réglages s&apos;appliquent à la page de candidature publique de vos
-          offres (hardswork.be/postuler/…).
+          offres (wolko.be/postuler/…).
         </p>
 
         {feedback && (

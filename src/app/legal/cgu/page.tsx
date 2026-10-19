@@ -35,7 +35,7 @@ export default function CGUPage() {
               <p>
                 Les présentes Conditions Générales d&apos;Utilisation (CGU) régissent l&apos;accès et
                 l&apos;utilisation de la plateforme Wolko, accessible à l&apos;adresse{" "}
-                <strong>hardswork.be</strong>, éditée par la société Wolko SRL (en cours de
+                <strong>wolko.be</strong>, éditée par la société Wolko SRL (en cours de
                 constitution), Belgique.
               </p>
               <p>

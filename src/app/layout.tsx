@@ -24,14 +24,14 @@ export const metadata: Metadata = {
     "recrutement", "emploi", "Belgique", "logistique", "transport",
     "industrie", "construction", "intérim", "restauration", "santé",
   ],
-  authors: [{ name: "Wolko", url: "https://hardswork.be" }],
+  authors: [{ name: "Wolko", url: "https://wolko.be" }],
   creator: "Wolko",
-  metadataBase: new URL("https://hardswork.be"),
+  metadataBase: new URL("https://wolko.be"),
   openGraph: {
     title: "Wolko — Le recrutement pour tous les métiers",
     description:
       "Recrutez tous les métiers : logistique, transport, industrie, construction, santé, restauration, sécurité.",
-    url: "https://hardswork.be",
+    url: "https://wolko.be",
     siteName: "Wolko",
     locale: "fr_BE",
     type: "website",

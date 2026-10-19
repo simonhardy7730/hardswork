@@ -45,9 +45,27 @@ export default function PrivacyPage() {
                 <li><strong>Données d&apos;identification</strong> : nom, prénom, adresse email, numéro de téléphone</li>
                 <li><strong>Données professionnelles</strong> : secteur d&apos;activité, compétences, permis, langues, disponibilité</li>
                 <li><strong>CV et documents</strong> : stockés de façon sécurisée dans nos infrastructures EU</li>
+                <li><strong>Disponibilités et préférences d&apos;emploi</strong> : jours et plages horaires, type de job recherché (emploi classique, intérim, job étudiant, flexi-job, stage), situation déclarée (étudiant, flexi-job)</li>
                 <li><strong>Données de navigation</strong> : cookies techniques strictement nécessaires au fonctionnement</li>
                 <li><strong>Données de paiement</strong> : gérées par notre prestataire Stripe (nous ne stockons pas vos données bancaires)</li>
               </ul>
+            </LegalSection>
+
+            <LegalSection title="2 bis. Visibilité de votre profil">
+              <p>
+                Votre profil, vos disponibilités et vos documents ne sont visibles que de vous. Un recruteur ne reçoit
+                que les informations que vous lui transmettez en postulant à son offre (nom, téléphone, email éventuel,
+                disponibilités choisies, message). Votre profil n&apos;est jamais rendu visible à toutes les entreprises
+                par défaut, et une candidature ne vaut pas autorisation de réutilisation pour de futurs recrutements.
+              </p>
+            </LegalSection>
+
+            <LegalSection title="2 ter. Jobs étudiants et flexi-jobs">
+              <p>
+                Les déclarations relatives au statut d&apos;étudiant ou au flexi-job sont indicatives. Wolko ne vérifie pas
+                l&apos;éligibilité légale : celle-ci reste « à confirmer » avec l&apos;employeur. Nous ne collectons pas de
+                justificatifs scolaires.
+              </p>
             </LegalSection>
 
             <LegalSection title="3. Finalités du traitement">
@@ -87,7 +105,9 @@ export default function PrivacyPage() {
               <ul>
                 <li><strong>Supabase</strong> (hébergement base de données) — serveurs en Union Européenne</li>
                 <li><strong>Vercel</strong> (hébergement application) — serveurs EU disponibles</li>
-                <li><strong>Stripe</strong> (paiement) — conforme PCI-DSS et RGPD</li>
+                <li><strong>Resend</strong> (envoi des emails de confirmation, de candidature et de notification)</li>
+                <li><strong>Cloudflare</strong> (protection anti-robot des formulaires, lorsqu&apos;elle est activée)</li>
+                <li><strong>Stripe</strong> (paiement, lorsque les abonnements payants sont activés) — conforme PCI-DSS et RGPD</li>
               </ul>
               <p>
                 Aucun transfert de données vers des pays tiers hors UE n&apos;est effectué sans garanties
@@ -100,9 +120,9 @@ export default function PrivacyPage() {
                 Conformément au RGPD et à la loi belge du 30 juillet 2018, vous disposez des droits suivants :
               </p>
               <ul>
-                <li><strong>Droit d&apos;accès</strong> : obtenir une copie de vos données personnelles</li>
+                <li><strong>Droit d&apos;accès et portabilité</strong> : obtenir une copie de vos données (bouton « Télécharger mes données » dans Mon compte)</li>
                 <li><strong>Droit de rectification</strong> : corriger des données inexactes</li>
-                <li><strong>Droit à l&apos;effacement</strong> : demander la suppression de vos données</li>
+                <li><strong>Droit à l&apos;effacement</strong> : supprimer votre compte vous-même dans Mon compte (candidats) ou sur demande</li>
                 <li><strong>Droit à la portabilité</strong> : recevoir vos données dans un format structuré</li>
                 <li><strong>Droit d&apos;opposition</strong> : vous opposer à certains traitements</li>
                 <li><strong>Droit de limitation</strong> : limiter le traitement dans certains cas</li>

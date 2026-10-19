@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "tsx --test tests/*.test.ts",
-    "test:sql": "node tests/sql-015.test.mjs && node tests/sql-016.test.mjs"
+    "test:sql": "node tests/sql-015.test.mjs && node tests/sql-016.test.mjs && node tests/sql-017.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

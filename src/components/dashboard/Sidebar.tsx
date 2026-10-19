@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Briefcase, Users, Settings, LogOut, Building2, ClipboardList,
+  LayoutDashboard, Briefcase, Users, Settings, LogOut, Building2, ClipboardList, Search,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -18,13 +18,16 @@ const NAV_ITEMS = [
   { href: "/dashboard/settings", icon: Settings,        fr: "Paramètres",      nl: "Instellingen",  exact: false },
 ];
 
+/* Candidathèque : affichée uniquement quand CANDIDATE_POOL_ENABLED=true */
+const POOL_ITEM = { href: "/dashboard/candidatheque", icon: Search, fr: "Candidathèque", nl: "Kandidatenbank", exact: false };
+
 /* Entrées réservées aux agences (les pages vérifient aussi le type côté serveur) */
 const AGENCY_ITEMS = [
   { href: "/dashboard/clients",  icon: Building2,       fr: "Clients",         nl: "Klanten",       exact: false },
   { href: "/dashboard/missions", icon: ClipboardList,   fr: "Missions",        nl: "Opdrachten",    exact: false },
 ];
 
-export default function DashboardSidebar({ org }: { org: Organization }) {
+export default function DashboardSidebar({ org, showPool = false }: { org: Organization; showPool?: boolean }) {
   const pathname = usePathname();
   const router   = useRouter();
   const l = useL();
@@ -64,10 +67,12 @@ export default function DashboardSidebar({ org }: { org: Organization }) {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-3 space-y-0.5">
-        {(org?.type === "agency"
-          ? [...NAV_ITEMS.slice(0, 3), ...AGENCY_ITEMS, ...NAV_ITEMS.slice(3)]
-          : NAV_ITEMS
-        ).map(({ href, icon: Icon, fr, nl, exact }) => {
+        {[
+          ...NAV_ITEMS.slice(0, 3),
+          ...(showPool ? [POOL_ITEM] : []),
+          ...(org?.type === "agency" ? AGENCY_ITEMS : []),
+          ...NAV_ITEMS.slice(3),
+        ].map(({ href, icon: Icon, fr, nl, exact }) => {
           const isActive = exact ? pathname === href : pathname.startsWith(href);
           return (
             <Link key={href} href={href}

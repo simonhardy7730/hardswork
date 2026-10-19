@@ -4,6 +4,7 @@ import DashboardSidebar from "@/components/dashboard/Sidebar";
 import DashboardTopbar from "@/components/dashboard/Topbar";
 import { getSpace } from "@/lib/auth/space";
 import { getOrgAccess } from "@/lib/billing/access";
+import { poolEnabled } from "@/lib/candidate/pool";
 import TrialBanner from "@/components/dashboard/TrialBanner";
 
 export default async function DashboardLayout({
@@ -30,7 +31,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-surface overflow-hidden">
-      <DashboardSidebar org={profile.organizations as never} />
+      <DashboardSidebar org={profile.organizations as never} showPool={poolEnabled()} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <DashboardTopbar user={profile} />
         <TrialBanner access={access} />

@@ -285,16 +285,12 @@ export default async function DashboardPage() {
 
                   <div className="flex items-center gap-3 shrink-0">
                     {app.applicant_phone && (
-                      <a
-                        href={`tel:${app.applicant_phone}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-1 text-xs text-ink-500 hover:text-brand transition"
-                      >
+                      <span className="flex items-center gap-1 text-xs text-ink-500">
                         <Phone size={13} />
                         <span className="hidden sm:block">
                           {app.applicant_phone}
                         </span>
-                      </a>
+                      </span>
                     )}
                     <div className="flex items-center gap-1 text-[10px] text-ink-300">
                       <Clock size={11} />

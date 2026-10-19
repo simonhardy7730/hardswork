@@ -23,7 +23,7 @@ export function SiteNavClient({ lang, t }: { lang: Lang; t: Dict["nav"] }) {
 
   return (
     <header
-      className="brand-on-dark fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b border-white/[0.07]"
+      className="brand-on-dark fixed top-0 left-0 right-0 z-50 border-b border-white/[0.07]"
       style={{ background: "rgba(16,31,67,0.97)" }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[60px] flex items-center justify-between gap-4">
@@ -71,7 +71,7 @@ export function SiteNavClient({ lang, t }: { lang: Lang; t: Dict["nav"] }) {
       </div>
 
       {open && (
-        <div id="mobile-menu" className="lg:hidden fixed inset-x-0 top-[60px] bottom-0 bg-[#0B1630] overflow-y-auto">
+        <div id="mobile-menu" className="lg:hidden fixed inset-x-0 top-[60px] h-[calc(100dvh-60px)] bg-[#0B1630] overflow-y-auto">
           <nav aria-label={t.mobile} className="px-4 py-6 flex flex-col">
             {NAV_LINKS.map((l) => (
               <Link key={l.href} href={l.href} onClick={() => setOpen(false)}

@@ -10,6 +10,7 @@ import {
 import { formatRelative } from "@/lib/utils";
 import type { Application, ApplicationStatus } from "@/lib/supabase/types";
 import { COLUMNS } from "./KanbanBoard";
+import { useL, useLang } from "@/lib/i18n/context";
 
 interface Props {
   application: Application;
@@ -34,6 +35,8 @@ export default function KanbanCard({
   hasSubscription,
   isDragging,
 }: Props) {
+  const l = useL();
+  const lang = useLang();
   const [showNotes, setShowNotes]     = useState(false);
   const [notes, setNotes]             = useState(app.notes ?? "");
   const [savingNotes, setSavingNotes] = useState(false);
@@ -87,10 +90,10 @@ export default function KanbanCard({
           {isLocked ? (
             <>
               <p className="text-[11px] font-black text-ink-300 uppercase tracking-wide leading-tight">
-                Candidat masqué
+                {l("Candidat masqué", "Verborgen kandidaat")}
               </p>
               <p className="text-[9px] font-bold text-ink-100 uppercase tracking-widest">
-                (Verrouillé)
+                {l("(Verrouillé)", "(Vergrendeld)")}
               </p>
             </>
           ) : (
@@ -102,7 +105,7 @@ export default function KanbanCard({
           {/* Titre / métier */}
           {app.applicant_name && (
             <p className="text-[10px] text-ink-500 truncate mt-0.5">
-              {isLocked ? "— Profil masqué —" : app.applicant_name}
+              {isLocked ? l("— Profil masqué —", "— Verborgen profiel —") : app.applicant_name}
             </p>
           )}
         </div>
@@ -121,14 +124,14 @@ export default function KanbanCard({
                 <button key={col.id}
                   onClick={() => { onStatusChange(app.id, col.id as ApplicationStatus); setShowMenu(false); }}
                   className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-ink hover:bg-surface-2 transition">
-                  <ChevronRight size={10} className="text-brand" /> {col.label}
+                  <ChevronRight size={10} className="text-brand" /> {l(col.label, col.nl)}
                 </button>
               ))}
               <div className="border-t border-ink-100 mt-1 pt-1">
                 <button
                   onClick={() => { setShowNotes(!showNotes); setShowMenu(false); }}
                   className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-ink hover:bg-surface-2 transition">
-                  <StickyNote size={10} className="text-amber-500" /> Notes
+                  <StickyNote size={10} className="text-amber-500" /> {l("Notes", "Notities")}
                 </button>
               </div>
             </div>
@@ -171,11 +174,11 @@ export default function KanbanCard({
       <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-ink-100">
         <span className="flex items-center gap-1 text-[10px] text-ink-300">
           <Clock size={9} />
-          {formatRelative(app.applied_at)}
+          {formatRelative(app.applied_at, lang)}
         </span>
         {app.availability === "immediate" && (
           <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full uppercase">
-            Dispo maintenant
+            {l("Dispo maintenant", "Nu beschikbaar")}
           </span>
         )}
       </div>
@@ -187,12 +190,12 @@ export default function KanbanCard({
             value={notes}
             onChange={e => setNotes(e.target.value)}
             rows={2}
-            placeholder="Notes sur ce candidat..."
+            placeholder={l("Notes sur ce candidat...", "Notities over deze kandidaat...")}
             className="w-full px-2 py-1.5 text-xs border border-ink-100 rounded-lg resize-none focus:outline-none focus:border-brand transition"
           />
           <button onClick={saveNotes} disabled={savingNotes}
             className="mt-1 flex items-center gap-1 text-[10px] text-white bg-brand px-2 py-1 rounded-lg hover:bg-brand-dark transition">
-            {savingNotes ? "…" : <><Check size={9} /> Sauvegarder</>}
+            {savingNotes ? "…" : <><Check size={9} /> {l("Sauvegarder", "Opslaan")}</>}
           </button>
         </div>
       )}

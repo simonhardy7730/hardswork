@@ -1,10 +1,12 @@
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
+import { useL } from "@/lib/i18n/context";
 
 interface Column {
   id: string;
   label: string;
+  nl?: string;
   color: string;
   accent: string;
 }
@@ -16,6 +18,7 @@ interface Props {
 }
 
 export default function KanbanColumn({ column, count, children }: Props) {
+  const l = useL();
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
 
   return (
@@ -29,7 +32,7 @@ export default function KanbanColumn({ column, count, children }: Props) {
         <div className="flex items-center justify-between">
           <span className="font-display font-black text-[13px] uppercase tracking-wider"
             style={{ color: column.accent }}>
-            {column.label}
+            {l(column.label, column.nl ?? column.label)}
           </span>
           <span
             className="text-[11px] font-black w-6 h-6 rounded-full flex items-center justify-center text-white"
@@ -48,7 +51,7 @@ export default function KanbanColumn({ column, count, children }: Props) {
         {children}
         {count === 0 && (
           <div className="text-center py-8 text-[11px] text-ink-300 border-2 border-dashed border-current/20 rounded-lg">
-            Déposez ici
+            {l("Déposez ici", "Sleep hierheen")}
           </div>
         )}
       </div>

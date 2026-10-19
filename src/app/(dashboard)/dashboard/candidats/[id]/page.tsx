@@ -6,7 +6,8 @@ import {
   Phone, Mail, CheckCircle, Award, Star,
   Wrench, Zap, Shield, Truck, ArrowRight,
 } from "lucide-react";
-import { SECTOR_LABELS, REGION_LABELS } from "@/lib/utils";
+import { labels } from "@/lib/utils";
+import { getLang } from "@/lib/i18n/server";
 
 /* ─── Icônes skills ───────────────────────────────────── */
 const SKILL_ICONS: Record<string, React.ElementType> = {
@@ -17,10 +18,17 @@ const SKILL_ICONS: Record<string, React.ElementType> = {
   soudure: Zap,
 };
 
-const AVAILABILITY_LABELS: Record<string, string> = {
-  immediate: "Disponible immédiatement",
-  "1_semaine": "Disponible sous 1 semaine",
-  "1_mois": "Disponible sous 1 mois",
+const AVAILABILITY_TEXT: Record<"fr" | "nl", Record<string, string>> = {
+  fr: {
+    immediate: "Disponible immédiatement",
+    "1_semaine": "Disponible sous 1 semaine",
+    "1_mois": "Disponible sous 1 mois",
+  },
+  nl: {
+    immediate: "Onmiddellijk beschikbaar",
+    "1_semaine": "Beschikbaar binnen 1 week",
+    "1_mois": "Beschikbaar binnen 1 maand",
+  },
 };
 
 const AVAILABILITY_COLOR: Record<string, string> = {
@@ -35,11 +43,11 @@ function buildSkills(candidate: {
   has_caces: boolean;
   licenses: string[];
   sectors: string[];
-}): Array<{ label: string; icon: string }> {
+}, SECTOR_LABELS: Record<string, string>, permisWord: string): Array<{ label: string; icon: string }> {
   const skills: Array<{ label: string; icon: string }> = [];
 
   candidate.caces_types?.forEach(c => skills.push({ label: `CACES ${c}`, icon: "securite" }));
-  candidate.licenses?.forEach(l => skills.push({ label: `Permis ${l}`, icon: "transport" }));
+  candidate.licenses?.forEach(l => skills.push({ label: `${permisWord} ${l}`, icon: "transport" }));
   candidate.sectors?.forEach(s => {
     const label = SECTOR_LABELS[s];
     if (label) skills.push({ label, icon: s });
@@ -54,6 +62,9 @@ export default async function CandidatDetailPage({
 }: {
   params: { id: string };
 }) {
+  const lang = getLang();
+  const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
+  const { sector: SECTOR_LABELS, status: STATUS_LABELS } = labels(lang);
   const supabase = await createClient();
 
   /* Auth */
@@ -98,7 +109,7 @@ export default async function CandidatDetailPage({
     .limit(5);
 
   const initials = `${candidat.first_name?.[0] ?? ""}${candidat.last_name?.[0] ?? ""}`.toUpperCase();
-  const skills = buildSkills(candidat);
+  const skills = buildSkills(candidat, SECTOR_LABELS, l("Permis", "Rijbewijs"));
 
   /* ─────────────────────────────────────────────────── */
   return (
@@ -112,7 +123,7 @@ export default async function CandidatDetailPage({
           <Link href="/dashboard/candidats"
             className="inline-flex items-center gap-1.5 text-white/40 hover:text-white/70 text-sm font-medium transition-colors mb-6">
             <ChevronLeft size={14} />
-            Retour à la candidathèque
+            {l("Retour à la candidathèque", "Terug naar de kandidatendatabase")}
           </Link>
 
           {/* Nom + avatar */}
@@ -156,12 +167,12 @@ export default async function CandidatDetailPage({
                 {candidat.experience_years != null && (
                   <span className="flex items-center gap-1.5 text-white/50 text-sm font-semibold">
                     <Clock size={13} />
-                    {candidat.experience_years === 0 ? "Débutant" : `${candidat.experience_years} an${candidat.experience_years > 1 ? "s" : ""} d'expérience`}
+                    {candidat.experience_years === 0 ? l("Débutant", "Starter") : lang === "nl" ? `${candidat.experience_years} jaar ervaring` : `${candidat.experience_years} an${candidat.experience_years > 1 ? "s" : ""} d'expérience`}
                   </span>
                 )}
                 {candidat.availability && (
                   <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${AVAILABILITY_COLOR[candidat.availability] ?? "text-white/40 bg-white/5 border-white/10"}`}>
-                    {AVAILABILITY_LABELS[candidat.availability] ?? candidat.availability}
+                    {AVAILABILITY_TEXT[lang][candidat.availability] ?? candidat.availability}
                   </span>
                 )}
               </div>
@@ -181,7 +192,7 @@ export default async function CandidatDetailPage({
             {skills.length > 0 && (
               <section className="bg-white border border-ink-100 rounded-2xl p-6">
                 <h2 className="font-display font-black text-ink uppercase text-sm tracking-widest mb-4">
-                  Compétences techniques
+                  {l("Compétences techniques", "Technische vaardigheden")}
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {skills.map((skill, i) => {
@@ -202,7 +213,7 @@ export default async function CandidatDetailPage({
             {(applications ?? []).length > 0 && (
               <section className="bg-white border border-ink-100 rounded-2xl p-6">
                 <h2 className="font-display font-black text-ink uppercase text-sm tracking-widest mb-5">
-                  Candidatures
+                  {l("Candidatures", "Sollicitaties")}
                 </h2>
                 <div className="space-y-0">
                   {(applications ?? []).map((app, i) => {
@@ -218,9 +229,9 @@ export default async function CandidatDetailPage({
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                            <p className="font-bold text-sm text-ink">{job?.title ?? "Poste inconnu"}</p>
+                            <p className="font-bold text-sm text-ink">{job?.title ?? l("Poste inconnu", "Onbekende functie")}</p>
                             <span className="text-[10px] font-bold text-white bg-brand px-2 py-0.5 rounded-full uppercase">
-                              {app.status}
+                              {STATUS_LABELS[app.status] ?? app.status}
                             </span>
                           </div>
                           <p className="text-xs text-ink-500">
@@ -243,7 +254,7 @@ export default async function CandidatDetailPage({
             {(candidat.caces_types?.length > 0 || candidat.licenses?.length > 0) && (
               <section className="bg-white border border-ink-100 rounded-2xl p-6">
                 <h2 className="font-display font-black text-ink uppercase text-sm tracking-widest mb-4">
-                  Certifications & Permis
+                  {l("Certifications & Permis", "Certificaten & Rijbewijzen")}
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {candidat.caces_types?.map((c: string) => (
@@ -255,12 +266,12 @@ export default async function CandidatDetailPage({
                       </div>
                     </div>
                   ))}
-                  {candidat.licenses?.map((l: string) => (
-                    <div key={l} className="flex items-center gap-3 bg-surface border border-ink-100 rounded-xl p-3">
+                  {candidat.licenses?.map((lic: string) => (
+                    <div key={lic} className="flex items-center gap-3 bg-surface border border-ink-100 rounded-xl p-3">
                       <Truck size={18} className="text-brand shrink-0" />
                       <div>
-                        <p className="text-[10px] font-semibold text-ink-300 uppercase tracking-wide">Permis</p>
-                        <p className="text-sm font-black text-ink">{l}</p>
+                        <p className="text-[10px] font-semibold text-ink-300 uppercase tracking-wide">{l("Permis", "Rijbewijs")}</p>
+                        <p className="text-sm font-black text-ink">{lic}</p>
                       </div>
                     </div>
                   ))}
@@ -272,7 +283,7 @@ export default async function CandidatDetailPage({
             {candidat.notes && !candidat.notes.startsWith("cv:") && (
               <section className="bg-white border border-ink-100 rounded-2xl p-6">
                 <h2 className="font-display font-black text-ink uppercase text-sm tracking-widest mb-3">
-                  Notes
+                  {l("Notes", "Notities")}
                 </h2>
                 <p className="text-sm text-ink-700 leading-relaxed">{candidat.notes}</p>
               </section>
@@ -291,7 +302,7 @@ export default async function CandidatDetailPage({
                   <div className="flex items-center gap-2 mb-4">
                     <CheckCircle size={14} className="text-emerald-400 shrink-0" />
                     <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wide">
-                      Coordonnées disponibles
+                      {l("Coordonnées disponibles", "Contactgegevens beschikbaar")}
                     </span>
                   </div>
 
@@ -302,7 +313,7 @@ export default async function CandidatDetailPage({
                         <Phone size={14} className="text-brand" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[10px] text-white/30 font-semibold uppercase tracking-wide">Téléphone</p>
+                        <p className="text-[10px] text-white/30 font-semibold uppercase tracking-wide">{l("Téléphone", "Telefoon")}</p>
                         <p className="text-sm font-bold text-white truncate">{candidat.phone}</p>
                       </div>
                     </a>
@@ -324,7 +335,7 @@ export default async function CandidatDetailPage({
                     {candidat.notes?.startsWith("cv:") && (
                       <a href={candidat.notes.replace("cv:", "")} target="_blank" rel="noopener noreferrer"
                         className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-bold text-sm rounded-xl py-3 transition mt-2">
-                        Télécharger le CV
+                        {l("Télécharger le CV", "CV downloaden")}
                         <ArrowRight size={13} />
                       </a>
                     )}
@@ -336,7 +347,7 @@ export default async function CandidatDetailPage({
                   <div className="flex items-center gap-2 mb-4">
                     <Lock size={13} className="text-white/40 shrink-0" />
                     <span className="text-[11px] font-bold text-white/40 uppercase tracking-wide">
-                      Coordonnées masquées
+                      {l("Coordonnées masquées", "Contactgegevens verborgen")}
                     </span>
                   </div>
 
@@ -356,11 +367,11 @@ export default async function CandidatDetailPage({
                     className="flex items-center justify-center gap-2 font-display font-black uppercase tracking-wide text-white bg-brand hover:bg-brand-dark transition rounded-xl py-3.5 text-sm w-full"
                     style={{ letterSpacing: "0.05em" }}>
                     <Lock size={13} />
-                    Débloquer les coordonnées
+                    {l("Débloquer les coordonnées", "Contactgegevens ontgrendelen")}
                   </Link>
 
                   <p className="text-white/25 text-[10px] text-center mt-3 leading-snug">
-                    L&apos;accès complet aux coordonnées est réservé aux recruteurs abonnés.
+                    {l("L'accès complet aux coordonnées est réservé aux recruteurs abonnés.", "Volledige toegang tot de contactgegevens is voorbehouden aan abonnees.")}
                   </p>
                 </>
               )}
@@ -369,7 +380,7 @@ export default async function CandidatDetailPage({
             {/* Score / Étoiles */}
             <div className="bg-white border border-ink-100 rounded-2xl p-5">
               <p className="font-display font-black text-ink uppercase text-xs tracking-widest mb-3">
-                Profil
+                {l("Profil", "Profiel")}
               </p>
               <div className="flex items-center gap-1 mb-2">
                 {Array.from({ length: 5 }).map((_, i) => {
@@ -391,7 +402,7 @@ export default async function CandidatDetailPage({
                 })}
               </div>
               <p className="text-xs text-ink-500">
-                {candidat.notes?.startsWith("cv:") ? "CV disponible" : "Pas de CV uploadé"}
+                {candidat.notes?.startsWith("cv:") ? l("CV disponible", "CV beschikbaar") : l("Pas de CV uploadé", "Geen CV geüpload")}
               </p>
             </div>
           </div>

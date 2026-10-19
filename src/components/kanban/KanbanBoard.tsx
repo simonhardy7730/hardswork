@@ -19,6 +19,7 @@ import KanbanColumn from "./KanbanColumn";
 import KanbanCard from "./KanbanCard";
 import { Lock } from "lucide-react";
 import type { Application, ApplicationStatus } from "@/lib/supabase/types";
+import { useL } from "@/lib/i18n/context";
 
 interface Props {
   applications: Application[];
@@ -31,36 +32,37 @@ interface Props {
 export const COLUMNS: {
   id: ApplicationStatus;
   label: string;
+  nl: string;
   color: string;
   accent: string;
 }[] = [
   {
     id: "nouveau",
-    label: "Nouveaux",
+    label: "Nouveaux", nl: "Nieuw",
     color: "bg-[#FFFBF2] border-ink-100",
     accent: "#3B82F6",
   },
   {
     id: "contacte",
-    label: "En révision",
+    label: "En révision", nl: "In behandeling",
     color: "bg-amber-50 border-amber-100",
     accent: "#D97706",
   },
   {
     id: "entretien",
-    label: "Entretien",
+    label: "Entretien", nl: "Gesprek",
     color: "bg-purple-50 border-purple-100",
     accent: "#7C3AED",
   },
   {
     id: "place",
-    label: "Recruté",
+    label: "Recruté", nl: "Aangenomen",
     color: "bg-emerald-50 border-emerald-100",
     accent: "#059669",
   },
   {
     id: "refuse",
-    label: "Refusé",
+    label: "Refusé", nl: "Afgewezen",
     color: "bg-red-50 border-red-100",
     accent: "#DC2626",
   },
@@ -72,6 +74,7 @@ export default function KanbanBoard({
   hasSubscription,
 }: Props) {
   const router   = useRouter();
+  const l = useL();
   const [apps, setApps]     = useState<Application[]>(initialApps);
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -130,11 +133,11 @@ export default function KanbanBoard({
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
         <div>
           <h2 className="font-display font-black text-ink uppercase tracking-tight text-lg leading-tight">
-            Gestion des candidatures —{" "}
-            <span className="text-brand">Pipeline B2B</span>
+            {l("Gestion des candidatures", "Beheer van sollicitaties")} —{" "}
+            <span className="text-brand">{l("Pipeline B2B", "B2B-pipeline")}</span>
           </h2>
           <p className="text-xs text-ink-500 mt-0.5">
-            {totalApps} candidature{totalApps !== 1 ? "s" : ""} au total · Glissez-déposez pour changer le statut
+            {totalApps} {totalApps !== 1 ? l("candidatures", "sollicitaties") : l("candidature", "sollicitatie")} {l("au total · Glissez-déposez pour changer le statut", "in totaal · Sleep om de status te wijzigen")}
           </p>
         </div>
 
@@ -143,14 +146,14 @@ export default function KanbanBoard({
           <Link href="/#tarifs"
             className="flex items-center gap-2 font-display font-black uppercase tracking-wide text-white bg-brand hover:bg-brand-dark transition rounded-xl px-4 py-2.5 text-[13px] shadow-md shadow-brand/20">
             <Lock size={13} />
-            Débloquer tout
+            {l("Débloquer tout", "Alles ontgrendelen")}
           </Link>
         )}
 
         {hasSubscription && (
           <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            Contacts débloqués
+            {l("Contacts débloqués", "Contacten ontgrendeld")}
           </span>
         )}
       </div>

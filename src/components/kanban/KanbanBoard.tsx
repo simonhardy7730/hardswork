@@ -20,6 +20,7 @@ import KanbanCard from "./KanbanCard";
 import { Lock } from "lucide-react";
 import type { Application, ApplicationStatus } from "@/lib/supabase/types";
 import { useL } from "@/lib/i18n/context";
+import { DAYS, SLOTS } from "@/lib/candidate/availability";
 
 interface Props {
   applications: Application[];
@@ -127,6 +128,20 @@ export default function KanbanBoard({
 
   const totalApps = apps.length;
 
+  // Filtres recruteur : jour / plage horaire / candidature rapide (uniquement si des créneaux existent)
+  const [fDay, setFDay] = useState("");
+  const [fSlot, setFSlot] = useState("");
+  const [fQuick, setFQuick] = useState(false);
+  const hasSlots = apps.some(a => (a.availability_slots?.length ?? 0) > 0);
+  const visible = apps.filter(a => {
+    const s = a.availability_slots ?? [];
+    if (fQuick && !a.quick_apply) return false;
+    if (fDay && !s.some(x => x.startsWith(`${fDay}:`))) return false;
+    if (fSlot && !s.some(x => x.endsWith(`:${fSlot}`))) return false;
+    return true;
+  });
+  const sel = "text-xs border border-ink-100 rounded-lg px-2.5 py-1.5 bg-white text-ink";
+
   return (
     <div>
       {/* ── Bandeau Pipeline ─────────────────────────── */}
@@ -158,6 +173,26 @@ export default function KanbanBoard({
         )}
       </div>
 
+      {hasSlots && (
+        <div className="flex items-center gap-2 flex-wrap mb-4" aria-label={l("Filtrer par disponibilités", "Filteren op beschikbaarheid")}>
+          <select className={sel} value={fDay} onChange={e => setFDay(e.target.value)} aria-label={l("Jour", "Dag")}>
+            <option value="">{l("Tous les jours", "Alle dagen")}</option>
+            {DAYS.map(d => <option key={d.key} value={d.key}>{l(d.frLong, d.nlLong)}</option>)}
+          </select>
+          <select className={sel} value={fSlot} onChange={e => setFSlot(e.target.value)} aria-label={l("Plage horaire", "Uurrooster")}>
+            <option value="">{l("Toutes les plages", "Alle uren")}</option>
+            {SLOTS.map(s => <option key={s.key} value={s.key}>{l(s.fr, s.nl)}</option>)}
+          </select>
+          <label className="flex items-center gap-1.5 text-xs text-ink-500 cursor-pointer">
+            <input type="checkbox" checked={fQuick} onChange={e => setFQuick(e.target.checked)} className="accent-brand" />
+            {l("Candidatures rapides", "Snelle sollicitaties")}
+          </label>
+          {(fDay || fSlot || fQuick) && (
+            <span className="text-xs text-ink-300">{visible.length}/{totalApps}</span>
+          )}
+        </div>
+      )}
+
       {/* ── Kanban ───────────────────────────────────── */}
       <DndContext
         sensors={sensors}
@@ -166,7 +201,7 @@ export default function KanbanBoard({
       >
         <div className="flex gap-3 overflow-x-auto pb-4">
           {COLUMNS.map(col => {
-            const colApps = apps.filter(a => a.status === col.id);
+            const colApps = visible.filter(a => a.status === col.id);
             return (
               <KanbanColumn key={col.id} column={col} count={colApps.length}>
                 <SortableContext

@@ -10,6 +10,7 @@ import {
 import { formatRelative } from "@/lib/utils";
 import type { Application, ApplicationStatus } from "@/lib/supabase/types";
 import { COLUMNS } from "./KanbanBoard";
+import { DAYS, SLOTS } from "@/lib/candidate/availability";
 import { useL, useLang } from "@/lib/i18n/context";
 
 interface Props {
@@ -167,6 +168,25 @@ export default function KanbanCard({
               {tag}
             </span>
           ))}
+        </div>
+      )}
+
+      {/* ── Créneaux de la candidature rapide ── */}
+      {(app.availability_slots?.length ?? 0) > 0 && (
+        <div className="flex flex-wrap gap-1 mt-2">
+          {app.availability_slots!.slice(0, 4).map(k => {
+            const [d, s] = k.split(":");
+            const day = DAYS.find(x => x.key === d), slot = SLOTS.find(x => x.key === s);
+            if (!day || !slot) return null;
+            return (
+              <span key={k} className="text-[9px] font-bold text-brand bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-full">
+                {l(day.fr, day.nl)} · {l(slot.fr, slot.nl)}
+              </span>
+            );
+          })}
+          {app.availability_slots!.length > 4 && (
+            <span className="text-[9px] font-bold text-ink-300 px-1 py-0.5">+{app.availability_slots!.length - 4}</span>
+          )}
         </div>
       )}
 

@@ -33,7 +33,11 @@ const SECTOR_CHIPS = [
 interface SearchParams {
   lieu?: string;
   q?: string; secteur?: string; region?: string; contrat?: string;
+  jour?: string; horaire?: string; rec?: string; debut?: string; salaire?: string;
 }
+
+const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun", "holiday"];
+const SLOT_KEYS = ["morning", "afternoon", "evening", "night"];
 
 export default async function JobsPage({ searchParams }: { searchParams: SearchParams }) {
   const { lang } = getDict();
@@ -61,7 +65,24 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
   const lieu = (searchParams.lieu ?? "").replace(/[%,()]/g, "").trim();
   if (lieu && !/^\d+$/.test(lieu)) query = query.ilike("city", `%${lieu}%`);
 
-  const { data: offersRaw } = await query;
+  // Filtres de planning (migration 010). Valeurs validées par liste blanche.
+  const jourList = (searchParams.jour ?? "").split(",").filter((d) => DAY_KEYS.includes(d));
+  const horaireList = (searchParams.horaire ?? "").split(",").filter((s) => SLOT_KEYS.includes(s));
+  const rec = searchParams.rec === "ponctuelle" || searchParams.rec === "recurrente" ? searchParams.rec : "";
+  const debut = /^\d{4}-\d{2}-\d{2}$/.test(searchParams.debut ?? "") ? (searchParams.debut as string) : "";
+  const salaire = Number(searchParams.salaire);
+  const hasPlanningFilter = jourList.length > 0 || horaireList.length > 0 || !!rec || !!debut || salaire > 0;
+  let planned = query;
+  if (jourList.length) planned = planned.overlaps("days_needed", jourList);
+  if (horaireList.length) planned = planned.overlaps("time_slots", horaireList);
+  if (rec) planned = planned.eq("recurrence", rec);
+  // Date de début : missions qui commencent à cette date ou après (ou sans date précisée)
+  if (debut) planned = planned.or(`work_date_from.gte.${debut},work_date_from.is.null`);
+  if (salaire > 0) planned = planned.gte("salary_max", salaire);
+
+  let { data: offersRaw, error: offersErr } = await planned;
+  // Colonnes de planning absentes (migration 010 non appliquée) : on retombe sur la recherche simple.
+  if (offersErr && hasPlanningFilter) ({ data: offersRaw } = await query);
   const offers = offersRaw ?? [];
 
   /* ── Offres premium (urgentes ou récentes) pour sidebar ─ */
@@ -80,7 +101,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
     .select("id", { count: "exact", head: true })
     .eq("status", "active");
 
-  const hasFilters = searchParams.secteur || searchParams.region || searchParams.q || searchParams.contrat || lieu;
+  const hasFilters = searchParams.secteur || searchParams.region || searchParams.q || searchParams.contrat || lieu || hasPlanningFilter;
 
   return (
     <div className="min-h-screen bg-[#F4F1EC] font-body pb-20">
@@ -176,6 +197,54 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
               );
             })}
           </div>
+
+          {/* Raccourcis + filtres de planning */}
+          <div className="flex items-center gap-2 flex-wrap pb-3" aria-label={l("Raccourcis", "Snelkoppelingen")}>
+            {[
+              { fr: "Je cherche un job ce week-end", nl: "Ik zoek een job dit weekend", p: { jour: "sat,sun" } as Record<string, string> },
+              { fr: "Je cherche un job après les cours", nl: "Ik zoek een job na school", p: { contrat: "etudiant", horaire: "afternoon,evening" } as Record<string, string> },
+              { fr: "Je cherche un flexi-job en soirée", nl: "Ik zoek een flexi-job in de avond", p: { contrat: "flexi", horaire: "evening" } as Record<string, string> },
+            ].map(({ fr, nl, p }) => (
+              <Link key={fr} href={`/jobs?${new URLSearchParams(p).toString()}`}
+                className="text-[12px] font-bold px-3.5 py-1.5 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all">
+                {l(fr, nl)}
+              </Link>
+            ))}
+          </div>
+          <form method="GET" className="flex items-center gap-2 flex-wrap pb-4">
+            {searchParams.contrat && <input type="hidden" name="contrat" value={searchParams.contrat} />}
+            {searchParams.secteur && <input type="hidden" name="secteur" value={searchParams.secteur} />}
+            {searchParams.q && <input type="hidden" name="q" value={searchParams.q} />}
+            {lieu && <input type="hidden" name="lieu" value={lieu} />}
+            <select name="jour" defaultValue={jourList.length === 1 ? jourList[0] : ""} aria-label={l("Jour", "Dag")}
+              className="bg-white text-ink text-xs px-3 h-9 rounded-lg focus:outline-none">
+              <option value="">{l("Jour de la semaine", "Dag van de week")}</option>
+              {[["mon","Lundi","Maandag"],["tue","Mardi","Dinsdag"],["wed","Mercredi","Woensdag"],["thu","Jeudi","Donderdag"],["fri","Vendredi","Vrijdag"],["sat","Samedi","Zaterdag"],["sun","Dimanche","Zondag"],["holiday","Jours fériés","Feestdagen"]].map(([k, fr, nl]) => (
+                <option key={k} value={k}>{l(fr, nl)}</option>
+              ))}
+            </select>
+            <select name="horaire" defaultValue={horaireList.length === 1 ? horaireList[0] : ""} aria-label={l("Horaire", "Uurrooster")}
+              className="bg-white text-ink text-xs px-3 h-9 rounded-lg focus:outline-none">
+              <option value="">{l("Horaire", "Uurrooster")}</option>
+              {[["morning","Matin","Voormiddag"],["afternoon","Après-midi","Namiddag"],["evening","Soirée","Avond"],["night","Nuit","Nacht"]].map(([k, fr, nl]) => (
+                <option key={k} value={k}>{l(fr, nl)}</option>
+              ))}
+            </select>
+            <select name="rec" defaultValue={rec} aria-label={l("Type de mission", "Soort opdracht")}
+              className="bg-white text-ink text-xs px-3 h-9 rounded-lg focus:outline-none">
+              <option value="">{l("Ponctuelle ou régulière", "Eenmalig of regelmatig")}</option>
+              <option value="ponctuelle">{l("Mission ponctuelle", "Eenmalige opdracht")}</option>
+              <option value="recurrente">{l("Mission régulière", "Regelmatige opdracht")}</option>
+            </select>
+            <input type="date" name="debut" defaultValue={debut} aria-label={l("Date de début", "Startdatum")}
+              className="bg-white text-ink text-xs px-3 h-9 rounded-lg focus:outline-none" />
+            <input type="number" name="salaire" min={0} step={1} inputMode="numeric" defaultValue={salaire > 0 ? salaire : ""}
+              placeholder={l("Rémunération min. (€)", "Min. loon (€)")} aria-label={l("Rémunération minimale", "Minimumloon")}
+              className="bg-white text-ink text-xs px-3 h-9 rounded-lg focus:outline-none w-[150px]" />
+            <button type="submit" className="h-9 px-4 bg-brand hover:bg-brand-dark text-white font-bold text-xs rounded-lg transition-colors">
+              {l("Filtrer", "Filteren")}
+            </button>
+          </form>
 
           {/* Chips secteurs */}
           <div className="flex items-center gap-2 flex-wrap pb-5">

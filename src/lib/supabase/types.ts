@@ -126,6 +126,10 @@ export interface Application {
   notes: string | null;
   applied_at: string;
   updated_at: string;
+  // Candidature rapide (migration 011)
+  availability_slots?: string[];
+  interest_confirmed?: boolean;
+  quick_apply?: boolean;
 }
 
 export interface Subscription {

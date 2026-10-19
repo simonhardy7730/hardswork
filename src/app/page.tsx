@@ -28,13 +28,16 @@ interface JobOffer {
 
 /* ─── Mosaïque du hero : plusieurs métiers ───────────── */
 const U = (id: string) => `https://images.unsplash.com/${id}?w=600&auto=format&fit=crop&q=75`;
+/* Chaque tuile : photo locale WebP (public/images/sectors/) ; tant qu'elle est absente,
+   l'ancienne photo (fallback) s'affiche. Voir public/images/sectors/README.md. */
+const L = (file: string) => `/images/sectors/${file}.webp`;
 const MOSAIC = (m: Record<string, string>) => [
-  { label: m.construction, src: U("photo-1504307651254-35680f356dfd"), pos: "center 25%" },
-  { label: m.health,        src: U("photo-1576091160550-2173dba999ef"), pos: "center 30%" },
-  { label: m.transport,    src: U("photo-1601584115197-04ecc0da31d7"), pos: "center 40%" },
-  { label: m.industry,    src: U("photo-1565793298595-6a879b1d9492"), pos: "center 60%" },
-  { label: m.logistics,   src: U("photo-1586528116311-ad8dd3c8310d"), pos: "center center" },
-  { label: m.office,       src: U("photo-1556761175-5973dc0f32e7"),    pos: "center center" },
+  { label: m.construction, local: L("construction"), src: U("photo-1504307651254-35680f356dfd"), pos: "center 25%" },
+  { label: m.health,       local: L("sante"),        src: U("photo-1576091160550-2173dba999ef"), pos: "center 30%" },
+  { label: m.transport,    local: L("transport"),    src: U("photo-1601584115197-04ecc0da31d7"), pos: "center 40%" },
+  { label: m.industry,     local: L("industrie"),    src: U("photo-1565793298595-6a879b1d9492"), pos: "center 60%" },
+  { label: m.logistics,    local: L("logistique"),   src: U("photo-1586528116311-ad8dd3c8310d"), pos: "center center" },
+  { label: m.office,       local: L("bureau"),       src: U("photo-1556761175-5973dc0f32e7"),    pos: "center center" },
 ];
 
 /* ─── Secteurs (extensible : ajouter une ligne) ──────── */
@@ -126,9 +129,8 @@ export default async function HomePage() {
               {MOSAIC(t.mosaic).map((m, i) => (
                 <div key={m.label}
                   className={`relative overflow-hidden rounded-xl sm:rounded-2xl h-28 sm:h-44 lg:h-52 ${i % 3 === 1 ? "lg:translate-y-6" : ""}`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={m.src} alt="" loading={i < 3 ? "eager" : "lazy"}
-                    className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: m.pos }} />
+                  <div aria-hidden className="absolute inset-0 w-full h-full bg-cover"
+                    style={{ backgroundImage: `url(${m.local}), url(${m.src})`, backgroundPosition: m.pos }} />
                   <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0B1630]/80 to-transparent" />
                   <span className="absolute left-2 bottom-2 text-[10px] sm:text-xs font-bold text-white uppercase tracking-wide">{m.label}</span>
                 </div>

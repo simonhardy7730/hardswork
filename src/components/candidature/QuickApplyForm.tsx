@@ -5,6 +5,8 @@ import { Loader2, CheckCircle2, Info } from "lucide-react";
 import { useL } from "@/lib/i18n/context";
 import Turnstile from "@/components/security/Turnstile";
 import CvPicker, { postBody } from "./CvPicker";
+import BirthField from "./BirthField";
+import { ageFromBirthDate, MIN_AGE } from "@/lib/candidate/age";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
 
 interface Prefill { first_name: string; last_name: string; phone: string; email: string; slots: string[] }
@@ -35,6 +37,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
   const [error, setError] = useState("");
   const [captcha, setCaptcha] = useState("");
   const [cv, setCv] = useState<File | null>(null);
+  const [birth, setBirth] = useState("");
   const [done, setDone] = useState(false);
 
   const toggle = (k: string) => setSlots((s) => (s.includes(k) ? s.filter((x) => x !== k) : [...s, k]));
@@ -43,6 +46,8 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    const a = ageFromBirthDate(birth);
+    if (a === null || a < MIN_AGE) { setError(l(`Il faut avoir au moins ${MIN_AGE} ans pour postuler.`, `Je moet minstens ${MIN_AGE} jaar zijn om te solliciteren.`)); return; }
     if (!interest) { setError(l("Confirmez votre intérêt pour l'offre.", "Bevestig je interesse voor het aanbod.")); return; }
     setLoading(true); setError("");
     const { body, headers } = postBody({
@@ -52,6 +57,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
         applicant_email: f.email || null,
         cover_message: msg || null,
         turnstile_token: captcha,
+        birth_date: birth,
         availability_slots: slots,
         interest_confirmed: true,
         quick_apply: true,
@@ -155,6 +161,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
         </div>
         <input required type="tel" inputMode="tel" className={`${input} mb-3`} value={f.phone} autoComplete="tel" placeholder={l("Téléphone * (+32 4XX XX XX XX)", "Telefoon * (+32 4XX XX XX XX)")} onChange={(e) => setF({ ...f, phone: e.target.value })} />
         <input type="email" inputMode="email" className={`${input} mb-3`} value={f.email} autoComplete="email" placeholder={l("Email (optionnel)", "E-mail (optioneel)")} onChange={(e) => setF({ ...f, email: e.target.value })} />
+        <div className="mb-3"><BirthField value={birth} onChange={setBirth} /></div>
         <textarea rows={2} className={`${input} resize-none`} value={msg} maxLength={300} placeholder={l("Un mot pour l'employeur (optionnel)", "Een woordje voor de werkgever (optioneel)")} onChange={(e) => setMsg(e.target.value.slice(0, 300))} />
       </section>
 

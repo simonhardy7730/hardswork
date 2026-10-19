@@ -145,6 +145,8 @@ export interface Application {
   quick_apply?: boolean;
   /** Ajouté côté serveur pour la vue « toutes les offres » */
   job_title?: string;
+  /** Migration 021 */
+  birth_date?: string | null;
 }
 
 export interface Subscription {

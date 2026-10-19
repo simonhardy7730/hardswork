@@ -4,15 +4,44 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Bell } from "lucide-react";
 import { formatRelative } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 import type { User } from "@/lib/supabase/types";
 import { useL, useLang } from "@/lib/i18n/context";
 
 export interface Notif { id: string; name: string; job: string; offerId: string; at: string }
 
-export default function DashboardTopbar({ user, notifications = [], total = 0 }: { user: User; notifications?: Notif[]; total?: number }) {
+export default function DashboardTopbar({ user, notifications: initialNotifs = [], total: initialTotal = 0 }: { user: User; notifications?: Notif[]; total?: number }) {
   const l = useL();
   const lang = useLang();
   const [open, setOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notif[]>(initialNotifs);
+  const [total, setTotal] = useState(initialTotal);
+
+  /* Le menu du dashboard reste affiché quand on change de page : on rafraîchit la cloche
+     toutes les 60 s, au retour sur l'onglet et à l'ouverture (sinon une candidature reçue entre-temps n'apparaît pas). */
+  useEffect(() => {
+    let alive = true;
+    async function refresh() {
+      const { data, count, error } = await createClient()
+        .from("applications")
+        .select("id, applicant_name, applied_at, job_offer_id, job_offers(title)", { count: "exact" })
+        .eq("status", "nouveau")
+        .order("applied_at", { ascending: false })
+        .limit(5);
+      if (!alive || error || !data) return;
+      setNotifications(data.map((a) => {
+        const j = a.job_offers as unknown as { title?: string } | { title?: string }[] | null;
+        return { id: a.id as string, name: a.applicant_name as string, job: (Array.isArray(j) ? j[0]?.title : j?.title) ?? "", offerId: a.job_offer_id as string, at: a.applied_at as string };
+      }));
+      setTotal(count ?? data.length);
+    }
+    refresh();
+    const timer = setInterval(refresh, 60_000);
+    const onFocus = () => { if (document.visibilityState === "visible") refresh(); };
+    document.addEventListener("visibilitychange", onFocus);
+    window.addEventListener("focus", onFocus);
+    return () => { alive = false; clearInterval(timer); document.removeEventListener("visibilitychange", onFocus); window.removeEventListener("focus", onFocus); };
+  }, []);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!open) return;

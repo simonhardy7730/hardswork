@@ -6,6 +6,7 @@ import type { Application } from "@/lib/supabase/types";
 import { useL } from "@/lib/i18n/context";
 import { getCvState, requestCv, getCvUrl, type CvState } from "@/app/(dashboard)/dashboard/candidatures/actions";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
+import { ageFromBirthDate } from "@/lib/candidate/age";
 
 interface Props {
   application: Application;
@@ -82,6 +83,9 @@ export default function ProfileModal({ application: app, hasSubscription, onClos
           <div className="min-w-0">
             <h3 className="font-display font-black uppercase text-ink text-lg leading-tight truncate">{app.applicant_name}</h3>
             {app.job_title && <p className="text-xs text-ink-500 mt-0.5 truncate">{app.job_title}</p>}
+            {app.birth_date && ageFromBirthDate(app.birth_date) !== null && (
+              <p className="text-xs text-ink-500 mt-0.5">{ageFromBirthDate(app.birth_date)} {l("ans", "jaar")}</p>
+            )}
           </div>
           <button onClick={onClose} aria-label={l("Fermer", "Sluiten")} className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-300 hover:bg-surface-2 shrink-0">
             <X size={16} />

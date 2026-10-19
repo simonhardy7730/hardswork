@@ -12,6 +12,7 @@ import { formatRelative } from "@/lib/utils";
 import type { Application, ApplicationStatus } from "@/lib/supabase/types";
 import { COLUMNS } from "./KanbanBoard";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
+import { ageFromBirthDate } from "@/lib/candidate/age";
 import { useL, useLang } from "@/lib/i18n/context";
 
 interface Props {
@@ -88,7 +89,9 @@ export default function KanbanCard({
   const initials = `${parts[0]?.[0] ?? ""}${parts[1]?.[0] ?? ""}`.toUpperCase();
 
   /* Tags compétences */
+  const age = app.birth_date ? ageFromBirthDate(app.birth_date) : null;
   const tags: string[] = [
+    ...(age !== null ? [`${age} ${l("ans", "jaar")}`] : []),
     ...(app.licenses ?? []),
     ...(app.caces_types ?? []).map(c => `CACES ${c}`),
   ].slice(0, 4);

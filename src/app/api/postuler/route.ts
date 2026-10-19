@@ -5,6 +5,7 @@ import { render } from "@react-email/render";
 import CandidatureConfirmationEmail from "@/emails/CandidatureConfirmation";
 import NouvelleCandiatureRecruteurEmail from "@/emails/NouvelleCandiatureRecruteur";
 import { allow, clientKey, verifyTurnstile } from "@/lib/security/abuse";
+import { ageFromBirthDate, MIN_AGE } from "@/lib/candidate/age";
 
 export async function POST(req: NextRequest) {
   const supabaseAdmin = createClient(
@@ -49,6 +50,11 @@ export async function POST(req: NextRequest) {
     const caces_types = list(body?.caces_types, 10);
     const cover_message = str(body?.cover_message, 300);
     const quick_apply = body?.quick_apply === true;
+    const birth_date = str(body?.birth_date, 10);
+    const age = ageFromBirthDate(birth_date);
+    if (age === null || age < MIN_AGE) {
+      return NextResponse.json({ error: "age" }, { status: 400 });
+    }
 
     const DAY_OK = ["mon", "tue", "wed", "thu", "fri", "sat", "sun", "holiday"];
     const SLOT_OK = ["morning", "afternoon", "evening", "night"];
@@ -100,6 +106,7 @@ export async function POST(req: NextRequest) {
         caces_types: caces_types || [],
         cover_message: cover_message || null,
         status: "nouveau",
+        birth_date,
     };
     let { data: application, error: insertError } = await supabaseAdmin
       .from("applications")
@@ -109,6 +116,18 @@ export async function POST(req: NextRequest) {
     // Migration 011 pas encore appliquée : on enregistre sans les nouveaux champs.
     if (insertError && quick_apply && /availability_slots|interest_confirmed|quick_apply/.test(insertError.message ?? "")) {
       ({ data: application, error: insertError } = await supabaseAdmin.from("applications").insert(baseRow).select().single());
+    }
+
+    // Migration 021 pas encore appliquée : on enregistre sans la date de naissance.
+    if (insertError && /birth_date/.test(insertError.message ?? "")) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { birth_date: _omit, ...withoutBirth } = baseRow;
+      const row = quick_apply ? { ...withoutBirth, availability_slots: slotsClean, interest_confirmed: true, quick_apply: true } : withoutBirth;
+      ({ data: application, error: insertError } = await supabaseAdmin.from("applications").insert(row as typeof withoutBirth).select().single());
+      if (insertError && quick_apply && /availability_slots|interest_confirmed|quick_apply/.test(insertError.message ?? "")) {
+        ({ data: application, error: insertError } = await supabaseAdmin.from("applications").insert(withoutBirth).select().single());
+      }
+      if (!insertError) console.error("applications.birth_date manquante : lancer la migration 021");
     }
 
     if (insertError) {
@@ -176,11 +195,17 @@ export async function POST(req: NextRequest) {
     // On les attend (pour qu'ils partent réellement sur Vercel) mais on tolère leur échec.
     const sends: Promise<unknown>[] = [];
 
-    if (orgEmail) {
+    // Destinataires : l'e-mail de l'organisation, sinon (ou en plus) les administrateurs et recruteurs du compte.
+    const { data: staff } = await supabaseAdmin
+      .from("users").select("email").eq("organization_id", jobData.organization_id).in("role", ["admin", "recruiter"]);
+    const recipients = Array.from(new Set([orgEmail, ...(staff ?? []).map((u) => u.email as string)]
+      .filter((e): e is string => typeof e === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)).map((e) => e.toLowerCase()))).slice(0, 5);
+
+    if (recipients.length > 0) {
       sends.push(resend.emails
         .send({
           from: `${FROM_NAME} <${FROM_EMAIL}>`,
-          to: orgEmail,
+          to: recipients,
           subject: `🔔 Nouvelle candidature — ${applicant_name} pour ${jobData.title}`,
           html: await render(
             NouvelleCandiatureRecruteurEmail({
@@ -199,6 +224,7 @@ export async function POST(req: NextRequest) {
             })
           ),
         })
+        .then((r) => { if (r.error) console.error("Recruiter email error:", r.error); })
         .catch((err: unknown) => console.error("Recruiter email error:", err)));
     }
 
@@ -219,6 +245,7 @@ export async function POST(req: NextRequest) {
             })
           ),
         })
+        .then((r) => { if (r.error) console.error("Candidate email error:", r.error); })
         .catch((err: unknown) => console.error("Candidate email error:", err)));
     }
 

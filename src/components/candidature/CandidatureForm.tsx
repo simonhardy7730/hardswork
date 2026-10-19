@@ -5,6 +5,8 @@ import { Loader2, Phone, User, Mail, CheckCircle2 } from "lucide-react";
 import { useL } from "@/lib/i18n/context";
 import Turnstile from "@/components/security/Turnstile";
 import CvPicker, { postBody } from "./CvPicker";
+import BirthField from "./BirthField";
+import { ageFromBirthDate, MIN_AGE } from "@/lib/candidate/age";
 
 interface Props {
   jobId: string;
@@ -31,6 +33,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
   const [error, setError] = useState("");
   const [captcha, setCaptcha] = useState("");
   const [cv, setCv] = useState<File | null>(null);
+  const [birth, setBirth] = useState("");
 
   const [form, setForm] = useState({
     first_name: "",
@@ -59,6 +62,8 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const a = ageFromBirthDate(birth);
+    if (a === null || a < MIN_AGE) { setError(l(`Il faut avoir au moins ${MIN_AGE} ans pour postuler.`, `Je moet minstens ${MIN_AGE} jaar zijn om te solliciteren.`)); return; }
     setLoading(true);
     setError("");
 
@@ -73,6 +78,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
         caces_types: form.caces_types,
         cover_message: form.cover_message || null,
         turnstile_token: captcha,
+        birth_date: birth,
       }, cv);
     const res = await fetch("/api/postuler", { method: "POST", headers, body });
 
@@ -204,6 +210,8 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
           />
         </div>
       </div>
+
+      <BirthField value={birth} onChange={setBirth} />
 
       {/* Disponibilité */}
       <div>

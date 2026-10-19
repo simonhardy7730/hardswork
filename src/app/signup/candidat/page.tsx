@@ -12,7 +12,6 @@ import {
   Shield, Sparkles, Briefcase,
 } from "lucide-react";
 import { HardSworkLogo, HardieIcon } from "@/components/ui/HardieIcon";
-import GoogleButton from "@/components/auth/GoogleButton";
 import PreferencesFields from "@/components/candidat/PreferencesFields";
 import { EMPTY_PREFERENCES, type Preferences } from "@/lib/candidate/preferences";
 import { useLang } from "@/lib/i18n/context";
@@ -640,22 +639,6 @@ export default function CandidatSignupPage() {
                 {l("Créer un compte recruteur", "Een werkgeversaccount aanmaken")}
               </Link>
             </p>
-          )}
-
-          {step === 3 && (
-            <>
-              <div className="relative my-3">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-ink-100" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-[#FFFBF2] px-3 text-[10px] text-ink-300 uppercase tracking-widest">
-                    {l("ou", "of")}
-                  </span>
-                </div>
-              </div>
-              <GoogleButton redirectTo="/candidat/dashboard" label={l("Inscription avec Google", "Registreren met Google")} dark={false} />
-            </>
           )}
 
           {error && step !== 3 && (

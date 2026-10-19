@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
-import GoogleButton from "@/components/auth/GoogleButton";
 import { useL } from "@/lib/i18n/context";
 
 export default function LoginPage() {
@@ -145,19 +144,6 @@ export default function LoginPage() {
             }
           </button>
         </form>
-
-        <div className="relative my-5">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/[0.08]" />
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-transparent px-3 text-[11px] text-white/25 uppercase tracking-widest">
-              {l("ou", "of")}
-            </span>
-          </div>
-        </div>
-
-        <GoogleButton redirectTo="/dashboard" />
 
         <p className="text-center text-sm text-white/30 mt-5">
           {l("Pas encore de compte ?", "Nog geen account?")}{" "}

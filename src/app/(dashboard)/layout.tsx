@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import DashboardSidebar from "@/components/dashboard/Sidebar";
 import DashboardTopbar from "@/components/dashboard/Topbar";
 import { getSpace } from "@/lib/auth/space";
+import { getOrgAccess } from "@/lib/billing/access";
+import TrialBanner from "@/components/dashboard/TrialBanner";
 
 export default async function DashboardLayout({
   children,
@@ -24,11 +26,14 @@ export default async function DashboardLayout({
 
   if (!profile) redirect((await getSpace()) === "candidate" ? "/candidat/dashboard" : "/onboarding");
 
+  const access = await getOrgAccess(supabase, profile.organization_id);
+
   return (
     <div className="flex h-screen bg-surface overflow-hidden">
       <DashboardSidebar org={profile.organizations as never} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <DashboardTopbar user={profile} />
+        <TrialBanner access={access} />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>

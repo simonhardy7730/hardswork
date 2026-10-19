@@ -392,7 +392,7 @@ function NormalSignup() {
                   style={{ background: loading ? "#FFD97A" : "#FFB900", fontFamily: "var(--font-display, sans-serif)" }}>
                   {loading
                     ? <Loader2 size={16} className="animate-spin" />
-                    : <><span>{l("Créer mon compte gratuitement", "Mijn account gratis aanmaken")}</span><ArrowRight size={15} strokeWidth={2.5} /></>}
+                    : <><span>{l("Démarrer mes 7 jours d'essai", "Mijn 7 proefdagen starten")}</span><ArrowRight size={15} strokeWidth={2.5} /></>}
                 </button>
 
                 <p className="text-center text-sm text-gray-400">

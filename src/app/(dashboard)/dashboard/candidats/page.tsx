@@ -1,3 +1,4 @@
+import { getOrgAccess, redactContacts } from "@/lib/billing/access";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import CandidatsList from "@/components/candidats/CandidatsList";
@@ -31,15 +32,8 @@ export default async function CandidatsPage(
 
   const orgId = profile.organization_id;
 
-  /* ── Vérifier l'abonnement ──────────────────────────── */
-  const { data: sub } = await supabase
-    .from("subscriptions")
-    .select("plan, status")
-    .eq("organization_id", orgId)
-    .in("status", ["active", "trial"])
-    .maybeSingle();
-
-  const hasSubscription = sub !== null && (sub.plan === "pro" || sub.plan === "agency" || sub.status === "trial");
+  /* ── Accès (essai en cours ou abonnement) — horloge du serveur ── */
+  const { hasAccess: hasSubscription } = await getOrgAccess(supabase, orgId);
 
   /* ── Requête candidats ──────────────────────────────── */
   let query = supabase
@@ -81,7 +75,7 @@ export default async function CandidatsPage(
 
   return (
     <CandidatsList
-      candidats={(candidats ?? []) as Candidate[]}
+      candidats={redactContacts((candidats ?? []) as Candidate[], hasSubscription)}
       total={total ?? 0}
       searchParams={searchParams}
       offresActives={offresActives ?? []}

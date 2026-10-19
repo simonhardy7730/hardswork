@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import SettingsPage from "@/components/settings/SettingsPage";
 import type { Organization, User, Subscription } from "@/lib/supabase/types";
+import { evaluateAccess, publicPrice, isLaunchOfferActive, type SubscriptionRow } from "@/lib/billing/pricing";
 
 export default async function SettingsRoute() {
   const supabase = await createClient();
@@ -43,12 +44,30 @@ export default async function SettingsRoute() {
     .gt("expires_at", new Date().toISOString())
     .order("created_at", { ascending: false });
 
+  const now = new Date(); // horloge du serveur
+  const access = evaluateAccess((subscription as SubscriptionRow | null) ?? null, now);
+  const sub = subscription as Subscription | null;
+  const founderActive =
+    !!sub?.founder_price_cents && !!sub.founder_price_ends_at && new Date(sub.founder_price_ends_at).getTime() > now.getTime();
+  const billing = {
+    hasAccess: access.hasAccess,
+    state: access.state,
+    trialDaysLeft: access.trialDaysLeft,
+    trialEndsAtIso: access.trialEndsAt ? access.trialEndsAt.toISOString() : null,
+    pro: publicPrice("pro", now),
+    agency: publicPrice("agency", now),
+    launch: isLaunchOfferActive(now),
+    founderPrice: founderActive ? (sub!.founder_price_cents as number) / 100 : null,
+    founderEndsAtIso: founderActive ? (sub!.founder_price_ends_at as string) : null,
+  };
+
   return (
     <SettingsPage
       org={org as Organization}
       currentUser={profile as User}
       members={(members ?? []) as User[]}
       subscription={subscription as Subscription | null}
+      billing={billing}
       invites={(invites ?? []) as { id: string; email: string; role: string; expires_at: string }[]}
     />
   );

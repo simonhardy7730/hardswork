@@ -35,6 +35,22 @@ interface Props {
   members: User[];
   subscription: Subscription | null;
   invites: { id: string; email: string; role: string; expires_at: string }[];
+  /** Calculé côté serveur (horloge du serveur) */
+  billing: BillingView;
+}
+
+export interface BillingView {
+  hasAccess: boolean;
+  state: "trial" | "trial_expired" | "active" | "cancelled_running" | "ended" | "none";
+  trialDaysLeft: number;
+  trialEndsAtIso: string | null;
+  /** Prix mensuel HT à payer aujourd'hui pour chaque formule */
+  pro: { price: number; strikethrough: number | null; discount: number | null };
+  agency: { price: number; strikethrough: number | null; discount: number | null };
+  launch: boolean;
+  /** Tarif verrouillé de l'abonnement en cours (€), s'il existe */
+  founderPrice: number | null;
+  founderEndsAtIso: string | null;
 }
 
 type Tab = "organisation" | "equipe" | "abonnement" | "personnalisation";
@@ -57,24 +73,6 @@ const ROLE_COLORS: Record<UserRole, string> = {
   recruiter: "bg-green-100 text-green-700",
   viewer: "bg-gray-100 text-gray-600",
 };
-
-const PLAN_LABELS: Record<string, string> = {
-  starter: "Starter",
-  pro: "Pro",
-  agency: "Agency",
-};
-
-const PLAN_PRICES: Record<string, string> = {
-  starter: "79 €/mois",
-  pro: "149 €/mois",
-  agency: "299 €/mois",
-};
-
-const planFeatures = (l: (fr: string, nl: string) => string): Record<string, string[]> => ({
-  starter: [l("1 recruteur", "1 recruiter"), l("5 offres actives", "5 actieve vacatures"), l("50 candidats", "50 kandidaten")],
-  pro: [l("3 recruteurs", "3 recruiters"), l("Offres illimitées", "Onbeperkt vacatures"), l("Candidats illimités", "Onbeperkt kandidaten"), l("Matching auto", "Automatische matching")],
-  agency: [l("Recruteurs illimités", "Onbeperkt recruiters"), l("Multi-clients", "Meerdere klanten"), l("Tableau de bord avancé", "Geavanceerd dashboard"), l("Support prioritaire", "Prioritaire ondersteuning")],
-});
 
 function Alert({
   type,
@@ -607,165 +605,163 @@ function TeamTab({
 }
 
 // ── Tab: Abonnement ──────────────────────────────────────
-function SubscriptionTab({ subscription }: { subscription: Subscription | null }) {
+function SubscriptionTab({ subscription, billing }: { subscription: Subscription | null; billing: BillingView }) {
   const l = useL();
   const lang = useLang();
-  const PLAN_FEATURES = planFeatures(l);
-  const plan = subscription?.plan ?? "starter";
-  const status = subscription?.status ?? "trial";
+  const locale = lang === "nl" ? "nl-BE" : "fr-BE";
+  const fmt = (iso: string | null) =>
+    iso ? new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" }) : null;
 
-  const trialDaysLeft = subscription?.trial_ends_at
-    ? Math.max(
-        0,
-        Math.ceil(
-          (new Date(subscription.trial_ends_at).getTime() - Date.now()) /
-            86_400_000
-        )
-      )
-    : 0;
+  const plan = subscription?.plan ?? "pro";
+  const planName = plan === "agency" ? l("Agence", "Kantoor") : "Pro";
+  const state = billing.state;
+  const periodEnd = fmt(subscription?.current_period_end ?? null);
+  const trialEnd = fmt(billing.trialEndsAtIso);
+  const mailto = (subject: string) => `mailto:hello@wolko.be?subject=${encodeURIComponent(subject)}`;
 
-  const periodEnd = subscription?.current_period_end
-    ? new Date(subscription.current_period_end).toLocaleDateString(lang === "nl" ? "nl-BE" : "fr-BE", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : null;
+  const statusBadge =
+    state === "trial"
+      ? { cls: "bg-amber-100 text-amber-700", txt: l("Essai gratuit", "Gratis proef") }
+      : state === "active"
+      ? { cls: "bg-green-100 text-green-700", txt: l("Actif", "Actief") }
+      : state === "cancelled_running"
+      ? { cls: "bg-amber-100 text-amber-700", txt: l("Résilié (accès jusqu'à la fin de période)", "Opgezegd (toegang tot einde periode)") }
+      : { cls: "bg-red-100 text-red-600", txt: state === "trial_expired" ? l("Essai terminé", "Proef afgelopen") : l("Aucun abonnement actif", "Geen actief abonnement") };
+
+  const cards: { id: "pro" | "agency"; name: string; feats: string[] }[] = [
+    {
+      id: "pro",
+      name: "Pro",
+      feats: [l("Offres illimitées", "Onbeperkt vacatures"), l("Coordonnées des candidats", "Contactgegevens van kandidaten"), l("Candidathèque", "Kandidatendatabank")],
+    },
+    {
+      id: "agency",
+      name: l("Agence", "Kantoor"),
+      feats: [l("Clients et missions", "Klanten en opdrachten"), l("ATS de recrutement", "ATS voor werving"), l("Équipe et rôles", "Team en rollen")],
+    },
+  ];
 
   return (
     <div className="space-y-6">
-      {/* Current plan */}
       <div className="bg-white rounded-xl border border-ink-100 p-6">
-        <h2 className="text-base font-semibold text-ink mb-4">
-          {l("Abonnement actuel", "Huidig abonnement")}
-        </h2>
+        <h2 className="text-base font-semibold text-ink mb-4">{l("Abonnement actuel", "Huidig abonnement")}</h2>
 
         <div className="flex items-start gap-4 p-4 bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl mb-4">
           <div className="w-10 h-10 bg-brand rounded-xl flex items-center justify-center shrink-0">
-            <CreditCard size={18} className="text-white" />
+            <CreditCard size={18} className="text-[#101F43]" />
           </div>
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-0.5">
+            <div className="flex items-center gap-2 flex-wrap mb-0.5">
               <p className="font-bold text-ink text-lg">
-                {l("Plan", "Abonnement")} {PLAN_LABELS[plan]}
+                {state === "active" || state === "cancelled_running" ? `${l("Formule", "Formule")} ${planName}` : l("Essai gratuit de 7 jours", "Gratis proef van 7 dagen")}
               </p>
-              <span
-                className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                  status === "trial"
-                    ? "bg-amber-100 text-amber-700"
-                    : status === "active"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-600"
-                }`}
-              >
-                {status === "trial"
-                  ? l("Période d'essai", "Proefperiode")
-                  : status === "active"
-                  ? l("Actif", "Actief")
-                  : l("Annulé", "Geannuleerd")}
-              </span>
+              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge.cls}`}>{statusBadge.txt}</span>
             </div>
-            <p className="text-sm text-ink-500">{PLAN_PRICES[plan]}</p>
+            {(state === "active" || state === "cancelled_running") && subscription?.monthly_price_cents ? (
+              <p className="text-sm text-ink-500">{(subscription.monthly_price_cents / 100).toLocaleString(locale)} € {l("/mois HT", "/maand excl. btw")}</p>
+            ) : null}
           </div>
         </div>
 
-        {/* Trial countdown */}
-        {status === "trial" && (
+        {state === "trial" && (
           <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg mb-4">
             <span className="text-xl">⏳</span>
-            <div>
-              <p className="text-sm font-medium text-amber-800">
-                {trialDaysLeft > 0
-                  ? l(`Il vous reste ${trialDaysLeft} jour${trialDaysLeft > 1 ? "s" : ""} de période d'essai`, `Nog ${trialDaysLeft} ${trialDaysLeft > 1 ? "dagen" : "dag"} proefperiode`)
-                  : l("Votre période d'essai est terminée", "Uw proefperiode is afgelopen")}
-              </p>
-            </div>
+            <p className="text-sm font-medium text-amber-800">
+              {l(
+                `Il vous reste ${billing.trialDaysLeft} jour${billing.trialDaysLeft > 1 ? "s" : ""} d'essai`,
+                `Nog ${billing.trialDaysLeft} ${billing.trialDaysLeft > 1 ? "dagen" : "dag"} proefperiode`
+              )}
+              {trialEnd ? l(` — fin de l'essai le ${trialEnd}`, ` — einde proefperiode op ${trialEnd}`) : ""}
+            </p>
           </div>
         )}
 
-        {/* Renewal date */}
-        {status === "active" && periodEnd && (
-          <p className="text-xs text-ink-300 mb-4">
+        {(state === "trial_expired" || state === "ended") && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-4 text-sm text-red-700">
+            {state === "trial_expired"
+              ? l("Votre essai gratuit est terminé. Vos données sont conservées. Choisissez un abonnement pour continuer à publier des offres et à contacter les candidats.",
+                  "Je gratis proefperiode is afgelopen. Je gegevens blijven bewaard. Kies een abonnement om vacatures te blijven publiceren en kandidaten te contacteren.")
+              : l("Vous n'avez pas d'abonnement actif. Vos données sont conservées. Choisissez un abonnement pour retrouver l'accès complet.",
+                  "Je hebt geen actief abonnement. Je gegevens blijven bewaard. Kies een abonnement om weer volledige toegang te krijgen.")}
+          </div>
+        )}
+
+        {state === "active" && periodEnd && (
+          <p className="text-xs text-ink-300 mb-2">
             {l("Prochain renouvellement le", "Volgende verlenging op")} <strong>{periodEnd}</strong>
           </p>
         )}
-
-        {/* Features */}
-        <ul className="space-y-2 mb-4">
-          {PLAN_FEATURES[plan].map((feat) => (
-            <li key={feat} className="flex items-center gap-2 text-sm text-[#475569]">
-              <Check size={14} className="text-green-500 shrink-0" />
-              {feat}
-            </li>
-          ))}
-        </ul>
+        {(state === "active" || state === "cancelled_running") && billing.founderPrice !== null && billing.founderEndsAtIso && (
+          <p className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+            {l(
+              `Tarif de lancement conservé jusqu'au ${fmt(billing.founderEndsAtIso)} (${billing.founderPrice} €/mois HT).`,
+              `Lanceringstarief behouden tot ${fmt(billing.founderEndsAtIso)} (${billing.founderPrice} €/maand excl. btw).`
+            )}
+          </p>
+        )}
       </div>
 
-      {/* Upgrade CTA */}
-      {plan !== "agency" && (
-        <div className="bg-gradient-to-br from-brand to-[#3B82F6] rounded-xl p-6 text-white">
-          <h3 className="font-bold text-lg mb-1">
-            {plan === "starter" ? l("Passez au plan Pro", "Neem het Pro-abonnement") : l("Passez au plan Agency", "Neem het Agency-abonnement")}
-          </h3>
-          <p className="text-blue-100 text-sm mb-4">
-            {plan === "starter"
-              ? l("Débloquez le matching automatique, les offres illimitées et plus encore.", "Ontgrendel automatische matching, onbeperkt vacatures en meer.")
-              : l("Gérez plusieurs clients, des recruteurs illimités et un support prioritaire.", "Beheer meerdere klanten, onbeperkt recruiters en prioritaire ondersteuning.")}
-          </p>
-          <button className="flex items-center gap-2 bg-white text-brand font-semibold px-5 py-2.5 rounded-lg hover:bg-blue-50 transition text-sm">
-            <ExternalLink size={14} />
-            {l("Voir les offres", "Abonnementen bekijken")}
-          </button>
-        </div>
-      )}
-
-      {/* All plans comparison */}
+      {/* Formules */}
       <div className="bg-white rounded-xl border border-ink-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-[#F1F5F9]">
-          <h3 className="text-sm font-semibold text-ink">
-            {l("Comparatif des formules", "Vergelijking van de formules")}
-          </h3>
+          <h3 className="text-sm font-semibold text-ink">{l("Nos formules", "Onze formules")}</h3>
+          {billing.launch && (
+            <p className="text-xs text-[#B87C2A] font-bold mt-0.5">
+              {l("Offre de lancement jusqu'au 31 décembre 2026 — tarif conservé 12 mois à compter de la souscription.", "Lanceringsaanbod tot 31 december 2026 — tarief behouden gedurende 12 maanden vanaf onderschrijving.")}
+            </p>
+          )}
         </div>
-        <div className="grid grid-cols-3 divide-x divide-[#F1F5F9]">
-          {(["starter", "pro", "agency"] as const).map((p) => (
-            <div
-              key={p}
-              className={`p-4 ${p === plan ? "bg-[#EFF6FF]" : ""}`}
-            >
-              <div className="flex items-center gap-1.5 mb-1">
-                {p === plan && <Check size={12} className="text-brand" />}
-                <p className="text-sm font-bold text-ink">
-                  {PLAN_LABELS[p]}
+        <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-[#F1F5F9]">
+          {cards.map((c) => {
+            const pr = billing[c.id];
+            return (
+              <div key={c.id} className={`p-5 ${c.id === plan ? "bg-[#FFFBF2]" : ""}`}>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm font-bold text-ink">{c.name}</p>
+                  {pr.discount !== null && (
+                    <span className="text-[10px] font-black uppercase bg-[#101F43] text-brand rounded-full px-2 py-0.5">−{pr.discount} %</span>
+                  )}
+                </div>
+                <p className="mb-3">
+                  {pr.strikethrough !== null && <span className="text-xs text-ink-300 line-through mr-1.5">{pr.strikethrough} €</span>}
+                  <span className="text-xl font-black text-[#101F43]">{pr.price} €</span>
+                  <span className="text-xs text-ink-500"> {l("/mois HT", "/maand excl. btw")}</span>
                 </p>
+                <ul className="space-y-1.5 mb-4">
+                  {c.feats.map((f) => (
+                    <li key={f} className="flex items-start gap-1.5 text-xs text-ink-500">
+                      <Check size={11} className="text-green-500 mt-0.5 shrink-0" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={mailto(l(`Souscription ${c.name} — WOLKO`, `Abonnement ${c.name} — WOLKO`))}
+                  className="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-[#101F43] font-bold px-4 py-2 rounded-lg transition text-xs"
+                >
+                  <ExternalLink size={12} />
+                  {billing.launch ? l("Profiter de l'offre de lancement", "Profiteer van het lanceringsaanbod") : l("Souscrire", "Onderschrijven")}
+                </a>
               </div>
-              <p className="text-xs font-medium text-brand mb-3">
-                {PLAN_PRICES[p]}
-              </p>
-              <ul className="space-y-1.5">
-                {PLAN_FEATURES[p].map((feat) => (
-                  <li key={feat} className="flex items-start gap-1.5 text-xs text-ink-500">
-                    <Check size={11} className="text-green-500 mt-0.5 shrink-0" />
-                    {feat}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+            );
+          })}
         </div>
+        <p className="px-6 py-3 text-[11px] text-ink-400 border-t border-[#F1F5F9]">
+          {l(
+            "Le paiement en ligne n'est pas encore activé : la souscription est finalisée avec notre équipe (hello@wolko.be). Aucun prélèvement sans votre accord explicite.",
+            "Online betalen is nog niet actief: je abonnement wordt afgerond met ons team (hello@wolko.be). Geen afschrijving zonder jouw uitdrukkelijke toestemming."
+          )}
+        </p>
       </div>
 
-      {/* Cancel */}
-      {status === "active" && (
+      {(state === "active" || state === "cancelled_running") && (
         <div className="bg-white rounded-xl border border-ink-100 p-6">
-          <h3 className="text-sm font-semibold text-ink mb-1">
-            {l("Résiliation", "Opzegging")}
-          </h3>
+          <h3 className="text-sm font-semibold text-ink mb-1">{l("Résiliation", "Opzegging")}</h3>
           <p className="text-sm text-ink-500 mb-3">
             {l("Vous pouvez résilier à tout moment. Votre accès reste actif jusqu'à la fin de la période facturée.", "U kunt op elk moment opzeggen. Uw toegang blijft actief tot het einde van de gefactureerde periode.")}
           </p>
-          <button className="text-sm text-red-500 hover:text-red-700 hover:underline transition">
-            {l("Résilier mon abonnement", "Mijn abonnement opzeggen")}
-          </button>
+          <a href={mailto(l("Résiliation de mon abonnement WOLKO", "Opzegging van mijn WOLKO-abonnement"))} className="text-sm text-red-500 hover:text-red-700 hover:underline transition">
+            {l("Demander la résiliation", "Opzegging aanvragen")}
+          </a>
         </div>
       )}
     </div>
@@ -993,7 +989,7 @@ function CustomizationTab({
 }
 
 // ── Main component ────────────────────────────────────────
-export default function SettingsPage({ org, currentUser, members, subscription, invites }: Props) {
+export default function SettingsPage({ org, currentUser, members, subscription, invites, billing }: Props) {
   const l = useL();
   const [activeTab, setActiveTab] = useState<Tab>("organisation");
 
@@ -1033,7 +1029,7 @@ export default function SettingsPage({ org, currentUser, members, subscription, 
         <TeamTab members={members} currentUser={currentUser} invites={invites} />
       )}
       {activeTab === "abonnement" && (
-        <SubscriptionTab subscription={subscription} />
+        <SubscriptionTab subscription={subscription} billing={billing} />
       )}
       {activeTab === "personnalisation" && (
         <CustomizationTab org={org} currentUser={currentUser} />

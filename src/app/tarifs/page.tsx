@@ -1,243 +1,260 @@
 import Link from "next/link";
-import { Check, ArrowRight, ChevronDown } from "lucide-react";
+import { Check, ArrowRight, ChevronDown, Sparkles } from "lucide-react";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { getDict } from "@/lib/i18n/server";
+import { CONTENT, type Bi } from "@/lib/billing/pricing-content";
+import { NETWORK_FROM_EUR, publicPrice, isLaunchOfferActive, type BillablePlan } from "@/lib/billing/pricing";
+
+// Les prix dépendent de la date : jamais de page figée, toujours l'horloge du serveur.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata() {
   const { lang } = await getDict();
   return lang === "nl"
-    ? { title: "Tarieven — Wolko", description: "Duidelijke wervingsplannen om de juiste profielen te vinden." }
-    : { title: "Tarifs — Wolko", description: "Des plans de recrutement clairs pour trouver les bons profils." };
+    ? { title: "Tarieven — Wolko", description: "Lanceringsaanbod tot 31 december 2026 en 7 dagen gratis proefperiode." }
+    : { title: "Tarifs — Wolko", description: "Offre de lancement jusqu'au 31 décembre 2026 et 7 jours d'essai gratuit." };
 }
 
-type L = (fr: string, nl: string) => string;
-
-function makePlans(l: L) {
-  return [
-    {
-      id: "starter",
-      name: l("Gratuit", "Gratis"),
-      price: "0",
-      description: l("Pour tester la plateforme", "Om het platform uit te proberen"),
-      cta: l("S'inscrire", "Registreren"),
-      href: "/recrute",
-      featured: false,
-      features: [
-        l("1 offre d'emploi active", "1 actieve vacature"),
-        l("Profils candidats illimités", "Onbeperkt kandidaatprofielen"),
-        l("Formulaire de candidature public", "Openbaar sollicitatieformulier"),
-        l("Tableau de bord basique", "Basis-dashboard"),
-      ],
-      locked: [l("Contacts candidats masqués", "Contactgegevens van kandidaten verborgen")],
-    },
-    {
-      id: "pro",
-      name: "Pro",
-      price: "89",
-      description: l("Pour les PME qui recrutent en direct", "Voor kmo's die rechtstreeks werven"),
-      cta: l("Choisir Pro", "Kies Pro"),
-      href: "/recrute",
-      featured: true,
-      features: [
-        l("Offres d'emploi illimitées", "Onbeperkt vacatures"),
-        l("Coordonnées des candidats débloquées", "Contactgegevens van kandidaten ontgrendeld"),
-        l("Candidathèque complète", "Volledige kandidatendatabank"),
-      ],
-      locked: [] as string[],
-    },
-    {
-      id: "agency",
-      name: l("Agence", "Kantoor"),
-      price: "249",
-      description: l("Pour les agences de recrutement", "Voor wervingskantoren"),
-      cta: l("Nous contacter", "Neem contact op"),
-      href: "mailto:hello@wolko.be",
-      featured: false,
-      features: [
-        l("Clients illimités", "Onbeperkt klanten"),
-        l("Gestion d'intérim", "Interimbeheer"),
-        l("Multi-sites", "Meerdere vestigingen"),
-      ],
-      locked: [] as string[],
-    },
-  ];
-}
-
-function makeFaqs(l: L) {
-  return [
-    {
-      q: l("Puis-je changer de plan à tout moment ?", "Kan ik op elk moment van plan veranderen?"),
-      a: l("Oui, sans engagement ni frais de résiliation. Votre abonnement reste actif jusqu'à la fin de la période payée.", "Ja, zonder verbintenis en zonder opzegkosten. Je abonnement blijft actief tot het einde van de betaalde periode."),
-    },
-    {
-      q: l("Quels secteurs couvrez-vous ?", "Welke sectoren dekken jullie?"),
-      a: l("Construction, logistique, transport, industrie, médical, sécurité, nettoyage, Horeca, Tech & IT — tous les métiers.", "Bouw, logistiek, transport, industrie, medisch, beveiliging, schoonmaak, horeca, tech & IT — alle beroepen."),
-    },
-    {
-      q: l("Les candidats paient-ils quelque chose ?", "Betalen kandidaten iets?"),
-      a: l("Non — Wolko est 100% gratuit pour les candidats. Ils créent leur profil et postulent aux offres.", "Nee — Wolko is 100% gratis voor kandidaten. Zij maken hun profiel aan en solliciteren op vacatures."),
-    },
-  ];
-}
+const MAIL = "hello@wolko.be";
+const mailto = (subject: string, body = "") =>
+  `mailto:${MAIL}?subject=${encodeURIComponent(subject)}${body ? `&body=${encodeURIComponent(body)}` : ""}`;
 
 export default async function TarifsPage() {
   const { lang } = await getDict();
-  const l: L = (fr, nl) => (lang === "nl" ? nl : fr);
-  const PLANS = makePlans(l);
-  const FAQS = makeFaqs(l);
+  const now = new Date(); // horloge du serveur
+  const launch = isLaunchOfferActive(now);
+  const t = (x: Bi) => (lang === "nl" ? x.nl : x.fr);
+  const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
+  const C = CONTENT;
+
+  const paid: { id: BillablePlan; featured: boolean }[] = [
+    { id: "pro", featured: true },
+    { id: "agency", featured: false },
+  ];
+
   return (
     <div className="min-h-screen bg-[#FFFBF2] font-body">
       <SiteNav />
 
       <div className="pt-[60px]">
+        {/* ── BANDEAU OFFRE DE LANCEMENT (disparaît le 1er janvier 2027) ── */}
+        {launch && (
+          <div className="bg-brand text-[#101F43] text-center px-4 py-3" data-testid="launch-banner">
+            <p className="font-display font-black uppercase text-[12px] sm:text-[13px] tracking-widest">{t(C.launchBanner.title)}</p>
+            <p className="text-[12px] sm:text-[13px] font-medium mt-0.5">{t(C.launchBanner.text)}</p>
+          </div>
+        )}
 
-        {/* ── HERO sombre ──────────────────────────────── */}
-        <div className="bg-[#101F43] py-20 text-center px-6">
+        {/* ── HERO ── */}
+        <div className="bg-[#101F43] pt-16 pb-24 text-center px-6">
           <h1
             className="font-display font-black text-white uppercase leading-[0.9] mb-5"
-            style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)", letterSpacing: "-0.02em" }}
+            style={{ fontSize: "clamp(2.3rem, 6vw, 5rem)", letterSpacing: "-0.02em" }}
           >
-            {l("Choisissez votre", "Kies je")} <span className="text-brand">{l("[plan]", "[plan]")}</span>
-            <br />{l("de recrutement.", "voor werving.")}
+            {t(C.heroTitle)} <span className="text-brand">{t(C.heroTitleAccent)}</span>
+            <br />{t(C.heroTitleEnd)}
           </h1>
-          <p className="text-white/45 text-base max-w-lg mx-auto leading-relaxed">
-            {l("Des outils simples et efficaces pour trouver les bons profils.", "Eenvoudige en efficiënte tools om de juiste profielen te vinden.")}
-          </p>
+          <p className="text-white/50 text-base max-w-lg mx-auto leading-relaxed">{t(C.heroText)}</p>
         </div>
 
-        {/* ── PLANS ────────────────────────────────────── */}
-        <div className="max-w-5xl mx-auto px-6 py-14">
-          <div className="grid md:grid-cols-3 gap-5">
-            {PLANS.map((plan) => (
-              <div
-                key={plan.id}
-                className={`rounded-2xl border overflow-hidden flex flex-col ${
-                  plan.featured
-                    ? "border-brand shadow-xl shadow-brand/10"
-                    : "border-ink-100 bg-white"
-                }`}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          {/* ── ENCART ESSAI 7 JOURS ── */}
+          <div
+            className="-mt-14 mb-10 rounded-3xl bg-white border border-brand/40 shadow-xl shadow-[#101F43]/10 p-6 sm:p-8 grid lg:grid-cols-[1.4fr_1fr] gap-6 items-center"
+            data-testid="trial-card"
+          >
+            <div>
+              <p className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-[#101F43] bg-brand rounded-full px-3 py-1 mb-3">
+                <Sparkles size={12} /> {l("Essai offert", "Gratis proef")}
+              </p>
+              <h2
+                className="font-display font-black text-[#101F43] uppercase leading-[0.95] mb-3"
+                style={{ fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)" }}
               >
-                {/* Badge featured */}
-                {plan.featured && (
-                  <div className="bg-brand text-white text-[10px] font-black uppercase tracking-widest text-center py-2.5">
-                    ⭐ {l("Le plus populaire", "Meest gekozen")}
-                  </div>
-                )}
-
-                <div className={`p-6 flex flex-col flex-1 ${plan.featured ? "bg-white" : ""}`}>
-                  {/* Nom */}
-                  <p className="font-display font-black text-ink-400 uppercase text-[11px] tracking-widest mb-3">
-                    {plan.name}
-                  </p>
-
-                  {/* Prix */}
-                  <div className="flex items-end gap-1 mb-1">
-                    <span
-                      className="font-display font-black text-ink leading-none"
-                      style={{ fontSize: "clamp(2.2rem, 4vw, 3rem)" }}
-                    >
-                      {plan.price}€
-                    </span>
-                    <span className="text-ink-400 text-sm mb-1.5">&nbsp;/{l("mois", "maand")}</span>
-                  </div>
-                  <p className="text-ink-400 text-xs mb-6">{plan.description}</p>
-
-                  {/* Features */}
-                  <ul className="space-y-2.5 mb-7 flex-1">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-sm text-ink-700">
-                        <Check size={14} className="text-brand shrink-0 mt-0.5" strokeWidth={3} />
-                        {f}
-                      </li>
-                    ))}
-                    {plan.locked.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-sm text-ink-300 line-through">
-                        <Check size={14} className="text-ink-100 shrink-0 mt-0.5" strokeWidth={2} />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* CTA */}
-                  <Link
-                    href={plan.href}
-                    className={`flex items-center justify-center gap-2 font-display font-black uppercase text-[13px] py-3.5 rounded-xl transition w-full ${
-                      plan.featured
-                        ? "bg-brand hover:bg-brand-dark text-white"
-                        : "border border-ink-200 text-ink hover:border-brand hover:text-brand"
-                    }`}
-                    style={{ letterSpacing: "0.05em" }}
-                  >
-                    {plan.cta}
-                    <ArrowRight size={13} />
-                  </Link>
-                </div>
-              </div>
-            ))}
+                {t(C.trial.title)}
+              </h2>
+              <p className="text-ink-500 text-sm leading-relaxed mb-4">{t(C.trial.text)}</p>
+              <ul className="space-y-1.5">
+                {C.trial.notes.map((n) => (
+                  <li key={n.fr} className="flex items-start gap-2 text-[13px] text-ink-700">
+                    <Check size={14} className="text-brand shrink-0 mt-0.5" strokeWidth={3} /> {t(n)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex flex-col gap-3">
+              <Link
+                href="/recrute"
+                className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-[#101F43] font-display font-black uppercase text-[13px] py-4 rounded-xl transition"
+                style={{ letterSpacing: "0.05em" }}
+              >
+                {t(C.trial.primary)} <ArrowRight size={14} />
+              </Link>
+              <a
+                href={mailto(l("Demande de démonstration WOLKO", "Aanvraag demo WOLKO"))}
+                className="flex items-center justify-center gap-2 border border-[#101F43]/20 text-[#101F43] hover:border-brand font-display font-black uppercase text-[13px] py-4 rounded-xl transition"
+                style={{ letterSpacing: "0.05em" }}
+              >
+                {t(C.trial.secondary)}
+              </a>
+            </div>
           </div>
 
-          {/* Garanties */}
-          <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { icon: "✅", label: l("Sans engagement", "Zonder verbintenis") },
-              { icon: "🔒", label: l("Données protégées", "Beschermde gegevens") },
-              { icon: "📞", label: l("Nous contacter", "Neem contact op") },
-            ].map(({ icon, label }) => (
-              <div key={label} className="bg-white border border-ink-100 rounded-xl p-3 text-center">
-                <span className="text-xl">{icon}</span>
-                <p className="text-xs font-bold text-ink mt-1.5">{label}</p>
+          {/* ── PLANS ── */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 pb-4">
+            {paid.map(({ id, featured }) => {
+              const P = C.plans[id];
+              const price = publicPrice(id, now);
+              return (
+                <div
+                  key={id}
+                  data-testid={`plan-${id}`}
+                  className={`rounded-2xl overflow-hidden flex flex-col bg-white border ${
+                    featured ? "border-brand shadow-xl shadow-brand/15 lg:-translate-y-2" : "border-ink-100"
+                  }`}
+                >
+                  {featured && (
+                    <div className="bg-brand text-[#101F43] text-[10px] font-black uppercase tracking-widest text-center py-2.5">
+                      ⭐ {t(C.labels.popular)}
+                    </div>
+                  )}
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="flex items-start justify-between gap-3 mb-3 min-h-[42px]">
+                      <p className="font-display font-black text-ink-500 uppercase text-[11px] tracking-widest">{t(P.name)}</p>
+                      {price.discount !== null && (
+                        <span className="shrink-0 bg-[#101F43] text-brand text-[10px] font-black uppercase tracking-wider rounded-full px-2.5 py-1 text-center">
+                          {t(C.labels.launchBadge(price.discount))}
+                        </span>
+                      )}
+                    </div>
+
+                    {price.strikethrough !== null && (
+                      <p className="text-ink-300 text-sm" aria-label={t(C.labels.refPrice)}>
+                        <span className="line-through decoration-2">{price.strikethrough} €</span>
+                        <span className="text-[11px]"> {t(C.labels.perMonthHt)}</span>
+                      </p>
+                    )}
+                    <div className="flex items-end gap-1.5 mb-1">
+                      <span className="font-display font-black text-[#101F43] leading-none whitespace-nowrap" style={{ fontSize: "clamp(2.6rem, 5vw, 3.6rem)" }}>
+                        {price.price} €
+                      </span>
+                      <span className="text-ink-500 text-sm mb-1.5">{t(C.labels.perMonthHt)}</span>
+                    </div>
+                    {price.launch ? (
+                      <p className="text-[12px] font-bold text-[#B87C2A] mb-1">{t(C.labels.launchValid)}</p>
+                    ) : (
+                      <p className="text-[12px] text-transparent select-none mb-1" aria-hidden>.</p>
+                    )}
+                    <p className="text-ink-400 text-xs mb-5">{t(P.description)}</p>
+
+                    <ul className="space-y-2.5 mb-7 flex-1">
+                      {P.features.map((f) => (
+                        <li key={f.fr} className="flex items-start gap-2 text-sm text-ink-700">
+                          <Check size={14} className="text-brand shrink-0 mt-0.5" strokeWidth={3} /> {t(f)}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <a
+                      href={mailto(
+                        l(`Souscription ${id === "pro" ? "Pro" : "Agence"} — WOLKO`, `Abonnement ${id === "pro" ? "Pro" : "Kantoor"} — WOLKO`),
+                        l(
+                          `Bonjour, je souhaite souscrire à l'offre ${id === "pro" ? "Pro" : "Agence"}${price.launch ? " au tarif de lancement" : ""}.\nNom de l'entreprise :\nN° de TVA :`,
+                          `Dag, ik wil graag het ${id === "pro" ? "Pro" : "Kantoor"}-abonnement nemen${price.launch ? " tegen het lanceringstarief" : ""}.\nNaam van het bedrijf:\nBtw-nummer:`
+                        )
+                      )}
+                      className={`flex items-center justify-center gap-2 font-display font-black uppercase text-[13px] py-3.5 rounded-xl transition w-full text-center ${
+                        featured
+                          ? "bg-brand hover:bg-brand-dark text-[#101F43]"
+                          : "bg-[#101F43] hover:bg-[#1C3058] text-white"
+                      }`}
+                      style={{ letterSpacing: "0.05em" }}
+                    >
+                      {price.launch ? t(P.launchCta) : t(P.standardCta)} <ArrowRight size={13} />
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Agence Réseau */}
+            <div data-testid="plan-network" className="rounded-2xl overflow-hidden flex flex-col bg-[#101F43] border border-[#1C3058] md:col-span-2 lg:col-span-1">
+              <div className="p-6 flex flex-col flex-1">
+                <p className="font-display font-black text-brand uppercase text-[11px] tracking-widest mb-3 min-h-[42px]">
+                  {t(C.plans.network.name)}
+                </p>
+                <p className="text-white/50 text-sm">{t(C.plans.network.priceLabel)}</p>
+                <div className="mb-1">
+                  <span className="font-display font-black text-white leading-none whitespace-nowrap" style={{ fontSize: "clamp(2.6rem, 5vw, 3.6rem)" }}>
+                    {NETWORK_FROM_EUR} €
+                  </span>
+                </div>
+                <p className="text-white/50 text-[12px] font-bold mb-1">{t(C.plans.network.priceNote)}</p>
+                <p className="text-white/45 text-xs mb-5">{t(C.plans.network.description)}</p>
+                <ul className="space-y-2.5 mb-7 flex-1">
+                  {C.plans.network.features.map((f) => (
+                    <li key={f.fr} className="flex items-start gap-2 text-sm text-white/80">
+                      <Check size={14} className="text-brand shrink-0 mt-0.5" strokeWidth={3} /> {t(f)}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={mailto(l("Demande de devis — Agence Réseau WOLKO", "Offerteaanvraag — Netwerkkantoor WOLKO"))}
+                  className="flex items-center justify-center gap-2 border border-white/25 hover:border-brand hover:text-brand text-white font-display font-black uppercase text-[13px] py-3.5 rounded-xl transition w-full"
+                  style={{ letterSpacing: "0.05em" }}
+                >
+                  {t(C.plans.network.cta)} <ArrowRight size={13} />
+                </a>
               </div>
-            ))}
+            </div>
+          </div>
+
+          {/* ── CONDITIONS ── */}
+          <div className="mt-6 mb-14 rounded-2xl bg-white border border-ink-100 p-5 sm:p-6" data-testid="conditions">
+            <p className="font-display font-black text-[#101F43] uppercase text-[12px] tracking-widest mb-3">{t(C.conditions.title)}</p>
+            <ul className="space-y-1.5 text-[12.5px] text-ink-500 leading-relaxed list-disc pl-4">
+              {(launch ? [...C.conditions.launch, ...C.conditions.common] : C.conditions.common).map((c) => (
+                <li key={c.fr}>{t(c)}</li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        {/* ── FAQ sur fond blanc ───────────────────────── */}
+        {/* ── FAQ ── */}
         <div className="border-t border-ink-100 bg-white">
           <div className="max-w-3xl mx-auto px-6 py-16">
-            <h2
-              className="font-display font-black text-ink uppercase leading-none mb-10"
-              style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", letterSpacing: "-0.02em" }}
-            >
+            <h2 className="font-display font-black text-ink uppercase leading-none mb-10" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", letterSpacing: "-0.02em" }}>
               FAQ.
             </h2>
             <div className="divide-y divide-ink-100">
-              {FAQS.map(({ q, a }) => (
-                <details key={q} className="group">
+              {C.faqs.map(({ q, a }) => (
+                <details key={q.fr} className="group">
                   <summary className="flex items-center justify-between gap-6 py-5 cursor-pointer list-none">
-                    <span className="font-display font-black text-ink uppercase text-[13px] tracking-wide">
-                      {q}
-                    </span>
-                    <ChevronDown
-                      size={16}
-                      className="text-ink-300 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                    />
+                    <span className="font-display font-black text-ink uppercase text-[13px] tracking-wide">{t(q)}</span>
+                    <ChevronDown size={16} className="text-ink-300 shrink-0 transition-transform duration-200 group-open:rotate-180" />
                   </summary>
-                  <p className="pb-6 text-ink-500 text-sm leading-relaxed">{a}</p>
+                  <p className="pb-6 text-ink-500 text-sm leading-relaxed">{t(a)}</p>
                 </details>
               ))}
             </div>
           </div>
         </div>
 
-        {/* ── CTA FINAL sombre ─────────────────────────── */}
+        {/* ── CTA FINAL ── */}
         <div className="bg-[#101F43] py-20 text-center px-6">
-          <h2
-            className="font-display font-black text-white uppercase leading-[0.9] mb-7"
-            style={{ fontSize: "clamp(2rem, 5vw, 3.8rem)", letterSpacing: "-0.02em" }}
-          >
+          <h2 className="font-display font-black text-white uppercase leading-[0.9] mb-7" style={{ fontSize: "clamp(2rem, 5vw, 3.8rem)", letterSpacing: "-0.02em" }}>
             {l("Prêt à renforcer", "Klaar om")} <span className="text-brand">{l("[vos équipes]", "[je teams]")}</span>{l("", " te versterken")}&nbsp;?
           </h2>
           <Link
             href="/recrute"
-            className="inline-flex items-center gap-3 bg-brand hover:bg-brand-dark text-white font-display font-black uppercase px-10 py-4 rounded-xl transition text-[13px]"
+            className="inline-flex items-center gap-3 bg-brand hover:bg-brand-dark text-[#101F43] font-display font-black uppercase px-8 sm:px-10 py-4 rounded-xl transition text-[13px]"
             style={{ letterSpacing: "0.08em" }}
           >
-            {l("Lancer mon premier recrutement", "Mijn eerste aanwerving starten")}
+            {t(C.trial.primary)}
             <ArrowRight size={15} />
           </Link>
         </div>
-
       </div>
       <SiteFooter />
     </div>

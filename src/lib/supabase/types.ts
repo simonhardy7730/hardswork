@@ -151,6 +151,12 @@ export interface Subscription {
   plan: SubscriptionPlan;
   status: SubscriptionStatus;
   trial_ends_at: string | null;
+  /** Migration 015 */
+  trial_started_at?: string | null;
+  subscribed_at?: string | null;
+  monthly_price_cents?: number | null;
+  founder_price_cents?: number | null;
+  founder_price_ends_at?: string | null;
   current_period_end: string | null;
   created_at: string;
 }

@@ -156,7 +156,7 @@ export default function RecrutePage() {
                   className="inline-flex items-center gap-2 font-display font-black uppercase text-white px-8 py-4 rounded-xl transition text-[14px]"
                   style={{ background: "#FFB900", letterSpacing: "0.06em" }}
                 >
-                  {l("Je recrute gratuitement", "Gratis aanwerven")}
+                  {l("Je recrute — 7 jours d'essai offerts", "Ik werf aan — 7 dagen gratis proef")}
                   <ArrowRight size={15} />
                 </button>
                 <Link href="/tarifs"
@@ -172,7 +172,7 @@ export default function RecrutePage() {
               <WolfBadge className="self-end mr-6 w-[200px] -mb-3 relative z-10" />
               <div className="bg-white rounded-2xl p-7 shadow-2xl">
                 <p className="font-display font-black text-[#101F43] uppercase text-sm mb-5">
-                  {l("Commencez maintenant — c'est gratuit", "Start nu — het is gratis")}
+                  {l("Commencez maintenant — 7 jours d'essai offerts", "Start nu — 7 dagen gratis proef")}
                 </p>
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   {ROLES.map((r) => (
@@ -271,7 +271,7 @@ export default function RecrutePage() {
           <button onClick={() => setShowForm(true)}
             className="inline-flex items-center gap-3 bg-white font-display font-black uppercase px-10 py-4 rounded-xl transition text-[14px] hover:bg-white/90"
             style={{ color: "var(--brand-text)", letterSpacing: "0.08em" }}>
-            {l("Commencer gratuitement", "Gratis starten")}
+            {l("Démarrer mes 7 jours d'essai", "Mijn 7 proefdagen starten")}
             <ArrowRight size={16} />
           </button>
         </div>
@@ -438,7 +438,7 @@ export default function RecrutePage() {
                 <button type="submit" disabled={loading}
                   className="w-full py-4 text-white font-black text-sm tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 transition"
                   style={{ background: loading ? "#FFD97A" : "#FFB900", fontFamily: "var(--font-display)" }}>
-                  {loading ? <Loader2 size={16} className="animate-spin" /> : <><span>{l("Créer mon compte gratuitement", "Mijn account gratis aanmaken")}</span><ArrowRight size={15} /></>}
+                  {loading ? <Loader2 size={16} className="animate-spin" /> : <><span>{l("Démarrer mes 7 jours d'essai", "Mijn 7 proefdagen starten")}</span><ArrowRight size={15} /></>}
                 </button>
                 <p className="text-center text-sm text-gray-400">
                   {l("Déjà un compte ?", "Al een account?")} <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>{l("Se connecter", "Inloggen")}</Link>

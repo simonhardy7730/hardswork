@@ -1,3 +1,4 @@
+import { getOrgAccess } from "@/lib/billing/access";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
@@ -29,14 +30,8 @@ export default async function CandidaturesPage(
     .single();
   if (!profile) redirect("/onboarding");
 
-  /* Vérifier abonnement */
-  const { data: sub } = await supabase
-    .from("subscriptions")
-    .select("plan, status")
-    .eq("organization_id", profile.organization_id)
-    .in("status", ["active", "trial"])
-    .maybeSingle();
-  const hasSubscription = sub !== null && (sub.plan === "pro" || sub.plan === "agency" || sub.status === "trial");
+  /* Accès (essai en cours ou abonnement) — horloge du serveur */
+  const { hasAccess: hasSubscription } = await getOrgAccess(supabase, profile.organization_id);
 
   const { data: offre } = await supabase
     .from("job_offers")
@@ -101,7 +96,7 @@ export default async function CandidaturesPage(
 
       {/* Kanban */}
       <KanbanBoard
-        applications={(applications ?? []) as Application[]}
+        applications={((applications ?? []) as Application[]).map((a) => (hasSubscription ? a : { ...a, applicant_email: null, applicant_phone: "" }))}
         jobOfferId={params.id}
         candidatureUrl={`${appUrl}/postuler/${offre.id}`}
         hasSubscription={hasSubscription}

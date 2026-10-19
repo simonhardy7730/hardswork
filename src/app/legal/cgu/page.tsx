@@ -71,16 +71,28 @@ export default function CGUPage() {
               </p>
             </LegalSection>
 
-            <LegalSection title="4. Abonnements et paiement">
+            <LegalSection title="4. Abonnements, essai gratuit et paiement">
               <p>
-                Wolko propose des plans d&apos;abonnement payants (Pro et Agence) dont les tarifs sont
-                indiqués en euros TTC sur la page{" "}
-                <Link href="/tarifs">/tarifs</Link>.
-                Les abonnements sont mensuels et renouvelables automatiquement.
+                <strong>Essai gratuit.</strong> Tout compte entreprise ou agence bénéficie d&apos;un essai gratuit de
+                7 jours calendaires, une seule fois par organisation, sans carte bancaire. Aucun prélèvement n&apos;est
+                effectué sans votre accord explicite. À la fin de l&apos;essai, vos données sont conservées ; l&apos;accès
+                à la publication d&apos;offres et aux coordonnées des candidats est suspendu jusqu&apos;à la souscription
+                d&apos;un abonnement.
               </p>
               <p>
-                Vous pouvez résilier à tout moment depuis votre tableau de bord. La résiliation prend
-                effet à la fin de la période de facturation en cours, sans remboursement au prorata.
+                <strong>Tarifs.</strong> Wolko propose des abonnements mensuels payants (Pro, Agence et Agence Réseau sur devis)
+                dont les tarifs sont indiqués en euros hors TVA sur la page <Link href="/tarifs">/tarifs</Link>.
+              </p>
+              <p>
+                <strong>Offre de lancement.</strong> Toute souscription conclue au plus tard le 31 décembre 2026 conserve
+                son tarif de lancement pendant 12 mois à compter de la date de souscription, y compris lors des
+                renouvellements. À partir du 1er janvier 2027, les nouvelles souscriptions sont facturées au tarif standard
+                en vigueur à la date de souscription. Les conditions d&apos;un abonnement déjà souscrit ne sont pas modifiées
+                rétroactivement.
+              </p>
+              <p>
+                Vous pouvez résilier à tout moment. La résiliation prend effet à la fin de la période de facturation en
+                cours, sans remboursement au prorata.
               </p>
             </LegalSection>
 

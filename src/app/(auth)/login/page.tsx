@@ -148,7 +148,7 @@ export default function LoginPage() {
         <p className="text-center text-sm text-white/30 mt-5">
           {l("Pas encore de compte ?", "Nog geen account?")}{" "}
           <Link href="/signup" className="text-brand hover:text-brand-light font-semibold transition-colors">
-            {l("Démarrer gratuitement", "Gratis starten")}
+            {l("Démarrer mes 7 jours d'essai", "Mijn 7 proefdagen starten")}
           </Link>
         </p>
       </div>

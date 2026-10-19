@@ -1,3 +1,4 @@
+import { getOrgAccess } from "@/lib/billing/access";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
@@ -91,15 +92,8 @@ export default async function CandidatDetailPage(
 
   if (!candidat) notFound();
 
-  /* Vérifier l'abonnement pour débloquer les coordonnées */
-  const { data: sub } = await supabase
-    .from("subscriptions")
-    .select("plan, status")
-    .eq("organization_id", orgId)
-    .in("status", ["active", "trial"])
-    .maybeSingle();
-
-  const hasActiveSubscription = sub !== null && (sub.plan === "pro" || sub.plan === "agency" || sub.status === "trial");
+  /* Accès (essai en cours ou abonnement) pour débloquer les coordonnées — horloge du serveur */
+  const { hasAccess: hasActiveSubscription } = await getOrgAccess(supabase, orgId);
 
   /* Candidatures liées */
   const { data: applications } = await supabase

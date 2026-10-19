@@ -74,7 +74,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
         </div>
         <h3 className="text-lg font-bold text-ink">{l("Candidature envoyée ! ✅", "Sollicitatie verstuurd! ✅")}</h3>
         <p className="text-sm text-ink-500">
-          <strong>{orgName}</strong> {l("vous contactera dans les meilleurs délais.", "neemt zo snel mogelijk contact met je op.")}
+          {l("Votre candidature a bien été transmise.", "Je sollicitatie is goed doorgestuurd.")}
         </p>
       </div>
     );

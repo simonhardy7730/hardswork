@@ -97,7 +97,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
             {l("Candidature envoyée ! ✅", "Sollicitatie verstuurd! ✅")}
           </h3>
           <p className="text-sm text-ink-500 mt-2">
-            <strong>{orgName}</strong> {l("vous contactera par téléphone dans les meilleurs délais.", "neemt zo snel mogelijk telefonisch contact met je op.")}
+            {l("Votre candidature a bien été transmise.", "Je sollicitatie is goed doorgestuurd.")}
           </p>
         </div>
         <p className="text-xs text-ink-300">

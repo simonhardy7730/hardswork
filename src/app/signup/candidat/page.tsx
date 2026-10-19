@@ -70,7 +70,7 @@ function makeLeft(l: L) {
       headline: [l("VOTRE PROFIL,", "JOUW PROFIEL,"), l("VOTRE", "JOUW"), l("[VALEUR].", "[WAARDE].")],
       redLine: l("[VALEUR].", "[WAARDE]."),
       sub: l("Plus votre profil est complet, plus vite vous serez contacté.", "Hoe completer je profiel, hoe sneller je gecontacteerd wordt."),
-      hardie: l("Ces infos sont visibles par les recruteurs abonnés.", "Deze info is zichtbaar voor werkgevers met een abonnement."),
+      hardie: l("Ces infos ne sont transmises qu'aux recruteurs auxquels vous postulez.", "Deze info wordt alleen doorgegeven aan werkgevers bij wie je solliciteert."),
     },
     3: {
       headline: [l("PRESQUE", "BIJNA"), l("[TERMINÉ].", "[KLAAR].")],
@@ -83,6 +83,19 @@ function makeLeft(l: L) {
 
 function toggleArr<T>(arr: T[], item: T): T[] {
   return arr.includes(item) ? arr.filter(x => x !== item) : [...arr, item];
+}
+
+/** Source de la campagne (paramètres du lien d'arrivée) : conservée dans le compte pour mesurer la pub. */
+function readCampaign(): Record<string, string> {
+  const out: Record<string, string> = {};
+  try {
+    const sp = new URLSearchParams(window.location.search);
+    for (const k of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid", "gclid", "ttclid"]) {
+      const v = sp.get(k);
+      if (v) out[k] = v.slice(0, 100);
+    }
+  } catch { /* sans effet */ }
+  return out;
 }
 
 /* ─── Page principale ─────────────────────────────────── */
@@ -138,7 +151,7 @@ export default function CandidatSignupPage() {
       email: auth.email,
       password: auth.password,
       options: {
-        data: { full_name: auth.full_name, user_type: "candidate", lang },
+        data: { full_name: auth.full_name, user_type: "candidate", lang, ...readCampaign() },
         emailRedirectTo: `${window.location.origin}/auth/callback?next=/candidat/dashboard`,
       },
     });
@@ -356,7 +369,7 @@ export default function CandidatSignupPage() {
                   style={{ fontSize: "clamp(1.6rem, 3vw, 2rem)", letterSpacing: "-0.01em" }}>
                   {l("Votre profil", "Jouw profiel")}
                 </h2>
-                <p className="text-ink-500 text-sm">{l("Ces infos sont visibles par les recruteurs.", "Deze info is zichtbaar voor werkgevers.")}</p>
+                <p className="text-ink-500 text-sm">{l("Ces infos ne sont transmises qu'aux recruteurs auxquels vous postulez.", "Deze info wordt alleen doorgegeven aan werkgevers bij wie je solliciteert.")}</p>
               </div>
 
               {/* Localisation : ville + code postal */}

@@ -31,30 +31,15 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  const publicPaths = [
-    "/",
-    "/login",
-    "/signup",
-    "/onboarding",
-    "/postuler",
-    "/jobs",
-    "/tarifs",
-    "/inscription",
-    "/a-propos",
-    "/recrute",
-    "/forgot-password",
-    "/legal",
-    "/auth",
-  ];
-  const isPublic =
-    publicPaths.some((p) => pathname === p || pathname.startsWith(p)) ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api/public") ||
-    pathname.startsWith("/api/auth");
+  // Zones privées : toute autre URL reste publique (les pages se protègent aussi elles-mêmes).
+  const isPrivate =
+    pathname === "/dashboard" || pathname.startsWith("/dashboard/") ||
+    pathname === "/candidat" || pathname.startsWith("/candidat/");
 
-  if (!user && !isPublic) {
+  if (!user && isPrivate) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    url.search = "";
     return NextResponse.redirect(url);
   }
 

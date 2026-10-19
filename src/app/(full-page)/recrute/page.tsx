@@ -6,7 +6,7 @@ import { ArrowRight, ArrowLeft, Check, Loader2, Zap, Users, Clock, Shield } from
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { signUp } from "@/app/actions/auth";
 
-import { WolfMascot } from "@/components/ui/WolfMascot";
+import { WolfBadge } from "@/components/ui/WolfMascot";
 /* ─── Rôles ──────────────────────────────────────────────── */
 const ROLES = [
   {
@@ -119,7 +119,7 @@ export default function RecrutePage() {
           <div className="relative max-w-6xl mx-auto px-6 pt-[60px] grid lg:grid-cols-2 gap-12 items-center py-24">
             {/* Texte gauche */}
             <div>
-              <WolfMascot className="lg:hidden w-28 mb-5 drop-shadow-xl" />
+              <WolfBadge className="lg:hidden w-36 mb-5" />
               <span className="inline-block text-[11px] font-black border px-4 py-1.5 rounded-full uppercase tracking-widest mb-8"
                 style={{ color: "var(--brand-text)", borderColor: "rgba(255,183,3,0.35)", background: "rgba(255,183,3,0.08)" }}>
                 30 jours gratuits · Sans carte bancaire
@@ -152,8 +152,8 @@ export default function RecrutePage() {
             </div>
 
             {/* Mini-form card droite */}
-            <div className="hidden lg:block relative">
-              <WolfMascot className="absolute right-8 bottom-full w-[190px] -mb-1 drop-shadow-xl" />
+            <div className="hidden lg:flex flex-col">
+              <WolfBadge className="self-end mr-6 w-[200px] -mb-3 relative z-10" />
               <div className="bg-white rounded-2xl p-7 shadow-2xl">
                 <p className="font-display font-black text-[#10214B] uppercase text-sm mb-5">
                   Commencez maintenant — c&apos;est gratuit

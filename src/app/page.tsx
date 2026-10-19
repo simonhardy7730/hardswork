@@ -6,7 +6,7 @@ import { SearchModule } from "@/components/home/SearchModule";
 import { HardSworkLogo, HardieIcon } from "@/components/ui/HardieIcon";
 import { SiteNav } from "@/components/layout/SiteNav";
 
-import { WolfMascot } from "@/components/ui/WolfMascot";
+import { WolfBadge } from "@/components/ui/WolfMascot";
 /* ─── TYPES ──────────────────────────────────────────── */
 interface JobOffer {
   id: string;
@@ -177,12 +177,12 @@ export default async function HomePage() {
         {/* Content */}
         <div className="relative max-w-7xl mx-auto px-6 w-full" style={{ zIndex: 3 }}>
           {/* Mascotte (desktop : à droite du titre) */}
-          <WolfMascot className="hidden lg:block absolute right-6 bottom-0 w-[300px] xl:w-[340px] drop-shadow-2xl" />
+          <WolfBadge className="hidden lg:block absolute right-6 bottom-0 w-[min(360px,42vh)]" />
           <div className="max-w-3xl">
 
 
             {/* Mascotte (mobile : au-dessus du titre) */}
-            <WolfMascot className="lg:hidden w-32 mb-4 drop-shadow-xl animate-fade-up-1" />
+            <WolfBadge className="lg:hidden w-40 mb-5 animate-fade-up-1" />
 
             {/* Headline */}
             <h1 className="font-display font-black text-white leading-none tracking-tight mb-8 animate-fade-up-1"

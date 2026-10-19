@@ -105,3 +105,21 @@ export function WolfHead(props: Omit<Props, "animated" | "viewBox">) {
     />
   );
 }
+
+/**
+ * Loup « sticker » : disque jaune derrière le loup pour qu'il ressorte
+ * sur les photos et les fonds sombres. La taille se règle sur le conteneur
+ * (ex. className="w-40"), la hauteur suit toute seule.
+ */
+export function WolfBadge({ className = "" }: { className?: string }) {
+  return (
+    <div className={`relative ${className}`}>
+      <div
+        aria-hidden="true"
+        className="absolute left-1/2 top-[46%] aspect-square w-[92%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{ background: "radial-gradient(circle at 50% 38%, #FFD45E 0%, #FFB703 64%, #E5A000 100%)" }}
+      />
+      <WolfMascot className="relative block w-full h-auto drop-shadow-xl" />
+    </div>
+  );
+}

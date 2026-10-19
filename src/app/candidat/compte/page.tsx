@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import DocumentsUpload from "@/components/candidat/DocumentsUpload";
 import PreferencesEditor from "@/components/candidat/PreferencesEditor";
+import VisibilityToggle from "@/components/candidat/VisibilityToggle";
 import AvailabilityEditor from "@/components/candidat/AvailabilityEditor";
 import DataRights from "@/components/candidat/DataRights";
 import { EMPTY_AVAILABILITY, type AvailabilityState } from "@/lib/candidate/availability";
@@ -27,6 +28,9 @@ export default async function ComptePage() {
     .select("id, job_types, is_student, student_profile, flexi_profile")
     .eq("auth_user_id", user.id)
     .maybeSingle();
+  // Visibilité (migration 016) : lecture séparée, tolérante si la colonne n'existe pas encore.
+  const { data: vis } = await supabase
+    .from("candidates").select("visible_to_recruiters").eq("auth_user_id", user.id).maybeSingle();
   const initialPrefs: Preferences = cand
     ? {
         job_types: (cand.job_types as string[]) ?? [],
@@ -146,6 +150,9 @@ export default async function ComptePage() {
           </p>
         </div>
       </div>
+
+      {/* Visibilité auprès des recruteurs abonnés (candidathèque) */}
+      <VisibilityToggle initial={!!(vis as { visible_to_recruiters?: boolean } | null)?.visible_to_recruiters} />
 
       {/* Mes recherches d'emploi (types d'emploi, profil étudiant / flexi-job) */}
       <PreferencesEditor initial={initialPrefs} />

@@ -94,7 +94,7 @@ export default async function CandidatsLanding(props: { searchParams: Promise<Re
             { Icon: CalendarDays, t: l("Indiquez vos disponibilités", "Geef je beschikbaarheid aan"),
               d: l("Jours, horaires, étudiant ou flexi-job : les offres affichées correspondent à votre planning.", "Dagen, uren, student of flexi-job: de vacatures passen bij je planning.") },
             { Icon: ShieldCheck, t: l("Vos données restent à vous", "Je gegevens blijven van jou"),
-              d: l("Seuls les recruteurs auxquels vous postulez voient votre profil. Export et suppression en un clic.", "Alleen werkgevers bij wie je solliciteert zien je profiel. Exporteren en verwijderen met één klik.") },
+              d: l("Vous décidez qui voit votre profil : par défaut, seuls les recruteurs auxquels vous postulez. Export et suppression en un clic.", "Jij beslist wie je profiel ziet: standaard enkel werkgevers bij wie je solliciteert. Exporteren en verwijderen met één klik.") },
           ].map(({ Icon, t, d }) => (
             <div key={t} className="border-t-2 border-ink pt-4">
               <Icon size={22} className="text-ink mb-3" aria-hidden />

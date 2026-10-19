@@ -55,3 +55,19 @@ export async function saveAvailability(raw: unknown): Promise<{ ok: boolean }> {
   revalidatePath("/candidat/compte");
   return { ok: true };
 }
+
+import { VISIBILITY_CONSENT_VERSION } from "@/lib/candidate/visibility";
+
+/** Accord (ou retrait) de visibilité auprès des recruteurs abonnés ; horodaté côté base. */
+export async function setVisibility(visible: boolean): Promise<{ ok: boolean }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+  const { error } = await supabase.rpc("set_candidate_visibility", {
+    p_visible: visible === true,
+    p_version: VISIBILITY_CONSENT_VERSION,
+  });
+  if (error) { console.error("setVisibility:", error.message); return { ok: false }; }
+  revalidatePath("/candidat/compte");
+  return { ok: true };
+}

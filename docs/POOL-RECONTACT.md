@@ -1,6 +1,11 @@
-# Pool de recontact (étudiants / flexi-jobs) — conception, NON implémenté
+# Candidathèque (type HelloWork) — recherche par les recruteurs abonnés
 
-Décision : ne pas livrer avant validation juridique. Un interrupteur côté candidat sans fonction côté
+Mise à jour 19/10/2026 : c'est le cœur de l'offre Pro, donc retenu. Fait : case de consentement (inscription +
+Mon compte), migration 016, texte de confidentialité. À faire : écran de recherche recruteur (voir ci-dessous).
+
+## Ancienne conception (toujours valable pour la suite)
+
+Ne pas ouvrir la recherche aux recruteurs avant validation juridique. Un interrupteur côté candidat sans fonction côté
 recruteur serait trompeur, et l'inverse (recruteurs voient des profils) sans base légale est interdit
 par notre propre politique de confidentialité (« une candidature ne vaut pas autorisation de réutilisation »).
 

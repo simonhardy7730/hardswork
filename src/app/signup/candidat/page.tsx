@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { VISIBILITY_LABEL } from "@/lib/candidate/visibility";
 import { friendlyAuthError } from "@/lib/auth-errors";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -70,7 +71,7 @@ function makeLeft(l: L) {
       headline: [l("VOTRE PROFIL,", "JOUW PROFIEL,"), l("VOTRE", "JOUW"), l("[VALEUR].", "[WAARDE].")],
       redLine: l("[VALEUR].", "[WAARDE]."),
       sub: l("Plus votre profil est complet, plus vite vous serez contacté.", "Hoe completer je profiel, hoe sneller je gecontacteerd wordt."),
-      hardie: l("Ces infos ne sont transmises qu'aux recruteurs auxquels vous postulez.", "Deze info wordt alleen doorgegeven aan werkgevers bij wie je solliciteert."),
+      hardie: l("Ces infos ne sont transmises qu'aux recruteurs auxquels vous postulez, sauf si vous choisissez d'être visible.", "Deze info gaat enkel naar werkgevers bij wie je solliciteert, tenzij je ervoor kiest zichtbaar te zijn."),
     },
     3: {
       headline: [l("PRESQUE", "BIJNA"), l("[TERMINÉ].", "[KLAAR].")],
@@ -129,6 +130,7 @@ export default function CandidatSignupPage() {
   /* Étape 3 — compte + CV */
   const [auth, setAuth]     = useState({ full_name: "", email: "", password: "", phone: "" });
   const [cvFile, setCvFile] = useState<File | null>(null);
+  const [visible, setVisible] = useState(false); // accord facultatif, jamais pré-coché
 
   /* ── Submit final ──────────────────────────────────── */
   async function handleSubmit() {
@@ -197,6 +199,7 @@ export default function CandidatSignupPage() {
         experience_years: profile.experience_years || null,
         preferences: prefs,
         sectors: selectedSectors,
+        visible_to_recruiters: visible,
       }),
     });
 
@@ -369,7 +372,7 @@ export default function CandidatSignupPage() {
                   style={{ fontSize: "clamp(1.6rem, 3vw, 2rem)", letterSpacing: "-0.01em" }}>
                   {l("Votre profil", "Jouw profiel")}
                 </h2>
-                <p className="text-ink-500 text-sm">{l("Ces infos ne sont transmises qu'aux recruteurs auxquels vous postulez.", "Deze info wordt alleen doorgegeven aan werkgevers bij wie je solliciteert.")}</p>
+                <p className="text-ink-500 text-sm">{l("Ces infos ne sont transmises qu'aux recruteurs auxquels vous postulez, sauf si vous choisissez d'être visible.", "Deze info gaat enkel naar werkgevers bij wie je solliciteert, tenzij je ervoor kiest zichtbaar te zijn.")}</p>
               </div>
 
               {/* Localisation : ville + code postal */}
@@ -575,6 +578,15 @@ export default function CandidatSignupPage() {
                   {l("Vos diplômes et permis ? Vous pourrez les ajouter depuis votre compte, une fois inscrit.", "Je diploma's en rijbewijzen? Je kunt ze toevoegen vanuit je account, zodra je ingeschreven bent.")}
                 </p>
               </div>
+
+              <label className="flex items-start gap-3 cursor-pointer bg-white border border-ink-100 rounded-xl p-3">
+                <input type="checkbox" checked={visible} onChange={(e) => setVisible(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[#101F43]" />
+                <span className="text-xs text-ink-700 leading-relaxed">
+                  {VISIBILITY_LABEL[lang === "nl" ? "nl" : "fr"]}{" "}
+                  <span className="text-ink-400">{l("(facultatif)", "(optioneel)")}</span>
+                </span>
+              </label>
 
               {error && (
                 <div className="text-sm px-4 py-3 rounded-xl bg-red-50 text-red-600 border border-red-200">

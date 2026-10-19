@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sanitizePreferences } from "@/lib/candidate/preferences";
 import { allow, clientKey } from "@/lib/security/abuse";
+import { VISIBILITY_CONSENT_VERSION } from "@/lib/candidate/visibility";
 
 const supabaseAdmin = () =>
   createClient(
@@ -27,6 +28,7 @@ export async function POST(req: NextRequest) {
       experience_years,
       sectors,
       preferences,
+      visible_to_recruiters,
     } = body;
 
     // Validation stricte (tout vient du navigateur, donc rien n'est de confiance).
@@ -110,6 +112,15 @@ export async function POST(req: NextRequest) {
     if (error) {
       console.error("Candidate insert error:", error);
       return NextResponse.json({ error: "Erreur lors de la création du profil" }, { status: 500 });
+    }
+
+    // Accord de visibilité (migration 016) : case facultative, décochée par défaut ; l'inscription ne dépend jamais de lui.
+    if (visible_to_recruiters === true) {
+      const { error: vErr } = await admin
+        .from("candidates")
+        .update({ visible_to_recruiters: true, visibility_consent_at: new Date().toISOString(), visibility_consent_version: VISIBILITY_CONSENT_VERSION })
+        .eq("id", data.id);
+      if (vErr) console.error("visibility consent not stored (migration 016 ?):", vErr.message);
     }
 
     return NextResponse.json({ success: true, candidateId: data.id });

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { VISIBILITY_LABEL } from "@/lib/candidate/visibility";
+import { ageFromBirthDate, MIN_AGE, ADULT_AGE } from "@/lib/candidate/age";
 import { friendlyAuthError } from "@/lib/auth-errors";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -130,6 +131,9 @@ export default function CandidatSignupPage() {
   /* Étape 3 — compte + CV */
   const [auth, setAuth]     = useState({ full_name: "", email: "", password: "", phone: "" });
   const [cvFile, setCvFile] = useState<File | null>(null);
+  const [birth, setBirth] = useState("");
+  const birthAge = ageFromBirthDate(birth);
+  const isAdult = birthAge !== null && birthAge >= ADULT_AGE;
   const [visible, setVisible] = useState(false); // accord facultatif, jamais pré-coché
 
   /* ── Submit final ──────────────────────────────────── */
@@ -144,8 +148,12 @@ export default function CandidatSignupPage() {
   }
 
   async function doSubmit() {
-    setLoading(true);
     setError("");
+    if (birthAge === null || birthAge < MIN_AGE) {
+      setError(l(`Indiquez votre date de naissance (inscription à partir de ${MIN_AGE} ans).`, `Geef je geboortedatum op (inschrijving vanaf ${MIN_AGE} jaar).`));
+      return;
+    }
+    setLoading(true);
     const supabase = createClient();
 
     // 1. Créer le compte auth
@@ -199,7 +207,8 @@ export default function CandidatSignupPage() {
         experience_years: profile.experience_years || null,
         preferences: prefs,
         sectors: selectedSectors,
-        visible_to_recruiters: visible,
+        visible_to_recruiters: visible && isAdult,
+        birth_date: birth,
       }),
     });
 
@@ -524,6 +533,14 @@ export default function CandidatSignupPage() {
                   </div>
                 </div>
               </div>
+              <div>
+                <label className={labelCls}>{l("Date de naissance", "Geboortedatum")}</label>
+                <input type="date" value={birth} onChange={e => { setBirth(e.target.value); if (ageFromBirthDate(e.target.value) !== null && (ageFromBirthDate(e.target.value) ?? 0) < ADULT_AGE) setVisible(false); }}
+                  max={new Date().toISOString().slice(0, 10)} required className={inputCls.replace(/pl-\d+/, "pl-3")} />
+                {birth && (birthAge === null || birthAge < MIN_AGE) && (
+                  <p className="text-xs text-red-600 mt-1">{l(`Inscription possible à partir de ${MIN_AGE} ans.`, `Inschrijven kan vanaf ${MIN_AGE} jaar.`)}</p>
+                )}
+              </div>
 
               <div>
                 <label className={labelCls}>{l("Email", "E-mail")}</label>
@@ -579,14 +596,14 @@ export default function CandidatSignupPage() {
                 </p>
               </div>
 
-              <label className="flex items-start gap-3 cursor-pointer bg-white border border-ink-100 rounded-xl p-3">
+              {isAdult && <label className="flex items-start gap-3 cursor-pointer bg-white border border-ink-100 rounded-xl p-3">
                 <input type="checkbox" checked={visible} onChange={(e) => setVisible(e.target.checked)}
                   className="mt-0.5 h-4 w-4 shrink-0 accent-[#101F43]" />
                 <span className="text-xs text-ink-700 leading-relaxed">
                   {VISIBILITY_LABEL[lang === "nl" ? "nl" : "fr"]}{" "}
                   <span className="text-ink-400">{l("(facultatif)", "(optioneel)")}</span>
                 </span>
-              </label>
+              </label>}
 
               {error && (
                 <div className="text-sm px-4 py-3 rounded-xl bg-red-50 text-red-600 border border-red-200">

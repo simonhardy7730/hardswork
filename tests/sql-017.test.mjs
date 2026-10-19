@@ -30,10 +30,12 @@ await db.exec(`INSERT INTO auth.users (id, email, raw_user_meta_data) VALUES
 const U = "00000000-0000-0000-0000-0000000000a1";
 assert.equal((await q(`select count(*)::int n from users where id='${U}'`))[0].n, 1);
 
-await db.exec(`INSERT INTO candidates (id, first_name, last_name, phone, email, city, sectors, job_types, auth_user_id, visible_to_recruiters, visibility_consent_at) VALUES
- ('00000000-0000-0000-0000-00000000000c','Camille','Dupont','0470','c@x.be','Tournai','{logistique}','{etudiant}','00000000-0000-0000-0000-0000000000c1', true, now()),
- ('00000000-0000-0000-0000-00000000000d','Dan','Martin','0471','d@x.be','Mons','{construction}','{}','00000000-0000-0000-0000-0000000000d1', false, null),
- ('00000000-0000-0000-0000-00000000000e','Old','Timer','0472','o@x.be','Tournai','{logistique}','{}','00000000-0000-0000-0000-0000000000e1', true, now() - interval '30 months')`);
+await db.exec(`INSERT INTO candidates (id, first_name, last_name, phone, email, city, sectors, job_types, auth_user_id, visible_to_recruiters, visibility_consent_at, birth_date) VALUES
+ ('00000000-0000-0000-0000-00000000000c','Camille','Dupont','0470','c@x.be','Tournai','{logistique}','{etudiant}','00000000-0000-0000-0000-0000000000c1', true, now(), '1995-05-05'),
+ ('00000000-0000-0000-0000-00000000000d','Dan','Martin','0471','d@x.be','Mons','{construction}','{}','00000000-0000-0000-0000-0000000000d1', false, null, '1990-01-01'),
+ ('00000000-0000-0000-0000-00000000000e','Old','Timer','0472','o@x.be','Tournai','{logistique}','{}','00000000-0000-0000-0000-0000000000e1', true, now() - interval '30 months', '1990-01-01'),
+ ('00000000-0000-0000-0000-00000000000f','Mina','Jeune','0473','m@x.be','Tournai','{logistique}','{}','00000000-0000-0000-0000-0000000000f1', true, now(), (current_date - interval '16 years')::date),
+ ('00000000-0000-0000-0000-000000000010','Nodate','Inconnu','0474','n@x.be','Tournai','{logistique}','{}','00000000-0000-0000-0000-000000000101', true, now(), null)`);
 
 // Sans session : refusé
 await as(null);
@@ -46,6 +48,8 @@ assert.equal(r.length, 1);
 assert.equal(r[0].first_name, "Camille");
 assert.equal(r[0].last_initial, "D");
 assert.ok(!("email" in r[0]) && !("phone" in r[0]) && !("last_name" in r[0]));
+// Mineur ou sans date de naissance : jamais listé, même si la case est (anormalement) à vrai
+assert.ok(!r.some((x) => ["Mina", "Nodate"].includes(x.first_name)));
 // Filtres
 assert.equal((await q(`select * from search_candidate_pool(p_cities => ARRAY['tournai'])`)).length, 1);
 assert.equal((await q(`select * from search_candidate_pool(p_cities => ARRAY['mons'])`)).length, 0);
@@ -57,6 +61,7 @@ let c = await q(`select * from reveal_candidate_contact('00000000-0000-0000-0000
 assert.deepEqual(c, [{ first_name: "Camille", last_name: "Dupont", email: "c@x.be", phone: "0470" }]);
 await assert.rejects(() => q(`select * from reveal_candidate_contact('00000000-0000-0000-0000-00000000000d')`), /not_found/); // non consentant
 await assert.rejects(() => q(`select * from reveal_candidate_contact('00000000-0000-0000-0000-00000000000e')`), /not_found/); // consentement expiré
+await assert.rejects(() => q(`select * from reveal_candidate_contact('00000000-0000-0000-0000-00000000000f')`), /not_found/); // mineur
 assert.equal((await q(`select count(*)::int n from candidate_pool_access`))[0].n, 1);
 await q(`select * from reveal_candidate_contact('00000000-0000-0000-0000-00000000000c')`); // déjà révélé : pas de double comptage
 assert.equal((await q(`select count(*)::int n from candidate_pool_access`))[0].n, 2); // journal complet, quota sur nouveaux candidats

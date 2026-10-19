@@ -32,6 +32,7 @@ BEGIN
        AND c.visibility_consent_at IS NOT NULL
        AND c.visibility_consent_at > now() - interval '24 months'
        AND c.status = 'actif'
+       AND c.birth_date IS NOT NULL AND c.birth_date <= current_date - interval '18 years'
        AND (p_sectors IS NULL OR c.sectors && p_sectors)
        AND (p_cities IS NULL OR lower(c.city) = ANY (SELECT lower(x) FROM unnest(p_cities) x))
        AND (p_job_type IS NULL OR p_job_type = ANY (c.job_types))
@@ -51,6 +52,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM candidates c
      WHERE c.id = p_candidate_id AND c.visible_to_recruiters AND c.status = 'actif'
+       AND c.birth_date IS NOT NULL AND c.birth_date <= current_date - interval '18 years'
        AND c.visibility_consent_at > now() - interval '24 months'
   ) THEN RAISE EXCEPTION 'not_found'; END IF;
 

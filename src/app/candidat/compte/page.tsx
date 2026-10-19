@@ -30,7 +30,7 @@ export default async function ComptePage() {
     .maybeSingle();
   // Visibilité (migration 016) : lecture séparée, tolérante si la colonne n'existe pas encore.
   const { data: vis } = await supabase
-    .from("candidates").select("visible_to_recruiters").eq("auth_user_id", user.id).maybeSingle();
+    .from("candidates").select("visible_to_recruiters, birth_date").eq("auth_user_id", user.id).maybeSingle();
   const initialPrefs: Preferences = cand
     ? {
         job_types: (cand.job_types as string[]) ?? [],
@@ -152,7 +152,7 @@ export default async function ComptePage() {
       </div>
 
       {/* Visibilité auprès des recruteurs abonnés (candidathèque) */}
-      <VisibilityToggle initial={!!(vis as { visible_to_recruiters?: boolean } | null)?.visible_to_recruiters} />
+      <VisibilityToggle initial={!!(vis as { visible_to_recruiters?: boolean } | null)?.visible_to_recruiters} birthDate={(vis as { birth_date?: string | null } | null)?.birth_date ?? null} />
 
       {/* Mes recherches d'emploi (types d'emploi, profil étudiant / flexi-job) */}
       <PreferencesEditor initial={initialPrefs} />

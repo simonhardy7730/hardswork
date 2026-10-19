@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { sanitizePreferences } from "@/lib/candidate/preferences";
 import { allow, clientKey } from "@/lib/security/abuse";
 import { VISIBILITY_CONSENT_VERSION } from "@/lib/candidate/visibility";
+import { ageFromBirthDate, MIN_AGE, ADULT_AGE } from "@/lib/candidate/age";
 
 const supabaseAdmin = () =>
   createClient(
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
       sectors,
       preferences,
       visible_to_recruiters,
+      birth_date,
     } = body;
 
     // Validation stricte (tout vient du navigateur, donc rien n'est de confiance).
@@ -42,6 +44,13 @@ export async function POST(req: NextRequest) {
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)
     ) {
       return NextResponse.json({ error: "Champs requis manquants ou invalides" }, { status: 400 });
+    }
+
+    // Date de naissance obligatoire : 15 ans minimum (le profil mineur n'est jamais dans la candidathèque).
+    const birth = typeof birth_date === "string" ? birth_date : "";
+    const age = ageFromBirthDate(birth);
+    if (age === null || age < MIN_AGE) {
+      return NextResponse.json({ error: "age", min: MIN_AGE }, { status: 400 });
     }
 
     // L'identifiant doit correspondre à un compte candidat tout juste créé avec CET e-mail :
@@ -114,8 +123,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Erreur lors de la création du profil" }, { status: 500 });
     }
 
+    // Date de naissance (migration 016) : enregistrée à part ; l'inscription ne doit pas échouer si la colonne manque encore.
+    const { error: bErr } = await admin.from("candidates").update({ birth_date: birth }).eq("id", data.id);
+    if (bErr) console.error("birth_date not stored (migration 016 ?):", bErr.message);
+
     // Accord de visibilité (migration 016) : case facultative, décochée par défaut ; l'inscription ne dépend jamais de lui.
-    if (visible_to_recruiters === true) {
+    if (visible_to_recruiters === true && age >= ADULT_AGE) {
       const { error: vErr } = await admin
         .from("candidates")
         .update({ visible_to_recruiters: true, visibility_consent_at: new Date().toISOString(), visibility_consent_version: VISIBILITY_CONSENT_VERSION })

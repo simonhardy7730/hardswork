@@ -71,3 +71,18 @@ export async function setVisibility(visible: boolean): Promise<{ ok: boolean }> 
   revalidatePath("/candidat/compte");
   return { ok: true };
 }
+
+import { ageFromBirthDate, MIN_AGE } from "@/lib/candidate/age";
+
+/** Date de naissance (une seule fois, vérifiée aussi côté base) : sert à réserver la candidathèque aux majeurs. */
+export async function saveBirthDate(value: string): Promise<{ ok: boolean }> {
+  const age = ageFromBirthDate(value);
+  if (age === null || age < MIN_AGE) return { ok: false };
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+  const { error } = await supabase.rpc("set_candidate_birth_date", { p_date: value });
+  if (error) { console.error("saveBirthDate:", error.message); return { ok: false }; }
+  revalidatePath("/candidat/compte");
+  return { ok: true };
+}

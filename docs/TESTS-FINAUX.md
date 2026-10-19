@@ -26,3 +26,9 @@ Prérequis : SQL 015 exécuté, clés Turnstile en place, 2 adresses mail de tes
 - Pages principales sur téléphone (≈375 px).
 - /api/health renvoie {"ok":true}.
 - En-têtes présents (securityheaders.com).
+
+## 6. Candidathèque (après SQL 015-017 et CANDIDATE_POOL_ENABLED=true)
+- Inscription candidat : date de naissance obligatoire ; < 15 ans refusé ; 15-17 ans : pas de case de visibilité.
+- Majeur : cocher la case → apparaît dans la candidathèque d'une entreprise en essai/abonnée ; décocher → disparaît.
+- Entreprise sans accès (essai expiré) : message d'abonnement, aucun profil ni coordonnée.
+- Coordonnées visibles uniquement après clic ; le clic est journalisé (table candidate_pool_access).

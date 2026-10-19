@@ -24,6 +24,19 @@ await db.exec(`INSERT INTO candidates (auth_user_id, first_name, last_name, phon
 // Par défaut : invisible
 assert.deepEqual(await q(`select count(*)::int n from candidates where visible_to_recruiters`), [{ n: 0 }]);
 
+// Sans date de naissance : accord refusé
+await db.exec(`SELECT set_config('app.uid','${a}',false)`);
+await assert.rejects(() => db.exec(`SELECT set_candidate_visibility(true,'v1')`), /adult_required/);
+// Mineur (16 ans) : refusé ; moins de 15 ans : date refusée
+await assert.rejects(() => db.exec(`SELECT set_candidate_birth_date((current_date - interval '14 years')::date)`), /invalid_age/);
+await db.exec(`SELECT set_candidate_birth_date((current_date - interval '16 years')::date)`);
+await assert.rejects(() => db.exec(`SELECT set_candidate_visibility(true,'v1')`), /adult_required/);
+// La date ne peut plus être changée pour « devenir majeur »
+await db.exec(`SELECT set_candidate_birth_date((current_date - interval '30 years')::date)`);
+assert.equal((await q(`select (birth_date > current_date - interval '18 years') minor from candidates where first_name='A'`))[0].minor, true);
+// Majeur : possible (date posée directement par l'inscription côté serveur)
+await db.exec(`UPDATE candidates SET birth_date = (current_date - interval '30 years')::date WHERE first_name='A'`);
+
 // A accepte : seul A change, avec horodatage et version
 await db.exec(`SELECT set_config('app.uid','${a}',false)`);
 await db.exec(`SELECT set_candidate_visibility(true,'v1')`);

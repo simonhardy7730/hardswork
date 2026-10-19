@@ -42,7 +42,7 @@ export default function PrivacyPage() {
             <LegalSection title="2. Données collectées">
               <p>Nous collectons les catégories de données suivantes :</p>
               <ul>
-                <li><strong>Données d&apos;identification</strong> : nom, prénom, adresse email, numéro de téléphone</li>
+                <li><strong>Données d&apos;identification</strong> : nom, prénom, adresse email, numéro de téléphone, date de naissance (âge minimum d&apos;inscription : 15 ans)</li>
                 <li><strong>Données professionnelles</strong> : secteur d&apos;activité, compétences, permis, langues, disponibilité</li>
                 <li><strong>CV et documents</strong> : stockés de façon sécurisée dans nos infrastructures EU</li>
                 <li><strong>Disponibilités et préférences d&apos;emploi</strong> : jours et plages horaires, type de job recherché (emploi classique, intérim, job étudiant, flexi-job, stage), situation déclarée (étudiant, flexi-job)</li>
@@ -146,7 +146,7 @@ export default function PrivacyPage() {
 
             <LegalSection title="7 bis. Mineurs">
               <p>
-                Wolko s&apos;adresse aux personnes en âge de travailler. Si vous avez moins de 18 ans, vous ne pouvez
+                Wolko s&apos;adresse aux personnes en âge de travailler (inscription à partir de 15 ans, vérifiée par la date de naissance). La visibilité auprès des recruteurs abonnés est réservée aux personnes de 18 ans et plus. Si vous avez moins de 18 ans, vous ne pouvez
                 postuler qu&apos;à des offres compatibles avec la réglementation sur le travail des jeunes, et un
                 représentant légal peut exercer vos droits en notre nom en écrivant à{" "}
                 <a href="mailto:hello@wolko.be">hello@wolko.be</a>. Nous ne réutilisons jamais le profil d&apos;un mineur

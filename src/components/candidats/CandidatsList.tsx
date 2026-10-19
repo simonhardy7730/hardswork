@@ -8,7 +8,8 @@ import {
   Search, Phone, Mail, MapPin, Clock,
   Zap, Award, ChevronRight, Lock, Users,
 } from "lucide-react";
-import { SECTOR_LABELS, REGION_LABELS } from "@/lib/utils";
+import { labels } from "@/lib/utils";
+import { useL, useLang } from "@/lib/i18n/context";
 import type { Candidate } from "@/lib/supabase/types";
 
 /* ─── Types ──────────────────────────────────────────── */
@@ -37,36 +38,28 @@ interface Props {
 }
 
 /* ─── Données filtres ────────────────────────────────── */
-const FILTER_SECTORS = [
-  { key: "logistique",   label: "Logistique" },
-  { key: "construction", label: "Construction" },
-  { key: "industrie",    label: "Industrie" },
-  { key: "transport",    label: "Transport" },
-  { key: "medical",      label: "Médical" },
-  { key: "securite",     label: "Sécurité" },
-  { key: "nettoyage",    label: "Nettoyage" },
-];
+const FILTER_SECTOR_KEYS = ["logistique", "construction", "industrie", "transport", "medical", "securite", "nettoyage"];
 
 const FILTER_CERTIFS = [
   { key: "vca",     label: "VCA",                  type: "caces"  },
   { key: "caces",   label: "CACES",                type: "caces"  },
-  { key: "B",       label: "Permis B",             type: "permis" },
-  { key: "C",       label: "Permis C",             type: "permis" },
-  { key: "CE",      label: "Permis CE",            type: "permis" },
+  { key: "B",       label: "B",                    type: "permis" },
+  { key: "C",       label: "C",                    type: "permis" },
+  { key: "CE",      label: "CE",                   type: "permis" },
 ];
 
 const AVAILABILITY_OPTIONS = [
-  { value: "",           label: "Tous" },
-  { value: "immediate",  label: "Immédiate" },
-  { value: "1_semaine",  label: "Préavis de 1 semaine" },
-  { value: "1_mois",     label: "Préavis de 1 mois" },
+  { value: "",           fr: "Tous",                  nl: "Alle" },
+  { value: "immediate",  fr: "Immédiate",             nl: "Onmiddellijk" },
+  { value: "1_semaine",  fr: "Préavis de 1 semaine",  nl: "1 week opzegtermijn" },
+  { value: "1_mois",     fr: "Préavis de 1 mois",     nl: "1 maand opzegtermijn" },
 ];
 
 /* ─── Helpers ────────────────────────────────────────── */
-function buildTags(c: Candidate): string[] {
+function buildTags(c: Candidate, SECTOR_LABELS: Record<string, string>, permisWord: string): string[] {
   const tags: string[] = [];
   c.caces_types?.forEach(t => tags.push(t));
-  c.licenses?.forEach(l => tags.push(`Permis ${l}`));
+  c.licenses?.forEach(l => tags.push(`${permisWord} ${l}`));
   c.sectors?.slice(0, 2).forEach(s => {
     const label = SECTOR_LABELS[s];
     if (label) tags.push(label);
@@ -93,6 +86,9 @@ export default function CandidatsList({
 }: Props) {
   const router   = useRouter();
   const pathname = usePathname();
+  const l = useL();
+  const lang = useLang();
+  const SECTOR_LABELS = labels(lang).sector;
 
   /* Filtres locaux (checkboxes secteurs multi-select) */
   const [localSectors, setLocalSectors] = useState<string[]>(
@@ -149,7 +145,7 @@ export default function CandidatsList({
             <input
               value={searchText}
               onChange={e => setSearchText(e.target.value)}
-              placeholder="Nom, ville…"
+              placeholder={l("Nom, ville…", "Naam, stad…")}
               className="w-full pl-8 pr-3 py-2 text-xs border border-ink-100 rounded-lg focus:outline-none focus:border-brand transition bg-surface"
             />
           </div>
@@ -157,9 +153,9 @@ export default function CandidatsList({
 
         {/* ── Secteur ── */}
         <div>
-          <p className="text-[10px] font-black text-ink uppercase tracking-widest mb-2.5">Secteur</p>
+          <p className="text-[10px] font-black text-ink uppercase tracking-widest mb-2.5">{l("Secteur", "Sector")}</p>
           <div className="space-y-1.5">
-            {FILTER_SECTORS.map(({ key, label }) => (
+            {FILTER_SECTOR_KEYS.map((key) => (
               <label key={key} className="flex items-center gap-2 cursor-pointer group">
                 <input
                   type="checkbox"
@@ -168,7 +164,7 @@ export default function CandidatsList({
                   className="w-3.5 h-3.5 rounded border-ink-100 text-brand accent-brand cursor-pointer"
                 />
                 <span className={`text-xs font-medium transition-colors ${localSectors.includes(key) ? "text-brand" : "text-ink-700 group-hover:text-ink"}`}>
-                  {label}
+                  {SECTOR_LABELS[key] ?? key}
                 </span>
               </label>
             ))}
@@ -177,11 +173,11 @@ export default function CandidatsList({
 
         {/* ── Localisation ── */}
         <div>
-          <p className="text-[10px] font-black text-ink uppercase tracking-widest mb-2.5">Localisation</p>
+          <p className="text-[10px] font-black text-ink uppercase tracking-widest mb-2.5">{l("Localisation", "Locatie")}</p>
           <input
             type="text"
             defaultValue={searchParams.lieu ?? ""}
-            placeholder="Ville ou code postal"
+            placeholder={l("Ville ou code postal", "Stad of postcode")}
             onBlur={e => update("lieu", e.target.value.trim())}
             onKeyDown={e => { if (e.key === "Enter") update("lieu", (e.target as HTMLInputElement).value.trim()); }}
             className="w-full text-xs border border-ink-100 rounded-lg px-2.5 py-2 focus:outline-none focus:border-brand transition bg-surface"
@@ -190,9 +186,9 @@ export default function CandidatsList({
 
         {/* ── Disponibilité ── */}
         <div>
-          <p className="text-[10px] font-black text-ink uppercase tracking-widest mb-2.5">Disponibilité</p>
+          <p className="text-[10px] font-black text-ink uppercase tracking-widest mb-2.5">{l("Disponibilité", "Beschikbaarheid")}</p>
           <div className="space-y-1.5">
-            {AVAILABILITY_OPTIONS.map(({ value, label }) => (
+            {AVAILABILITY_OPTIONS.map(({ value, fr, nl }) => (
               <label key={value} className="flex items-center gap-2 cursor-pointer group">
                 <input
                   type="radio"
@@ -202,7 +198,7 @@ export default function CandidatsList({
                   className="w-3.5 h-3.5 accent-brand cursor-pointer"
                 />
                 <span className={`text-xs font-medium ${(searchParams.disponibilite ?? "") === value ? "text-brand" : "text-ink-700"}`}>
-                  {label}
+                  {l(fr, nl)}
                 </span>
               </label>
             ))}
@@ -211,7 +207,7 @@ export default function CandidatsList({
 
         {/* ── Permis / Certifications ── */}
         <div>
-          <p className="text-[10px] font-black text-ink uppercase tracking-widest mb-2.5">Permis / Certifications</p>
+          <p className="text-[10px] font-black text-ink uppercase tracking-widest mb-2.5">{l("Permis / Certifications", "Rijbewijzen / Certificaten")}</p>
           <div className="space-y-1.5">
             {FILTER_CERTIFS.map(({ key, label, type }) => {
               const isActive = type === "caces"
@@ -229,7 +225,7 @@ export default function CandidatsList({
                     className="w-3.5 h-3.5 rounded border-ink-100 accent-brand cursor-pointer"
                   />
                   <span className={`text-xs font-medium ${isActive ? "text-brand" : "text-ink-700"}`}>
-                    {label}
+                    {type === "permis" ? `${l("Permis", "Rijbewijs")} ${label}` : label}
                   </span>
                 </label>
               );
@@ -247,7 +243,7 @@ export default function CandidatsList({
             }}
             className="text-[11px] text-brand hover:text-brand-dark font-bold underline-offset-2 hover:underline transition"
           >
-            Réinitialiser les filtres
+            {l("Réinitialiser les filtres", "Filters wissen")}
           </button>
         )}
       </aside>
@@ -261,12 +257,15 @@ export default function CandidatsList({
             className="font-display font-black text-ink uppercase leading-none mb-1"
             style={{ fontSize: "clamp(1.6rem, 3vw, 2.4rem)", letterSpacing: "-0.01em" }}
           >
-            Votre prochaine{" "}
-            <span className="text-brand">[Recrue]</span>{" "}
-            est ici.
+            {l("Votre prochaine", "Uw volgende")}{" "}
+            <span className="text-brand">{l("[Recrue]", "[Aanwinst]")}</span>{" "}
+            {l("est ici.", "staat hier.")}
           </h1>
           <p className="text-ink-500 text-sm">
-            <span className="font-bold text-ink">{total.toLocaleString("fr-BE")}</span> profil{total > 1 ? "s" : ""} qualifié{total > 1 ? "s" : ""} disponible{total > 1 ? "s" : ""}
+            <span className="font-bold text-ink">{total.toLocaleString(lang === "nl" ? "nl-BE" : "fr-BE")}</span>{" "}
+            {lang === "nl"
+              ? `gekwalificeerd${total > 1 ? "e profielen" : " profiel"} beschikbaar`
+              : `profil${total > 1 ? "s" : ""} qualifié${total > 1 ? "s" : ""} disponible${total > 1 ? "s" : ""}`}
           </p>
         </div>
 
@@ -274,8 +273,8 @@ export default function CandidatsList({
         {candidats.length === 0 && (
           <div className="bg-white border border-ink-100 rounded-2xl py-16 text-center">
             <HardieIcon size={56} className="mx-auto mb-3" />
-            <p className="font-display font-black text-ink text-lg mb-1">Aucun candidat trouvé</p>
-            <p className="text-sm text-ink-500">Ajustez vos filtres ou revenez plus tard.</p>
+            <p className="font-display font-black text-ink text-lg mb-1">{l("Aucun candidat trouvé", "Geen kandidaten gevonden")}</p>
+            <p className="text-sm text-ink-500">{l("Ajustez vos filtres ou revenez plus tard.", "Pas uw filters aan of kom later terug.")}</p>
           </div>
         )}
 
@@ -284,7 +283,7 @@ export default function CandidatsList({
           <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden">
             {candidats.map((c, idx) => {
               const isUnlocked = hasSubscription;
-              const tags = buildTags(c);
+              const tags = buildTags(c, SECTOR_LABELS, l("Permis", "Rijbewijs"));
               const score = matchMap.get(c.id) ?? 0;
               const initials = `${c.first_name?.[0] ?? ""}${c.last_name?.[0] ?? ""}`.toUpperCase();
 
@@ -340,7 +339,7 @@ export default function CandidatsList({
                       {c.experience_years != null && (
                         <span className="flex items-center gap-1 text-[11px] text-ink-300">
                           <Clock size={10} />
-                          {c.experience_years === 0 ? "Débutant" : `${c.experience_years} ans d'exp.`}
+                          {c.experience_years === 0 ? l("Débutant", "Starter") : l(`${c.experience_years} ans d'exp.`, `${c.experience_years} jaar ervaring`)}
                         </span>
                       )}
                       {/* Ville */}
@@ -372,7 +371,7 @@ export default function CandidatsList({
                           href={`/dashboard/candidats/${c.id}`}
                           className="font-display font-black text-white bg-brand hover:bg-brand-dark rounded-lg px-3 py-2 text-[11px] uppercase tracking-wide transition hidden sm:flex items-center gap-1.5"
                         >
-                          Contacter
+                          {l("Contacter", "Contact opnemen")}
                           <ChevronRight size={11} />
                         </Link>
                         {/* Icônes contact rapide */}
@@ -395,7 +394,7 @@ export default function CandidatsList({
                         <Link href="/#tarifs"
                           className="font-display font-black text-brand bg-brand/10 hover:bg-brand/15 border border-brand/20 rounded-lg px-3 py-2 text-[11px] uppercase tracking-wide transition hidden sm:flex items-center gap-1.5">
                           <Lock size={10} />
-                          Débloquer
+                          {l("Débloquer", "Ontgrendelen")}
                         </Link>
                         {/* Icônes grisées */}
                         <div className="w-8 h-8 rounded-lg bg-surface border border-ink-100 flex items-center justify-center text-ink-100 cursor-not-allowed">
@@ -418,16 +417,16 @@ export default function CandidatsList({
           <div className="mt-5 bg-[#101F43] rounded-2xl p-5 flex items-center justify-between gap-4">
             <div>
               <p className="font-display font-black text-white text-base mb-0.5">
-                Débloquez tous les contacts
+                {l("Débloquez tous les contacts", "Ontgrendel alle contactgegevens")}
               </p>
               <p className="text-white/40 text-xs">
-                Passez à un plan Pro pour accéder aux coordonnées directes de tous vos candidats.
+                {l("Passez à un plan Pro pour accéder aux coordonnées directes de tous vos candidats.", "Neem een Pro-abonnement om de rechtstreekse contactgegevens van al uw kandidaten te zien.")}
               </p>
             </div>
             <Link href="/#tarifs"
               className="btn-brand shrink-0"
               style={{ fontSize: "0.8rem", padding: "0.5rem 1rem" }}>
-              Voir les tarifs
+              {l("Voir les tarifs", "Tarieven bekijken")}
             </Link>
           </div>
         )}

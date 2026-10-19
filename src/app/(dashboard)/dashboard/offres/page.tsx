@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import OffresTable from "@/components/offres/OffresTable";
 import OffresFilters from "@/components/offres/OffresFilters";
 import type { JobOffer } from "@/lib/supabase/types";
+import { getL } from "@/lib/i18n/server";
 
 interface SearchParams {
   secteur?: string;
@@ -17,6 +18,7 @@ export default async function OffresPage({
 }: {
   searchParams: SearchParams;
 }) {
+  const l = getL();
   const supabase = await createClient();
   const {
     data: { user },
@@ -61,11 +63,11 @@ export default async function OffresPage({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-[#101F43]">
-            Offres d&apos;emploi
+            {l("Offres d'emploi", "Vacatures")}
           </h1>
           <p className="text-sm text-ink-500 mt-0.5">
-            {counts.total} offre{counts.total > 1 ? "s" : ""} · {counts.active}{" "}
-            active{counts.active > 1 ? "s" : ""}
+            {counts.total} {counts.total > 1 ? l("offres", "vacatures") : l("offre", "vacature")} · {counts.active}{" "}
+            {counts.active > 1 ? l("actives", "actief") : l("active", "actief")}
           </p>
         </div>
         <Link
@@ -73,7 +75,7 @@ export default async function OffresPage({
           className="flex items-center gap-2 bg-brand text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-dark transition"
         >
           <Plus size={16} />
-          Nouvelle offre
+          {l("Nouvelle offre", "Nieuwe vacature")}
         </Link>
       </div>
 

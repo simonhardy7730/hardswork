@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { SECTOR_LABELS } from "@/lib/utils";
+import { labels } from "@/lib/utils";
+import { useL, useLang } from "@/lib/i18n/context";
 
 interface Props {
   searchParams: { secteur?: string; statut?: string; region?: string };
@@ -9,15 +10,18 @@ interface Props {
 }
 
 const STATUS_TABS = [
-  { value: "", label: "Toutes" },
-  { value: "active", label: "Actives" },
-  { value: "draft", label: "Brouillons" },
-  { value: "paused", label: "En pause" },
-  { value: "closed", label: "Clôturées" },
+  { value: "", fr: "Toutes", nl: "Alle" },
+  { value: "active", fr: "Actives", nl: "Actief" },
+  { value: "draft", fr: "Brouillons", nl: "Concepten" },
+  { value: "paused", fr: "En pause", nl: "Gepauzeerd" },
+  { value: "closed", fr: "Clôturées", nl: "Afgesloten" },
 ];
 
 export default function OffresFilters({ searchParams }: Props) {
   const router = useRouter();
+  const l = useL();
+  const lang = useLang();
+  const SECTOR_LABELS = labels(lang).sector;
   const pathname = usePathname();
 
   function update(key: string, value: string) {
@@ -46,7 +50,7 @@ export default function OffresFilters({ searchParams }: Props) {
                 : "text-ink-500 hover:text-ink hover:bg-surface-2"
             }`}
           >
-            {tab.label}
+            {l(tab.fr, tab.nl)}
           </button>
         ))}
       </div>
@@ -58,7 +62,7 @@ export default function OffresFilters({ searchParams }: Props) {
           onChange={(e) => update("secteur", e.target.value)}
           className="px-3 py-1.5 border border-ink-100 rounded-lg text-sm text-ink-500 bg-white focus:outline-none focus:border-brand transition"
         >
-          <option value="">Tous les secteurs</option>
+          <option value="">{l("Tous les secteurs", "Alle sectoren")}</option>
           {Object.entries(SECTOR_LABELS).map(([val, label]) => (
             <option key={val} value={val}>
               {label}
@@ -71,10 +75,10 @@ export default function OffresFilters({ searchParams }: Props) {
           onChange={(e) => update("region", e.target.value)}
           className="px-3 py-1.5 border border-ink-100 rounded-lg text-sm text-ink-500 bg-white focus:outline-none focus:border-brand transition"
         >
-          <option value="">Toutes les régions</option>
-          <option value="wallonie">Wallonie</option>
-          <option value="bruxelles">Bruxelles</option>
-          <option value="flandre">Flandre</option>
+          <option value="">{l("Toutes les régions", "Alle regio's")}</option>
+          <option value="wallonie">{l("Wallonie", "Wallonië")}</option>
+          <option value="bruxelles">{l("Bruxelles", "Brussel")}</option>
+          <option value="flandre">{l("Flandre", "Vlaanderen")}</option>
         </select>
 
         {(searchParams.secteur || searchParams.region) && (
@@ -82,7 +86,7 @@ export default function OffresFilters({ searchParams }: Props) {
             onClick={() => router.push(pathname)}
             className="px-3 py-1.5 text-sm text-red-500 hover:text-red-700 transition"
           >
-            ✕ Réinitialiser
+            {"✕ " + l("Réinitialiser", "Wissen")}
           </button>
         )}
       </div>

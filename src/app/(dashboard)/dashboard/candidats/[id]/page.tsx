@@ -150,7 +150,7 @@ export default async function CandidatDetailPage({
                   <span className="flex items-center gap-1.5 text-white/50 text-sm font-semibold">
                     <MapPin size={13} />
                     {candidat.city}
-                    {candidat.region && ` · ${REGION_LABELS[candidat.region as string] ?? candidat.region}`}
+                    {candidat.postal_code && ` · ${candidat.postal_code}`}
                   </span>
                 )}
                 {candidat.experience_years != null && (

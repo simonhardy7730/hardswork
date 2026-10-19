@@ -1,3 +1,4 @@
+import { HardieIcon } from "@/components/ui/HardieIcon";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -207,7 +208,7 @@ export default async function DashboardPage() {
 
         {!recentApps || recentApps.length === 0 ? (
           <div className="py-12 text-center">
-            <Users size={32} className="text-[#EADFC4] mx-auto mb-3" />
+            <HardieIcon size={48} className="mx-auto mb-3" />
             <p className="text-sm text-ink-300">
               Aucune candidature pour le moment.
             </p>

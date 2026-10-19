@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import DocumentsUpload from "@/components/candidat/DocumentsUpload";
 import { User, Mail, Phone, Lock, LogOut } from "lucide-react";
 
 export const metadata = { title: "Mon compte — HardSwork" };
@@ -102,6 +103,9 @@ export default async function ComptePage() {
           </p>
         </div>
       </div>
+
+      {/* Diplômes & permis */}
+      <DocumentsUpload userId={user.id} />
 
       {/* Sécurité */}
       <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden">

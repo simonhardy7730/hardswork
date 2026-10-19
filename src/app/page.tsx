@@ -40,7 +40,6 @@ const SECTORS = [
   {
     key: "logistique",
     label: "Logistique",
-    count: "840+",
     bg: "linear-gradient(135deg, #1a1512 0%, #2d2420 100%)",
     accent: "#FFB703",
     img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&auto=format&fit=crop&q=70",
@@ -48,7 +47,6 @@ const SECTORS = [
   {
     key: "transport",
     label: "Transport",
-    count: "620+",
     bg: "linear-gradient(135deg, #0f1a24 0%, #1a2d3d 100%)",
     accent: "#3B82F6",
     img: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=800&auto=format&fit=crop&q=70",
@@ -56,7 +54,6 @@ const SECTORS = [
   {
     key: "industrie",
     label: "Industrie",
-    count: "510+",
     bg: "linear-gradient(135deg, #1a1a0f 0%, #2d2d1a 100%)",
     accent: "#F59E0B",
     img: "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=800&auto=format&fit=crop&q=70",
@@ -64,7 +61,6 @@ const SECTORS = [
   {
     key: "construction",
     label: "Construction",
-    count: "390+",
     bg: "linear-gradient(135deg, #1a1209 0%, #2d1f0f 100%)",
     accent: "#F97316",
     img: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&auto=format&fit=crop&q=70",
@@ -72,7 +68,6 @@ const SECTORS = [
   {
     key: "nettoyage",
     label: "Nettoyage",
-    count: "280+",
     bg: "linear-gradient(135deg, #0f1a17 0%, #1a2d26 100%)",
     accent: "#10B981",
     img: "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=800&auto=format&fit=crop&q=70",
@@ -80,7 +75,6 @@ const SECTORS = [
   {
     key: "securite",
     label: "Sécurité",
-    count: "190+",
     bg: "linear-gradient(135deg, #12120f 0%, #1f1f17 100%)",
     accent: "#8B5CF6",
     img: "https://images.unsplash.com/photo-1582139329536-e7284fece509?w=800&auto=format&fit=crop&q=70",
@@ -88,7 +82,6 @@ const SECTORS = [
   {
     key: "medical",
     label: "Médical",
-    count: "320+",
     bg: "linear-gradient(135deg, #0f1a1a 0%, #1a2d2d 100%)",
     accent: "#06B6D4",
     img: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&auto=format&fit=crop&q=70",
@@ -113,22 +106,6 @@ export default async function HomePage() {
     .eq("status", "active")
     .order("created_at", { ascending: false })
     .limit(8);
-
-  // Compteurs par secteur
-  const sectorKeys = ["logistique","transport","industrie","construction","nettoyage","securite","medical"];
-  const sectorCountsRaw = await Promise.all(
-    sectorKeys.map((s) =>
-      supabase
-        .from("job_offers")
-        .select("id", { count: "exact", head: true })
-        .eq("status", "active")
-        .eq("sector", s)
-        .then(({ count }) => ({ sector: s, count: count ?? 0 }))
-    )
-  );
-  const sectorCounts: Record<string, number> = Object.fromEntries(
-    sectorCountsRaw.map(({ sector, count }) => [sector, count])
-  );
 
   const jobs = (featuredRaw ?? []) as unknown as JobOffer[];
 
@@ -225,6 +202,74 @@ export default async function HomePage() {
       <SearchModule />
 
 
+      {/* ── AUDIENCE SPLIT ────────────────────────────── */}
+      <section className="relative grid md:grid-cols-2 min-h-[80vh]">
+        {/* Mascotte au centre de la jonction */}
+        <WolfBadge className="absolute left-1/2 top-4 -translate-x-1/2 w-28 md:w-[170px] z-10" />
+
+        {/* Recruiter side */}
+        <div className="brand-on-dark relative overflow-hidden noise group cursor-pointer">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=900&auto=format&fit=crop&q=75"
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#10214B]/95 via-[#10214B]/70 to-[#FFB703]/20" />
+          <div className="relative h-full flex flex-col justify-end p-10 md:p-14 min-h-[50vh]" style={{ zIndex: 2 }}>
+            <p className="section-label text-brand/80 mb-4">Pour les recruteurs</p>
+            <h2 className="font-display font-black text-white mb-4"
+              style={{ fontSize: "clamp(2rem, 3.5vw, 3.25rem)", lineHeight: 0.95 }}>
+              Trouvez le
+              <br />
+              bon profil.
+              <br />
+              Vite.
+            </h2>
+            <p className="text-white/55 text-sm leading-relaxed mb-8 max-w-xs">
+              Publiez en 2 minutes. Recevez des candidatures filtrées par permis, CACES et expérience.
+            </p>
+            <div>
+              <Link href="/signup" className="btn-brand inline-flex">
+                Créer mon espace recruteur
+                <ArrowRight size={15} />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Worker side */}
+        <div className="relative overflow-hidden noise group cursor-pointer">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=900&auto=format&fit=crop&q=75"
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#FBF1D8]/92 via-[#FBF1D8]/60 to-transparent" />
+          <div className="relative h-full flex flex-col justify-end p-10 md:p-14 min-h-[50vh]" style={{ zIndex: 2 }}>
+            <p className="section-label mb-4">Pour les chercheurs d&apos;emploi</p>
+            <h2 className="font-display font-black text-ink"
+              style={{ fontSize: "clamp(2rem, 3.5vw, 3.25rem)", lineHeight: 0.95 }}>
+              Votre métier
+              <br />
+              mérite
+              <br />
+              <em className="not-italic text-brand">mieux.</em>
+            </h2>
+            <p className="text-ink-500 text-sm leading-relaxed mb-8 max-w-xs">
+              Créez votre profil, uploadez votre CV. Les recruteurs viennent à vous — pas l&apos;inverse.
+            </p>
+            <div>
+              <Link href="/signup/candidat" className="btn-dark inline-flex">
+                Créer mon profil gratuitement
+                <ArrowRight size={15} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── SECTORS ──────────────────────────────────── */}
       <section id="secteurs" className="bg-[#10214B] pb-24">
         <div className="max-w-7xl mx-auto px-6">
@@ -257,12 +302,7 @@ export default async function HomePage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#10214B] via-[#10214B]/40 to-transparent" />
 
                   {/* Content */}
-                  <div className="absolute inset-0 p-5 flex flex-col justify-between" style={{ zIndex: 2 }}>
-                    <div className="flex justify-end">
-                      <span className="text-[11px] font-bold text-white/60 bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded-full">
-                        {sectorCounts[s.key] > 0 ? `${sectorCounts[s.key]}` : s.count} offres
-                      </span>
-                    </div>
+                  <div className="absolute inset-0 p-5 flex flex-col justify-end" style={{ zIndex: 2 }}>
                     <div>
                       <h3 className="font-display font-black text-white text-2xl leading-none mb-2 group-hover:text-brand transition-colors">
                         {s.label}
@@ -356,71 +396,6 @@ export default async function HomePage() {
               Voir toutes les offres d&apos;emploi
               <ArrowRight size={15} />
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── AUDIENCE SPLIT ────────────────────────────── */}
-      <section className="grid md:grid-cols-2 min-h-[80vh]">
-        {/* Recruiter side */}
-        <div className="brand-on-dark relative overflow-hidden noise group cursor-pointer">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=900&auto=format&fit=crop&q=75"
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-[#10214B]/95 via-[#10214B]/70 to-[#FFB703]/20" />
-          <div className="relative h-full flex flex-col justify-end p-10 md:p-14 min-h-[50vh]" style={{ zIndex: 2 }}>
-            <p className="section-label text-brand/80 mb-4">Pour les recruteurs</p>
-            <h2 className="font-display font-black text-white mb-4"
-              style={{ fontSize: "clamp(2rem, 3.5vw, 3.25rem)", lineHeight: 0.95 }}>
-              Trouvez le
-              <br />
-              bon profil.
-              <br />
-              Vite.
-            </h2>
-            <p className="text-white/55 text-sm leading-relaxed mb-8 max-w-xs">
-              Publiez en 2 minutes. Recevez des candidatures filtrées par permis, CACES et expérience.
-            </p>
-            <div>
-              <Link href="/signup" className="btn-brand inline-flex">
-                Créer mon espace recruteur
-                <ArrowRight size={15} />
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Worker side */}
-        <div className="relative overflow-hidden noise group cursor-pointer">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=900&auto=format&fit=crop&q=75"
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-[#FBF1D8]/95 via-[#FBF1D8]/70 to-transparent" />
-          <div className="relative h-full flex flex-col justify-end p-10 md:p-14 min-h-[50vh]" style={{ zIndex: 2 }}>
-            <p className="section-label mb-4">Pour les chercheurs d&apos;emploi</p>
-            <h2 className="font-display font-black text-ink"
-              style={{ fontSize: "clamp(2rem, 3.5vw, 3.25rem)", lineHeight: 0.95 }}>
-              Votre métier
-              <br />
-              mérite
-              <br />
-              <em className="not-italic text-brand">mieux.</em>
-            </h2>
-            <p className="text-ink-500 text-sm leading-relaxed mb-8 max-w-xs">
-              Créez votre profil, uploadez votre CV. Les recruteurs viennent à vous — pas l&apos;inverse.
-            </p>
-            <div>
-              <Link href="/signup/candidat" className="btn-dark inline-flex">
-                Créer mon profil gratuitement
-                <ArrowRight size={15} />
-              </Link>
-            </div>
           </div>
         </div>
       </section>

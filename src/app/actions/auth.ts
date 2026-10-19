@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { isValidVat, normalizeVat } from "@/lib/vat";
 
 export async function signIn(formData: FormData) {
   const email = formData.get("email") as string;
@@ -41,6 +42,9 @@ export async function signUp(formData: FormData) {
   const fullName = formData.get("full_name") as string;
   const orgType = formData.get("org_type") as "agency" | "company";
   const orgName = formData.get("org_name") as string;
+  const vatRaw = ((formData.get("vat_number") as string) ?? "").trim();
+  if (!isValidVat(vatRaw)) return { error: "Numéro de TVA invalide. Exemple : BE 0123.456.789" };
+  const vatNumber = normalizeVat(vatRaw);
 
   const supabase = await createClient();
 
@@ -59,11 +63,19 @@ export async function signUp(formData: FormData) {
   }
 
   // Créer l'organisation
-  const { data: org, error: orgError } = await supabase
+  let { data: org, error: orgError } = await supabase
     .from("organizations")
-    .insert({ name: orgName, type: orgType })
+    .insert({ name: orgName, type: orgType, vat_number: vatNumber })
     .select()
     .single();
+  // vat_number : colonne ajoutée par la migration 004 ; sans elle, on crée l'organisation quand même.
+  if (orgError && /vat_number/.test(orgError.message ?? "")) {
+    ({ data: org, error: orgError } = await supabase
+      .from("organizations")
+      .insert({ name: orgName, type: orgType })
+      .select()
+      .single());
+  }
 
   if (orgError || !org) {
     return { error: "Erreur lors de la création de l'organisation." };

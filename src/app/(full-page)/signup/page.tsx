@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, ArrowRight, ArrowLeft, Check, UserPlus } from "lucide-react";
+import { isValidVat } from "@/lib/vat";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
 
 type OrgType = "agency" | "company";
@@ -126,7 +127,7 @@ function NormalSignup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [cgu, setCgu] = useState(false);
-  const [formData, setFormData] = useState({ org_name: "", full_name: "", email: "", password: "" });
+  const [formData, setFormData] = useState({ org_name: "", vat_number: "", full_name: "", email: "", password: "" });
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -138,6 +139,7 @@ function NormalSignup() {
     if (!cgu) { setError("Veuillez accepter les CGU pour continuer."); return; }
     setLoading(true);
     setError("");
+    if (!isValidVat(formData.vat_number)) { setError("Numéro de TVA invalide. Exemple : BE 0123.456.789"); setLoading(false); return; }
     const supabase = createClient();
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -147,8 +149,12 @@ function NormalSignup() {
     });
     if (authError || !authData.user) { setError(authError?.message ?? "Erreur lors de l'inscription."); setLoading(false); return; }
 
-    const { data: org, error: orgError } = await supabase.from("organizations")
-      .insert({ name: formData.org_name, type: orgType }).select().single();
+    let { data: org, error: orgError } = await supabase.from("organizations")
+      .insert({ name: formData.org_name, type: orgType, vat_number: formData.vat_number.trim() }).select().single();
+    if (orgError && /vat_number/.test(orgError.message ?? "")) {
+      ({ data: org, error: orgError } = await supabase.from("organizations")
+        .insert({ name: formData.org_name, type: orgType }).select().single());
+    }
     if (orgError || !org) { setError("Erreur lors de la création de l'organisation."); setLoading(false); return; }
 
     await supabase.from("users").insert({ id: authData.user.id, organization_id: org.id, email: formData.email, full_name: formData.full_name, role: "admin" });
@@ -295,6 +301,13 @@ function NormalSignup() {
                   <input type="text" name="org_name" required value={formData.org_name} onChange={handleChange}
                     placeholder={currentRole?.placeholder}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition-colors" />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">Numéro de TVA</label>
+                  <input type="text" placeholder="BE 0123.456.789 ou FR 12 345678901" name="vat_number" value={formData.vat_number} onChange={handleChange}
+                    autoComplete="off" required
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition" />
                 </div>
 
                 <div>

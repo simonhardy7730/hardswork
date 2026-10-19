@@ -49,9 +49,8 @@ const SECTORS_DATA = [
   },
 ];
 
-const LICENSES    = ["B", "C", "CE"];
+const LICENSES    = ["B", "C", "CE", "D"];
 const CACES_TYPES = ["CACES 1", "CACES 3", "CACES 5", "CACES 6", "CACES R489"];
-const CITIES      = ["Liège", "Charleroi", "Namur", "Mons", "Bruxelles", "Bruges", "Gand", "Anvers", "Autre"];
 
 /* ─── Left-panel config par étape ────────────────────── */
 const LEFT = {
@@ -92,7 +91,7 @@ export default function CandidatSignupPage() {
   /* Étape 2 — profil */
   const [profile, setProfile] = useState({
     city: "",
-    region: "wallonie",
+    postal_code: "",
     availability: "immediate",
     licenses: [] as string[],
     has_caces: false,
@@ -151,7 +150,7 @@ export default function CandidatSignupPage() {
         phone: auth.phone,
         email: auth.email,
         city: profile.city || null,
-        region: profile.region || null,
+        postal_code: profile.postal_code || null,
         availability: profile.availability,
         licenses: profile.licenses,
         has_caces: profile.has_caces,
@@ -333,29 +332,25 @@ export default function CandidatSignupPage() {
                 <p className="text-ink-500 text-sm">Ces infos sont visibles par les recruteurs.</p>
               </div>
 
-              {/* Localisation */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* Localisation : ville + code postal */}
+              <div className="grid grid-cols-[1fr_120px] gap-3">
                 <div>
                   <label className={labelCls}>Ville</label>
                   <div className="relative">
                     <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
-                    <select value={profile.city}
+                    <input type="text" autoComplete="address-level2" placeholder="Ex : Tournai"
+                      value={profile.city}
                       onChange={e => setProfile(p => ({ ...p, city: e.target.value }))}
-                      className={inputCls + " appearance-none"}>
-                      <option value="">Ville...</option>
-                      {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
+                      className={inputCls} />
                   </div>
                 </div>
                 <div>
-                  <label className={labelCls}>Région</label>
-                  <select value={profile.region}
-                    onChange={e => setProfile(p => ({ ...p, region: e.target.value }))}
-                    className="w-full px-3 py-3 bg-white border border-ink-100 rounded-xl text-ink text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/15 transition appearance-none">
-                    <option value="wallonie">Wallonie</option>
-                    <option value="bruxelles">Bruxelles</option>
-                    <option value="flandre">Flandre</option>
-                  </select>
+                  <label className={labelCls}>Code postal</label>
+                  <input type="text" inputMode="numeric" autoComplete="postal-code" placeholder="7500"
+                    maxLength={5} pattern="\d{4,5}"
+                    value={profile.postal_code}
+                    onChange={e => setProfile(p => ({ ...p, postal_code: e.target.value.replace(/\D/g, "") }))}
+                    className={inputCls.replace("pl-9", "pl-3")} />
                 </div>
               </div>
 
@@ -534,6 +529,9 @@ export default function CandidatSignupPage() {
                     </div>
                   )}
                 </label>
+                <p className="text-xs text-ink-400 mt-2">
+                  Vos diplômes et permis ? Vous pourrez les ajouter depuis votre compte, une fois inscrit.
+                </p>
               </div>
 
               {error && (

@@ -9,7 +9,7 @@ interface SearchParams {
   secteurs?: string;       // comma-separated
   caces?: string;
   permis?: string;
-  region?: string;
+  lieu?: string;
 }
 
 export default async function CandidatsPage({
@@ -50,7 +50,11 @@ export default async function CandidatsPage({
   if (searchParams.disponibilite) query = query.eq("availability", searchParams.disponibilite);
   if (searchParams.caces)         query = query.eq("has_caces", true);
   if (searchParams.permis)        query = query.contains("licenses", [searchParams.permis]);
-  if (searchParams.region)        query = query.eq("region", searchParams.region);
+  if (searchParams.lieu) {
+    const lieu = searchParams.lieu.replace(/[%,()]/g, "").trim();
+    if (/^\d+$/.test(lieu)) query = query.like("postal_code", `${lieu}%`);
+    else if (lieu)           query = query.ilike("city", `%${lieu}%`);
+  }
   if (searchParams.q)             query = query.or(`first_name.ilike.%${searchParams.q}%,last_name.ilike.%${searchParams.q}%,city.ilike.%${searchParams.q}%`);
 
   // Filtres secteurs (multi)

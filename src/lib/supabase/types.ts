@@ -43,6 +43,7 @@ export interface Organization {
   address: string | null;
   city: string | null;
   region: Region | null;
+  vat_number?: string | null;
   phone: string | null;
   email: string | null;
   website: string | null;
@@ -94,6 +95,7 @@ export interface Candidate {
   phone: string;
   email: string | null;
   city: string | null;
+  postal_code?: string | null;
   region: Region | null;
   availability: CandidateAvailability;
   licenses: string[];

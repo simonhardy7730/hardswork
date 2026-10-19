@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowLeft, Check, Loader2, Zap, Users, Clock, Shield } from "lucide-react";
+import { isValidVat } from "@/lib/vat";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { signUp } from "@/app/actions/auth";
 
@@ -45,7 +46,7 @@ export default function RecrutePage() {
   const [showForm, setShowForm] = useState(false);
   const [step, setStep]         = useState<Step>("select");
   const [selected, setSelected] = useState<OrgType | null>(null);
-  const [form, setForm]         = useState({ orgName: "", fullName: "", email: "", password: "", cgu: false });
+  const [form, setForm]         = useState({ orgName: "", vat: "", fullName: "", email: "", password: "", cgu: false });
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
 
@@ -58,6 +59,7 @@ export default function RecrutePage() {
     e.preventDefault();
     if (!form.cgu) { setError("Veuillez accepter les CGU pour continuer."); return; }
     if (!selected) return;
+    if (!isValidVat(form.vat)) { setError("Numéro de TVA invalide. Exemple : BE 0123.456.789"); return; }
     setError("");
     setLoading(true);
     try {
@@ -67,6 +69,7 @@ export default function RecrutePage() {
       fd.append("full_name", form.fullName);
       fd.append("org_type",  selected);
       fd.append("org_name",  form.orgName);
+      fd.append("vat_number", form.vat);
       const result = await signUp(fd);
       if (result?.error) setError(result.error);
     } catch {
@@ -383,6 +386,12 @@ export default function RecrutePage() {
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">1. Nom de l&apos;entreprise</label>
                   <input type="text" placeholder={currentRole?.placeholder} value={form.orgName} onChange={set("orgName")} required
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition" />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">Numéro de TVA</label>
+                  <input type="text" placeholder="BE 0123.456.789 ou FR 12 345678901" value={form.vat} onChange={set("vat")}
+                    autoComplete="off" required
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition" />
                 </div>
                 <div>

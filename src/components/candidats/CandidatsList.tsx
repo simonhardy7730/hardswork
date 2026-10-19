@@ -1,4 +1,5 @@
 "use client";
+import { HardieIcon } from "@/components/ui/HardieIcon";
 
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -29,7 +30,7 @@ interface Props {
     secteurs?: string;
     caces?: string;
     permis?: string;
-    region?: string;
+    lieu?: string;
   };
   offresActives: JobOfferBasic[];
   hasSubscription: boolean;
@@ -177,16 +178,14 @@ export default function CandidatsList({
         {/* ── Localisation ── */}
         <div>
           <p className="text-[10px] font-black text-ink uppercase tracking-widest mb-2.5">Localisation</p>
-          <select
-            value={searchParams.region ?? ""}
-            onChange={e => update("region", e.target.value)}
-            className="w-full text-xs border border-ink-100 rounded-lg px-2.5 py-2 focus:outline-none focus:border-brand transition bg-surface appearance-none"
-          >
-            <option value="">Toutes les régions</option>
-            {Object.entries(REGION_LABELS).map(([v, l]) => (
-              <option key={v} value={v}>{l}</option>
-            ))}
-          </select>
+          <input
+            type="text"
+            defaultValue={searchParams.lieu ?? ""}
+            placeholder="Ville ou code postal"
+            onBlur={e => update("lieu", e.target.value.trim())}
+            onKeyDown={e => { if (e.key === "Enter") update("lieu", (e.target as HTMLInputElement).value.trim()); }}
+            className="w-full text-xs border border-ink-100 rounded-lg px-2.5 py-2 focus:outline-none focus:border-brand transition bg-surface"
+          />
         </div>
 
         {/* ── Disponibilité ── */}
@@ -239,7 +238,7 @@ export default function CandidatsList({
         </div>
 
         {/* Réinitialiser */}
-        {(localSectors.length > 0 || searchParams.disponibilite || searchParams.caces || searchParams.permis || searchParams.region || searchParams.q) && (
+        {(localSectors.length > 0 || searchParams.disponibilite || searchParams.caces || searchParams.permis || searchParams.lieu || searchParams.q) && (
           <button
             onClick={() => {
               setLocalSectors([]);
@@ -274,7 +273,7 @@ export default function CandidatsList({
         {/* Empty state */}
         {candidats.length === 0 && (
           <div className="bg-white border border-ink-100 rounded-2xl py-16 text-center">
-            <Users size={40} className="text-ink-100 mx-auto mb-3" />
+            <HardieIcon size={56} className="mx-auto mb-3" />
             <p className="font-display font-black text-ink text-lg mb-1">Aucun candidat trouvé</p>
             <p className="text-sm text-ink-500">Ajustez vos filtres ou revenez plus tard.</p>
           </div>
@@ -348,8 +347,7 @@ export default function CandidatsList({
                       {c.city && (
                         <span className="flex items-center gap-1 text-[11px] text-ink-300">
                           <MapPin size={10} />
-                          {c.city}
-                          {c.region ? `, ${REGION_LABELS[c.region as string] ?? c.region}` : ""}
+                          {[c.postal_code, c.city].filter(Boolean).join(" ")}
                         </span>
                       )}
                     </div>

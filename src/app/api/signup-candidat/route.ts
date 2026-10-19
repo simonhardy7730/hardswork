@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
       phone,
       email,
       city,
-      region,
+      postal_code,
       availability,
       licenses,
       has_caces,
@@ -44,14 +44,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Profil déjà existant" }, { status: 409 });
     }
 
-    const { data, error } = await admin.from("candidates").insert({
+    const row = {
       auth_user_id,
       first_name,
       last_name: last_name || "-",
       phone,
       email,
       city: city || null,
-      region: region || null,
       availability: availability || "immediate",
       licenses: licenses || [],
       has_caces: has_caces || false,
@@ -61,7 +60,18 @@ export async function POST(req: NextRequest) {
       notes: cv_url || null,
       status: "actif",
       organization_id: null,
-    }).select().single();
+    };
+
+    // postal_code : colonne ajoutée par la migration 004 ; tant qu'elle n'est pas appliquée,
+    // on enregistre le profil sans (aucune inscription ne doit échouer à cause de ça).
+    let { data, error } = await admin
+      .from("candidates")
+      .insert({ ...row, postal_code: postal_code || null })
+      .select()
+      .single();
+    if (error && /postal_code/.test(error.message ?? "")) {
+      ({ data, error } = await admin.from("candidates").insert(row).select().single());
+    }
 
     if (error) {
       console.error("Candidate insert error:", error);

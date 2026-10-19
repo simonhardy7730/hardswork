@@ -64,7 +64,7 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
 
   const { data: offer } = await supabase
     .from("job_offers")
-    .select(`*, organizations(name, city, logo_url, primary_color, description)`)
+    .select(`*, organizations(name, city, logo_url, primary_color)`)
     .eq("id", params.id).eq("status", "active").single();
 
   if (!offer) notFound();

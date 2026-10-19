@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
 import { BRAND } from "@/lib/brand";
+import { getLang } from "@/lib/i18n/server";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
 const barlow = Barlow_Condensed({
@@ -53,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${inter.variable} ${barlow.variable}`}>
+    <html lang={getLang()} className={`${inter.variable} ${barlow.variable}`}>
       <body className="antialiased">{children}</body>
     </html>
   );

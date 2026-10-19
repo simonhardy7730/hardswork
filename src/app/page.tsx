@@ -4,13 +4,13 @@ import {
   ArrowRight, ArrowUpRight, MapPin, CheckCircle, Search, Building2, Zap, LayoutGrid, HeartHandshake,
   HardHat, Package, Truck, Factory, Stethoscope, ShieldCheck, Sparkles, UtensilsCrossed, Laptop,
 } from "lucide-react";
-import { CONTRACT_LABELS } from "@/lib/utils";
 import { SearchModule } from "@/components/home/SearchModule";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { WolfBadge } from "@/components/ui/WolfMascot";
-import { BRAND } from "@/lib/brand";
+import { getDict } from "@/lib/i18n/server";
+import type { Dict } from "@/lib/i18n/dict";
 
 interface JobOffer {
   id: string;
@@ -28,34 +28,29 @@ interface JobOffer {
 
 /* ─── Mosaïque du hero : plusieurs métiers ───────────── */
 const U = (id: string) => `https://images.unsplash.com/${id}?w=600&auto=format&fit=crop&q=75`;
-const MOSAIC = [
-  { label: "Construction", src: U("photo-1504307651254-35680f356dfd"), pos: "center 25%" },
-  { label: "Santé",        src: U("photo-1576091160550-2173dba999ef"), pos: "center 30%" },
-  { label: "Transport",    src: U("photo-1601584115197-04ecc0da31d7"), pos: "center 40%" },
-  { label: "Industrie",    src: U("photo-1565793298595-6a879b1d9492"), pos: "center 60%" },
-  { label: "Logistique",   src: U("photo-1586528116311-ad8dd3c8310d"), pos: "center center" },
-  { label: "Bureau",       src: U("photo-1556761175-5973dc0f32e7"),    pos: "center center" },
+const MOSAIC = (m: Record<string, string>) => [
+  { label: m.construction, src: U("photo-1504307651254-35680f356dfd"), pos: "center 25%" },
+  { label: m.health,        src: U("photo-1576091160550-2173dba999ef"), pos: "center 30%" },
+  { label: m.transport,    src: U("photo-1601584115197-04ecc0da31d7"), pos: "center 40%" },
+  { label: m.industry,    src: U("photo-1565793298595-6a879b1d9492"), pos: "center 60%" },
+  { label: m.logistics,   src: U("photo-1586528116311-ad8dd3c8310d"), pos: "center center" },
+  { label: m.office,       src: U("photo-1556761175-5973dc0f32e7"),    pos: "center center" },
 ];
 
 /* ─── Secteurs (extensible : ajouter une ligne) ──────── */
-const SECTORS = [
-  { label: "Construction", icon: HardHat,         href: "/jobs?secteur=construction" },
-  { label: "Logistique",   icon: Package,         href: "/jobs?secteur=logistique" },
-  { label: "Transport",    icon: Truck,           href: "/jobs?secteur=transport" },
-  { label: "Industrie",    icon: Factory,         href: "/jobs?secteur=industrie" },
-  { label: "Médical",      icon: Stethoscope,     href: "/jobs?secteur=medical" },
-  { label: "Sécurité",     icon: ShieldCheck,     href: "/jobs?secteur=securite" },
-  { label: "Nettoyage",    icon: Sparkles,        href: "/jobs?secteur=nettoyage" },
-  { label: "Horeca",       icon: UtensilsCrossed, href: "/jobs?secteur=autre" },
-  { label: "Tech & IT",    icon: Laptop,          href: "/jobs?q=informatique" },
+const SECTORS = (t: Dict["sectors"]) => [
+  { label: t.construction, icon: HardHat,         href: "/jobs?secteur=construction" },
+  { label: t.logistics,   icon: Package,         href: "/jobs?secteur=logistique" },
+  { label: t.transport,    icon: Truck,           href: "/jobs?secteur=transport" },
+  { label: t.industry,    icon: Factory,         href: "/jobs?secteur=industrie" },
+  { label: t.medical,      icon: Stethoscope,     href: "/jobs?secteur=medical" },
+  { label: t.security,     icon: ShieldCheck,     href: "/jobs?secteur=securite" },
+  { label: t.cleaning,    icon: Sparkles,        href: "/jobs?secteur=nettoyage" },
+  { label: t.horeca,       icon: UtensilsCrossed, href: "/jobs?secteur=autre" },
+  { label: t.tech,    icon: Laptop,          href: "/jobs?q=informatique" },
 ];
 
-const WHY = [
-  { icon: MapPin,         title: "Recrutement local",     body: "Trouvez des opportunités et des talents près de chez vous." },
-  { icon: Zap,            title: "Simple et rapide",      body: "Une expérience pensée pour faciliter les recherches et les candidatures." },
-  { icon: LayoutGrid,     title: "Tous les secteurs",     body: "Industrie, logistique, commerce, administratif et bien plus." },
-  { icon: HeartHandshake, title: "Une plateforme humaine", body: "Un outil conçu avec une véritable connaissance du recrutement." },
-];
+const WHY_ICONS = [MapPin, Zap, LayoutGrid, HeartHandshake];
 
 const CONTRACT_STYLE: Record<string, string> = {
   interim: "bg-orange-50 text-orange-700 border border-orange-200",
@@ -67,6 +62,7 @@ const CONTRACT_STYLE: Record<string, string> = {
 const H2 = { fontSize: "clamp(2rem, 4.5vw, 3.5rem)", lineHeight: 0.95 } as const;
 
 export default async function HomePage() {
+  const { t } = getDict();
   const supabase = await createClient();
 
   /* Offres réelles uniquement — aucune offre factice n'est affichée. */
@@ -88,12 +84,11 @@ export default async function HomePage() {
           <div>
             <h1 className="font-display font-black text-white uppercase leading-[0.92] tracking-tight mb-6 animate-fade-up-1"
               style={{ fontSize: "clamp(2.75rem, 7vw, 5.75rem)" }}>
-              Le bon talent.<br />
-              La bonne <span className="text-brand">entreprise.</span>
+              {t.hero.h1a}<br />
+              {t.hero.h1b}<span className="text-brand">{t.hero.h1c}</span>
             </h1>
             <p className="text-white/80 text-base sm:text-lg leading-relaxed max-w-xl mb-8 animate-fade-up-2">
-              La plateforme belge qui rapproche les candidats, les entreprises et les agences d&apos;intérim.
-              Trouvez un emploi ou recrutez plus simplement, près de chez vous.
+              {t.hero.sub}
             </p>
 
             <div className="grid sm:grid-cols-2 gap-3 animate-fade-up-3">
@@ -102,22 +97,22 @@ export default async function HomePage() {
                 <div className="w-11 h-11 rounded-xl bg-[#101F43] flex items-center justify-center mb-4">
                   <Search size={20} className="text-[#FFB900]" aria-hidden />
                 </div>
-                <h2 className="font-display font-black text-[#101F43] text-2xl leading-tight mb-1.5">Je cherche un emploi</h2>
+                <h2 className="font-display font-black text-[#101F43] text-2xl leading-tight mb-1.5">{t.hero.candTitle}</h2>
                 <p className="text-sm text-[#64748B] leading-relaxed mb-5 flex-1">
-                  Découvrez les opportunités près de chez vous et postulez facilement.
+                  {t.hero.candText}
                 </p>
-                <Link href="/jobs" className="btn-brand justify-center">Trouver un emploi <ArrowRight size={15} /></Link>
+                <Link href="/jobs" className="btn-brand justify-center">{t.hero.candCta} <ArrowRight size={15} /></Link>
               </div>
               {/* Recruteur */}
               <div className="bg-[#1C3058] border border-white/15 rounded-2xl p-5 flex flex-col shadow-lg">
                 <div className="w-11 h-11 rounded-xl bg-[#FFB900] flex items-center justify-center mb-4">
                   <Building2 size={20} className="text-[#101F43]" aria-hidden />
                 </div>
-                <h2 className="font-display font-black text-white text-2xl leading-tight mb-1.5">Je recrute</h2>
+                <h2 className="font-display font-black text-white text-2xl leading-tight mb-1.5">{t.hero.recTitle}</h2>
                 <p className="text-sm text-white/70 leading-relaxed mb-5 flex-1">
-                  Publiez vos offres et rencontrez vos futurs collaborateurs.
+                  {t.hero.recText}
                 </p>
-                <Link href="/recrute" className="btn-ghost-dark justify-center">Publier une offre <ArrowRight size={15} /></Link>
+                <Link href="/recrute" className="btn-ghost-dark justify-center">{t.hero.recCta} <ArrowRight size={15} /></Link>
               </div>
             </div>
           </div>
@@ -125,7 +120,7 @@ export default async function HomePage() {
           {/* Mosaïque multi-métiers + mascotte */}
           <div className="relative pb-6 lg:pb-4">
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              {MOSAIC.map((m, i) => (
+              {MOSAIC(t.mosaic).map((m, i) => (
                 <div key={m.label}
                   className={`relative overflow-hidden rounded-xl sm:rounded-2xl h-28 sm:h-44 lg:h-52 ${i % 3 === 1 ? "lg:translate-y-6" : ""}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -151,11 +146,11 @@ export default async function HomePage() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="flex items-end justify-between mb-10">
               <div>
-                <p className="section-label mb-3">Offres récentes</p>
-                <h2 className="font-display font-black text-ink" style={H2}>Les postes<br />du moment.</h2>
+                <p className="section-label mb-3">{t.recent.label}</p>
+                <h2 className="font-display font-black text-ink" style={H2}>{t.recent.title[0]}<br />{t.recent.title[1]}</h2>
               </div>
               <Link href="/jobs" className="hidden md:inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink transition-colors font-medium">
-                Toutes les offres <ArrowUpRight size={14} />
+                {t.recent.all} <ArrowUpRight size={14} />
               </Link>
             </div>
           {/* Editorial job list */}
@@ -169,7 +164,7 @@ export default async function HomePage() {
                   {/* Left: urgency dot + title */}
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     {job.is_urgent && (
-                      <div className="w-2 h-2 rounded-full bg-brand shrink-0" title="Urgent" />
+                      <div className="w-2 h-2 rounded-full bg-brand shrink-0" title={t.recent.urgent} />
                     )}
                     {!job.is_urgent && (
                       <div className="w-2 h-2 rounded-full bg-surface-3 shrink-0" />
@@ -179,7 +174,7 @@ export default async function HomePage() {
                         {job.title}
                       </p>
                       <p className="text-sm text-ink-500 mt-0.5 truncate">
-                        {job.organizations?.name ?? "Organisation"}
+                        {job.organizations?.name ?? t.recent.org}
                       </p>
                     </div>
                   </div>
@@ -193,7 +188,7 @@ export default async function HomePage() {
                   {/* Contract badge */}
                   <div className="shrink-0">
                     <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${CONTRACT_STYLE[job.contract_type] ?? "bg-surface-2 text-ink-500"}`}>
-                      {CONTRACT_LABELS[job.contract_type] ?? job.contract_type}
+                      {t.contracts[job.contract_type] ?? job.contract_type}
                     </span>
                   </div>
 
@@ -214,7 +209,7 @@ export default async function HomePage() {
           </div>
 
             <div className="mt-6 flex justify-center">
-              <Link href="/jobs" className="btn-dark">Voir toutes les offres d&apos;emploi <ArrowRight size={15} /></Link>
+              <Link href="/jobs" className="btn-dark">{t.recent.seeAll} <ArrowRight size={15} /></Link>
             </div>
           </div>
         </section>
@@ -223,27 +218,30 @@ export default async function HomePage() {
       {/* ── COMMENT ÇA MARCHE ─────────────────────────── */}
       <section id="comment-ca-marche" className="bg-surface-2 py-20 scroll-mt-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <p className="section-label mb-3">Comment ça marche</p>
-          <h2 className="font-display font-black text-ink mb-8" style={H2}>Simple, en trois étapes.</h2>
-          <HowItWorks />
+          <p className="section-label mb-3">{t.how.label}</p>
+          <h2 className="font-display font-black text-ink mb-8" style={H2}>{t.how.title}</h2>
+          <HowItWorks t={t.how} />
         </div>
       </section>
 
       {/* ── POURQUOI NOUS CHOISIR ─────────────────────── */}
       <section className="bg-surface py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <p className="section-label mb-3">Pourquoi {BRAND.name}</p>
-          <h2 className="font-display font-black text-ink mb-10" style={H2}>Pourquoi nous choisir.</h2>
+          <p className="section-label mb-3">{t.why.label}</p>
+          <h2 className="font-display font-black text-ink mb-10" style={H2}>{t.why.title}</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {WHY.map((w) => (
+            {t.why.items.map((w, i) => {
+              const WIcon = WHY_ICONS[i];
+              return (
               <div key={w.title} className="bg-white border border-[#EADFC4] rounded-2xl p-6 shadow-sm">
                 <div className="w-11 h-11 rounded-xl bg-[#101F43] flex items-center justify-center mb-5">
-                  <w.icon size={20} className="text-[#FFB900]" aria-hidden />
+                  <WIcon size={20} className="text-[#FFB900]" aria-hidden />
                 </div>
                 <h3 className="font-display font-bold text-ink text-xl mb-2">{w.title}</h3>
                 <p className="text-sm text-[#64748B] leading-relaxed">{w.body}</p>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -253,15 +251,15 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <p className="section-label mb-3">Secteurs</p>
-              <h2 className="font-display font-black text-ink" style={H2}>Chaque métier,<br />une offre.</h2>
+              <p className="section-label mb-3">{t.sectors.label}</p>
+              <h2 className="font-display font-black text-ink" style={H2}>{t.sectors.title[0]}<br />{t.sectors.title[1]}</h2>
             </div>
             <Link href="/jobs" className="hidden md:inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink transition-colors font-medium">
-              Toutes les offres <ArrowUpRight size={14} />
+              {t.recent.all} <ArrowUpRight size={14} />
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {SECTORS.map((s) => (
+            {SECTORS(t.sectors).map((s) => (
               <Link key={s.label} href={s.href}
                 className="group flex items-center gap-4 bg-white border border-[#EADFC4] hover:border-[#FFB900] hover:shadow-md rounded-2xl p-4 sm:p-5 transition-all">
                 <div className="w-11 h-11 sm:w-12 sm:h-12 shrink-0 rounded-xl bg-[#101F43] group-hover:bg-[#FFB900] flex items-center justify-center transition-colors">
@@ -277,17 +275,13 @@ export default async function HomePage() {
       {/* ── RECRUTEURS ────────────────────────────────── */}
       <section className="brand-on-dark bg-[#101F43] py-20 noise">
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6" style={{ zIndex: 2 }}>
-          <p className="section-label mb-4">PME &amp; agences d&apos;intérim</p>
+          <p className="section-label mb-4">{t.recruiters.label}</p>
           <h2 className="font-display font-black text-white uppercase mb-10 max-w-3xl"
             style={{ fontSize: "clamp(2.2rem, 5.5vw, 4.5rem)", lineHeight: 0.95 }}>
-            Vos prochains talents sont <span className="text-brand">peut-être déjà ici.</span>
+            {t.recruiters.title1}<span className="text-brand">{t.recruiters.title2}</span>
           </h2>
           <div className="grid md:grid-cols-3 gap-4 mb-10">
-            {[
-              { t: "Publiez vos offres facilement", b: "Un formulaire simple, adapté à chaque métier." },
-              { t: "Centralisez vos candidatures", b: "Retrouvez tous vos candidats au même endroit." },
-              { t: "Simplifiez votre recrutement", b: "Moins d'allers-retours, plus de temps pour les bons profils." },
-            ].map((x) => (
+            {t.recruiters.points.map((x) => (
               <div key={x.t} className="bg-[#1C3058] border border-white/10 rounded-2xl p-6">
                 <CheckCircle size={20} className="text-[#FFB900] mb-4" aria-hidden />
                 <h3 className="font-display font-bold text-white text-xl mb-2">{x.t}</h3>
@@ -295,7 +289,7 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-          <Link href="/recrute" className="btn-brand">Découvrir les solutions recruteurs <ArrowRight size={15} /></Link>
+          <Link href="/recrute" className="btn-brand">{t.recruiters.cta} <ArrowRight size={15} /></Link>
         </div>
       </section>
 
@@ -303,12 +297,12 @@ export default async function HomePage() {
       <section className="bg-surface py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="font-display font-black text-ink uppercase mb-4" style={{ fontSize: "clamp(2.2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}>
-            Prêt à vous lancer&nbsp;?
+            {t.final.title}
           </h2>
-          <p className="text-[#64748B] text-base sm:text-lg mb-8">Candidat ou recruteur, créez votre compte en quelques minutes.</p>
+          <p className="text-[#64748B] text-base sm:text-lg mb-8">{t.final.text}</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/signup/candidat" className="btn-brand justify-center">Je cherche un emploi <ArrowRight size={15} /></Link>
-            <Link href="/recrute" className="btn-dark justify-center">Je recrute <ArrowRight size={15} /></Link>
+            <Link href="/signup/candidat" className="btn-brand justify-center">{t.final.cand} <ArrowRight size={15} /></Link>
+            <Link href="/recrute" className="btn-dark justify-center">{t.final.rec} <ArrowRight size={15} /></Link>
           </div>
         </div>
       </section>

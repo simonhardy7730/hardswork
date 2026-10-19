@@ -4,6 +4,7 @@ import { resend, FROM_EMAIL, FROM_NAME } from "@/lib/resend";
 import { render } from "@react-email/render";
 import CandidatureConfirmationEmail from "@/emails/CandidatureConfirmation";
 import NouvelleCandiatureRecruteurEmail from "@/emails/NouvelleCandiatureRecruteur";
+import { allow, clientKey, verifyTurnstile } from "@/lib/security/abuse";
 
 export async function POST(req: NextRequest) {
   const supabaseAdmin = createClient(
@@ -12,36 +13,46 @@ export async function POST(req: NextRequest) {
   );
   try {
     const body = await req.json();
-    const {
-      job_offer_id,
-      applicant_name,
-      applicant_phone,
-      applicant_email,
-      availability,
-      licenses,
-      has_caces,
-      caces_types,
-      cover_message,
-      availability_slots,
-      quick_apply,
-    } = body;
 
-    // Liste blanche des créneaux "jour:plage" (candidature rapide)
+    // Anti-bot (Cloudflare Turnstile) : actif dès que TURNSTILE_SECRET_KEY est défini.
+    if (!(await verifyTurnstile(body?.turnstile_token, req))) {
+      return NextResponse.json({ error: "Vérification anti-robot échouée. Rechargez la page." }, { status: 400 });
+    }
+
+    // Limitation de débit : 5 candidatures / 10 min et 20 / jour par visiteur.
+    const who = clientKey(req);
+    if (!(await allow(supabaseAdmin, `apply:${who}:10m`, 600, 5)) || !(await allow(supabaseAdmin, `apply:${who}:1d`, 86400, 20))) {
+      return NextResponse.json({ error: "Trop de tentatives. Réessayez plus tard." }, { status: 429 });
+    }
+
+    // Validation stricte côté serveur : rien de ce qui vient du navigateur n'est de confiance.
+    const str = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+    const list = (v: unknown, max: number) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && x.length <= 20).slice(0, max) : []);
+    const job_offer_id = str(body?.job_offer_id, 40);
+    const applicant_name = str(body?.applicant_name, 120);
+    const applicant_phone = str(body?.applicant_phone, 25);
+    const applicant_email = str(body?.applicant_email, 254).toLowerCase();
+    const availability = ["immediate", "1_semaine", "1_mois"].includes(body?.availability) ? body.availability : "immediate";
+    const licenses = list(body?.licenses, 10);
+    const has_caces = body?.has_caces === true;
+    const caces_types = list(body?.caces_types, 10);
+    const cover_message = str(body?.cover_message, 300);
+    const quick_apply = body?.quick_apply === true;
+
     const DAY_OK = ["mon", "tue", "wed", "thu", "fri", "sat", "sun", "holiday"];
     const SLOT_OK = ["morning", "afternoon", "evening", "night"];
-    const slotsClean: string[] = Array.isArray(availability_slots)
-      ? Array.from(new Set(availability_slots.filter((s: unknown): s is string => {
-          if (typeof s !== "string") return false;
-          const [d, t] = s.split(":");
-          return DAY_OK.includes(d) && SLOT_OK.includes(t);
-        }))).slice(0, 40) as string[]
-      : [];
+    const slotsClean: string[] = Array.from(new Set(list(body?.availability_slots, 40).filter((s) => {
+      const [d, t] = s.split(":");
+      return DAY_OK.includes(d) && SLOT_OK.includes(t);
+    })));
 
-    if (!job_offer_id || !applicant_name || !applicant_phone) {
-      return NextResponse.json(
-        { error: "Champs requis manquants" },
-        { status: 400 }
-      );
+    if (
+      !/^[0-9a-f-]{36}$/i.test(job_offer_id) ||
+      applicant_name.length < 2 ||
+      !/^[+\d][\d\s().\-/]{6,24}$/.test(applicant_phone) ||
+      (applicant_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(applicant_email))
+    ) {
+      return NextResponse.json({ error: "Champs requis manquants ou invalides" }, { status: 400 });
     }
 
     // Fetch job offer + org email
@@ -54,6 +65,20 @@ export async function POST(req: NextRequest) {
 
     if (jobError || !jobData) {
       return NextResponse.json({ error: "Offre introuvable" }, { status: 404 });
+    }
+
+    // Déduplication : même offre + même téléphone dans les 24 h = déjà reçue (double clic, nouvel essai).
+    // On répond « succès » sans rien renvoyer ni envoyer d'email, pour ne rien révéler et éviter les doublons.
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: dup } = await supabaseAdmin
+      .from("applications")
+      .select("id")
+      .eq("job_offer_id", job_offer_id)
+      .eq("applicant_phone", applicant_phone)
+      .gte("applied_at", since)
+      .limit(1);
+    if (dup && dup.length > 0) {
+      return NextResponse.json({ success: true });
     }
 
     // Insert application
@@ -94,9 +119,12 @@ export async function POST(req: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://wolko.be";
     const dashboardUrl = `${appUrl}/dashboard/offres/${job_offer_id}/candidatures`;
 
-    // Send recruiter notification (fire-and-forget, don't block response)
+    // Les emails ne doivent jamais faire perdre une candidature : elle est déjà enregistrée.
+    // On les attend (pour qu'ils partent réellement sur Vercel) mais on tolère leur échec.
+    const sends: Promise<unknown>[] = [];
+
     if (orgEmail) {
-      resend.emails
+      sends.push(resend.emails
         .send({
           from: `${FROM_NAME} <${FROM_EMAIL}>`,
           to: orgEmail,
@@ -118,12 +146,12 @@ export async function POST(req: NextRequest) {
             })
           ),
         })
-        .catch((err: unknown) => console.error("Recruiter email error:", err));
+        .catch((err: unknown) => console.error("Recruiter email error:", err)));
     }
 
     // Send candidate confirmation if email provided
     if (applicant_email) {
-      resend.emails
+      sends.push(resend.emails
         .send({
           from: `${FROM_NAME} <${FROM_EMAIL}>`,
           to: applicant_email,
@@ -138,8 +166,10 @@ export async function POST(req: NextRequest) {
             })
           ),
         })
-        .catch((err: unknown) => console.error("Candidate email error:", err));
+        .catch((err: unknown) => console.error("Candidate email error:", err)));
     }
+
+    await Promise.allSettled(sends);
 
     return NextResponse.json({ success: true, applicationId: application.id });
   } catch (err) {

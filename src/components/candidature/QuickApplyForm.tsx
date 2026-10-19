@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2, CheckCircle2, Info } from "lucide-react";
 import { useL } from "@/lib/i18n/context";
+import Turnstile from "@/components/security/Turnstile";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
 
 interface Prefill { first_name: string; last_name: string; phone: string; email: string; slots: string[] }
@@ -31,6 +32,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [captcha, setCaptcha] = useState("");
   const [done, setDone] = useState(false);
 
   const toggle = (k: string) => setSlots((s) => (s.includes(k) ? s.filter((x) => x !== k) : [...s, k]));
@@ -50,6 +52,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
         applicant_phone: f.phone,
         applicant_email: f.email || null,
         cover_message: msg || null,
+        turnstile_token: captcha,
         availability_slots: slots,
         interest_confirmed: true,
         quick_apply: true,
@@ -150,6 +153,8 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
         <input type="email" inputMode="email" className={`${input} mb-3`} value={f.email} autoComplete="email" placeholder={l("Email (optionnel)", "E-mail (optioneel)")} onChange={(e) => setF({ ...f, email: e.target.value })} />
         <textarea rows={2} className={`${input} resize-none`} value={msg} maxLength={300} placeholder={l("Un mot pour l'employeur (optionnel)", "Een woordje voor de werkgever (optioneel)")} onChange={(e) => setMsg(e.target.value.slice(0, 300))} />
       </section>
+
+      <Turnstile onToken={setCaptcha} />
 
       {error && <div className="text-sm px-4 py-3 rounded-xl bg-red-50 text-red-600 border border-red-200">{error}</div>}
 

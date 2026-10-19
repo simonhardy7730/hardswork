@@ -6,9 +6,9 @@ import QuickApplyForm from "@/components/candidature/QuickApplyForm";
 import { labels } from "@/lib/utils";
 import { getDict } from "@/lib/i18n/server";
 import { LangSwitch } from "@/components/layout/LangSwitch";
-import type { JobOffer, Organization } from "@/lib/supabase/types";
+import type { JobOffer, JobPlanning, Organization } from "@/lib/supabase/types";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
-import { MapPin, Clock, Briefcase, Zap, CheckCircle, ArrowLeft } from "lucide-react";
+import { MapPin, Briefcase, Zap, CheckCircle, ArrowLeft } from "lucide-react";
 
 export function generateMetadata() {
   const { lang } = getDict();
@@ -258,8 +258,8 @@ export default async function PostulerPage({
                   jobId={job.id}
                   orgName={org?.name ?? "Wolko"}
                   flexi={job.contract_type === "flexi"}
-                  offerDays={(job as any).days_needed ?? []}
-                  offerSlots={(job as any).time_slots ?? []}
+                  offerDays={(job as JobOffer & JobPlanning).days_needed ?? []}
+                  offerSlots={(job as JobOffer & JobPlanning).time_slots ?? []}
                   prefill={prefill}
                 />
               ) : (

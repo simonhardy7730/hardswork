@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   Search, Phone, Mail, MapPin, Clock,
-  Zap, Award, ChevronRight, Lock, Users,
+  ChevronRight, Lock,
 } from "lucide-react";
 import { labels } from "@/lib/utils";
 import { useL, useLang } from "@/lib/i18n/context";
@@ -281,7 +281,7 @@ export default function CandidatsList({
         {/* Liste */}
         {candidats.length > 0 && (
           <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden">
-            {candidats.map((c, idx) => {
+            {candidats.map((c) => {
               const isUnlocked = hasSubscription;
               const tags = buildTags(c, SECTOR_LABELS, l("Permis", "Rijbewijs"));
               const score = matchMap.get(c.id) ?? 0;

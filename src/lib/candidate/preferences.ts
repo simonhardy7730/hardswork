@@ -75,6 +75,7 @@ const bool = (v: unknown) => v === true;
 
 /** Nettoyage côté serveur : liste blanche, tailles limitées. Ne donne jamais d'éligibilité. */
 export function sanitizePreferences(raw: unknown) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const r = (raw && typeof raw === "object" ? raw : {}) as Record<string, any>;
   const allowedTypes = keys(JOB_TYPES);
   const job_types = Array.isArray(r.job_types)
@@ -83,7 +84,9 @@ export function sanitizePreferences(raw: unknown) {
   const wantsStudent = job_types.includes("etudiant");
   const wantsFlexi = job_types.includes("flexi");
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sp = (r.student_profile ?? {}) as Record<string, any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fp = (r.flexi_profile ?? {}) as Record<string, any>;
   const slots = keys(STUDENT_SLOTS);
 

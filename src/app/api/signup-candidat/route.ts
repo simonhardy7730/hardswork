@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sanitizePreferences } from "@/lib/candidate/preferences";
+import { allow, clientKey } from "@/lib/security/abuse";
 
 const supabaseAdmin = () =>
   createClient(
@@ -44,6 +45,9 @@ export async function POST(req: NextRequest) {
     // L'identifiant doit correspondre à un compte candidat tout juste créé avec CET e-mail :
     // on ne peut pas créer ou usurper le profil d'un autre compte.
     const admin = supabaseAdmin();
+    if (!(await allow(admin, `signup-cand:${clientKey(req)}:1h`, 3600, 10))) {
+      return NextResponse.json({ error: "Trop de tentatives. Réessayez plus tard." }, { status: 429 });
+    }
     const { data: au, error: auErr } = await admin.auth.admin.getUserById(auth_user_id);
     const authUser = au?.user;
     const fresh = authUser ? Date.now() - new Date(authUser.created_at).getTime() < 30 * 60 * 1000 : false;

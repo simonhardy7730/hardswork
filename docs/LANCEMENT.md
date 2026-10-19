@@ -40,7 +40,7 @@ Mis en place : export des données (`/api/account/export`), suppression du compt
 ## 3. Sauvegarde, restauration, retour arrière
 
 - **Code** : Vercel → Deployments → ⋯ sur un déploiement précédent → *Promote to Production* (retour arrière immédiat, sans toucher à la base).
-- **Base** : le plan gratuit Supabase n'a pas de sauvegarde automatique. Avant l'ouverture : plan Pro (sauvegardes quotidiennes) ou export régulier (`pg_dump`). **Aucune restauration n'a encore été testée → bloquant.**
+- **Base** : le plan gratuit Supabase n'a pas de sauvegarde automatique. Avant l'ouverture : plan Pro (sauvegardes quotidiennes) ou export régulier (`pg_dump`). Sauvegarde nocturne chiffrée prévue via GitHub Actions (voir `docs/SAUVEGARDE.md`, secrets à créer). **Aucune restauration n'a encore été testée → bloquant.**
 - **Migrations** : additives. Retour arrière de 012 : voir les commentaires en bas du fichier.
 
 ## 4. Variables d'environnement à connaître

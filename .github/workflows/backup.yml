@@ -1,0 +1,60 @@
+name: Sauvegarde chiffrée (base + fichiers)
+
+on:
+  schedule:
+    - cron: "17 2 * * *"   # chaque nuit à ~04h17 (heure belge d'été)
+  workflow_dispatch: {}     # lancement manuel possible
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer le client PostgreSQL 17
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+
+      - name: Export de la base (schémas public + auth)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          pg_dump "$SUPABASE_DB_URL" -Fc --no-owner --no-acl \
+            --schema=public --schema=auth \
+            -f out/db.dump
+          ls -lh out/db.dump
+
+      - name: Export des fichiers (CV, diplômes…)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/backup-storage.mjs out/storage
+
+      - name: Archiver et chiffrer (AES-256)
+        env:
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          STAMP=$(date -u +%Y-%m-%d)
+          tar -czf "wolko-$STAMP.tar.gz" -C out .
+          gpg --batch --yes --pinentry-mode loopback --symmetric --cipher-algo AES256 \
+            --passphrase "$BACKUP_PASSPHRASE" -o "wolko-$STAMP.tar.gz.gpg" "wolko-$STAMP.tar.gz"
+          rm -rf out "wolko-$STAMP.tar.gz"
+          ls -lh wolko-*.gpg
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wolko-backup
+          path: wolko-*.gpg
+          retention-days: 30
+          if-no-files-found: error

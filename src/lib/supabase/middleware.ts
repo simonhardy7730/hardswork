@@ -40,6 +40,7 @@ export async function updateSession(request: NextRequest) {
     "/jobs",
     "/tarifs",
     "/inscription",
+    "/a-propos",
     "/recrute",
     "/forgot-password",
     "/legal",

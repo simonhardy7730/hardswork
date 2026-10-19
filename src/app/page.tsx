@@ -10,6 +10,8 @@ import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { WolfBadge } from "@/components/ui/WolfMascot";
 import { getDict, getL } from "@/lib/i18n/server";
+import { formatSalary } from "@/lib/salary";
+import { SECTOR_PHOTOS } from "@/lib/sector-photos";
 import type { Dict } from "@/lib/i18n/dict";
 
 interface JobOffer {
@@ -65,7 +67,7 @@ const CONTRACT_STYLE: Record<string, string> = {
 const H2 = { fontSize: "clamp(2rem, 4.5vw, 3.5rem)", lineHeight: 0.95 } as const;
 
 export default async function HomePage() {
-  const { t } = await getDict();
+  const { t, lang } = await getDict();
   const l = await getL();
   const supabase = await createClient();
 
@@ -162,19 +164,19 @@ export default async function HomePage() {
           {/* Editorial job list */}
           <div className="rounded-2xl overflow-hidden border border-ink-100 bg-white">
             {displayJobs.slice(0, 6).map((job) => {
-              const salaryStr = job.show_salary && job.salary_min
-                ? `${job.salary_min}–${job.salary_max ?? "?"}€/${job.salary_period === "heure" ? "h" : job.salary_period === "jour" ? "j" : "mois"}`
-                : null;
+              const salaryStr = job.show_salary ? formatSalary(job.salary_min, job.salary_max, job.salary_period, lang) : null;
+              const photo = SECTOR_PHOTOS[job.sector] ?? SECTOR_PHOTOS.autre;
               return (
-                <Link key={job.id} href={`/postuler/${job.id}`} className="job-row group">
+                <Link key={job.id} href={`/jobs/${job.id}`} className="job-row group">
                   {/* Left: urgency dot + title */}
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    {job.is_urgent && (
-                      <div className="w-2 h-2 rounded-full bg-brand shrink-0" title={t.recent.urgent} />
-                    )}
-                    {!job.is_urgent && (
-                      <div className="w-2 h-2 rounded-full bg-surface-3 shrink-0" />
-                    )}
+                    <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={photo} alt="" loading="lazy" className="w-full h-full object-cover" style={{ filter: "brightness(0.85) saturate(0.9)" }} />
+                      {job.is_urgent && (
+                        <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-brand ring-2 ring-white" title={t.recent.urgent} />
+                      )}
+                    </div>
                     <div className="min-w-0">
                       <p className="font-display font-bold text-ink text-lg leading-tight truncate group-hover:text-brand transition-colors">
                         {job.title}

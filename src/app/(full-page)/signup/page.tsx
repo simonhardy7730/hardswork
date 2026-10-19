@@ -170,6 +170,7 @@ function NormalSignup() {
   const [orgType, setOrgType] = useState<OrgType | null>(presetType);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [cgu, setCgu] = useState(false);
   const [formData, setFormData] = useState({ org_name: "", vat_number: "", full_name: "", email: "", password: "" });
 
@@ -186,28 +187,21 @@ function NormalSignup() {
     if (!isValidVat(formData.vat_number)) { setError(l("Numéro de TVA invalide. Exemple : BE 0123.456.789", "Ongeldig btw-nummer. Voorbeeld: BE 0123.456.789")); setLoading(false); return; }
     const supabase = createClient();
 
+    // Organisation, profil admin et essai gratuit : créés côté base (trigger sécurisé, migration 012).
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
-      options: { data: { full_name: formData.full_name }, emailRedirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        data: { full_name: formData.full_name, signup_kind: "organization", org_name: formData.org_name, org_type: orgType, vat_number: formData.vat_number.trim() },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
     if (authError || !authData.user) { setError(authError?.message ?? l("Erreur lors de l'inscription.", "Fout bij het registreren.")); setLoading(false); return; }
-
-    let { data: org, error: orgError } = await supabase.from("organizations")
-      .insert({ name: formData.org_name, type: orgType, vat_number: formData.vat_number.trim() }).select().single();
-    if (orgError && /vat_number/.test(orgError.message ?? "")) {
-      ({ data: org, error: orgError } = await supabase.from("organizations")
-        .insert({ name: formData.org_name, type: orgType }).select().single());
+    if (!authData.session) {
+      setNotice(l("Compte créé ! Vérifiez votre boîte mail et cliquez sur le lien pour confirmer votre adresse.", "Account aangemaakt! Controleer je mailbox en klik op de link om je e-mailadres te bevestigen."));
+      setLoading(false);
+      return;
     }
-    if (orgError || !org) { setError(l("Erreur lors de la création de l'organisation.", "Fout bij het aanmaken van de organisatie.")); setLoading(false); return; }
-
-    await supabase.from("users").insert({ id: authData.user.id, organization_id: org.id, email: formData.email, full_name: formData.full_name, role: "admin" });
-    await supabase.from("subscriptions").insert({
-      organization_id: org.id,
-      plan: orgType === "agency" ? "agency" : "starter",
-      status: "trial",
-      trial_ends_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    });
     router.push("/onboarding");
   }
 
@@ -390,6 +384,7 @@ function NormalSignup() {
                 </label>
 
                 {error && <p className="text-xs rounded-xl px-4 py-3 bg-red-50 border border-red-100" style={{ color: "#B91C1C" }}>{error}</p>}
+                {notice && <p className="text-xs rounded-xl px-4 py-3 bg-green-50 border border-green-200 text-green-800">{notice}</p>}
 
                 <button type="submit" disabled={loading}
                   className="w-full py-4 text-white font-black text-sm tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 transition-all"

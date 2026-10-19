@@ -48,12 +48,13 @@ export async function signUp(formData: FormData) {
 
   const supabase = await createClient();
 
-  // Créer le compte auth
+  // Créer le compte auth. L'organisation, le profil admin et l'essai gratuit sont créés
+  // CÔTÉ BASE (trigger sécurisé, migration 012) à partir de ces métadonnées : jamais depuis le navigateur.
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { full_name: fullName },
+      data: { full_name: fullName, signup_kind: "organization", org_name: orgName, org_type: orgType, vat_number: vatNumber },
       emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
     },
   });
@@ -62,48 +63,10 @@ export async function signUp(formData: FormData) {
     return { error: authError?.message ?? "Erreur lors de l'inscription." };
   }
 
-  // Créer l'organisation
-  let { data: org, error: orgError } = await supabase
-    .from("organizations")
-    .insert({ name: orgName, type: orgType, vat_number: vatNumber })
-    .select()
-    .single();
-  // vat_number : colonne ajoutée par la migration 004 ; sans elle, on crée l'organisation quand même.
-  if (orgError && /vat_number/.test(orgError.message ?? "")) {
-    ({ data: org, error: orgError } = await supabase
-      .from("organizations")
-      .insert({ name: orgName, type: orgType })
-      .select()
-      .single());
+  // Sans session (confirmation e-mail activée) : on demande de confirmer l'adresse.
+  if (!authData.session) {
+    return { success: "Compte créé ! Vérifiez votre boîte mail et cliquez sur le lien pour confirmer votre adresse." };
   }
-
-  if (orgError || !org) {
-    return { error: "Erreur lors de la création de l'organisation." };
-  }
-
-  // Créer le profil utilisateur
-  const { error: userError } = await supabase.from("users").insert({
-    id: authData.user.id,
-    organization_id: org.id,
-    email,
-    full_name: fullName,
-    role: "admin",
-  });
-
-  if (userError) {
-    return { error: "Erreur lors de la création du profil." };
-  }
-
-  // Créer l'abonnement trial
-  await supabase.from("subscriptions").insert({
-    organization_id: org.id,
-    plan: orgType === "agency" ? "agency" : "starter",
-    status: "trial",
-    trial_ends_at: new Date(
-      Date.now() + 30 * 24 * 60 * 60 * 1000
-    ).toISOString(),
-  });
-
   redirect("/onboarding");
 }
 

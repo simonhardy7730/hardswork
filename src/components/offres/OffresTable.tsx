@@ -58,7 +58,7 @@ const SECTOR_ICONS: Record<string, string> = {
   autre: "💼",
 };
 
-export default function OffresTable({ offres }: { offres: JobOffer[] }) {
+export default function OffresTable({ offres, refusedByOffer = {} }: { offres: JobOffer[]; refusedByOffer?: Record<string, number> }) {
   const router = useRouter();
   const l = useL();
   const lang = useLang();
@@ -202,6 +202,16 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
                 >
                   <Users size={14} className="text-ink-300" />
                   {offre.applications_count}
+                  {(refusedByOffer[offre.id] ?? 0) > 0 && (
+                    <span className="ml-1 text-[11px] font-semibold text-red-500">
+                      · {refusedByOffer[offre.id]} {l("refusé(s)", "geweigerd")}
+                    </span>
+                  )}
+                  {(offre.applications_deleted_count ?? 0) > 0 && (
+                    <span className="ml-1 text-[11px] font-semibold text-ink-300">
+                      · {offre.applications_deleted_count} {l("supprimé(s)", "verwijderd")}
+                    </span>
+                  )}
                 </Link>
               </div>
 

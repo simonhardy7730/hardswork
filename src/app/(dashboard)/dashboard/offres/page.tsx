@@ -58,6 +58,17 @@ export default async function OffresPage(
     paused: allOffres?.filter((o) => o.status === "paused").length ?? 0,
   };
 
+  // Candidatures refusées par offre (les supprimées viennent du compteur de l'offre)
+  const refusedByOffer: Record<string, number> = {};
+  const { data: refusedApps } = await supabase
+    .from("applications")
+    .select("job_offer_id")
+    .eq("status", "refuse");
+  for (const a of refusedApps ?? []) {
+    const id = a.job_offer_id as string;
+    refusedByOffer[id] = (refusedByOffer[id] ?? 0) + 1;
+  }
+
   return (
     <div className="max-w-6xl mx-auto space-y-5">
       {/* Header */}
@@ -84,7 +95,7 @@ export default async function OffresPage(
       <OffresFilters searchParams={searchParams} counts={counts} />
 
       {/* Table */}
-      <OffresTable offres={(offres ?? []) as JobOffer[]} />
+      <OffresTable offres={(offres ?? []) as JobOffer[]} refusedByOffer={refusedByOffer} />
     </div>
   );
 }

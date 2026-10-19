@@ -6,6 +6,7 @@ import {
   ArrowRight, CheckCircle, ChevronRight,
 } from "lucide-react";
 import { labels } from "@/lib/utils";
+import { buildJobPosting, jsonLd } from "@/lib/seo/jobposting";
 import { getDict } from "@/lib/i18n/server";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
 import type { JobPlanning } from "@/lib/supabase/types";
@@ -96,6 +97,7 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
 
   return (
     <div className="min-h-screen bg-[#FFFBF2] font-body pb-24">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(buildJobPosting(offer, org?.name ?? "Wolko")) }} />
       <SiteNav />
 
       {/* ══ HERO — image plein écran + titre overlaid ═════ */}

@@ -4,6 +4,13 @@ export function friendlyAuthError(
   l: (fr: string, nl: string) => string
 ): string {
   const m = (message ?? "").toLowerCase();
+  // Quota global d'envoi de mails (offre gratuite) ou envoi en échec : ce n'est pas la faute du visiteur.
+  if (m.includes("email rate limit") || m.includes("error sending") || m.includes("sending confirmation") || m.includes("smtp")) {
+    return l(
+      "Beaucoup d'inscriptions en ce moment : l'email de confirmation n'a pas pu partir. Réessayez dans quelques minutes.",
+      "Veel inschrijvingen op dit moment: de bevestigingsmail kon niet verstuurd worden. Probeer het over enkele minuten opnieuw."
+    );
+  }
   if (m.includes("for security purposes") || m.includes("rate limit") || m.includes("too many")) {
     const sec = /(\d+)\s*second/.exec(m)?.[1];
     return l(

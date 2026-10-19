@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description:
     "La plateforme de recrutement pour tous les métiers : logistique, transport, industrie, construction, santé, restauration, nettoyage, sécurité et plus.",
   keywords: [
-    "recrutement", "emploi", "Belgique", "France", "logistique", "transport",
+    "recrutement", "emploi", "Belgique", "logistique", "transport",
     "industrie", "construction", "intérim", "restauration", "santé",
   ],
   authors: [{ name: "HardSwork", url: "https://hardswork.be" }],

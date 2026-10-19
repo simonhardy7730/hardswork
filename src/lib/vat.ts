@@ -22,9 +22,13 @@ function checkFR(n: string): boolean {
 
 const EU_FORMAT = /^(AT|BG|CY|CZ|DE|DK|EE|EL|ES|FI|HR|HU|IE|IT|LT|LU|LV|MT|NL|PL|PT|RO|SE|SI|SK)[0-9A-Z]{8,12}$/;
 
+/** Pour l'instant : numéros belges uniquement (BE + clé de contrôle). */
+const BELGIUM_ONLY = true;
+
 export function isValidVat(raw: string): boolean {
   const n = normalizeVat(raw);
   if (n.startsWith("BE")) return checkBE(n);
+  if (BELGIUM_ONLY) return false;
   if (n.startsWith("FR")) return checkFR(n);
   return EU_FORMAT.test(n);
 }

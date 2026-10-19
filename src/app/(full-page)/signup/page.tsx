@@ -305,7 +305,7 @@ function NormalSignup() {
 
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">Numéro de TVA</label>
-                  <input type="text" placeholder="BE 0123.456.789 ou FR 12 345678901" name="vat_number" value={formData.vat_number} onChange={handleChange}
+                  <input type="text" placeholder="BE 0123.456.789" name="vat_number" value={formData.vat_number} onChange={handleChange}
                     autoComplete="off" required
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition" />
                 </div>

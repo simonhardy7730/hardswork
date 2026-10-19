@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { formatSalary } from "@/lib/salary";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
@@ -74,11 +75,7 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
     description: string | null;
   } | null;
 
-  const salary = offer.show_salary && offer.salary_min
-    ? offer.salary_period === "heure"
-      ? `${offer.salary_min}–${offer.salary_max}€/h`
-      : `${offer.salary_min?.toLocaleString(numLocale)}–${offer.salary_max?.toLocaleString(numLocale)}€/${l("mois", "maand")}`
-    : null;
+  const salary = offer.show_salary ? formatSalary(offer.salary_min, offer.salary_max, offer.salary_period, lang) : null;
 
   const heroPhoto = SECTOR_PHOTOS[offer.sector] ?? SECTOR_PHOTOS.default;
   const sectorLabel = SECTOR_LABELS[offer.sector] ?? offer.sector;

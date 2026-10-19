@@ -5,6 +5,7 @@ import { labels } from "@/lib/utils";
 import { getDict } from "@/lib/i18n/server";
 import { HardieIcon } from "@/components/ui/HardieIcon";
 import { SiteNav } from "@/components/layout/SiteNav";
+import { formatSalary } from "@/lib/salary";
 import { RADIUS_OPTIONS, citiesWithin, safeIlikeValue } from "@/lib/geo/distance";
 
 /* ── Photos miniatures par secteur ─────────────────────── */
@@ -326,18 +327,15 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
             {offers.length > 0 && (
               <div className="space-y-2">
                 {offers.map((offer) => {
-                  const salary = offer.show_salary && offer.salary_min
-                    ? offer.salary_period === "heure"
-                      ? `${offer.salary_min}–${offer.salary_max}€/h`
-                      : `${offer.salary_min?.toLocaleString(numLocale)}–${offer.salary_max?.toLocaleString(numLocale)}€/${l("mois", "maand")}`
-                    : l("Salaire : Compétitif", "Loon: Competitief");
+                  const salary = (offer.show_salary ? formatSalary(offer.salary_min, offer.salary_max, offer.salary_period, lang) : null)
+                    ?? l("Compétitif", "Competitief");
 
                   const sectorPhoto = SECTOR_PHOTOS[offer.sector] ?? SECTOR_PHOTOS.autre;
 
                   return (
                     <div
                       key={offer.id}
-                      className={`bg-white rounded-xl border flex items-center gap-4 px-4 py-3 transition-all hover:shadow-md hover:border-brand/20 group ${
+                      className={`relative bg-white rounded-xl border flex items-center gap-4 px-4 py-3 transition-all hover:shadow-md hover:border-brand/20 group ${
                         offer.is_urgent ? "border-brand/40" : "border-ink-100"
                       }`}
                     >
@@ -361,7 +359,7 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
                             </span>
                           )}
                           <h2 className="font-display font-black text-ink uppercase text-sm tracking-tight group-hover:text-brand transition-colors">
-                            {offer.title}
+                            <Link href={`/jobs/${offer.id}`} className="after:absolute after:inset-0 after:content-['']">{offer.title}</Link>
                           </h2>
                         </div>
                         <div className="flex items-center gap-2 flex-wrap">
@@ -369,7 +367,7 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
                             {CONTRACT_LABELS[offer.contract_type] ?? offer.contract_type}
                           </span>
                           <span className="text-[11px] bg-ink-100 text-ink-600 font-bold px-2 py-0.5 rounded">
-                            {l("Salaire", "Loon")} : {offer.show_salary && offer.salary_min ? salary : l("Compétitif", "Competitief")}
+                            {l("Salaire", "Loon")} : {salary}
                           </span>
                           {offer.city && (
                             <span className="flex items-center gap-1 text-[11px] bg-ink-100 text-ink-600 font-bold px-2 py-0.5 rounded">
@@ -381,7 +379,7 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
                       </div>
 
                       {/* CTA Postuler — toujours visible */}
-                      <div className="shrink-0">
+                      <div className="shrink-0 relative z-10">
                         <Link
                           href={`/postuler/${offer.id}`}
                           className="bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-[11px] px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
@@ -429,9 +427,9 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
                           <p className="font-display font-black text-ink text-[12px] uppercase leading-tight group-hover:text-brand transition-colors truncate">
                             {p.title}
                           </p>
-                          {p.show_salary && p.salary_min ? (
+                          {p.show_salary && formatSalary(p.salary_min, p.salary_max, p.salary_period, lang) ? (
                             <p className="text-[10px] text-emerald-600 font-bold mt-0.5">
-                              {p.salary_period === "heure" ? `${p.salary_min}–${p.salary_max}€/h` : l("Salaire compétitif", "Competitief loon")}
+                              {formatSalary(p.salary_min, p.salary_max, p.salary_period, lang) ?? l("Salaire compétitif", "Competitief loon")}
                             </p>
                           ) : (
                             <p className="text-[10px] text-ink-300 mt-0.5">{l("Salaire : Compétitif", "Loon: Competitief")}</p>

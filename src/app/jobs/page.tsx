@@ -6,6 +6,7 @@ import { getDict } from "@/lib/i18n/server";
 import { HardieIcon } from "@/components/ui/HardieIcon";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { formatSalary } from "@/lib/salary";
+import { keywordGroups } from "@/lib/search/keywords";
 import { SECTOR_PHOTOS } from "@/lib/sector-photos";
 import { RADIUS_OPTIONS, citiesWithin, safeIlikeValue } from "@/lib/geo/distance";
 
@@ -53,7 +54,8 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
   if (searchParams.region)  query = query.eq("region",        searchParams.region);
   if (searchParams.contrat === "classique") query = query.in("contract_type", ["cdi", "cdd"]);
   else if (searchParams.contrat) query = query.eq("contract_type", searchParams.contrat);
-  if (searchParams.q)       query = query.ilike("title",      `%${searchParams.q}%`);
+  // Recherche par mots : chaque mot peut correspondre au titre, à la ville, à la description, au secteur ou au contrat.
+  if (searchParams.q) for (const g of keywordGroups(searchParams.q)) query = query.or(g);
   // Ville ou code postal : les offres n'ont pas (encore) de code postal, on filtre donc sur la ville uniquement.
   const lieu = (searchParams.lieu ?? "").replace(/[%,()]/g, "").trim();
   // Rayon (km) autour d'une ville connue ; sinon, recherche exacte sur le nom de la ville.
@@ -124,7 +126,7 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
               <input
                 name="q"
                 defaultValue={searchParams.q}
-                placeholder={l("Mots-clés, chauffeur SPL, soudeur...", "Trefwoorden, vrachtwagenchauffeur, lasser...")}
+                placeholder={l("Métier, ville, mot-clé… (ex. cariste Tournai)", "Beroep, stad, trefwoord… (bv. heftruck Doornik)")}
                 className="bg-transparent text-ink placeholder-ink-300 text-sm flex-1 focus:outline-none"
               />
             </div>

@@ -80,42 +80,56 @@ export default async function PostulerPage(
 
       {/* ── LEFT PANEL (photo + info) ─────────────────────── */}
       <div className="brand-on-dark hidden lg:flex lg:w-[42%] relative flex-col">
-        {/* Fond de marque + mascotte (plus de photo de secteur hors-sujet) */}
-        <div className="absolute inset-0 bg-[#101F43]" />
-        <div className="absolute -top-24 -right-24 w-[420px] h-[420px] rounded-full bg-brand/10 blur-3xl" />
-        {/* Gradient overlay */}
+        {/* Fond de marque : bleu nuit, trame de points, halos jaunes */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#101F43] via-[#101F43] to-[#16275A]" />
-        <div className="absolute right-8 top-1/2 -translate-y-[62%] w-36 xl:w-44 z-10">
-          <WolfBadge sign="POSTULE !" />
-        </div>
+        <div aria-hidden="true" className="absolute inset-0 opacity-70"
+          style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px)", backgroundSize: "22px 22px" }} />
+        <div aria-hidden="true" className="absolute -top-28 -right-28 w-[440px] h-[440px] rounded-full bg-brand/15 blur-3xl" />
+        <div aria-hidden="true" className="absolute -bottom-32 -left-24 w-[380px] h-[380px] rounded-full bg-[#3B82F6]/10 blur-3xl" />
 
         {/* Content */}
         <div className="relative z-10 flex flex-col h-full p-10">
           {/* Logo */}
-          <Link href="/" className="mb-auto">
+          <Link href="/">
             <HardSworkLogo size="md" dark />
           </Link>
 
-          {/* Main headline */}
-          <div className="my-auto">
-            <div className="inline-flex items-center gap-2 mb-5">
+          {/* Mascotte + accroche, centrées */}
+          <div className="my-auto py-6 text-center">
+            <div className="relative w-44 xl:w-52 mx-auto mb-6">
+              <div aria-hidden="true" className="absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[125%] aspect-square rounded-full border border-white/10" />
+              <div aria-hidden="true" className="absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[160%] aspect-square rounded-full border border-white/[0.06]" />
+              <WolfBadge sign="POSTULE !" />
+            </div>
+
+            <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full bg-white/[0.07] border border-white/10">
               <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
-              <span className="text-[11px] font-black text-white/50 uppercase tracking-widest">
-                {sectorLabel}
-              </span>
+              <span className="text-[11px] font-black text-white/70 uppercase tracking-widest">{sectorLabel}</span>
             </div>
             <h1
-              className="font-display font-black text-white uppercase leading-none mb-4"
-              style={{ fontSize: "clamp(2rem, 4vw, 3rem)", letterSpacing: "-0.02em" }}
+              className="font-display font-black text-white uppercase leading-[0.95] mb-4"
+              style={{ fontSize: "clamp(2rem, 3.6vw, 2.8rem)", letterSpacing: "-0.02em" }}
             >
-              {l("VOTRE", "JOUW")}<br />
-              {l("PROCHAINE", "VOLGENDE")}<br />
+              {l("VOTRE PROCHAINE", "JOUW VOLGENDE")}<br />
               <span className="text-brand">{l("[MISSION].", "[OPDRACHT].")}</span>
             </h1>
-            <p className="text-white/50 text-sm max-w-xs leading-relaxed">
-              {l("Postulez en moins de 2 minutes.", "Solliciteer in minder dan 2 minuten.")}
-              {l(" Sans compte, sans prise de tête.", " Zonder account, zonder gedoe.")}
+            <p className="text-white/55 text-sm max-w-xs mx-auto leading-relaxed mb-7">
+              {l("Postulez en moins de 2 minutes. Sans compte, sans prise de tête.", "Solliciteer in minder dan 2 minuten. Zonder account, zonder gedoe.")}
             </p>
+
+            {/* 3 étapes */}
+            <div className="flex items-start justify-center gap-5 max-w-sm mx-auto">
+              {[
+                { n: "1", t: l("Remplissez le formulaire", "Vul het formulier in") },
+                { n: "2", t: l("L'employeur reçoit votre profil", "De werkgever ontvangt je profiel") },
+                { n: "3", t: l("Il vous recontacte si ça colle", "Hij contacteert je als het past") },
+              ].map((st) => (
+                <div key={st.n} className="flex-1 text-center">
+                  <span className="mx-auto mb-2 w-7 h-7 rounded-full bg-brand text-[#101F43] font-black text-xs flex items-center justify-center">{st.n}</span>
+                  <p className="text-[11px] leading-snug text-white/60">{st.t}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Job summary card */}

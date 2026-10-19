@@ -25,15 +25,35 @@ export async function POST(req: NextRequest) {
       caces_types,
       experience_years,
       sectors,
-      cv_url,
       preferences,
     } = body;
 
-    if (!auth_user_id || !first_name || !phone || !email) {
-      return NextResponse.json({ error: "Champs requis manquants" }, { status: 400 });
+    // Validation stricte (tout vient du navigateur, donc rien n'est de confiance).
+    const str = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+    const cleanEmail = str(email, 254).toLowerCase();
+    const cleanPhone = str(phone, 25);
+    const cleanFirst = str(first_name, 80);
+    if (
+      typeof auth_user_id !== "string" || !/^[0-9a-f-]{36}$/i.test(auth_user_id) ||
+      !cleanFirst || !/^[+\d][\d\s().\-/]{6,24}$/.test(cleanPhone) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)
+    ) {
+      return NextResponse.json({ error: "Champs requis manquants ou invalides" }, { status: 400 });
     }
 
+    // L'identifiant doit correspondre à un compte candidat tout juste créé avec CET e-mail :
+    // on ne peut pas créer ou usurper le profil d'un autre compte.
     const admin = supabaseAdmin();
+    const { data: au, error: auErr } = await admin.auth.admin.getUserById(auth_user_id);
+    const authUser = au?.user;
+    const fresh = authUser ? Date.now() - new Date(authUser.created_at).getTime() < 30 * 60 * 1000 : false;
+    if (
+      auErr || !authUser || !fresh ||
+      (authUser.email ?? "").toLowerCase() !== cleanEmail ||
+      authUser.user_metadata?.user_type !== "candidate"
+    ) {
+      return NextResponse.json({ error: "Requête refusée" }, { status: 403 });
+    }
 
     // Vérifier que cet auth_user_id n'a pas déjà un profil
     const { data: existing } = await admin
@@ -48,18 +68,17 @@ export async function POST(req: NextRequest) {
 
     const row = {
       auth_user_id,
-      first_name,
-      last_name: last_name || "-",
-      phone,
-      email,
-      city: city || null,
-      availability: availability || "immediate",
-      licenses: licenses || [],
+      first_name: cleanFirst,
+      last_name: str(last_name, 80) || "-",
+      phone: cleanPhone,
+      email: cleanEmail,
+      city: str(city, 80) || null,
+      availability: ["immediate", "1_semaine", "1_mois"].includes(availability) ? availability : "immediate",
+      licenses: Array.isArray(licenses) ? licenses.filter((x: unknown) => typeof x === "string").slice(0, 10) : [],
       has_caces: has_caces || false,
-      caces_types: caces_types || [],
+      caces_types: Array.isArray(caces_types) ? caces_types.filter((x: unknown) => typeof x === "string").slice(0, 10) : [],
       experience_years: experience_years ? parseInt(experience_years) : null,
-      sectors: sectors || [],
-      notes: cv_url || null,
+      sectors: Array.isArray(sectors) ? sectors.filter((x: unknown) => typeof x === "string").slice(0, 12) : [],
       status: "actif",
       organization_id: null,
     };

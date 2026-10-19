@@ -138,17 +138,19 @@ export default function CandidatSignupPage() {
       return;
     }
 
-    // 2. Upload CV si fourni
-    let cvUrl: string | null = null;
-    if (cvFile) {
-      const ext = cvFile.name.split(".").pop();
-      const path = `cvs/${authData.user.id}.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from("candidate-cvs")
-        .upload(path, cvFile, { upsert: true });
-      if (!uploadError) {
-        const { data: urlData } = supabase.storage.from("candidate-cvs").getPublicUrl(path);
-        cvUrl = urlData.publicUrl;
+    // 2. CV : dépôt dans le bucket PRIVÉ (jamais de lien public), possible dès qu'une session existe.
+    // Sans session (confirmation e-mail activée), le CV se dépose depuis « Mon compte » après connexion.
+    if (cvFile && authData.session) {
+      const okType = ["application/pdf", "image/jpeg", "image/png", "image/webp"].includes(cvFile.type);
+      if (okType && cvFile.size <= 8 * 1024 * 1024) {
+        const safe = cvFile.name.replace(/[^\w.\-]+/g, "_").slice(-80);
+        const path = `${authData.user.id}/${Date.now()}_${safe}`;
+        const up = await supabase.storage.from("candidate-documents").upload(path, cvFile, { contentType: cvFile.type });
+        if (!up.error) {
+          await supabase.from("candidate_documents").insert({
+            auth_user_id: authData.user.id, doc_type: "autre", label: "CV", file_path: path, file_name: cvFile.name,
+          });
+        }
       }
     }
 
@@ -171,7 +173,6 @@ export default function CandidatSignupPage() {
         experience_years: profile.experience_years || null,
         preferences: prefs,
         sectors: selectedSectors,
-        cv_url: cvUrl,
       }),
     });
 

@@ -63,6 +63,7 @@ export default function RecrutePage() {
   const [selected, setSelected] = useState<OrgType | null>(null);
   const [form, setForm]         = useState({ orgName: "", vat: "", fullName: "", email: "", password: "", cgu: false });
   const [error, setError]       = useState("");
+  const [notice, setNotice]     = useState("");
   const [loading, setLoading]   = useState(false);
 
   function set(field: keyof typeof form) {
@@ -87,6 +88,7 @@ export default function RecrutePage() {
       fd.append("vat_number", form.vat);
       const result = await signUp(fd);
       if (result?.error) setError(result.error);
+      else if (result && "success" in result && result.success) setNotice(result.success);
     } catch {
       setError(l("Une erreur est survenue. Réessayez.", "Er is een fout opgetreden. Probeer opnieuw."));
     } finally {
@@ -432,6 +434,7 @@ export default function RecrutePage() {
                   </span>
                 </label>
                 {error && <p className="text-xs rounded-xl px-4 py-3 bg-red-50 border border-red-100" style={{ color: "#B91C1C" }}>{error}</p>}
+                {notice && <p className="text-xs rounded-xl px-4 py-3 bg-green-50 border border-green-200 text-green-800">{notice}</p>}
                 <button type="submit" disabled={loading}
                   className="w-full py-4 text-white font-black text-sm tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 transition"
                   style={{ background: loading ? "#FFD97A" : "#FFB900", fontFamily: "var(--font-display)" }}>

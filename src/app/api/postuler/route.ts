@@ -22,7 +22,20 @@ export async function POST(req: NextRequest) {
       has_caces,
       caces_types,
       cover_message,
+      availability_slots,
+      quick_apply,
     } = body;
+
+    // Liste blanche des créneaux "jour:plage" (candidature rapide)
+    const DAY_OK = ["mon", "tue", "wed", "thu", "fri", "sat", "sun", "holiday"];
+    const SLOT_OK = ["morning", "afternoon", "evening", "night"];
+    const slotsClean: string[] = Array.isArray(availability_slots)
+      ? Array.from(new Set(availability_slots.filter((s: unknown): s is string => {
+          if (typeof s !== "string") return false;
+          const [d, t] = s.split(":");
+          return DAY_OK.includes(d) && SLOT_OK.includes(t);
+        }))).slice(0, 40) as string[]
+      : [];
 
     if (!job_offer_id || !applicant_name || !applicant_phone) {
       return NextResponse.json(
@@ -44,9 +57,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert application
-    const { data: application, error: insertError } = await supabaseAdmin
-      .from("applications")
-      .insert({
+    const baseRow = {
         job_offer_id,
         applicant_name,
         applicant_phone,
@@ -57,9 +68,16 @@ export async function POST(req: NextRequest) {
         caces_types: caces_types || [],
         cover_message: cover_message || null,
         status: "nouveau",
-      })
+    };
+    let { data: application, error: insertError } = await supabaseAdmin
+      .from("applications")
+      .insert((quick_apply ? { ...baseRow, availability_slots: slotsClean, interest_confirmed: true, quick_apply: true } : baseRow) as typeof baseRow)
       .select()
       .single();
+    // Migration 011 pas encore appliquée : on enregistre sans les nouveaux champs.
+    if (insertError && quick_apply && /availability_slots|interest_confirmed|quick_apply/.test(insertError.message ?? "")) {
+      ({ data: application, error: insertError } = await supabaseAdmin.from("applications").insert(baseRow).select().single());
+    }
 
     if (insertError) {
       console.error("Insert error:", insertError);

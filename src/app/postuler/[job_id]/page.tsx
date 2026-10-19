@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import CandidatureForm from "@/components/candidature/CandidatureForm";
+import QuickApplyForm from "@/components/candidature/QuickApplyForm";
 import { labels } from "@/lib/utils";
 import { getDict } from "@/lib/i18n/server";
 import { LangSwitch } from "@/components/layout/LangSwitch";
@@ -50,6 +51,34 @@ export default async function PostulerPage({
   const job = offre as JobOffer & { organizations: Organization };
   const orgRaw = job.organizations as unknown;
   const org = Array.isArray(orgRaw) ? (orgRaw as Organization[])[0] : orgRaw as Organization | null;
+
+  // Candidature rapide (étudiant / flexi-job) : préremplie si le candidat est connecté.
+  const isQuick = job.contract_type === "etudiant" || job.contract_type === "flexi";
+  let prefill: { first_name: string; last_name: string; phone: string; email: string; slots: string[] } | null = null;
+  if (isQuick) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: cand } = await supabase
+        .from("candidates")
+        .select("id, first_name, last_name, phone, email")
+        .eq("auth_user_id", user.id)
+        .maybeSingle();
+      if (cand) {
+        const { data: av } = await supabase
+          .from("candidate_availabilities")
+          .select("day_key, slot")
+          .eq("candidate_id", cand.id)
+          .eq("kind", "recurring");
+        prefill = {
+          first_name: (cand.first_name as string) ?? "",
+          last_name: (cand.last_name as string) ?? "",
+          phone: (cand.phone as string) ?? "",
+          email: (cand.email as string) ?? user.email ?? "",
+          slots: (av ?? []).map((r) => `${r.day_key}:${r.slot}`),
+        };
+      }
+    }
+  }
 
   const sectorPhoto = SECTOR_PHOTOS[job.sector] ?? SECTOR_PHOTOS.autre;
   const sectorLabel = SECTOR_LABELS[job.sector] ?? job.sector;
@@ -224,7 +253,18 @@ export default async function PostulerPage({
 
             {/* The form itself */}
             <div className="bg-white border border-ink-100 rounded-2xl p-6 shadow-sm">
-              <CandidatureForm jobId={job.id} orgName={org?.name ?? "Wolko"} />
+              {isQuick ? (
+                <QuickApplyForm
+                  jobId={job.id}
+                  orgName={org?.name ?? "Wolko"}
+                  flexi={job.contract_type === "flexi"}
+                  offerDays={(job as any).days_needed ?? []}
+                  offerSlots={(job as any).time_slots ?? []}
+                  prefill={prefill}
+                />
+              ) : (
+                <CandidatureForm jobId={job.id} orgName={org?.name ?? "Wolko"} />
+              )}
             </div>
 
             {/* Footer */}

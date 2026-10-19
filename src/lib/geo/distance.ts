@@ -62,6 +62,15 @@ export function safeIlikeValue(n: string): string {
 }
 
 /** Région déduite de la ville (le champ « région » n'est plus saisi) ; Wallonie par défaut si la ville est inconnue. */
+const BRUSSELS_COMMUNES = new Set(
+  ["Anderlecht", "Oudergem", "Auderghem", "Sint-Agatha-Berchem", "Berchem-Sainte-Agathe", "Brussel", "Bruxelles", "Brussels",
+   "Etterbeek", "Evere", "Vorst", "Forest", "Ganshoren", "Elsene", "Ixelles", "Jette", "Koekelberg", "Sint-Jans-Molenbeek",
+   "Molenbeek-Saint-Jean", "Molenbeek", "Sint-Gillis", "Saint-Gilles", "Sint-Joost-ten-Node", "Saint-Josse-ten-Noode", "Schaarbeek",
+   "Schaerbeek", "Ukkel", "Uccle", "Watermaal-Bosvoorde", "Watermael-Boitsfort", "Sint-Lambrechts-Woluwe", "Woluwe-Saint-Lambert",
+   "Sint-Pieters-Woluwe", "Woluwe-Saint-Pierre"].map(normalizePlace)
+);
+
 export function regionForCity(city: string): "wallonie" | "bruxelles" | "flandre" {
+  if (BRUSSELS_COMMUNES.has(normalizePlace(city))) return "bruxelles";
   return findCity(city)?.r ?? "wallonie";
 }

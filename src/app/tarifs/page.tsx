@@ -86,9 +86,6 @@ export default function TarifsPage() {
 
         {/* ── HERO sombre ──────────────────────────────── */}
         <div className="bg-[#10214B] py-20 text-center px-6">
-          <span className="inline-block text-[11px] font-black text-brand border border-brand/30 bg-brand/10 px-4 py-1.5 rounded-full uppercase tracking-widest mb-6">
-            30 jours gratuits · Sans carte bancaire
-          </span>
           <h1
             className="font-display font-black text-white uppercase leading-[0.9] mb-5"
             style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)", letterSpacing: "-0.02em" }}
@@ -225,9 +222,6 @@ export default function TarifsPage() {
           >
             Prêt à renforcer <span className="text-brand">[vos équipes]</span>&nbsp;?
           </h2>
-          <p className="text-white/40 text-sm mb-8">
-            30 jours gratuits · Sans carte bancaire · Annulation à tout moment
-          </p>
           <Link
             href="/recrute"
             className="inline-flex items-center gap-3 bg-brand hover:bg-brand-dark text-white font-display font-black uppercase px-10 py-4 rounded-xl transition text-[13px]"

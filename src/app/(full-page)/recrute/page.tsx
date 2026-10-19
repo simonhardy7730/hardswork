@@ -111,26 +111,22 @@ export default function RecrutePage() {
               backgroundImage: "url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1400&q=75')",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              filter: "brightness(0.22) saturate(0.6)",
+              filter: "brightness(0.7) saturate(0.95)",
             }}
           />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(16,33,75,0.95) 0%, rgba(16,33,75,0.6) 100%)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(100deg, rgba(16,33,75,0.82) 0%, rgba(16,33,75,0.55) 42%, rgba(16,33,75,0.12) 100%)" }} />
 
           <div className="relative max-w-6xl mx-auto px-6 pt-[60px] grid lg:grid-cols-2 gap-12 items-center py-24">
             {/* Texte gauche */}
             <div>
               <WolfBadge className="lg:hidden w-36 mb-5" />
-              <span className="inline-block text-[11px] font-black border px-4 py-1.5 rounded-full uppercase tracking-widest mb-8"
-                style={{ color: "var(--brand-text)", borderColor: "rgba(255,183,3,0.35)", background: "rgba(255,183,3,0.08)" }}>
-                30 jours gratuits · Sans carte bancaire
-              </span>
               <h1 className="font-display font-black text-white uppercase leading-[0.88] mb-6"
                 style={{ fontSize: "clamp(3rem, 6vw, 5rem)", letterSpacing: "-0.02em" }}>
                 Recrutez les<br />
                 <span style={{ color: "var(--brand-text)" }}>[meilleurs]</span><br />
                 du terrain.
               </h1>
-              <p className="text-white/45 text-lg leading-relaxed mb-10 max-w-md">
+              <p className="text-white/80 text-lg leading-relaxed mb-10 max-w-md">
                 La plateforme de recrutement pensée pour les métiers techniques et manuels en Belgique.
                 Construction, logistique, transport, industrie et plus.
               </p>
@@ -252,7 +248,6 @@ export default function RecrutePage() {
             style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", letterSpacing: "-0.02em" }}>
             Prêt à trouver<br />vos talents&nbsp;?
           </h2>
-          <p className="text-white/70 mb-8 text-lg">30 jours gratuits · Aucune carte bancaire · Annulation à tout moment</p>
           <button onClick={() => setShowForm(true)}
             className="inline-flex items-center gap-3 bg-white font-display font-black uppercase px-10 py-4 rounded-xl transition text-[14px] hover:bg-white/90"
             style={{ color: "var(--brand-text)", letterSpacing: "0.08em" }}>

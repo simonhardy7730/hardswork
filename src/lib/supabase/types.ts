@@ -10,7 +10,7 @@ export type Json =
 export type OrganizationType = "agency" | "company";
 export type Region = "wallonie" | "bruxelles" | "flandre";
 export type UserRole = "admin" | "recruiter" | "viewer";
-export type ContractType = "interim" | "cdi" | "cdd" | "apprentissage";
+export type ContractType = "interim" | "cdi" | "cdd" | "apprentissage" | "etudiant" | "flexi" | "stage";
 export type Sector =
   | "logistique"
   | "industrie"

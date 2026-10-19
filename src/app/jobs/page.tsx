@@ -54,7 +54,8 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
 
   if (searchParams.secteur) query = query.eq("sector",        searchParams.secteur);
   if (searchParams.region)  query = query.eq("region",        searchParams.region);
-  if (searchParams.contrat) query = query.eq("contract_type", searchParams.contrat);
+  if (searchParams.contrat === "classique") query = query.in("contract_type", ["cdi", "cdd"]);
+  else if (searchParams.contrat) query = query.eq("contract_type", searchParams.contrat);
   if (searchParams.q)       query = query.ilike("title",      `%${searchParams.q}%`);
   // Ville ou code postal : les offres n'ont pas (encore) de code postal, on filtre donc sur la ville uniquement.
   const lieu = (searchParams.lieu ?? "").replace(/[%,()]/g, "").trim();
@@ -79,7 +80,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
     .select("id", { count: "exact", head: true })
     .eq("status", "active");
 
-  const hasFilters = searchParams.secteur || searchParams.region || searchParams.q || lieu;
+  const hasFilters = searchParams.secteur || searchParams.region || searchParams.q || searchParams.contrat || lieu;
 
   return (
     <div className="min-h-screen bg-[#F4F1EC] font-body pb-20">
@@ -100,6 +101,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
 
           {/* Barre de recherche */}
           <form method="GET" className="flex gap-2 mb-5 flex-wrap sm:flex-nowrap">
+            {searchParams.contrat && <input type="hidden" name="contrat" value={searchParams.contrat} />}
             {/* Mots-clés */}
             <div className="flex items-center gap-2.5 bg-white border border-white/10 rounded-xl px-4 h-12 flex-1 min-w-0">
               <Search size={14} className="text-ink-300 shrink-0" />
@@ -142,6 +144,39 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
             </button>
           </form>
 
+          {/* Chips type d'emploi */}
+          <div className="flex items-center gap-2 flex-wrap pb-3" aria-label={l("Type d'emploi", "Soort job")}>
+            {[
+              { key: "",          fr: "Tous les types",  nl: "Alle types" },
+              { key: "classique", fr: "Emploi classique", nl: "Klassieke job" },
+              { key: "interim",   fr: "Intérim",          nl: "Interim" },
+              { key: "etudiant",  fr: "Job étudiant",     nl: "Studentenjob" },
+              { key: "flexi",     fr: "Flexi-job",        nl: "Flexi-job" },
+              { key: "stage",     fr: "Stage",            nl: "Stage" },
+            ].map(({ key, fr, nl }) => {
+              const params = new URLSearchParams();
+              if (key) params.set("contrat", key);
+              if (searchParams.secteur) params.set("secteur", searchParams.secteur);
+              if (searchParams.q) params.set("q", searchParams.q);
+              if (lieu) params.set("lieu", lieu);
+              const qs = params.toString();
+              const active = (searchParams.contrat ?? "") === key;
+              return (
+                <Link
+                  key={key || "all"}
+                  href={qs ? `/jobs?${qs}` : "/jobs"}
+                  className={`text-[12px] font-bold px-3.5 py-1.5 rounded-full transition-all ${
+                    active
+                      ? "bg-brand text-white"
+                      : "border border-white/20 text-white/60 hover:text-white hover:border-white/40"
+                  }`}
+                >
+                  {l(fr, nl)}
+                </Link>
+              );
+            })}
+          </div>
+
           {/* Chips secteurs */}
           <div className="flex items-center gap-2 flex-wrap pb-5">
             <Link
@@ -157,7 +192,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
             {SECTOR_CHIPS.map(({ key, label }) => (
               <Link
                 key={key}
-                href={`/jobs?secteur=${key}${searchParams.q ? `&q=${searchParams.q}` : ""}`}
+                href={`/jobs?secteur=${key}${searchParams.q ? `&q=${encodeURIComponent(searchParams.q)}` : ""}${searchParams.contrat ? `&contrat=${searchParams.contrat}` : ""}`}
                 className={`text-[12px] font-bold px-3.5 py-1.5 rounded-full transition-all ${
                   searchParams.secteur === key
                     ? "bg-brand text-white"

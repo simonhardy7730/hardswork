@@ -58,6 +58,9 @@ export const CONTRACT_LABELS: Record<string, string> = {
   cdi: "CDI",
   cdd: "CDD",
   apprentissage: "Apprentissage",
+  etudiant: "Job étudiant",
+  flexi: "Flexi-job",
+  stage: "Stage",
 };
 
 export const SECTOR_LABELS: Record<string, string> = {
@@ -97,7 +100,7 @@ export const AVAILABILITY_LABELS: Record<string, string> = {
 
 /** Libellés néerlandais + accès par langue : labels("nl").sector[key] */
 const NL = {
-  contract: { interim: "Interimcontract", cdi: "Onbepaalde duur", cdd: "Bepaalde duur", apprentissage: "Leercontract" },
+  contract: { interim: "Interimcontract", cdi: "Onbepaalde duur", cdd: "Bepaalde duur", apprentissage: "Leercontract", etudiant: "Studentenjob", flexi: "Flexi-job", stage: "Stage" },
   sector: { logistique: "Logistiek", industrie: "Industrie", construction: "Bouw", transport: "Transport", nettoyage: "Schoonmaak", securite: "Beveiliging", medical: "Medisch", autre: "Andere" },
   region: { wallonie: "Wallonië", bruxelles: "Brussel", flandre: "Vlaanderen" },
   status: { nouveau: "Nieuw", contacte: "Gecontacteerd", entretien: "Gesprek", place: "Geplaatst", refuse: "Geweigerd", draft: "Concept", active: "Actief", paused: "Gepauzeerd", closed: "Afgesloten" },

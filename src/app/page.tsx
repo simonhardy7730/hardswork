@@ -9,7 +9,7 @@ import { HowItWorks } from "@/components/home/HowItWorks";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { WolfBadge } from "@/components/ui/WolfMascot";
-import { getDict } from "@/lib/i18n/server";
+import { getDict, getL } from "@/lib/i18n/server";
 import type { Dict } from "@/lib/i18n/dict";
 
 interface JobOffer {
@@ -66,6 +66,7 @@ const H2 = { fontSize: "clamp(2rem, 4.5vw, 3.5rem)", lineHeight: 0.95 } as const
 
 export default async function HomePage() {
   const { t } = getDict();
+  const l = getL();
   const supabase = await createClient();
 
   /* Offres réelles uniquement — aucune offre factice n'est affichée. */
@@ -219,6 +220,31 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* ── UN JOB ADAPTÉ À VOTRE RYTHME ──────────────── */}
+      <section className="bg-surface py-16" aria-labelledby="rythme-title">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <h2 id="rythme-title" className="font-display font-black uppercase text-ink text-3xl sm:text-4xl text-center mb-8">
+            {l("Un job adapté à votre rythme.", "Een job aangepast aan jouw ritme.")}
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              { href: "/jobs?contrat=classique", title: l("Emploi classique", "Klassieke job"), desc: l("CDI, CDD ou intérim : trouvez un poste durable près de chez vous.", "Onbepaalde of bepaalde duur of interim: vind een vaste job in je buurt.") },
+              { href: "/jobs?contrat=etudiant",  title: l("Job étudiant", "Studentenjob"),      desc: l("Trouve un job compatible avec tes études, tes disponibilités et tes envies.", "Vind een job die past bij je studies, je beschikbaarheid en je wensen.") },
+              { href: "/jobs?contrat=flexi",     title: l("Flexi-job", "Flexi-job"),            desc: l("Trouve un travail complémentaire adapté à ton emploi du temps.", "Vind een aanvullende job die past bij je agenda.") },
+            ].map((c) => (
+              <Link key={c.href} href={c.href}
+                className="group flex flex-col rounded-2xl border border-ink-100 bg-white p-6 hover:border-brand hover:shadow-md transition">
+                <span className="font-display font-black uppercase text-ink text-xl mb-2">{c.title}</span>
+                <span className="text-sm text-ink-500 mb-5">{c.desc}</span>
+                <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-bold text-brand">
+                  {l("Voir les offres", "Bekijk de vacatures")} <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ── COMMENT ÇA MARCHE ─────────────────────────── */}
       <section id="comment-ca-marche" className="bg-surface-2 py-20 scroll-mt-16">

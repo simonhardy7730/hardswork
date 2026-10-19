@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import DocumentsUpload from "@/components/candidat/DocumentsUpload";
 import PreferencesEditor from "@/components/candidat/PreferencesEditor";
+import AvailabilityEditor from "@/components/candidat/AvailabilityEditor";
+import { EMPTY_AVAILABILITY, type AvailabilityState } from "@/lib/candidate/availability";
 import { EMPTY_PREFERENCES, type Preferences } from "@/lib/candidate/preferences";
 import { User, Mail, Phone, Lock, LogOut } from "lucide-react";
 import { getDict } from "@/lib/i18n/server";
@@ -21,7 +23,7 @@ export default async function ComptePage() {
   // Préférences (migration 008). Si les colonnes n'existent pas encore, on affiche un formulaire vide.
   const { data: cand } = await supabase
     .from("candidates")
-    .select("job_types, is_student, student_profile, flexi_profile")
+    .select("id, job_types, is_student, student_profile, flexi_profile")
     .eq("auth_user_id", user.id)
     .maybeSingle();
   const initialPrefs: Preferences = cand
@@ -32,6 +34,24 @@ export default async function ComptePage() {
         flexi_profile: (cand.flexi_profile as object) ?? {},
       }
     : EMPTY_PREFERENCES;
+
+  // Disponibilités (migration 009). Table absente ou vide : calendrier vide.
+  let initialAvail: AvailabilityState = EMPTY_AVAILABILITY;
+  if (cand?.id) {
+    const { data: av } = await supabase
+      .from("candidate_availabilities")
+      .select("kind, day_key, slot, date_from, date_to, note")
+      .eq("candidate_id", cand.id);
+    if (av) {
+      initialAvail = {
+        recurring: av.filter((r) => r.kind === "recurring").map((r) => `${r.day_key}:${r.slot}`),
+        exceptions: av
+          .filter((r) => r.kind !== "recurring")
+          .map((r) => ({ kind: r.kind as "available" | "unavailable", date_from: r.date_from as string, date_to: r.date_to as string, note: (r.note as string) ?? "" }))
+          .sort((a, b) => a.date_from.localeCompare(b.date_from)),
+      };
+    }
+  }
 
   const fullName = (user.user_metadata?.full_name as string) ?? "";
   const initials = fullName
@@ -128,6 +148,9 @@ export default async function ComptePage() {
 
       {/* Mes recherches d'emploi (types d'emploi, profil étudiant / flexi-job) */}
       <PreferencesEditor initial={initialPrefs} />
+
+      {/* Calendrier de disponibilités */}
+      <AvailabilityEditor initial={initialAvail} />
 
       {/* Diplômes & permis */}
       <DocumentsUpload userId={user.id} />

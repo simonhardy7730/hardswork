@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
@@ -46,6 +47,29 @@ export default function KanbanCard({
   const [notes, setNotes]             = useState(app.notes ?? "");
   const [savingNotes, setSavingNotes] = useState(false);
   const [showMenu, setShowMenu]       = useState(false);
+  const [menuPos, setMenuPos]         = useState<{ left: number; top?: number; bottom?: number }>({ left: 0 });
+  const menuBtn = useRef<HTMLButtonElement>(null);
+
+  /* Menu affiché dans <body> (portail) : il n'est plus rogné par le tableau et s'ouvre vers le haut s'il manque de place. */
+  function toggleMenu() {
+    if (showMenu) return setShowMenu(false);
+    const r = menuBtn.current?.getBoundingClientRect();
+    if (r) {
+      const MENU_W = 160, EST_H = 250;
+      const left = Math.max(8, Math.min(r.right - MENU_W, window.innerWidth - MENU_W - 8));
+      setMenuPos(r.bottom + EST_H > window.innerHeight
+        ? { left, bottom: window.innerHeight - r.top + 4 }
+        : { left, top: r.bottom + 4 });
+    }
+    setShowMenu(true);
+  }
+  useEffect(() => {
+    if (!showMenu) return;
+    const close = () => setShowMenu(false);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => { window.removeEventListener("scroll", close, true); window.removeEventListener("resize", close); };
+  }, [showMenu]);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging: isSortableDragging } =
     useSortable({ id: app.id });
@@ -119,13 +143,18 @@ export default function KanbanCard({
         {/* Menu "..." */}
         <div className="relative shrink-0" onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
           <button
-            onClick={() => setShowMenu(!showMenu)}
+            ref={menuBtn}
+            onClick={toggleMenu}
+            aria-haspopup="menu" aria-expanded={showMenu}
             className="w-6 h-6 rounded-md flex items-center justify-center text-ink-300 hover:text-ink hover:bg-surface-2 transition"
           >
             <MoreHorizontal size={13} />
           </button>
-          {showMenu && (
-            <div className="absolute top-full right-0 mt-1 z-30 w-36 bg-white rounded-xl border border-ink-100 shadow-xl py-1 overflow-hidden">
+          {showMenu && createPortal(
+            <>
+            <div className="fixed inset-0 z-[90]" onClick={(e) => { e.stopPropagation(); setShowMenu(false); }} onPointerDown={(e) => e.stopPropagation()} />
+            <div role="menu" style={menuPos} onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}
+              className="fixed z-[100] w-40 bg-white rounded-xl border border-ink-100 shadow-xl py-1 overflow-hidden">
               {COLUMNS.filter(c => c.id !== app.status).map(col => (
                 <button key={col.id}
                   onClick={() => { onStatusChange(app.id, col.id as ApplicationStatus); setShowMenu(false); }}
@@ -148,6 +177,8 @@ export default function KanbanCard({
                 </button>
               </div>
             </div>
+            </>,
+            document.body
           )}
         </div>
       </div>

@@ -192,7 +192,7 @@ function NormalSignup() {
       email: formData.email,
       password: formData.password,
       options: {
-        data: { full_name: formData.full_name, signup_kind: "organization", org_name: formData.org_name, org_type: orgType, vat_number: formData.vat_number.trim() },
+        data: { full_name: formData.full_name, signup_kind: "organization", lang, org_name: formData.org_name, org_type: orgType, vat_number: formData.vat_number.trim() },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });

@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { isValidVat, normalizeVat } from "@/lib/vat";
+import { getLang } from "@/lib/i18n/server";
 
 export async function signIn(formData: FormData) {
   const email = formData.get("email") as string;
@@ -54,7 +55,7 @@ export async function signUp(formData: FormData) {
     email,
     password,
     options: {
-      data: { full_name: fullName, signup_kind: "organization", org_name: orgName, org_type: orgType, vat_number: vatNumber },
+      data: { full_name: fullName, signup_kind: "organization", lang: getLang(), org_name: orgName, org_type: orgType, vat_number: vatNumber },
       emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
     },
   });

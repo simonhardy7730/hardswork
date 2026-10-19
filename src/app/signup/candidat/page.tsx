@@ -127,7 +127,7 @@ export default function CandidatSignupPage() {
       email: auth.email,
       password: auth.password,
       options: {
-        data: { full_name: auth.full_name, user_type: "candidate" },
+        data: { full_name: auth.full_name, user_type: "candidate", lang },
         emailRedirectTo: `${window.location.origin}/auth/callback?next=/candidat/dashboard`,
       },
     });

@@ -2,8 +2,10 @@
 
 import { Bell } from "lucide-react";
 import type { User } from "@/lib/supabase/types";
+import { useL } from "@/lib/i18n/context";
 
 export default function DashboardTopbar({ user }: { user: User }) {
+  const l = useL();
   const initials = user.full_name
     ?.split(" ")
     .map((n) => n[0])
@@ -30,7 +32,7 @@ export default function DashboardTopbar({ user }: { user: User }) {
           <div className="hidden sm:block">
             <p className="text-[12px] font-semibold text-white leading-tight">{user.full_name}</p>
             <p className="text-[10px] text-white/30 capitalize">
-              {user.role === "admin" ? "Administrateur" : user.role === "recruiter" ? "Recruteur" : "Lecteur"}
+              {user.role === "admin" ? l("Administrateur", "Beheerder") : user.role === "recruiter" ? l("Recruteur", "Recruiter") : l("Lecteur", "Lezer")}
             </p>
           </div>
         </div>

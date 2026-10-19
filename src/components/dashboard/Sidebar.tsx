@@ -9,17 +9,19 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import type { Organization } from "@/lib/supabase/types";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
+import { useL } from "@/lib/i18n/context";
 
 const NAV_ITEMS = [
-  { href: "/dashboard",          icon: LayoutDashboard, label: "Tableau de bord", exact: true },
-  { href: "/dashboard/offres",   icon: Briefcase,       label: "Offres d'emploi",  exact: false },
-  { href: "/dashboard/candidats",icon: Users,           label: "Candidats",        exact: false },
-  { href: "/dashboard/settings", icon: Settings,        label: "Paramètres",       exact: false },
+  { href: "/dashboard",          icon: LayoutDashboard, fr: "Tableau de bord", nl: "Dashboard",     exact: true },
+  { href: "/dashboard/offres",   icon: Briefcase,       fr: "Offres d'emploi", nl: "Vacatures",     exact: false },
+  { href: "/dashboard/candidats",icon: Users,           fr: "Candidats",       nl: "Kandidaten",    exact: false },
+  { href: "/dashboard/settings", icon: Settings,        fr: "Paramètres",      nl: "Instellingen",  exact: false },
 ];
 
 export default function DashboardSidebar({ org }: { org: Organization }) {
   const pathname = usePathname();
   const router   = useRouter();
+  const l = useL();
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -46,9 +48,9 @@ export default function DashboardSidebar({ org }: { org: Organization }) {
             </span>
           </div>
           <div className="overflow-hidden flex-1">
-            <p className="text-[12px] font-semibold text-white truncate">{org?.name ?? "Organisation"}</p>
+            <p className="text-[12px] font-semibold text-white truncate">{org?.name ?? l("Organisation", "Organisatie")}</p>
             <p className="text-[10px] text-white/30 capitalize">
-              {org?.type === "agency" ? "Agence" : "Entreprise"}
+              {org?.type === "agency" ? l("Agence", "Bureau") : l("Entreprise", "Bedrijf")}
             </p>
           </div>
         </div>
@@ -56,7 +58,7 @@ export default function DashboardSidebar({ org }: { org: Organization }) {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-3 space-y-0.5">
-        {NAV_ITEMS.map(({ href, icon: Icon, label, exact }) => {
+        {NAV_ITEMS.map(({ href, icon: Icon, fr, nl, exact }) => {
           const isActive = exact ? pathname === href : pathname.startsWith(href);
           return (
             <Link key={href} href={href}
@@ -66,7 +68,7 @@ export default function DashboardSidebar({ org }: { org: Organization }) {
                   : "text-white/40 hover:text-white hover:bg-white/[0.06]"
               }`}>
               <Icon size={16} className={isActive ? "text-white" : "text-white/30"} />
-              {label}
+              {l(fr, nl)}
             </Link>
           );
         })}
@@ -77,7 +79,7 @@ export default function DashboardSidebar({ org }: { org: Organization }) {
         <button onClick={handleSignOut}
           className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-semibold text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-all w-full">
           <LogOut size={16} />
-          Se déconnecter
+          {l("Se déconnecter", "Afmelden")}
         </button>
       </div>
     </aside>

@@ -12,13 +12,13 @@ import {
   Phone,
   Clock,
 } from "lucide-react";
-import {
-  SECTOR_LABELS,
-  formatRelative,
-  STATUS_LABELS,
-} from "@/lib/utils";
+import { labels, formatRelative } from "@/lib/utils";
+import { getLang } from "@/lib/i18n/server";
 
 export default async function DashboardPage() {
+  const lang = getLang();
+  const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
+  const { sector: SECTOR_LABELS, status: STATUS_LABELS } = labels(lang);
   const supabase = await createClient();
   const {
     data: { user },
@@ -107,29 +107,29 @@ export default async function DashboardPage() {
 
   const metrics = [
     {
-      label: "Offres actives",
+      label: l("Offres actives", "Actieve vacatures"),
       value: offresResult.count ?? 0,
       icon: Briefcase,
       color: "bg-brand/10 text-brand",
       href: "/dashboard/offres",
     },
     {
-      label: "Nouvelles candidatures",
-      sublabel: "7 derniers jours",
+      label: l("Nouvelles candidatures", "Nieuwe sollicitaties"),
+      sublabel: l("7 derniers jours", "Laatste 7 dagen"),
       value: candidaturesResult.count ?? 0,
       icon: TrendingUp,
       color: "bg-amber-50 text-amber-600",
       href: "/dashboard/offres",
     },
     {
-      label: "Candidats dans la base",
+      label: l("Candidats dans la base", "Kandidaten in de database"),
       value: candidatsResult.count ?? 0,
       icon: Users,
       color: "bg-purple-50 text-purple-600",
       href: "/dashboard/candidats",
     },
     {
-      label: "Placements ce mois",
+      label: l("Placements ce mois", "Plaatsingen deze maand"),
       value: placementsResult.count ?? 0,
       icon: UserCheck,
       color: "bg-green-50 text-green-600",
@@ -151,11 +151,11 @@ export default async function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-[#101F43]">
-            Bonjour,{" "}
+            {l("Bonjour,", "Hallo,")}{" "}
             {profile.full_name.split(" ")[0]} 👋
           </h1>
           <p className="text-sm text-ink-500 mt-0.5">
-            Voici ce qui se passe sur votre espace Wolko
+            {l("Voici ce qui se passe sur votre espace Wolko", "Dit gebeurt er in uw Wolko-omgeving")}
           </p>
         </div>
         <Link
@@ -164,7 +164,7 @@ export default async function DashboardPage() {
             style={{ padding: "0.5rem 1rem", fontSize: "0.8125rem" }}
         >
           <Plus size={16} />
-          Nouvelle offre
+          {l("Nouvelle offre", "Nieuwe vacature")}
         </Link>
       </div>
 
@@ -196,13 +196,13 @@ export default async function DashboardPage() {
       <div className="bg-white rounded-xl border border-ink-100">
         <div className="flex items-center justify-between px-5 py-4 border-b border-ink-100">
           <h2 className="font-semibold text-[#101F43] text-sm">
-            Dernières candidatures
+            {l("Dernières candidatures", "Laatste sollicitaties")}
           </h2>
           <Link
             href="/dashboard/offres"
             className="text-xs text-brand hover:underline flex items-center gap-1"
           >
-            Voir tout <ArrowRight size={12} />
+            {l("Voir tout", "Alles bekijken")} <ArrowRight size={12} />
           </Link>
         </div>
 
@@ -210,13 +210,13 @@ export default async function DashboardPage() {
           <div className="py-12 text-center">
             <HardieIcon size={48} className="mx-auto mb-3" />
             <p className="text-sm text-ink-300">
-              Aucune candidature pour le moment.
+              {l("Aucune candidature pour le moment.", "Nog geen sollicitaties.")}
             </p>
             <Link
               href="/dashboard/offres/nouvelle"
               className="text-sm text-brand hover:underline mt-1 inline-block"
             >
-              Créer une offre d&apos;emploi →
+              {l("Créer une offre d'emploi →", "Een vacature aanmaken →")}
             </Link>
           </div>
         ) : (
@@ -281,7 +281,7 @@ export default async function DashboardPage() {
                     )}
                     <div className="flex items-center gap-1 text-[10px] text-ink-300">
                       <Clock size={11} />
-                      {formatRelative(app.applied_at)}
+                      {formatRelative(app.applied_at, lang)}
                     </div>
                     <ArrowRight
                       size={14}
@@ -306,9 +306,9 @@ export default async function DashboardPage() {
           </div>
           <div>
             <div className="text-sm font-medium text-[#101F43]">
-              Nouvelle offre
+              {l("Nouvelle offre", "Nieuwe vacature")}
             </div>
-            <div className="text-xs text-ink-300">Publier en 2 minutes</div>
+            <div className="text-xs text-ink-300">{l("Publier en 2 minutes", "Publiceren in 2 minuten")}</div>
           </div>
         </Link>
         <Link
@@ -320,9 +320,9 @@ export default async function DashboardPage() {
           </div>
           <div>
             <div className="text-sm font-medium text-[#101F43]">
-              Base candidats
+              {l("Base candidats", "Kandidatendatabase")}
             </div>
-            <div className="text-xs text-ink-300">Gérer vos profils</div>
+            <div className="text-xs text-ink-300">{l("Gérer vos profils", "Beheer uw profielen")}</div>
           </div>
         </Link>
         <Link
@@ -334,9 +334,9 @@ export default async function DashboardPage() {
           </div>
           <div>
             <div className="text-sm font-medium text-[#101F43]">
-              Inviter l&apos;équipe
+              {l("Inviter l'équipe", "Team uitnodigen")}
             </div>
-            <div className="text-xs text-ink-300">Ajouter des recruteurs</div>
+            <div className="text-xs text-ink-300">{l("Ajouter des recruteurs", "Recruiters toevoegen")}</div>
           </div>
         </Link>
       </div>

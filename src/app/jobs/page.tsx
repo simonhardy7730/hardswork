@@ -5,6 +5,7 @@ import { labels } from "@/lib/utils";
 import { getDict } from "@/lib/i18n/server";
 import { HardieIcon } from "@/components/ui/HardieIcon";
 import { SiteNav } from "@/components/layout/SiteNav";
+import { RADIUS_OPTIONS, citiesWithin, safeIlikeValue } from "@/lib/geo/distance";
 
 /* ── Photos miniatures par secteur ─────────────────────── */
 const SECTOR_PHOTOS: Record<string, string> = {
@@ -32,7 +33,7 @@ const SECTOR_CHIPS = [
 
 interface SearchParams {
   lieu?: string;
-  q?: string; secteur?: string; region?: string; contrat?: string;
+  q?: string; rayon?: string; secteur?: string; region?: string; contrat?: string;
   jour?: string; horaire?: string; rec?: string; debut?: string; salaire?: string;
 }
 
@@ -64,7 +65,14 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
   if (searchParams.q)       query = query.ilike("title",      `%${searchParams.q}%`);
   // Ville ou code postal : les offres n'ont pas (encore) de code postal, on filtre donc sur la ville uniquement.
   const lieu = (searchParams.lieu ?? "").replace(/[%,()]/g, "").trim();
-  if (lieu && !/^\d+$/.test(lieu)) query = query.ilike("city", `%${lieu}%`);
+  // Rayon (km) autour d'une ville connue ; sinon, recherche exacte sur le nom de la ville.
+  const rayon = RADIUS_OPTIONS.find((r) => String(r) === searchParams.rayon) ?? 0;
+  const around = lieu && rayon ? citiesWithin(lieu, rayon) : null;
+  if (around) {
+    const names = around.names.map(safeIlikeValue).filter(Boolean);
+    query = query.or(names.map((n) => `city.ilike.${n}`).join(","));
+  } else if (lieu && !/^\d+$/.test(lieu)) query = query.ilike("city", `%${lieu}%`);
+  const rayonUnknown = Boolean(lieu && rayon && !around);
 
   // Filtres de planning (migration 010). Valeurs validées par liste blanche.
   const jourList = (searchParams.jour ?? "").split(",").filter((d) => DAY_KEYS.includes(d));
@@ -151,6 +159,11 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
                 className="bg-transparent text-ink placeholder-ink-300 text-sm flex-1 min-w-0 focus:outline-none"
               />
             </div>
+            <select name="rayon" defaultValue={searchParams.rayon ?? ""} aria-label={l("Rayon", "Straal")}
+              className="bg-white text-ink text-sm px-3 h-12 rounded-xl focus:outline-none">
+              <option value="">{l("Distance", "Afstand")}</option>
+              {RADIUS_OPTIONS.map((r) => <option key={r} value={r}>{`+${r} km`}</option>)}
+            </select>
             {/* Bouton */}
             <button
               type="submit"
@@ -176,6 +189,7 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
               if (searchParams.secteur) params.set("secteur", searchParams.secteur);
               if (searchParams.q) params.set("q", searchParams.q);
               if (lieu) params.set("lieu", lieu);
+              if (rayon) params.set("rayon", String(rayon));
               const qs = params.toString();
               const active = (searchParams.contrat ?? "") === key;
               return (
@@ -212,6 +226,7 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
             {searchParams.secteur && <input type="hidden" name="secteur" value={searchParams.secteur} />}
             {searchParams.q && <input type="hidden" name="q" value={searchParams.q} />}
             {lieu && <input type="hidden" name="lieu" value={lieu} />}
+            {rayon ? <input type="hidden" name="rayon" value={rayon} /> : null}
             <select name="jour" defaultValue={jourList.length === 1 ? jourList[0] : ""} aria-label={l("Jour", "Dag")}
               className="bg-white text-ink text-xs px-3 h-9 rounded-lg focus:outline-none">
               <option value="">{l("Jour de la semaine", "Dag van de week")}</option>
@@ -282,6 +297,7 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
               <p className="text-sm text-ink-500">
                 <span className="font-black text-ink">{offers.length}</span> {lang === "nl" ? (offers.length !== 1 ? "vacatures" : "vacature") : `offre${offers.length !== 1 ? "s" : ""}`}
                 {hasFilters && <span className="text-ink-300"> · {l("filtres actifs", "actieve filters")}</span>}
+                {rayonUnknown && <span className="text-ink-300"> · {l("ville inconnue pour le calcul de distance : recherche exacte", "onbekende stad voor afstandsberekening: exacte zoekopdracht")}</span>}
               </p>
               {hasFilters && (
                 <Link href="/jobs" className="text-[11px] text-brand hover:underline font-bold">

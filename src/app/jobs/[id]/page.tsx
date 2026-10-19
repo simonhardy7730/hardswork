@@ -62,15 +62,20 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
   const numLocale = lang === "nl" ? "nl-BE" : "fr-BE";
   const supabase = await createClient();
 
-  const { data: offer } = await supabase
+  // Même colonnes d'entreprise que la page de candidature (les seules lisibles publiquement).
+  let { data: offer } = await supabase
     .from("job_offers")
-    .select(`*, organizations(name, city, logo_url, primary_color)`)
+    .select(`*, organizations(name, logo_url, primary_color)`)
     .eq("id", params.id).eq("status", "active").single();
+  if (!offer) {
+    // Filet : si la jointure entreprise échoue, on affiche quand même l'offre.
+    ({ data: offer } = await supabase.from("job_offers").select("*").eq("id", params.id).eq("status", "active").single());
+  }
 
   if (!offer) notFound();
 
   const org = offer.organizations as {
-    name: string; city: string | null;
+    name: string; city?: string | null;
     logo_url: string | null; primary_color: string | null;
     description: string | null;
   } | null;

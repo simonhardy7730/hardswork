@@ -3,13 +3,17 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { Check, Copy, ArrowRight, Users } from "lucide-react";
 import QRCodeDisplay from "@/components/offres/QRCodeDisplay";
-import { CONTRACT_LABELS, SECTOR_LABELS } from "@/lib/utils";
+import { labels } from "@/lib/utils";
+import { getLang } from "@/lib/i18n/server";
 
 export default async function ConfirmationPage({
   params,
 }: {
   params: { id: string };
 }) {
+  const lang = getLang();
+  const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
+  const { contract: CONTRACT_LABELS, sector: SECTOR_LABELS } = labels(lang);
   const supabase = await createClient();
   const {
     data: { user },
@@ -38,8 +42,8 @@ export default async function ConfirmationPage({
           </div>
           <h1 className="text-xl font-bold mb-1">
             {offre.status === "active"
-              ? "Offre publiée ! 🎉"
-              : "Brouillon enregistré"}
+              ? l("Offre publiée ! 🎉", "Vacature gepubliceerd! 🎉")
+              : l("Brouillon enregistré", "Concept opgeslagen")}
           </h1>
           <p className="text-sm text-white/80">
             {offre.title} · {SECTOR_LABELS[offre.sector]} ·{" "}
@@ -51,7 +55,7 @@ export default async function ConfirmationPage({
           {/* Lien de candidature */}
           <div>
             <p className="text-sm font-semibold text-[#101F43] mb-2">
-              🔗 Lien de candidature
+              {"🔗 " + l("Lien de candidature", "Sollicitatielink")}
             </p>
             <div className="flex items-center gap-2">
               <div className="flex-1 px-3 py-2.5 bg-surface border border-ink-100 rounded-lg text-xs text-ink-500 font-mono truncate">
@@ -60,15 +64,14 @@ export default async function ConfirmationPage({
               <CopyButton url={candidatureUrl} />
             </div>
             <p className="text-xs text-ink-300 mt-1.5">
-              Partagez ce lien par email, WhatsApp, ou affichez-le sur un
-              flyer.
+              {l("Partagez ce lien par email, WhatsApp, ou affichez-le sur un flyer.", "Deel deze link via e-mail, WhatsApp of toon hem op een flyer.")}
             </p>
           </div>
 
           {/* QR Code */}
           <div>
             <p className="text-sm font-semibold text-[#101F43] mb-3">
-              📱 QR Code — à afficher en agence ou en usine
+              {"📱 QR Code — " + l("à afficher en agence ou en usine", "om te tonen in het kantoor of de fabriek")}
             </p>
             <QRCodeDisplay url={candidatureUrl} title={offre.title} />
           </div>
@@ -80,13 +83,13 @@ export default async function ConfirmationPage({
               className="flex items-center justify-center gap-2 bg-brand text-white py-2.5 rounded-lg text-sm font-medium hover:bg-brand-dark transition"
             >
               <Users size={15} />
-              Voir les candidatures
+              {l("Voir les candidatures", "Sollicitaties bekijken")}
             </Link>
             <Link
               href="/dashboard/offres"
               className="flex items-center justify-center gap-2 border border-ink-100 text-ink-500 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-2 transition"
             >
-              Retour aux offres
+              {l("Retour aux offres", "Terug naar vacatures")}
               <ArrowRight size={15} />
             </Link>
           </div>

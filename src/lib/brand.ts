@@ -9,7 +9,7 @@ export const BRAND = {
   tagline: "Le bon talent. La bonne entreprise.",
   description:
     "La plateforme qui rapproche les candidats, les entreprises et les agences d'intérim. Trouvez un emploi ou recrutez plus simplement, près de chez vous.",
-  contactEmail: "hello@hardswork.be",
+  contactEmail: "hello@welko.be",
   colors: {
     navy: "#101F43",
     navyDeep: "#0B1630",

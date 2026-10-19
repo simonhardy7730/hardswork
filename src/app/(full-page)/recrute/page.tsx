@@ -282,7 +282,7 @@ export default function RecrutePage() {
             <div className="flex gap-6 text-ink-300 text-xs">
               <Link href="/legal/cgu" className="hover:text-ink transition">{l("CGU", "Voorwaarden")}</Link>
               <Link href="/legal/privacy" className="hover:text-ink transition">{l("Confidentialité", "Privacy")}</Link>
-              <Link href="mailto:hello@hardswork.be" className="hover:text-ink transition">Contact</Link>
+              <Link href="mailto:hello@welko.be" className="hover:text-ink transition">Contact</Link>
             </div>
           </div>
         </footer>

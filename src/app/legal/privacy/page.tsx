@@ -35,7 +35,7 @@ export default function PrivacyPage() {
                 Wolko SRL (en cours de constitution), Belgique.
                 <br />
                 Email de contact RGPD :{" "}
-                <a href="mailto:privacy@hardswork.be">privacy@hardswork.be</a>
+                <a href="mailto:hello@welko.be">hello@welko.be</a>
               </p>
             </LegalSection>
 
@@ -109,7 +109,7 @@ export default function PrivacyPage() {
               </ul>
               <p>
                 Pour exercer ces droits, contactez :{" "}
-                <a href="mailto:privacy@hardswork.be">privacy@hardswork.be</a>
+                <a href="mailto:hello@welko.be">hello@welko.be</a>
                 <br />
                 Vous pouvez également introduire une réclamation auprès de l&apos;
                 <a href="https://www.dataprotectionauthority.be" target="_blank" rel="noopener noreferrer">
@@ -152,7 +152,7 @@ export default function PrivacyPage() {
             <div className="flex gap-6 text-xs">
               <Link href="/legal/cgu" className="text-ink-300 hover:text-ink transition">CGU</Link>
               <Link href="/legal/privacy" className="text-brand font-semibold">Confidentialité</Link>
-              <a href="mailto:hello@hardswork.be" className="text-ink-300 hover:text-ink transition">Contact</a>
+              <a href="mailto:hello@welko.be" className="text-ink-300 hover:text-ink transition">Contact</a>
             </div>
           </div>
         </footer>

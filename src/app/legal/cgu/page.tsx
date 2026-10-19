@@ -55,7 +55,7 @@ export default function CGUPage() {
                 Vous êtes responsable de la confidentialité de vos identifiants de connexion et de toutes
                 les activités réalisées sous votre compte. Toute utilisation non autorisée doit être
                 signalée immédiatement à{" "}
-                <a href="mailto:hello@hardswork.be">hello@hardswork.be</a>.
+                <a href="mailto:hello@welko.be">hello@welko.be</a>.
               </p>
             </LegalSection>
 
@@ -122,7 +122,7 @@ export default function CGUPage() {
                 Les présentes CGU sont soumises au droit belge. Tout litige sera soumis aux
                 tribunaux compétents de l&apos;arrondissement judiciaire de Bruxelles, Belgique.
                 Contact légal :{" "}
-                <a href="mailto:legal@hardswork.be">legal@hardswork.be</a>
+                <a href="mailto:hello@welko.be">hello@welko.be</a>
               </p>
             </LegalSection>
 
@@ -144,7 +144,7 @@ export default function CGUPage() {
             <div className="flex gap-6 text-xs">
               <Link href="/legal/cgu" className="text-brand font-semibold">CGU</Link>
               <Link href="/legal/privacy" className="text-ink-300 hover:text-ink transition">Confidentialité</Link>
-              <a href="mailto:hello@hardswork.be" className="text-ink-300 hover:text-ink transition">Contact</a>
+              <a href="mailto:hello@welko.be" className="text-ink-300 hover:text-ink transition">Contact</a>
             </div>
           </div>
         </footer>

@@ -3,7 +3,8 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import KanbanBoard from "@/components/kanban/KanbanBoard";
-import { CONTRACT_LABELS, SECTOR_LABELS } from "@/lib/utils";
+import { labels } from "@/lib/utils";
+import { getLang } from "@/lib/i18n/server";
 import type { Application } from "@/lib/supabase/types";
 
 export default async function CandidaturesPage({
@@ -11,6 +12,9 @@ export default async function CandidaturesPage({
 }: {
   params: { id: string };
 }) {
+  const lang = getLang();
+  const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
+  const { contract: CONTRACT_LABELS, sector: SECTOR_LABELS } = labels(lang);
   const supabase = await createClient();
   const {
     data: { user },
@@ -68,8 +72,8 @@ export default async function CandidaturesPage({
               {SECTOR_LABELS[offre.sector]} ·{" "}
               {CONTRACT_LABELS[offre.contract_type]} · {offre.city} ·{" "}
               <span className="font-medium text-brand">
-                {applications?.length ?? 0} candidature
-                {(applications?.length ?? 0) > 1 ? "s" : ""}
+                {applications?.length ?? 0}{" "}
+                {(applications?.length ?? 0) > 1 ? l("candidatures", "sollicitaties") : l("candidature", "sollicitatie")}
               </span>
             </p>
           </div>
@@ -83,7 +87,7 @@ export default async function CandidaturesPage({
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-ink-100 rounded-lg text-ink-500 hover:bg-surface-2 transition"
           >
             <ExternalLink size={13} />
-            Formulaire public
+            {l("Formulaire public", "Openbaar formulier")}
           </a>
           <Link
             href={`/dashboard/offres/${offre.id}/confirmation`}

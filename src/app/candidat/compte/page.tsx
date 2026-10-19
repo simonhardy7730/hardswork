@@ -102,8 +102,8 @@ export default async function ComptePage() {
         <div className="px-5 py-4 border-t border-ink-100 bg-surface">
           <p className="text-xs text-ink-400 leading-relaxed">
             {l("La modification du profil complet arrive prochainement. Pour toute urgence, contactez", "Het volledige profiel wijzigen komt binnenkort. Neem bij dringende vragen contact op via")}{" "}
-            <a href="mailto:hello@hardswork.be" className="font-bold text-brand hover:text-brand-dark transition-colors">
-              hello@hardswork.be
+            <a href="mailto:hello@welko.be" className="font-bold text-brand hover:text-brand-dark transition-colors">
+              hello@welko.be
             </a>
           </p>
         </div>

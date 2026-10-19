@@ -52,7 +52,7 @@ function makePlans(l: L) {
       price: "249",
       description: l("Pour les agences de recrutement", "Voor wervingskantoren"),
       cta: l("Nous contacter", "Neem contact op"),
-      href: "mailto:hello@hardswork.be",
+      href: "mailto:hello@welko.be",
       featured: false,
       features: [
         l("Clients illimités", "Onbeperkt klanten"),

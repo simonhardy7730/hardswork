@@ -17,35 +17,31 @@ import {
   X,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import {
-  CONTRACT_LABELS,
-  SECTOR_LABELS,
-  REGION_LABELS,
-  formatDate,
-} from "@/lib/utils";
+import { labels, formatDate } from "@/lib/utils";
+import { useL, useLang } from "@/lib/i18n/context";
 import type { JobOffer, JobStatus } from "@/lib/supabase/types";
 
 const STATUS_CONFIG: Record<
   JobStatus,
-  { label: string; color: string; dot: string }
+  { fr: string; nl: string; color: string; dot: string }
 > = {
   active: {
-    label: "Active",
+    fr: "Active", nl: "Actief",
     color: "bg-green-100 text-green-700",
     dot: "bg-green-500",
   },
   draft: {
-    label: "Brouillon",
+    fr: "Brouillon", nl: "Concept",
     color: "bg-gray-100 text-gray-600",
     dot: "bg-gray-400",
   },
   paused: {
-    label: "En pause",
+    fr: "En pause", nl: "Gepauzeerd",
     color: "bg-amber-100 text-amber-700",
     dot: "bg-amber-500",
   },
   closed: {
-    label: "Clôturée",
+    fr: "Clôturée", nl: "Afgesloten",
     color: "bg-red-100 text-red-600",
     dot: "bg-red-400",
   },
@@ -63,6 +59,9 @@ const SECTOR_ICONS: Record<string, string> = {
 
 export default function OffresTable({ offres }: { offres: JobOffer[] }) {
   const router = useRouter();
+  const l = useL();
+  const lang = useLang();
+  const { contract: CONTRACT_LABELS, sector: SECTOR_LABELS, region: REGION_LABELS } = labels(lang);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -103,16 +102,16 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
       <div className="bg-white rounded-xl border border-ink-100 py-16 text-center">
         <Briefcase size={40} className="text-[#EADFC4] mx-auto mb-4" />
         <h3 className="text-sm font-semibold text-ink mb-1">
-          Aucune offre
+          {l("Aucune offre", "Geen vacatures")}
         </h3>
         <p className="text-sm text-ink-300 mb-4">
-          Créez votre première offre d&apos;emploi pour démarrer.
+          {l("Créez votre première offre d'emploi pour démarrer.", "Maak uw eerste vacature aan om te starten.")}
         </p>
         <Link
           href="/dashboard/offres/nouvelle"
           className="inline-flex items-center gap-2 bg-brand text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-dark transition"
         >
-          Créer une offre
+          {l("Créer une offre", "Vacature aanmaken")}
         </Link>
       </div>
     );
@@ -122,13 +121,13 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
     <div className="bg-white rounded-xl border border-ink-100 overflow-hidden">
       {/* Header table */}
       <div className="hidden lg:grid grid-cols-[2fr_1fr_1fr_1fr_80px_100px_120px] gap-3 px-5 py-3 bg-surface border-b border-ink-100 text-xs font-semibold text-ink-500 uppercase tracking-wide">
-        <span>Poste</span>
-        <span>Secteur</span>
-        <span>Ville</span>
-        <span>Contrat</span>
-        <span className="text-center">Candidat.</span>
-        <span>Statut</span>
-        <span>Actions</span>
+        <span>{l("Poste", "Functie")}</span>
+        <span>{l("Secteur", "Sector")}</span>
+        <span>{l("Ville", "Stad")}</span>
+        <span>{l("Contrat", "Contract")}</span>
+        <span className="text-center">{l("Candidat.", "Kandid.")}</span>
+        <span>{l("Statut", "Status")}</span>
+        <span>{l("Actions", "Acties")}</span>
       </div>
 
       <div className="divide-y divide-[#F1F5F9]">
@@ -160,7 +159,7 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
                     )}
                   </div>
                   <div className="text-[11px] text-ink-300 mt-0.5">
-                    {formatDate(offre.created_at)} · {REGION_LABELS[offre.region]}
+                    {formatDate(offre.created_at, lang)} · {REGION_LABELS[offre.region]}
                   </div>
                 </div>
               </div>
@@ -199,7 +198,7 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
                   <span
                     className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`}
                   />
-                  {statusCfg.label}
+                  {l(statusCfg.fr, statusCfg.nl)}
                 </span>
               </div>
 
@@ -209,7 +208,7 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
                 <Link
                   href={`/dashboard/offres/${offre.id}/candidatures`}
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-500 hover:bg-surface-2 hover:text-brand transition"
-                  title="Voir les candidatures"
+                  title={l("Voir les candidatures", "Sollicitaties bekijken")}
                 >
                   <Eye size={15} />
                 </Link>
@@ -218,7 +217,7 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
                 <button
                   onClick={() => copyLink(offre.id)}
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-500 hover:bg-surface-2 hover:text-brand transition"
-                  title="Copier le lien de candidature"
+                  title={l("Copier le lien de candidature", "Sollicitatielink kopiëren")}
                 >
                   {copiedId === offre.id ? (
                     <span className="text-[10px] text-green-600 font-bold">
@@ -236,8 +235,8 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
                     className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-500 hover:bg-surface-2 hover:text-brand transition"
                     title={
                       offre.status === "active"
-                        ? "Mettre en pause"
-                        : "Réactiver"
+                        ? l("Mettre en pause", "Pauzeren")
+                        : l("Réactiver", "Heractiveren")
                     }
                   >
                     {offre.status === "active" ? (
@@ -267,7 +266,7 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
                         className="flex items-center gap-2 px-3 py-2 text-sm text-ink hover:bg-surface-2 transition"
                       >
                         <ExternalLink size={14} />
-                        Voir l&apos;offre publique
+                        {l("Voir l'offre publique", "Openbare vacature bekijken")}
                       </a>
                       <Link
                         href={`/dashboard/offres/${offre.id}/qrcode`}
@@ -282,7 +281,7 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
                           className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition w-full"
                         >
                           <X size={14} />
-                          Clôturer l&apos;offre
+                          {l("Clôturer l'offre", "Vacature afsluiten")}
                         </button>
                       )}
                     </div>

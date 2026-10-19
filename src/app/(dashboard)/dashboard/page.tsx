@@ -27,13 +27,26 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("organization_id, full_name")
+    .select("organization_id, full_name, organizations(type)")
     .eq("id", user.id)
     .single();
 
   if (!profile) redirect("/onboarding");
 
   const orgId = profile.organization_id;
+  const isAgency = (profile.organizations as unknown as { type?: string } | null)?.type === "agency";
+
+  // Espace agence : indicateurs clients / missions (0 si la migration 006 n'est pas encore appliquée)
+  let agencyClients = 0;
+  let agencyMissions = 0;
+  if (isAgency) {
+    const [c, m] = await Promise.all([
+      supabase.from("agency_clients").select("id", { count: "exact", head: true }).eq("organization_id", orgId).eq("status", "actif"),
+      supabase.from("agency_missions").select("id", { count: "exact", head: true }).eq("organization_id", orgId).in("status", ["ouverte", "en_cours"]),
+    ]);
+    agencyClients = c.count ?? 0;
+    agencyMissions = m.count ?? 0;
+  }
 
   // Fetch métriques en parallèle
   const [offresResult, candidaturesResult, candidatsResult, placementsResult] =
@@ -106,6 +119,10 @@ export default async function DashboardPage() {
     .limit(10);
 
   const metrics = [
+    ...(isAgency ? [
+      { label: l("Clients actifs", "Actieve klanten"), value: agencyClients, icon: Users, color: "bg-brand/10 text-brand", href: "/dashboard/clients" },
+      { label: l("Missions en cours", "Lopende opdrachten"), value: agencyMissions, icon: Briefcase, color: "bg-amber-50 text-amber-600", href: "/dashboard/missions" },
+    ] : []),
     {
       label: l("Offres actives", "Actieve vacatures"),
       value: offresResult.count ?? 0,
@@ -169,7 +186,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Métriques */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className={`grid grid-cols-2 gap-4 ${isAgency ? "lg:grid-cols-3" : "lg:grid-cols-4"}`}>
         {metrics.map((m) => (
           <Link
             key={m.label}

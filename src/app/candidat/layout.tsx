@@ -3,8 +3,11 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { LayoutDashboard, Search, Bell, User, LogOut } from "lucide-react";
+import { LangSwitch } from "@/components/layout/LangSwitch";
+import { getL } from "@/lib/i18n/server";
 
 export default async function CandidatLayout({ children }: { children: React.ReactNode }) {
+  const l = getL();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -13,10 +16,10 @@ export default async function CandidatLayout({ children }: { children: React.Rea
     .split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase();
 
   const NAV = [
-    { href: "/candidat/dashboard", label: "Mon profil",      icon: LayoutDashboard },
-    { href: "/jobs",               label: "Offres d'emploi", icon: Search           },
-    { href: "/candidat/alertes",   label: "Mes alertes",     icon: Bell             },
-    { href: "/candidat/compte",    label: "Mon compte",      icon: User             },
+    { href: "/candidat/dashboard", label: l("Mon profil", "Mijn profiel"),      icon: LayoutDashboard },
+    { href: "/jobs",               label: l("Offres d'emploi", "Vacatures"), icon: Search           },
+    { href: "/candidat/alertes",   label: l("Mes alertes", "Mijn alerts"),     icon: Bell             },
+    { href: "/candidat/compte",    label: l("Mon compte", "Mijn account"),      icon: User             },
   ];
 
   return (
@@ -35,7 +38,7 @@ export default async function CandidatLayout({ children }: { children: React.Rea
           </div>
           <div className="min-w-0">
             <p className="text-white text-xs font-bold truncate">
-              {(user.user_metadata?.full_name as string) || "Candidat"}
+              {(user.user_metadata?.full_name as string) || l("Candidat", "Kandidaat")}
             </p>
             <p className="text-white/30 text-[10px] truncate">{user.email}</p>
           </div>
@@ -53,12 +56,13 @@ export default async function CandidatLayout({ children }: { children: React.Rea
         </nav>
 
         {/* Déconnexion */}
-        <div className="px-3 pb-5 border-t border-white/[0.07] pt-3">
+        <div className="px-3 pb-5 border-t border-white/[0.07] pt-3 space-y-3">
+          <div className="px-3"><LangSwitch /></div>
           <form action="/auth/signout" method="POST">
             <button type="submit"
               className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-white/30 hover:text-brand hover:bg-brand/10 transition-all text-sm font-medium w-full">
               <LogOut size={15} className="shrink-0" />
-              Se déconnecter
+              {l("Se déconnecter", "Uitloggen")}
             </button>
           </form>
         </div>
@@ -69,8 +73,11 @@ export default async function CandidatLayout({ children }: { children: React.Rea
         {/* Topbar mobile */}
         <header className="md:hidden bg-[#101F43] h-14 flex items-center justify-between px-4 border-b border-white/[0.07]">
           <Link href="/"><HardSworkLogo size="sm" dark /></Link>
-          <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center">
-            <span className="font-display font-black text-white text-xs">{initials}</span>
+          <div className="flex items-center gap-3">
+            <LangSwitch />
+            <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center">
+              <span className="font-display font-black text-white text-xs">{initials}</span>
+            </div>
           </div>
         </header>
         <main className="flex-1 p-6">{children}</main>

@@ -6,18 +6,23 @@ import {
   MapPin, Briefcase, Star,
 } from "lucide-react";
 import { formatRelative } from "@/lib/utils";
+import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Mon tableau de bord — Wolko" };
+export function generateMetadata() {
+  return { title: getDict().lang === "nl" ? "Mijn dashboard — Wolko" : "Mon tableau de bord — Wolko" };
+}
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  nouveau:   { label: "En attente",   color: "text-blue-600 bg-blue-50 border-blue-200",    icon: Clock       },
-  contacte:  { label: "Vu",           color: "text-amber-600 bg-amber-50 border-amber-200",  icon: Eye         },
-  entretien: { label: "Entretien",    color: "text-purple-600 bg-purple-50 border-purple-200",icon: CheckCircle },
-  place:     { label: "Recruté ✓",    color: "text-emerald-600 bg-emerald-50 border-emerald-200", icon: CheckCircle },
-  refuse:    { label: "Non retenu",   color: "text-red-500 bg-red-50 border-red-200",         icon: XCircle     },
+const STATUS_CONFIG: Record<string, { label: string; nl: string; color: string; icon: React.ElementType }> = {
+  nouveau:   { label: "En attente", nl: "In behandeling",  color: "text-blue-600 bg-blue-50 border-blue-200",    icon: Clock       },
+  contacte:  { label: "Vu", nl: "Bekeken",          color: "text-amber-600 bg-amber-50 border-amber-200",  icon: Eye         },
+  entretien: { label: "Entretien", nl: "Gesprek",    color: "text-purple-600 bg-purple-50 border-purple-200",icon: CheckCircle },
+  place:     { label: "Recruté ✓", nl: "Aangeworven ✓",    color: "text-emerald-600 bg-emerald-50 border-emerald-200", icon: CheckCircle },
+  refuse:    { label: "Non retenu", nl: "Niet weerhouden",   color: "text-red-500 bg-red-50 border-red-200",         icon: XCircle     },
 };
 
 export default async function CandidatDashboardPage() {
+  const { lang } = getDict();
+  const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -70,31 +75,31 @@ export default async function CandidatDashboardPage() {
             className="font-display font-black text-ink uppercase leading-none"
             style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", letterSpacing: "-0.01em" }}
           >
-            Bonjour,{" "}
+            {l("Bonjour,", "Hallo,")}{" "}
             <span className="text-brand">
-              [{(fullName.split(" ")[0] || "Candidat").toUpperCase()}].
+              [{(fullName.split(" ")[0] || l("Candidat", "Kandidaat")).toUpperCase()}].
             </span>
           </h1>
           <p className="text-ink-500 text-sm mt-1">
             {stats.active > 0
-              ? `${stats.active} candidature${stats.active > 1 ? "s" : ""} en cours · Bonne chance !`
-              : "Retrouvez vos candidatures et les offres disponibles."}
+              ? (lang === "nl" ? `${stats.active} ${stats.active > 1 ? "sollicitaties" : "sollicitatie"} lopend · Veel succes!` : `${stats.active} candidature${stats.active > 1 ? "s" : ""} en cours · Bonne chance !`)
+              : l("Retrouvez vos candidatures et les offres disponibles.", "Vind je sollicitaties en de beschikbare vacatures.")}
           </p>
         </div>
         <Link href="/jobs"
           className="flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-display font-black uppercase text-xs px-4 py-2.5 rounded-xl transition shrink-0"
           style={{ letterSpacing: "0.05em" }}>
-          Voir les offres <ArrowRight size={13} />
+          {l("Voir les offres", "Bekijk de vacatures")} <ArrowRight size={13} />
         </Link>
       </div>
 
       {/* ── STATS ────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Candidatures",  value: stats.total,     color: "text-ink" },
-          { label: "En cours",      value: stats.active,    color: "text-blue-600" },
-          { label: "Entretiens",    value: stats.entretien,  color: "text-purple-600" },
-          { label: "Recrutements",  value: stats.place,      color: "text-emerald-600" },
+          { label: l("Candidatures", "Sollicitaties"),  value: stats.total,     color: "text-ink" },
+          { label: l("En cours", "Lopend"),      value: stats.active,    color: "text-blue-600" },
+          { label: l("Entretiens", "Gesprekken"),    value: stats.entretien,  color: "text-purple-600" },
+          { label: l("Recrutements", "Aanwervingen"),  value: stats.place,      color: "text-emerald-600" },
         ].map(({ label, value, color }) => (
           <div key={label} className="bg-white border border-ink-100 rounded-2xl p-4 text-center">
             <p className={`font-display font-black text-3xl ${color}`}>{value}</p>
@@ -108,21 +113,21 @@ export default async function CandidatDashboardPage() {
         {/* ── CANDIDATURES ─────────────────────────────── */}
         <div className="space-y-4">
           <h2 className="font-display font-black text-ink uppercase text-sm tracking-widest">
-            Mes candidatures
+            {l("Mes candidatures", "Mijn sollicitaties")}
           </h2>
 
           {apps.length === 0 ? (
             <div className="bg-white border border-ink-100 rounded-2xl p-8 text-center">
               <Briefcase size={36} className="text-ink-100 mx-auto mb-3" />
               <p className="font-display font-black text-ink text-base mb-1">
-                Aucune candidature
+                {l("Aucune candidature", "Geen sollicitaties")}
               </p>
               <p className="text-ink-500 text-sm mb-4">
-                Trouvez votre prochain poste parmi nos offres disponibles.
+                {l("Trouvez votre prochain poste parmi nos offres disponibles.", "Vind je volgende job tussen onze beschikbare vacatures.")}
               </p>
               <Link href="/jobs"
                 className="inline-flex items-center gap-2 bg-brand text-white font-bold text-sm px-4 py-2 rounded-xl hover:bg-brand-dark transition">
-                Explorer les offres <ArrowRight size={13} />
+                {l("Explorer les offres", "Vacatures verkennen")} <ArrowRight size={13} />
               </Link>
             </div>
           ) : (
@@ -145,13 +150,13 @@ export default async function CandidatDashboardPage() {
                     {/* Statut */}
                     <div className={`shrink-0 flex items-center gap-1.5 text-[10px] font-black uppercase px-2.5 py-1 rounded-full border ${status.color}`}>
                       <Icon size={10} />
-                      {status.label}
+                      {lang === "nl" ? status.nl : status.label}
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <p className="font-display font-black text-ink text-sm uppercase tracking-tight truncate">
-                        {job?.title ?? "Poste"}
+                        {job?.title ?? l("Poste", "Functie")}
                       </p>
                       <div className="flex items-center gap-2 flex-wrap">
                         {org?.name && <span className="text-[11px] text-ink-500">{org.name}</span>}
@@ -161,7 +166,7 @@ export default async function CandidatDashboardPage() {
                           </span>
                         )}
                         <span className="text-[11px] text-ink-300">
-                          {formatRelative(app.applied_at)}
+                          {formatRelative(app.applied_at, lang)}
                         </span>
                       </div>
                     </div>
@@ -187,7 +192,7 @@ export default async function CandidatDashboardPage() {
           <div className="bg-white border border-ink-100 rounded-2xl p-5">
             <div className="flex items-center justify-between mb-3">
               <p className="font-display font-black text-ink uppercase text-xs tracking-widest">
-                Profil
+                {l("Profil", "Profiel")}
               </p>
               <span className="font-display font-black text-brand text-lg">{profileScore}%</span>
             </div>
@@ -200,9 +205,9 @@ export default async function CandidatDashboardPage() {
             </div>
             <div className="space-y-2">
               {[
-                { label: "Email vérifié",     done: !!email },
-                { label: "Nom renseigné",     done: !!fullName },
-                { label: "1ère candidature",  done: apps.length > 0 },
+                { label: l("Email vérifié", "E-mail geverifieerd"),     done: !!email },
+                { label: l("Nom renseigné", "Naam ingevuld"),     done: !!fullName },
+                { label: l("1ère candidature", "1e sollicitatie"),  done: apps.length > 0 },
               ].map(({ label, done }) => (
                 <div key={label} className="flex items-center gap-2 text-xs">
                   <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${done ? "bg-brand" : "bg-ink-100"}`}>
@@ -222,7 +227,7 @@ export default async function CandidatDashboardPage() {
               <div className="px-4 py-3 border-b border-ink-100 flex items-center gap-2">
                 <Star size={12} className="text-brand" />
                 <p className="font-display font-black text-ink uppercase text-xs tracking-widest">
-                  Offres suggérées
+                  {l("Offres suggérées", "Voorgestelde vacatures")}
                 </p>
               </div>
               <div className="divide-y divide-ink-100">
@@ -248,7 +253,7 @@ export default async function CandidatDashboardPage() {
               <div className="px-4 py-3 border-t border-ink-100">
                 <Link href="/jobs"
                   className="text-[11px] font-bold text-brand hover:text-brand-dark transition-colors flex items-center gap-1">
-                  Voir toutes les offres <ArrowRight size={11} />
+                  {l("Voir toutes les offres", "Bekijk alle vacatures")} <ArrowRight size={11} />
                 </Link>
               </div>
             </div>

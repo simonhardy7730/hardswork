@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Loader2, Phone, User, Mail, CheckCircle2 } from "lucide-react";
+import { useL } from "@/lib/i18n/context";
 
 interface Props {
   jobId: string;
@@ -12,6 +13,7 @@ const LICENSES = [
   { value: "B", label: "Permis B" },
   { value: "C", label: "Permis C" },
   { value: "CE", label: "Permis CE" },
+  { value: "D", label: "Permis D" },
 ];
 
 const CACES_OPTIONS = [
@@ -21,6 +23,7 @@ const CACES_OPTIONS = [
 ];
 
 export default function CandidatureForm({ jobId, orgName }: Props) {
+  const l = useL();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -72,7 +75,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
     });
 
     if (!res.ok) {
-      setError("Une erreur est survenue. Réessayez.");
+      setError(l("Une erreur est survenue. Réessayez.", "Er is een fout opgetreden. Probeer opnieuw."));
       setLoading(false);
       return;
     }
@@ -88,15 +91,14 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
         </div>
         <div>
           <h3 className="text-lg font-bold text-ink">
-            Candidature envoyée ! ✅
+            {l("Candidature envoyée ! ✅", "Sollicitatie verstuurd! ✅")}
           </h3>
           <p className="text-sm text-ink-500 mt-2">
-            <strong>{orgName}</strong> vous contactera par téléphone dans les
-            meilleurs délais.
+            <strong>{orgName}</strong> {l("vous contactera par téléphone dans les meilleurs délais.", "neemt zo snel mogelijk telefonisch contact met je op.")}
           </p>
         </div>
         <p className="text-xs text-ink-300">
-          Vous pouvez fermer cette page.
+          {l("Vous pouvez fermer cette page.", "Je kunt deze pagina sluiten.")}
         </p>
       </div>
     );
@@ -108,7 +110,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-sm font-medium text-ink mb-1.5">
-            Prénom *
+            {l("Prénom", "Voornaam")} *
           </label>
           <div className="relative">
             <User
@@ -122,7 +124,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
               onChange={(e) =>
                 setForm((p) => ({ ...p, first_name: e.target.value }))
               }
-              placeholder="Jean"
+              placeholder={l("Jean", "Jan")}
               autoComplete="given-name"
               className="w-full pl-9 pr-3 py-3 border border-ink-100 rounded-xl text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition"
             />
@@ -130,7 +132,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
         </div>
         <div>
           <label className="block text-sm font-medium text-ink mb-1.5">
-            Nom *
+            {l("Nom", "Achternaam")} *
           </label>
           <input
             type="text"
@@ -139,7 +141,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
             onChange={(e) =>
               setForm((p) => ({ ...p, last_name: e.target.value }))
             }
-            placeholder="Dupont"
+            placeholder={l("Dupont", "Peeters")}
             autoComplete="family-name"
             className="w-full px-3 py-3 border border-ink-100 rounded-xl text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition"
           />
@@ -149,7 +151,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
       {/* Téléphone */}
       <div>
         <label className="block text-sm font-medium text-ink mb-1.5">
-          Téléphone *
+          {l("Téléphone", "Telefoon")} *
         </label>
         <div className="relative">
           <Phone
@@ -175,7 +177,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
       <div>
         <label className="block text-sm font-medium text-ink mb-1.5">
           Email{" "}
-          <span className="text-ink-300 font-normal">(optionnel)</span>
+          <span className="text-ink-300 font-normal">({l("optionnel", "optioneel")})</span>
         </label>
         <div className="relative">
           <Mail
@@ -188,7 +190,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
             onChange={(e) =>
               setForm((p) => ({ ...p, email: e.target.value }))
             }
-            placeholder="votre@email.be"
+            placeholder={l("votre@email.be", "jouw@email.be")}
             autoComplete="email"
             inputMode="email"
             className="w-full pl-9 pr-3 py-3 border border-ink-100 rounded-xl text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition"
@@ -199,13 +201,13 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
       {/* Disponibilité */}
       <div>
         <label className="block text-sm font-medium text-ink mb-2">
-          Disponibilité *
+          {l("Disponibilité", "Beschikbaarheid")} *
         </label>
         <div className="grid grid-cols-3 gap-2">
           {[
-            { val: "immediate", label: "Immédiatement" },
-            { val: "1_semaine", label: "Dans 1 semaine" },
-            { val: "1_mois", label: "Dans 1 mois" },
+            { val: "immediate", label: l("Immédiatement", "Onmiddellijk") },
+            { val: "1_semaine", label: l("Dans 1 semaine", "Binnen 1 week") },
+            { val: "1_mois", label: l("Dans 1 mois", "Binnen 1 maand") },
           ].map((opt) => (
             <button
               key={opt.val}
@@ -231,7 +233,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
       {/* Permis */}
       <div>
         <label className="block text-sm font-medium text-ink mb-2">
-          Permis de conduire
+          {l("Permis de conduire", "Rijbewijs")}
         </label>
         <div className="flex gap-2">
           {LICENSES.map((lic) => (
@@ -265,7 +267,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
                   : "border-ink-100 text-ink-500"
               }`}
             >
-              Oui
+              {l("Oui", "Ja")}
             </button>
             <button
               type="button"
@@ -282,7 +284,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
                   : "border-ink-100 text-ink-500"
               }`}
             >
-              Non
+              {l("Non", "Nee")}
             </button>
           </div>
         </div>
@@ -309,9 +311,9 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
       {/* Message (optionnel) */}
       <div>
         <label className="block text-sm font-medium text-ink mb-1.5">
-          Message{" "}
+          {l("Message", "Bericht")}{" "}
           <span className="text-ink-300 font-normal">
-            (optionnel · max 300 car.)
+            ({l("optionnel · max 300 car.", "optioneel · max. 300 tekens")})
           </span>
         </label>
         <textarea
@@ -323,7 +325,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
             }))
           }
           rows={3}
-          placeholder="Présentez-vous brièvement..."
+          placeholder={l("Présentez-vous brièvement...", "Stel jezelf kort voor...")}
           className="w-full px-3 py-3 border border-ink-100 rounded-xl text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition resize-none"
         />
         <p className="text-right text-xs text-ink-300 mt-0.5">
@@ -345,7 +347,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
         {loading ? (
           <Loader2 size={18} className="animate-spin" />
         ) : (
-          "Envoyer ma candidature"
+          l("Envoyer ma candidature", "Mijn sollicitatie versturen")
         )}
       </button>
     </form>

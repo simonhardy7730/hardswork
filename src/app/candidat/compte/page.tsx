@@ -2,10 +2,16 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import DocumentsUpload from "@/components/candidat/DocumentsUpload";
 import { User, Mail, Phone, Lock, LogOut } from "lucide-react";
+import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Mon compte — Wolko" };
+export function generateMetadata() {
+  return { title: getDict().lang === "nl" ? "Mijn account — Wolko" : "Mon compte — Wolko" };
+}
 
 export default async function ComptePage() {
+  const { lang } = getDict();
+  const l = (fr: string, nl: string) => (lang === "nl" ? nl : fr);
+  const notSet = l("Non renseigné", "Niet ingevuld");
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -23,9 +29,9 @@ export default async function ComptePage() {
           className="font-display font-black text-ink uppercase leading-none"
           style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", letterSpacing: "-0.01em" }}
         >
-          Mon <span className="text-brand">[compte].</span>
+          {l("Mon", "Mijn")} <span className="text-brand">{l("[compte].", "[account].")}</span>
         </h1>
-        <p className="text-ink-500 text-sm mt-1">Gérez vos informations personnelles.</p>
+        <p className="text-ink-500 text-sm mt-1">{l("Gérez vos informations personnelles.", "Beheer je persoonlijke gegevens.")}</p>
       </div>
 
       {/* Avatar + nom */}
@@ -36,11 +42,11 @@ export default async function ComptePage() {
         <div>
           <p className="font-display font-black text-ink text-lg uppercase leading-tight"
             style={{ letterSpacing: "-0.01em" }}>
-            {fullName || "Candidat"}
+            {fullName || l("Candidat", "Kandidaat")}
           </p>
           <p className="text-ink-400 text-sm">{user.email}</p>
           <span className="inline-block mt-1 text-[10px] font-black text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wide">
-            ● Compte actif
+            ● {l("Compte actif", "Actief account")}
           </span>
         </div>
       </div>
@@ -49,28 +55,28 @@ export default async function ComptePage() {
       <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden">
         <div className="px-5 py-4 border-b border-ink-100">
           <p className="font-display font-black text-ink uppercase text-xs tracking-widest">
-            Informations
+            {l("Informations", "Gegevens")}
           </p>
         </div>
         <div className="divide-y divide-ink-100">
           {[
             {
               icon: User,
-              label: "Nom complet",
-              value: fullName || "Non renseigné",
-              hint: fullName ? "" : "À compléter",
+              label: l("Nom complet", "Volledige naam"),
+              value: fullName || notSet,
+              hint: fullName ? "" : l("À compléter", "Aan te vullen"),
             },
             {
               icon: Mail,
-              label: "Adresse email",
+              label: l("Adresse email", "E-mailadres"),
               value: user.email ?? "—",
               hint: "",
             },
             {
               icon: Phone,
-              label: "Téléphone",
-              value: (user.user_metadata?.phone as string) || "Non renseigné",
-              hint: !user.user_metadata?.phone ? "À compléter" : "",
+              label: l("Téléphone", "Telefoon"),
+              value: (user.user_metadata?.phone as string) || notSet,
+              hint: !user.user_metadata?.phone ? l("À compléter", "Aan te vullen") : "",
             },
           ].map(({ icon: Icon, label, value, hint }) => (
             <div key={label} className="flex items-center gap-4 px-5 py-4">
@@ -79,7 +85,7 @@ export default async function ComptePage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] font-medium text-ink-400 uppercase tracking-wide">{label}</p>
-                <p className={`text-sm font-bold truncate ${value.includes("Non") ? "text-ink-300" : "text-ink"}`}>
+                <p className={`text-sm font-bold truncate ${value === notSet ? "text-ink-300" : "text-ink"}`}>
                   {value}
                 </p>
               </div>
@@ -95,8 +101,7 @@ export default async function ComptePage() {
         {/* Edit notice */}
         <div className="px-5 py-4 border-t border-ink-100 bg-surface">
           <p className="text-xs text-ink-400 leading-relaxed">
-            La modification du profil complet arrive prochainement.
-            Pour toute urgence, contactez{" "}
+            {l("La modification du profil complet arrive prochainement. Pour toute urgence, contactez", "Het volledige profiel wijzigen komt binnenkort. Neem bij dringende vragen contact op via")}{" "}
             <a href="mailto:hello@hardswork.be" className="font-bold text-brand hover:text-brand-dark transition-colors">
               hello@hardswork.be
             </a>
@@ -111,7 +116,7 @@ export default async function ComptePage() {
       <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden">
         <div className="px-5 py-4 border-b border-ink-100">
           <p className="font-display font-black text-ink uppercase text-xs tracking-widest">
-            Sécurité
+            {l("Sécurité", "Beveiliging")}
           </p>
         </div>
         <div className="px-5 py-4 flex items-center gap-4">
@@ -119,10 +124,10 @@ export default async function ComptePage() {
             <Lock size={14} className="text-ink-400" />
           </div>
           <div className="flex-1">
-            <p className="text-[11px] font-medium text-ink-400 uppercase tracking-wide">Mot de passe</p>
+            <p className="text-[11px] font-medium text-ink-400 uppercase tracking-wide">{l("Mot de passe", "Wachtwoord")}</p>
             <p className="text-sm font-bold text-ink">••••••••••••</p>
           </div>
-          <span className="text-[10px] font-black text-ink-300 uppercase tracking-wide">Bientôt</span>
+          <span className="text-[10px] font-black text-ink-300 uppercase tracking-wide">{l("Bientôt", "Binnenkort")}</span>
         </div>
       </div>
 
@@ -133,15 +138,15 @@ export default async function ComptePage() {
             <LogOut size={14} className="text-red-400" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-bold text-ink">Se déconnecter</p>
-            <p className="text-[11px] text-ink-400">Fermer la session sur cet appareil</p>
+            <p className="text-sm font-bold text-ink">{l("Se déconnecter", "Uitloggen")}</p>
+            <p className="text-[11px] text-ink-400">{l("Fermer la session sur cet appareil", "Sessie op dit toestel afsluiten")}</p>
           </div>
           <form action="/auth/signout" method="POST">
             <button
               type="submit"
               className="text-[11px] font-black text-red-500 hover:text-red-700 border border-red-200 hover:border-red-300 px-3 py-1.5 rounded-lg uppercase tracking-wide transition"
             >
-              Déconnexion
+              {l("Déconnexion", "Uitloggen")}
             </button>
           </form>
         </div>

@@ -3,19 +3,21 @@
 import { useEffect, useState, useCallback } from "react";
 import { FileText, Trash2, Upload, GraduationCap, IdCard, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useL } from "@/lib/i18n/context";
 
 type DocType = "diplome" | "permis" | "autre";
 interface Doc { id: string; doc_type: DocType; label: string | null; file_path: string; file_name: string; created_at: string }
 
-const TYPES: { id: DocType; label: string }[] = [
-  { id: "diplome", label: "Diplôme" },
-  { id: "permis",  label: "Permis / CACES / attestation" },
-  { id: "autre",   label: "Autre document" },
+const TYPES: { id: DocType; fr: string; nl: string }[] = [
+  { id: "diplome", fr: "Diplôme", nl: "Diploma" },
+  { id: "permis",  fr: "Permis / CACES / attestation", nl: "Rijbewijs / CACES / attest" },
+  { id: "autre",   fr: "Autre document", nl: "Ander document" },
 ];
 const MAX = 8 * 1024 * 1024;
 const OK = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
 
 export default function DocumentsUpload({ userId }: { userId: string }) {
+  const l = useL();
   const supabase = createClient();
   const [docs, setDocs] = useState<Doc[]>([]);
   const [type, setType] = useState<DocType>("diplome");
@@ -38,19 +40,19 @@ export default function DocumentsUpload({ userId }: { userId: string }) {
     e.target.value = "";
     if (!file) return;
     setError("");
-    if (!OK.includes(file.type)) return setError("Format accepté : PDF, JPG, PNG ou WebP.");
-    if (file.size > MAX) return setError("Fichier trop lourd (8 Mo maximum).");
+    if (!OK.includes(file.type)) return setError(l("Format accepté : PDF, JPG, PNG ou WebP.", "Toegelaten formaten: PDF, JPG, PNG of WebP."));
+    if (file.size > MAX) return setError(l("Fichier trop lourd (8 Mo maximum).", "Bestand te zwaar (max. 8 MB)."));
     setBusy(true);
     const safe = file.name.replace(/[^\w.\-]+/g, "_");
     const path = `${userId}/${Date.now()}_${safe}`;
     const up = await supabase.storage.from("candidate-documents").upload(path, file, { contentType: file.type });
-    if (up.error) { setBusy(false); return setError("Envoi impossible. Réessayez dans un instant."); }
+    if (up.error) { setBusy(false); return setError(l("Envoi impossible. Réessayez dans un instant.", "Verzenden mislukt. Probeer zo opnieuw.")); }
     const ins = await supabase.from("candidate_documents").insert({
       auth_user_id: userId, doc_type: type, label: label.trim() || null, file_path: path, file_name: file.name,
     });
     if (ins.error) {
       await supabase.storage.from("candidate-documents").remove([path]);
-      setError("Enregistrement impossible. Réessayez dans un instant.");
+      setError(l("Enregistrement impossible. Réessayez dans un instant.", "Opslaan mislukt. Probeer zo opnieuw."));
     } else { setLabel(""); await load(); }
     setBusy(false);
   }
@@ -61,7 +63,7 @@ export default function DocumentsUpload({ userId }: { userId: string }) {
   }
 
   async function remove(d: Doc) {
-    if (!confirm(`Supprimer « ${d.label || d.file_name} » ?`)) return;
+    if (!confirm(l(`Supprimer « ${d.label || d.file_name} » ?`, `« ${d.label || d.file_name} » verwijderen?`))) return;
     await supabase.storage.from("candidate-documents").remove([d.file_path]);
     await supabase.from("candidate_documents").delete().eq("id", d.id);
     load();
@@ -70,12 +72,12 @@ export default function DocumentsUpload({ userId }: { userId: string }) {
   return (
     <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden">
       <div className="px-5 py-4 border-b border-ink-100">
-        <p className="font-display font-black text-ink uppercase text-xs tracking-widest">Diplômes &amp; permis</p>
-        <p className="text-xs text-ink-400 mt-1">Ajoutez vos justificatifs : ils restent privés et vous seul pouvez les ouvrir.</p>
+        <p className="font-display font-black text-ink uppercase text-xs tracking-widest">{l("Diplômes & permis", "Diploma's & rijbewijzen")}</p>
+        <p className="text-xs text-ink-400 mt-1">{l("Ajoutez vos justificatifs : ils restent privés et vous seul pouvez les ouvrir.", "Voeg je bewijsstukken toe: ze blijven privé en alleen jij kunt ze openen.")}</p>
       </div>
 
       {!ready ? (
-        <p className="px-5 py-4 text-sm text-ink-400">Cette fonction sera disponible très bientôt.</p>
+        <p className="px-5 py-4 text-sm text-ink-400">{l("Cette fonction sera disponible très bientôt.", "Deze functie is binnenkort beschikbaar.")}</p>
       ) : (
         <>
           <div className="p-5 space-y-3 border-b border-ink-100">
@@ -83,23 +85,23 @@ export default function DocumentsUpload({ userId }: { userId: string }) {
               {TYPES.map(t => (
                 <button key={t.id} type="button" onClick={() => setType(t.id)}
                   className={`text-xs font-bold px-3 py-1.5 rounded-full border transition ${type === t.id ? "bg-ink text-white border-ink" : "border-ink-100 text-ink-500 hover:border-ink-300"}`}>
-                  {t.label}
+                  {l(t.fr, t.nl)}
                 </button>
               ))}
             </div>
             <input value={label} onChange={e => setLabel(e.target.value)} maxLength={80}
-              placeholder="Intitulé (ex : CAP électricien, permis CE…)"
+              placeholder={l("Intitulé (ex : CAP électricien, permis CE…)", "Titel (bv. diploma elektricien, rijbewijs CE…)")}
               className="w-full border border-ink-100 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ink" />
             <label className={`flex items-center justify-center gap-2 border-2 border-dashed border-ink-100 rounded-xl py-4 text-sm font-bold text-ink-500 cursor-pointer hover:border-ink-300 transition ${busy ? "opacity-60 pointer-events-none" : ""}`}>
               {busy ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-              {busy ? "Envoi…" : "Choisir un fichier (PDF, photo — 8 Mo max)"}
+              {busy ? l("Envoi…", "Verzenden…") : l("Choisir un fichier (PDF, photo — 8 Mo max)", "Kies een bestand (PDF, foto — max. 8 MB)")}
               <input type="file" accept=".pdf,image/jpeg,image/png,image/webp" className="hidden" onChange={onFile} />
             </label>
             {error && <p className="text-xs text-red-700">{error}</p>}
           </div>
 
           <ul className="divide-y divide-ink-100">
-            {docs.length === 0 && <li className="px-5 py-4 text-sm text-ink-300">Aucun document pour l’instant.</li>}
+            {docs.length === 0 && <li className="px-5 py-4 text-sm text-ink-300">{l("Aucun document pour l’instant.", "Nog geen documenten.")}</li>}
             {docs.map(d => {
               const Icon = d.doc_type === "diplome" ? GraduationCap : d.doc_type === "permis" ? IdCard : FileText;
               return (
@@ -107,9 +109,9 @@ export default function DocumentsUpload({ userId }: { userId: string }) {
                   <div className="w-8 h-8 bg-surface rounded-lg flex items-center justify-center shrink-0"><Icon size={14} className="text-ink-400" /></div>
                   <button type="button" onClick={() => open(d)} className="flex-1 min-w-0 text-left">
                     <p className="text-sm font-bold text-ink truncate">{d.label || d.file_name}</p>
-                    <p className="text-[11px] text-ink-400 truncate">{TYPES.find(t => t.id === d.doc_type)?.label} · {d.file_name}</p>
+                    <p className="text-[11px] text-ink-400 truncate">{l(TYPES.find(t => t.id === d.doc_type)?.fr ?? "", TYPES.find(t => t.id === d.doc_type)?.nl ?? "")} · {d.file_name}</p>
                   </button>
-                  <button type="button" onClick={() => remove(d)} aria-label="Supprimer" className="p-2 text-ink-300 hover:text-red-600 transition"><Trash2 size={15} /></button>
+                  <button type="button" onClick={() => remove(d)} aria-label={l("Supprimer", "Verwijderen")} className="p-2 text-ink-300 hover:text-red-600 transition"><Trash2 size={15} /></button>
                 </li>
               );
             })}

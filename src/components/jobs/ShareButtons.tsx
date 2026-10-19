@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy, Linkedin } from "lucide-react";
+import { Check, Copy } from "lucide-react";
+import { useL } from "@/lib/i18n/context";
 
 interface Props {
   url: string;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function ShareButtons({ url, title }: Props) {
+  const l = useL();
   const [copied, setCopied] = useState(false);
 
   function copyLink() {
@@ -18,7 +20,7 @@ export default function ShareButtons({ url, title }: Props) {
     });
   }
 
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${title} — Postulez ici : ${url}`)}`;
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${title} — ${l("Postulez ici", "Solliciteer hier")} : ${url}`)}`;
   const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
 
   return (
@@ -46,7 +48,7 @@ export default function ShareButtons({ url, title }: Props) {
         className="flex-1 text-[10px] font-black rounded-lg py-2 uppercase tracking-wide transition hover:opacity-80 flex items-center justify-center gap-1"
         style={{ background: "#FBF1D8", color: "#101F43" }}
       >
-        {copied ? <><Check size={10} /> Copié</> : <><Copy size={10} /> Copier</>}
+        {copied ? <><Check size={10} /> {l("Copié", "Gekopieerd")}</> : <><Copy size={10} /> {l("Copier", "Kopiëren")}</>}
       </button>
     </div>
   );

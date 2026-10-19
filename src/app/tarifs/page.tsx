@@ -1,83 +1,91 @@
 import Link from "next/link";
 import { Check, ArrowRight, ChevronDown } from "lucide-react";
 import { SiteNav } from "@/components/layout/SiteNav";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { getDict } from "@/lib/i18n/server";
 
-export const metadata = {
-  title: "Tarifs — Wolko",
-  description: "Des plans de recrutement clairs pour trouver les bons profils.",
-};
+export function generateMetadata() {
+  const { lang } = getDict();
+  return lang === "nl"
+    ? { title: "Tarieven — Wolko", description: "Duidelijke wervingsplannen om de juiste profielen te vinden." }
+    : { title: "Tarifs — Wolko", description: "Des plans de recrutement clairs pour trouver les bons profils." };
+}
 
-const PLANS = [
-  {
-    id: "starter",
-    name: "Gratuit",
-    price: "0",
-    description: "Pour tester la plateforme",
-    cta: "S'inscrire",
-    href: "/recrute",
-    featured: false,
-    features: [
-      "1 offre d'emploi active",
-      "Profils candidats illimités",
-      "Formulaire de candidature public",
-      "Tableau de bord basique",
-    ],
-    locked: ["Contacts candidats masqués", "Pas de données qualité"],
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: "89",
-    description: "Pour les PME qui recrutent en direct",
-    cta: "Choisir Pro",
-    href: "/recrute",
-    featured: true,
-    features: [
-      "Offres d'emploi illimitées",
-      "Candidats débloqués",
-      "Candidathèque complète",
-      "Support technique 24/7",
-    ],
-    locked: [],
-  },
-  {
-    id: "agency",
-    name: "Agence",
-    price: "249",
-    description: "Pour les agences de recrutement",
-    cta: "Contacter la vente",
-    href: "mailto:hello@hardswork.be",
-    featured: false,
-    features: [
-      "Clients illimités",
-      "API & intégrations ATS",
-      "Account Manager Dédié",
-      "Gestion d'intérim",
-    ],
-    locked: [],
-  },
-];
+type L = (fr: string, nl: string) => string;
 
-const FAQS = [
-  {
-    q: "Comment fonctionne la liste de qualité ?",
-    a: "Notre algorithme classe les candidats selon leur profil, expérience et disponibilité pour ne vous présenter que les meilleurs correspondants.",
-  },
-  {
-    q: "Puis-je changer de plan à tout moment ?",
-    a: "Oui, sans engagement ni frais de résiliation. Votre abonnement reste actif jusqu'à la fin de la période payée.",
-  },
-  {
-    q: "Quels secteurs couvrez-vous ?",
-    a: "Construction, logistique, transport, industrie, médical, sécurité et nettoyage — tous les métiers.",
-  },
-  {
-    q: "Les candidats paient-ils quelque chose ?",
-    a: "Non — Wolko est 100% gratuit pour les candidats. Ils créent leur profil, postulent aux offres, et vous les contactez directement.",
-  },
-];
+function makePlans(l: L) {
+  return [
+    {
+      id: "starter",
+      name: l("Gratuit", "Gratis"),
+      price: "0",
+      description: l("Pour tester la plateforme", "Om het platform uit te proberen"),
+      cta: l("S'inscrire", "Registreren"),
+      href: "/recrute",
+      featured: false,
+      features: [
+        l("1 offre d'emploi active", "1 actieve vacature"),
+        l("Profils candidats illimités", "Onbeperkt kandidaatprofielen"),
+        l("Formulaire de candidature public", "Openbaar sollicitatieformulier"),
+        l("Tableau de bord basique", "Basis-dashboard"),
+      ],
+      locked: [l("Contacts candidats masqués", "Contactgegevens van kandidaten verborgen")],
+    },
+    {
+      id: "pro",
+      name: "Pro",
+      price: "89",
+      description: l("Pour les PME qui recrutent en direct", "Voor kmo's die rechtstreeks werven"),
+      cta: l("Choisir Pro", "Kies Pro"),
+      href: "/recrute",
+      featured: true,
+      features: [
+        l("Offres d'emploi illimitées", "Onbeperkt vacatures"),
+        l("Coordonnées des candidats débloquées", "Contactgegevens van kandidaten ontgrendeld"),
+        l("Candidathèque complète", "Volledige kandidatendatabank"),
+      ],
+      locked: [] as string[],
+    },
+    {
+      id: "agency",
+      name: l("Agence", "Kantoor"),
+      price: "249",
+      description: l("Pour les agences de recrutement", "Voor wervingskantoren"),
+      cta: l("Nous contacter", "Neem contact op"),
+      href: "mailto:hello@hardswork.be",
+      featured: false,
+      features: [
+        l("Clients illimités", "Onbeperkt klanten"),
+        l("Gestion d'intérim", "Interimbeheer"),
+        l("Multi-sites", "Meerdere vestigingen"),
+      ],
+      locked: [] as string[],
+    },
+  ];
+}
+
+function makeFaqs(l: L) {
+  return [
+    {
+      q: l("Puis-je changer de plan à tout moment ?", "Kan ik op elk moment van plan veranderen?"),
+      a: l("Oui, sans engagement ni frais de résiliation. Votre abonnement reste actif jusqu'à la fin de la période payée.", "Ja, zonder verbintenis en zonder opzegkosten. Je abonnement blijft actief tot het einde van de betaalde periode."),
+    },
+    {
+      q: l("Quels secteurs couvrez-vous ?", "Welke sectoren dekken jullie?"),
+      a: l("Construction, logistique, transport, industrie, médical, sécurité, nettoyage, Horeca, Tech & IT — tous les métiers.", "Bouw, logistiek, transport, industrie, medisch, beveiliging, schoonmaak, horeca, tech & IT — alle beroepen."),
+    },
+    {
+      q: l("Les candidats paient-ils quelque chose ?", "Betalen kandidaten iets?"),
+      a: l("Non — Wolko est 100% gratuit pour les candidats. Ils créent leur profil et postulent aux offres.", "Nee — Wolko is 100% gratis voor kandidaten. Zij maken hun profiel aan en solliciteren op vacatures."),
+    },
+  ];
+}
 
 export default function TarifsPage() {
+  const { lang } = getDict();
+  const l: L = (fr, nl) => (lang === "nl" ? nl : fr);
+  const PLANS = makePlans(l);
+  const FAQS = makeFaqs(l);
   return (
     <div className="min-h-screen bg-[#FFFBF2] font-body">
       <SiteNav />
@@ -90,12 +98,11 @@ export default function TarifsPage() {
             className="font-display font-black text-white uppercase leading-[0.9] mb-5"
             style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)", letterSpacing: "-0.02em" }}
           >
-            Choisissez votre <span className="text-brand">[plan]</span>
-            <br />de recrutement.
+            {l("Choisissez votre", "Kies je")} <span className="text-brand">{l("[plan]", "[plan]")}</span>
+            <br />{l("de recrutement.", "voor werving.")}
           </h1>
           <p className="text-white/45 text-base max-w-lg mx-auto leading-relaxed">
-            Des outils de haute précision pour trouver les bons profils.
-            Pas de fioritures, juste la performance brute.
+            {l("Des outils simples et efficaces pour trouver les bons profils.", "Eenvoudige en efficiënte tools om de juiste profielen te vinden.")}
           </p>
         </div>
 
@@ -114,7 +121,7 @@ export default function TarifsPage() {
                 {/* Badge featured */}
                 {plan.featured && (
                   <div className="bg-brand text-white text-[10px] font-black uppercase tracking-widest text-center py-2.5">
-                    ⭐ Le plus populaire
+                    ⭐ {l("Le plus populaire", "Meest gekozen")}
                   </div>
                 )}
 
@@ -132,7 +139,7 @@ export default function TarifsPage() {
                     >
                       {plan.price}€
                     </span>
-                    <span className="text-ink-400 text-sm mb-1.5">&nbsp;/mois</span>
+                    <span className="text-ink-400 text-sm mb-1.5">&nbsp;/{l("mois", "maand")}</span>
                   </div>
                   <p className="text-ink-400 text-xs mb-6">{plan.description}</p>
 
@@ -173,10 +180,9 @@ export default function TarifsPage() {
           {/* Garanties */}
           <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { icon: "✅", label: "Sans engagement" },
-              { icon: "🔒", label: "Données sécurisées" },
-              { icon: "🔒", label: "Données protégées (RGPD)" },
-              { icon: "📞", label: "Support humain" },
+              { icon: "✅", label: l("Sans engagement", "Zonder verbintenis") },
+              { icon: "🔒", label: l("Données protégées", "Beschermde gegevens") },
+              { icon: "📞", label: l("Nous contacter", "Neem contact op") },
             ].map(({ icon, label }) => (
               <div key={label} className="bg-white border border-ink-100 rounded-xl p-3 text-center">
                 <span className="text-xl">{icon}</span>
@@ -220,31 +226,20 @@ export default function TarifsPage() {
             className="font-display font-black text-white uppercase leading-[0.9] mb-7"
             style={{ fontSize: "clamp(2rem, 5vw, 3.8rem)", letterSpacing: "-0.02em" }}
           >
-            Prêt à renforcer <span className="text-brand">[vos équipes]</span>&nbsp;?
+            {l("Prêt à renforcer", "Klaar om")} <span className="text-brand">{l("[vos équipes]", "[je teams]")}</span>{l("", " te versterken")}&nbsp;?
           </h2>
           <Link
             href="/recrute"
             className="inline-flex items-center gap-3 bg-brand hover:bg-brand-dark text-white font-display font-black uppercase px-10 py-4 rounded-xl transition text-[13px]"
             style={{ letterSpacing: "0.08em" }}
           >
-            Lancer mon premier recrutement
+            {l("Lancer mon premier recrutement", "Mijn eerste aanwerving starten")}
             <ArrowRight size={15} />
           </Link>
         </div>
 
-        {/* ── FOOTER ───────────────────────────────────── */}
-        <footer className="border-t border-ink-100 bg-[#FFFBF2] py-8 px-6">
-          <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-ink-300 text-xs">© 2026 Wolko · Tous droits réservés</p>
-            <div className="flex gap-6 text-ink-300 text-xs">
-              <Link href="/legal/cgu" className="hover:text-ink transition">CGU</Link>
-              <Link href="/legal/privacy" className="hover:text-ink transition">Confidentialité</Link>
-              <Link href="mailto:hello@hardswork.be" className="hover:text-ink transition">Contact</Link>
-            </div>
-          </div>
-        </footer>
-
       </div>
+      <SiteFooter />
     </div>
   );
 }

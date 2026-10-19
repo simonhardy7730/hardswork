@@ -17,7 +17,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type { Organization, User, Subscription, UserRole } from "@/lib/supabase/types";
-import { REGION_LABELS } from "@/lib/utils";
+import { labels } from "@/lib/utils";
+import { useL, useLang } from "@/lib/i18n/context";
 import {
   updateOrganization,
   updateCustomization,
@@ -35,18 +36,18 @@ interface Props {
 
 type Tab = "organisation" | "equipe" | "abonnement" | "personnalisation";
 
-const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
-  { id: "organisation", label: "Organisation", icon: Building2 },
-  { id: "equipe", label: "Équipe", icon: Users },
-  { id: "abonnement", label: "Abonnement", icon: CreditCard },
-  { id: "personnalisation", label: "Personnalisation", icon: Palette },
+const TABS: { id: Tab; fr: string; nl: string; icon: React.ElementType }[] = [
+  { id: "organisation", fr: "Organisation", nl: "Organisatie", icon: Building2 },
+  { id: "equipe", fr: "Équipe", nl: "Team", icon: Users },
+  { id: "abonnement", fr: "Abonnement", nl: "Abonnement", icon: CreditCard },
+  { id: "personnalisation", fr: "Personnalisation", nl: "Aanpassing", icon: Palette },
 ];
 
-const ROLE_LABELS: Record<UserRole, string> = {
-  admin: "Administrateur",
-  recruiter: "Recruteur",
-  viewer: "Observateur",
-};
+const roleLabels = (l: (fr: string, nl: string) => string): Record<UserRole, string> => ({
+  admin: l("Administrateur", "Beheerder"),
+  recruiter: l("Recruteur", "Recruiter"),
+  viewer: l("Observateur", "Waarnemer"),
+});
 
 const ROLE_COLORS: Record<UserRole, string> = {
   admin: "bg-blue-100 text-blue-700",
@@ -66,11 +67,11 @@ const PLAN_PRICES: Record<string, string> = {
   agency: "299 €/mois",
 };
 
-const PLAN_FEATURES: Record<string, string[]> = {
-  starter: ["1 recruteur", "5 offres actives", "50 candidats"],
-  pro: ["3 recruteurs", "Offres illimitées", "Candidats illimités", "Matching auto"],
-  agency: ["Recruteurs illimités", "Multi-clients", "Tableau de bord avancé", "Support prioritaire"],
-};
+const planFeatures = (l: (fr: string, nl: string) => string): Record<string, string[]> => ({
+  starter: [l("1 recruteur", "1 recruiter"), l("5 offres actives", "5 actieve vacatures"), l("50 candidats", "50 kandidaten")],
+  pro: [l("3 recruteurs", "3 recruiters"), l("Offres illimitées", "Onbeperkt vacatures"), l("Candidats illimités", "Onbeperkt kandidaten"), l("Matching auto", "Automatische matching")],
+  agency: [l("Recruteurs illimités", "Onbeperkt recruiters"), l("Multi-clients", "Meerdere klanten"), l("Tableau de bord avancé", "Geavanceerd dashboard"), l("Support prioritaire", "Prioritaire ondersteuning")],
+});
 
 function Alert({
   type,
@@ -106,6 +107,9 @@ function OrgTab({
   org: Organization;
   currentUser: User;
 }) {
+  const l = useL();
+  const lang = useLang();
+  const REGION_LABELS = labels(lang).region;
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [profilePending, startProfileTransition] = useTransition();
@@ -118,9 +122,9 @@ function OrgTab({
     startTransition(async () => {
       const result = await updateOrganization(fd);
       if (result.success) {
-        setFeedback({ type: "success", message: "Informations mises à jour avec succès." });
+        setFeedback({ type: "success", message: l("Informations mises à jour avec succès.", "Gegevens succesvol bijgewerkt.") });
       } else {
-        setFeedback({ type: "error", message: result.error ?? "Une erreur est survenue." });
+        setFeedback({ type: "error", message: result.error ?? l("Une erreur est survenue.", "Er is een fout opgetreden.") });
       }
     });
   }
@@ -131,9 +135,9 @@ function OrgTab({
     startProfileTransition(async () => {
       const result = await updateCurrentUserName(fd);
       if (result.success) {
-        setProfileFeedback({ type: "success", message: "Profil mis à jour." });
+        setProfileFeedback({ type: "success", message: l("Profil mis à jour.", "Profiel bijgewerkt.") });
       } else {
-        setProfileFeedback({ type: "error", message: result.error ?? "Une erreur est survenue." });
+        setProfileFeedback({ type: "error", message: result.error ?? l("Une erreur est survenue.", "Er is een fout opgetreden.") });
       }
     });
   }
@@ -142,8 +146,8 @@ function OrgTab({
     <div className="space-y-6">
       {/* Mon profil */}
       <div className="bg-white rounded-xl border border-ink-100 p-6">
-        <h2 className="text-base font-semibold text-ink mb-1">Mon profil</h2>
-        <p className="text-sm text-ink-500 mb-4">Vos informations personnelles.</p>
+        <h2 className="text-base font-semibold text-ink mb-1">{l("Mon profil", "Mijn profiel")}</h2>
+        <p className="text-sm text-ink-500 mb-4">{l("Vos informations personnelles.", "Uw persoonlijke gegevens.")}</p>
 
         {profileFeedback && (
           <Alert
@@ -157,7 +161,7 @@ function OrgTab({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-[#475569] mb-1.5">
-                Nom complet
+                {l("Nom complet", "Volledige naam")}
               </label>
               <input
                 name="full_name"
@@ -168,7 +172,7 @@ function OrgTab({
             </div>
             <div>
               <label className="block text-xs font-medium text-[#475569] mb-1.5">
-                Adresse e-mail
+                {l("Adresse e-mail", "E-mailadres")}
               </label>
               <input
                 value={currentUser.email}
@@ -184,7 +188,7 @@ function OrgTab({
               className="px-4 py-2 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-dark disabled:opacity-50 transition flex items-center gap-2"
             >
               {profilePending && <RefreshCw size={14} className="animate-spin" />}
-              Enregistrer
+              {l("Enregistrer", "Opslaan")}
             </button>
           </div>
         </form>
@@ -193,15 +197,15 @@ function OrgTab({
       {/* Infos organisation */}
       <div className="bg-white rounded-xl border border-ink-100 p-6">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-base font-semibold text-ink">Informations organisation</h2>
+          <h2 className="text-base font-semibold text-ink">{l("Informations organisation", "Gegevens van de organisatie")}</h2>
           {!isAdmin && (
             <span className="text-xs text-ink-300 flex items-center gap-1">
-              <Eye size={12} /> Lecture seule
+              <Eye size={12} /> {l("Lecture seule", "Alleen lezen")}
             </span>
           )}
         </div>
         <p className="text-sm text-ink-500 mb-4">
-          Ces informations apparaissent sur vos formulaires de candidature publics.
+          {l("Ces informations apparaissent sur vos formulaires de candidature publics.", "Deze gegevens verschijnen op uw openbare sollicitatieformulieren.")}
         </p>
 
         {feedback && (
@@ -216,7 +220,7 @@ function OrgTab({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-[#475569] mb-1.5">
-                Nom de l&apos;organisation <span className="text-red-500">*</span>
+                {l("Nom de l'organisation", "Naam van de organisatie")} <span className="text-red-500">*</span>
               </label>
               <input
                 name="name"
@@ -228,10 +232,10 @@ function OrgTab({
             </div>
             <div>
               <label className="block text-xs font-medium text-[#475569] mb-1.5">
-                Type
+                {l("Type", "Type")}
               </label>
               <input
-                value={org.type === "agency" ? "Agence d'intérim" : "Entreprise"}
+                value={org.type === "agency" ? l("Agence d'intérim", "Uitzendkantoor") : l("Entreprise", "Bedrijf")}
                 disabled
                 className="w-full px-3 py-2 text-sm border border-ink-100 rounded-lg bg-surface text-ink-300 cursor-not-allowed"
               />
@@ -240,7 +244,7 @@ function OrgTab({
 
           <div>
             <label className="block text-xs font-medium text-[#475569] mb-1.5">
-              Adresse
+              {l("Adresse", "Adres")}
             </label>
             <input
               name="address"
@@ -253,7 +257,7 @@ function OrgTab({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-[#475569] mb-1.5">
-                Ville
+                {l("Ville", "Stad")}
               </label>
               <input
                 name="city"
@@ -264,7 +268,7 @@ function OrgTab({
             </div>
             <div>
               <label className="block text-xs font-medium text-[#475569] mb-1.5">
-                Région
+                {l("Région", "Regio")}
               </label>
               <select
                 name="region"
@@ -272,7 +276,7 @@ function OrgTab({
                 disabled={!isAdmin}
                 className="w-full px-3 py-2 text-sm border border-ink-100 rounded-lg focus:outline-none focus:border-brand disabled:bg-surface disabled:text-ink-300 transition"
               >
-                <option value="">Sélectionner...</option>
+                <option value="">{l("Sélectionner...", "Selecteren...")}</option>
                 {Object.entries(REGION_LABELS).map(([val, label]) => (
                   <option key={val} value={val}>
                     {label}
@@ -285,7 +289,7 @@ function OrgTab({
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-medium text-[#475569] mb-1.5">
-                Téléphone
+                {l("Téléphone", "Telefoon")}
               </label>
               <input
                 name="phone"
@@ -309,7 +313,7 @@ function OrgTab({
             </div>
             <div>
               <label className="block text-xs font-medium text-[#475569] mb-1.5">
-                Site web
+                {l("Site web", "Website")}
               </label>
               <input
                 name="website"
@@ -330,7 +334,7 @@ function OrgTab({
                 className="px-4 py-2 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-dark disabled:opacity-50 transition flex items-center gap-2"
               >
                 {isPending && <RefreshCw size={14} className="animate-spin" />}
-                Enregistrer les modifications
+                {l("Enregistrer les modifications", "Wijzigingen opslaan")}
               </button>
             </div>
           )}
@@ -350,6 +354,8 @@ function TeamTab({
   currentUser: User;
   orgId: string;
 }) {
+  const l = useL();
+  const ROLE_LABELS = roleLabels(l);
   const [copied, setCopied] = useState(false);
   const [roleLoading, setRoleLoading] = useState<string | null>(null);
   const [removeLoading, setRemoveLoading] = useState<string | null>(null);
@@ -378,19 +384,19 @@ function TeamTab({
     if (result.error) {
       setFeedback({ type: "error", message: result.error });
     } else {
-      setFeedback({ type: "success", message: "Rôle mis à jour." });
+      setFeedback({ type: "success", message: l("Rôle mis à jour.", "Rol bijgewerkt.") });
     }
   }
 
   async function handleRemove(memberId: string, name: string) {
-    if (!confirm(`Retirer ${name} de l'organisation ?`)) return;
+    if (!confirm(l(`Retirer ${name} de l'organisation ?`, `${name} uit de organisatie verwijderen?`))) return;
     setRemoveLoading(memberId);
     const result = await removeMember(memberId);
     setRemoveLoading(null);
     if (result.error) {
       setFeedback({ type: "error", message: result.error });
     } else {
-      setFeedback({ type: "success", message: "Membre retiré." });
+      setFeedback({ type: "success", message: l("Membre retiré.", "Lid verwijderd.") });
     }
   }
 
@@ -400,11 +406,10 @@ function TeamTab({
       {isAdmin && (
         <div className="bg-white rounded-xl border border-ink-100 p-6">
           <h2 className="text-base font-semibold text-ink mb-1">
-            Inviter un membre
+            {l("Inviter un membre", "Een lid uitnodigen")}
           </h2>
           <p className="text-sm text-ink-500 mb-4">
-            Partagez ce lien avec votre collègue. Il devra créer un compte Wolko
-            pour rejoindre votre organisation.
+            {l("Partagez ce lien avec votre collègue. Il devra créer un compte Wolko pour rejoindre votre organisation.", "Deel deze link met uw collega. Die moet een Wolko-account aanmaken om zich bij uw organisatie aan te sluiten.")}
           </p>
           <div className="flex gap-2">
             <input
@@ -422,17 +427,17 @@ function TeamTab({
             >
               {copied ? (
                 <>
-                  <Check size={14} /> Copié !
+                  <Check size={14} /> {l("Copié !", "Gekopieerd!")}
                 </>
               ) : (
                 <>
-                  <Copy size={14} /> Copier
+                  <Copy size={14} /> {l("Copier", "Kopiëren")}
                 </>
               )}
             </button>
           </div>
           <p className="text-xs text-ink-300 mt-2">
-            💡 Le lien pré-remplit le champ organisation lors de l&apos;inscription.
+            {l("💡 Le lien pré-remplit le champ organisation lors de l'inscription.", "💡 De link vult het organisatieveld vooraf in bij de registratie.")}
           </p>
         </div>
       )}
@@ -441,10 +446,10 @@ function TeamTab({
       <div className="bg-white rounded-xl border border-ink-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-[#F1F5F9] flex items-center justify-between">
           <h2 className="text-base font-semibold text-ink">
-            Membres de l&apos;équipe
+            {l("Membres de l'équipe", "Teamleden")}
           </h2>
           <span className="text-xs font-medium bg-surface-2 text-ink-500 px-2.5 py-1 rounded-full">
-            {members.length} membre{members.length > 1 ? "s" : ""}
+            {members.length} {members.length > 1 ? l("membres", "leden") : l("membre", "lid")}
           </span>
         </div>
 
@@ -483,7 +488,7 @@ function TeamTab({
                     </p>
                     {isMe && (
                       <span className="text-[10px] bg-brand/10 text-brand px-1.5 py-0.5 rounded font-medium">
-                        Vous
+                        {l("Vous", "U")}
                       </span>
                     )}
                     {member.role === "admin" && (
@@ -502,9 +507,9 @@ function TeamTab({
                       disabled={roleLoading === member.id}
                       className="text-xs border border-ink-100 rounded-lg px-2 py-1.5 focus:outline-none focus:border-brand disabled:opacity-50 transition"
                     >
-                      <option value="admin">Administrateur</option>
-                      <option value="recruiter">Recruteur</option>
-                      <option value="viewer">Observateur</option>
+                      <option value="admin">{ROLE_LABELS.admin}</option>
+                      <option value="recruiter">{ROLE_LABELS.recruiter}</option>
+                      <option value="viewer">{ROLE_LABELS.viewer}</option>
                     </select>
                   ) : (
                     <span
@@ -523,7 +528,7 @@ function TeamTab({
                     onClick={() => handleRemove(member.id, member.full_name)}
                     disabled={removeLoading === member.id}
                     className="p-1.5 text-ink-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
-                    title="Retirer"
+                    title={l("Retirer", "Verwijderen")}
                   >
                     {removeLoading === member.id ? (
                       <RefreshCw size={14} className="animate-spin" />
@@ -540,13 +545,13 @@ function TeamTab({
 
       {/* Roles explanation */}
       <div className="bg-surface rounded-xl border border-ink-100 p-4">
-        <p className="text-xs font-semibold text-[#475569] mb-3">Rôles disponibles</p>
+        <p className="text-xs font-semibold text-[#475569] mb-3">{l("Rôles disponibles", "Beschikbare rollen")}</p>
         <div className="space-y-2">
           {(
             [
-              { role: "admin", desc: "Accès complet : organisation, équipe, offres, candidats, paramètres." },
-              { role: "recruiter", desc: "Gestion des offres, candidats et pipeline. Ne peut pas modifier l'organisation." },
-              { role: "viewer", desc: "Lecture seule. Peut voir le dashboard mais pas modifier." },
+              { role: "admin", desc: l("Accès complet : organisation, équipe, offres, candidats, paramètres.", "Volledige toegang: organisatie, team, vacatures, kandidaten, instellingen.") },
+              { role: "recruiter", desc: l("Gestion des offres, candidats et pipeline. Ne peut pas modifier l'organisation.", "Beheer van vacatures, kandidaten en pipeline. Kan de organisatie niet wijzigen.") },
+              { role: "viewer", desc: l("Lecture seule. Peut voir le dashboard mais pas modifier.", "Alleen lezen. Kan het dashboard bekijken maar niets wijzigen.") },
             ] as { role: UserRole; desc: string }[]
           ).map(({ role, desc }) => (
             <div key={role} className="flex items-start gap-2">
@@ -564,6 +569,9 @@ function TeamTab({
 
 // ── Tab: Abonnement ──────────────────────────────────────
 function SubscriptionTab({ subscription }: { subscription: Subscription | null }) {
+  const l = useL();
+  const lang = useLang();
+  const PLAN_FEATURES = planFeatures(l);
   const plan = subscription?.plan ?? "starter";
   const status = subscription?.status ?? "trial";
 
@@ -578,7 +586,7 @@ function SubscriptionTab({ subscription }: { subscription: Subscription | null }
     : 0;
 
   const periodEnd = subscription?.current_period_end
-    ? new Date(subscription.current_period_end).toLocaleDateString("fr-BE", {
+    ? new Date(subscription.current_period_end).toLocaleDateString(lang === "nl" ? "nl-BE" : "fr-BE", {
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -590,7 +598,7 @@ function SubscriptionTab({ subscription }: { subscription: Subscription | null }
       {/* Current plan */}
       <div className="bg-white rounded-xl border border-ink-100 p-6">
         <h2 className="text-base font-semibold text-ink mb-4">
-          Abonnement actuel
+          {l("Abonnement actuel", "Huidig abonnement")}
         </h2>
 
         <div className="flex items-start gap-4 p-4 bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl mb-4">
@@ -600,7 +608,7 @@ function SubscriptionTab({ subscription }: { subscription: Subscription | null }
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-0.5">
               <p className="font-bold text-ink text-lg">
-                Plan {PLAN_LABELS[plan]}
+                {l("Plan", "Abonnement")} {PLAN_LABELS[plan]}
               </p>
               <span
                 className={`text-xs font-medium px-2 py-0.5 rounded-full ${
@@ -612,10 +620,10 @@ function SubscriptionTab({ subscription }: { subscription: Subscription | null }
                 }`}
               >
                 {status === "trial"
-                  ? "Période d'essai"
+                  ? l("Période d'essai", "Proefperiode")
                   : status === "active"
-                  ? "Actif"
-                  : "Annulé"}
+                  ? l("Actif", "Actief")
+                  : l("Annulé", "Geannuleerd")}
               </span>
             </div>
             <p className="text-sm text-ink-500">{PLAN_PRICES[plan]}</p>
@@ -629,11 +637,8 @@ function SubscriptionTab({ subscription }: { subscription: Subscription | null }
             <div>
               <p className="text-sm font-medium text-amber-800">
                 {trialDaysLeft > 0
-                  ? `Il vous reste ${trialDaysLeft} jour${trialDaysLeft > 1 ? "s" : ""} d'essai gratuit`
-                  : "Votre période d'essai est terminée"}
-              </p>
-              <p className="text-xs text-amber-600">
-                Aucune carte bancaire requise pendant l&apos;essai.
+                  ? l(`Il vous reste ${trialDaysLeft} jour${trialDaysLeft > 1 ? "s" : ""} de période d'essai`, `Nog ${trialDaysLeft} ${trialDaysLeft > 1 ? "dagen" : "dag"} proefperiode`)
+                  : l("Votre période d'essai est terminée", "Uw proefperiode is afgelopen")}
               </p>
             </div>
           </div>
@@ -642,7 +647,7 @@ function SubscriptionTab({ subscription }: { subscription: Subscription | null }
         {/* Renewal date */}
         {status === "active" && periodEnd && (
           <p className="text-xs text-ink-300 mb-4">
-            Prochain renouvellement le <strong>{periodEnd}</strong>
+            {l("Prochain renouvellement le", "Volgende verlenging op")} <strong>{periodEnd}</strong>
           </p>
         )}
 
@@ -661,16 +666,16 @@ function SubscriptionTab({ subscription }: { subscription: Subscription | null }
       {plan !== "agency" && (
         <div className="bg-gradient-to-br from-brand to-[#3B82F6] rounded-xl p-6 text-white">
           <h3 className="font-bold text-lg mb-1">
-            {plan === "starter" ? "Passez au plan Pro" : "Passez au plan Agency"}
+            {plan === "starter" ? l("Passez au plan Pro", "Neem het Pro-abonnement") : l("Passez au plan Agency", "Neem het Agency-abonnement")}
           </h3>
           <p className="text-blue-100 text-sm mb-4">
             {plan === "starter"
-              ? "Débloquez le matching automatique, les offres illimitées et plus encore."
-              : "Gérez plusieurs clients, des recruteurs illimités et un support prioritaire."}
+              ? l("Débloquez le matching automatique, les offres illimitées et plus encore.", "Ontgrendel automatische matching, onbeperkt vacatures en meer.")
+              : l("Gérez plusieurs clients, des recruteurs illimités et un support prioritaire.", "Beheer meerdere klanten, onbeperkt recruiters en prioritaire ondersteuning.")}
           </p>
           <button className="flex items-center gap-2 bg-white text-brand font-semibold px-5 py-2.5 rounded-lg hover:bg-blue-50 transition text-sm">
             <ExternalLink size={14} />
-            Voir les offres
+            {l("Voir les offres", "Abonnementen bekijken")}
           </button>
         </div>
       )}
@@ -679,7 +684,7 @@ function SubscriptionTab({ subscription }: { subscription: Subscription | null }
       <div className="bg-white rounded-xl border border-ink-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-[#F1F5F9]">
           <h3 className="text-sm font-semibold text-ink">
-            Comparatif des formules
+            {l("Comparatif des formules", "Vergelijking van de formules")}
           </h3>
         </div>
         <div className="grid grid-cols-3 divide-x divide-[#F1F5F9]">
@@ -714,14 +719,13 @@ function SubscriptionTab({ subscription }: { subscription: Subscription | null }
       {status === "active" && (
         <div className="bg-white rounded-xl border border-ink-100 p-6">
           <h3 className="text-sm font-semibold text-ink mb-1">
-            Résiliation
+            {l("Résiliation", "Opzegging")}
           </h3>
           <p className="text-sm text-ink-500 mb-3">
-            Vous pouvez résilier à tout moment. Votre accès reste actif jusqu&apos;à
-            la fin de la période facturée.
+            {l("Vous pouvez résilier à tout moment. Votre accès reste actif jusqu'à la fin de la période facturée.", "U kunt op elk moment opzeggen. Uw toegang blijft actief tot het einde van de gefactureerde periode.")}
           </p>
           <button className="text-sm text-red-500 hover:text-red-700 hover:underline transition">
-            Résilier mon abonnement
+            {l("Résilier mon abonnement", "Mijn abonnement opzeggen")}
           </button>
         </div>
       )}
@@ -737,6 +741,7 @@ function CustomizationTab({
   org: Organization;
   currentUser: User;
 }) {
+  const l = useL();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [previewColor, setPreviewColor] = useState(org.primary_color ?? "#FFB900");
@@ -760,9 +765,9 @@ function CustomizationTab({
     startTransition(async () => {
       const result = await updateCustomization(fd);
       if (result.success) {
-        setFeedback({ type: "success", message: "Personnalisation enregistrée." });
+        setFeedback({ type: "success", message: l("Personnalisation enregistrée.", "Aanpassing opgeslagen.") });
       } else {
-        setFeedback({ type: "error", message: result.error ?? "Une erreur est survenue." });
+        setFeedback({ type: "error", message: result.error ?? l("Une erreur est survenue.", "Er is een fout opgetreden.") });
       }
     });
   }
@@ -772,17 +777,16 @@ function CustomizationTab({
       <div className="bg-white rounded-xl border border-ink-100 p-6">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-base font-semibold text-ink">
-            Apparence du formulaire public
+            {l("Apparence du formulaire public", "Uiterlijk van het openbare formulier")}
           </h2>
           {!isAdmin && (
             <span className="text-xs text-ink-300 flex items-center gap-1">
-              <Eye size={12} /> Lecture seule
+              <Eye size={12} /> {l("Lecture seule", "Alleen lezen")}
             </span>
           )}
         </div>
         <p className="text-sm text-ink-500 mb-5">
-          Ces réglages s&apos;appliquent à la page de candidature publique de vos
-          offres (wolko.be/postuler/…).
+          {l("Ces réglages s'appliquent à la page de candidature publique de vos offres (wolko.be/postuler/…).", "Deze instellingen gelden voor de openbare sollicitatiepagina van uw vacatures (wolko.be/postuler/…).")}
         </p>
 
         {feedback && (
@@ -799,26 +803,26 @@ function CustomizationTab({
             {/* Logo URL */}
             <div>
               <label className="block text-xs font-medium text-[#475569] mb-1.5">
-                URL du logo
+                {l("URL du logo", "Logo-URL")}
               </label>
               <input
                 name="logo_url"
                 type="url"
-                placeholder="https://votre-site.be/logo.png"
+                placeholder={l("https://votre-site.be/logo.png", "https://uw-site.be/logo.png")}
                 value={previewLogo}
                 onChange={(e) => setPreviewLogo(e.target.value)}
                 disabled={!isAdmin}
                 className="w-full px-3 py-2 text-sm border border-ink-100 rounded-lg focus:outline-none focus:border-brand disabled:bg-surface disabled:text-ink-300 transition"
               />
               <p className="text-xs text-ink-300 mt-1">
-                Format recommandé : PNG ou SVG, fond transparent, min 200×200px.
+                {l("Format recommandé : PNG ou SVG, fond transparent, min 200×200px.", "Aanbevolen formaat: PNG of SVG, transparante achtergrond, min. 200×200px.")}
               </p>
             </div>
 
             {/* Color picker */}
             <div>
               <label className="block text-xs font-medium text-[#475569] mb-1.5">
-                Couleur principale
+                {l("Couleur principale", "Hoofdkleur")}
               </label>
 
               {/* Presets */}
@@ -867,7 +871,7 @@ function CustomizationTab({
                 className="w-full py-2 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-dark disabled:opacity-50 transition flex items-center justify-center gap-2"
               >
                 {isPending && <RefreshCw size={14} className="animate-spin" />}
-                Enregistrer la personnalisation
+                {l("Enregistrer la personnalisation", "Aanpassing opslaan")}
               </button>
             )}
           </form>
@@ -875,7 +879,7 @@ function CustomizationTab({
           {/* Preview */}
           <div>
             <p className="text-xs font-medium text-[#475569] mb-2 flex items-center gap-1">
-              <Eye size={12} /> Aperçu du formulaire
+              <Eye size={12} /> {l("Aperçu du formulaire", "Voorbeeld van het formulier")}
             </p>
             <div className="rounded-xl border border-ink-100 overflow-hidden shadow-sm">
               {/* Header preview */}
@@ -905,7 +909,7 @@ function CustomizationTab({
                 <div>
                   <p className="text-white font-bold text-sm">{org.name}</p>
                   <p className="text-white/70 text-xs">
-                    {org.city ?? "Wallonie"}
+                    {org.city ?? ""}
                   </p>
                 </div>
               </div>
@@ -918,7 +922,7 @@ function CustomizationTab({
                   className="mt-2 h-8 rounded-lg flex items-center justify-center"
                   style={{ backgroundColor: previewColor }}
                 >
-                  <span className="text-white text-xs font-medium">Postuler maintenant</span>
+                  <span className="text-white text-xs font-medium">{l("Postuler maintenant", "Nu solliciteren")}</span>
                 </div>
               </div>
             </div>
@@ -935,13 +939,13 @@ function CustomizationTab({
       {/* Danger zone */}
       {isAdmin && (
         <div className="bg-white rounded-xl border border-red-200 p-6">
-          <h2 className="text-sm font-semibold text-red-600 mb-1">Zone de danger</h2>
+          <h2 className="text-sm font-semibold text-red-600 mb-1">{l("Zone de danger", "Gevarenzone")}</h2>
           <p className="text-sm text-ink-500 mb-3">
-            Ces actions sont irréversibles. Procédez avec précaution.
+            {l("Ces actions sont irréversibles. Procédez avec précaution.", "Deze acties zijn onomkeerbaar. Ga voorzichtig te werk.")}
           </p>
           <button className="flex items-center gap-2 text-sm text-red-500 hover:text-red-700 border border-red-200 hover:border-red-300 px-4 py-2 rounded-lg hover:bg-red-50 transition">
             <Trash2 size={14} />
-            Supprimer l&apos;organisation
+            {l("Supprimer l'organisation", "Organisatie verwijderen")}
           </button>
         </div>
       )}
@@ -951,21 +955,22 @@ function CustomizationTab({
 
 // ── Main component ────────────────────────────────────────
 export default function SettingsPage({ org, currentUser, members, subscription }: Props) {
+  const l = useL();
   const [activeTab, setActiveTab] = useState<Tab>("organisation");
 
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-ink">Paramètres</h1>
+        <h1 className="text-2xl font-bold text-ink">{l("Paramètres", "Instellingen")}</h1>
         <p className="text-sm text-ink-500 mt-0.5">
-          Gérez votre organisation, votre équipe et votre abonnement.
+          {l("Gérez votre organisation, votre équipe et votre abonnement.", "Beheer uw organisatie, uw team en uw abonnement.")}
         </p>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 bg-surface-2 p-1 rounded-xl mb-6">
-        {TABS.map(({ id, label, icon: Icon }) => (
+        {TABS.map(({ id, fr, nl, icon: Icon }) => (
           <button
             key={id}
             onClick={() => setActiveTab(id)}
@@ -976,7 +981,7 @@ export default function SettingsPage({ org, currentUser, members, subscription }
             }`}
           >
             <Icon size={15} />
-            {label}
+            {l(fr, nl)}
           </button>
         ))}
       </div>

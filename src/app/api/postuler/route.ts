@@ -12,7 +12,18 @@ export async function POST(req: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
   try {
-    const body = await req.json();
+    // JSON classique, ou multipart (champ « data » en JSON + fichier « cv » optionnel).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let body: any = {};
+    let cvFile: File | null = null;
+    if ((req.headers.get("content-type") ?? "").includes("multipart/form-data")) {
+      const form = await req.formData();
+      try { body = JSON.parse(String(form.get("data") ?? "{}")); } catch { body = {}; }
+      const f = form.get("cv");
+      if (f instanceof File && f.size > 0) cvFile = f;
+    } else {
+      body = await req.json();
+    }
 
     // Anti-bot (Cloudflare Turnstile) : actif dès que TURNSTILE_SECRET_KEY est défini.
     if (!(await verifyTurnstile(body?.turnstile_token, req))) {
@@ -106,6 +117,48 @@ export async function POST(req: NextRequest) {
         { error: "Erreur lors de la candidature" },
         { status: 500 }
       );
+    }
+
+    // CV déposé sans compte (facultatif) : fichier privé, lisible seulement par l'entreprise via un lien temporaire.
+    // Un échec ne doit jamais faire perdre la candidature.
+    if (cvFile) {
+      try {
+        const CV_TYPES: Record<string, string> = {
+          pdf: "application/pdf", doc: "application/msword",
+          docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        };
+        const ext = (cvFile.name.split(".").pop() ?? "").toLowerCase();
+        const head = new Uint8Array(await cvFile.slice(0, 4).arrayBuffer());
+        const isPdf = head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46; // %PDF
+        const isZip = head[0] === 0x50 && head[1] === 0x4b; // docx
+        const isOle = head[0] === 0xd0 && head[1] === 0xcf; // doc
+        const okType = (ext === "pdf" && isPdf) || (ext === "docx" && isZip) || (ext === "doc" && isOle);
+        if (okType && cvFile.size <= 4 * 1024 * 1024 && CV_TYPES[ext]) {
+          const safe = cvFile.name.replace(/[^\w.\-]+/g, "_").slice(-80);
+          const path = `applications/${application.id}/${Date.now()}_${safe}`;
+          const up = await supabaseAdmin.storage.from("candidate-documents").upload(path, cvFile, { contentType: CV_TYPES[ext] });
+          if (!up.error) {
+            const orgR = jobData.organizations;
+            const o = Array.isArray(orgR) ? orgR[0] : orgR;
+            const { error: cvErr } = await supabaseAdmin.from("cv_requests").insert({
+              application_id: application.id,
+              organization_id: jobData.organization_id,
+              candidate_email: applicant_email || "",
+              org_name: o?.name ?? "",
+              job_title: jobData.title,
+              status: "fulfilled",
+              cv_path: path,
+              cv_name: cvFile.name.slice(0, 150),
+              fulfilled_at: new Date().toISOString(),
+            });
+            if (cvErr) { console.error("CV row error:", cvErr.message); await supabaseAdmin.storage.from("candidate-documents").remove([path]); }
+          } else {
+            console.error("CV upload error:", up.error.message);
+          }
+        }
+      } catch (e) {
+        console.error("CV error:", e);
+      }
     }
 
     const orgRaw = jobData.organizations;

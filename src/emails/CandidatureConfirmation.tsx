@@ -43,8 +43,8 @@ export default function CandidatureConfirmationEmail({
     <Html lang="fr" dir="ltr">
       <Head />
       <Preview>
-        Votre candidature a été transmise à {orgName}. Ils vous contacteront
-        bientôt.
+        Votre candidature a été transmise à {orgName}. Créez votre compte gratuit
+        pour recevoir plus d&apos;offres.
       </Preview>
       <Body
         style={{
@@ -184,7 +184,7 @@ export default function CandidatureConfirmationEmail({
               },
               {
                 n: "2",
-                text: "Si votre profil correspond, ils vous contactent directement par téléphone.",
+                text: "Si votre profil correspond, l'employeur peut vous contacter directement.",
               },
               {
                 n: "3",
@@ -227,6 +227,57 @@ export default function CandidatureConfirmationEmail({
                 </Column>
               </Row>
             ))}
+          </Section>
+
+          {/* Inscription : plus d'offres, alertes, suivi */}
+          <Section
+            style={{
+              backgroundColor: "#101F43",
+              borderRadius: "16px",
+              padding: "28px 24px",
+              marginTop: "20px",
+              textAlign: "center",
+            }}
+          >
+            <Heading
+              style={{
+                fontSize: "18px",
+                fontWeight: "900",
+                color: "#ffffff",
+                margin: "0 0 10px 0",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              Plus de résultats avec un compte gratuit
+            </Heading>
+            <Text
+              style={{
+                fontSize: "13px",
+                color: "#D6DCEB",
+                margin: "0 0 18px 0",
+                lineHeight: "1.7",
+              }}
+            >
+              ✓ Alertes dès qu&apos;une offre correspond à votre profil
+              <br />
+              ✓ Toutes vos candidatures suivies au même endroit
+              <br />
+              ✓ Votre CV déposé une seule fois, prêt pour chaque offre
+            </Text>
+            <Button
+              href={`${appUrl}/signup/candidat?utm_source=email&utm_medium=confirmation&utm_campaign=apply`}
+              style={{
+                backgroundColor: "#FFB900",
+                color: "#101F43",
+                padding: "12px 28px",
+                borderRadius: "10px",
+                fontSize: "13px",
+                fontWeight: "700",
+                textDecoration: "none",
+              }}
+            >
+              Créer mon compte gratuit →
+            </Button>
           </Section>
 
           {/* Browse more jobs */}

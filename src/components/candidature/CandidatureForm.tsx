@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Loader2, Phone, User, Mail, CheckCircle2 } from "lucide-react";
 import { useL } from "@/lib/i18n/context";
 import Turnstile from "@/components/security/Turnstile";
+import CvPicker, { postBody } from "./CvPicker";
 
 interface Props {
   jobId: string;
@@ -29,6 +30,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [captcha, setCaptcha] = useState("");
+  const [cv, setCv] = useState<File | null>(null);
 
   const [form, setForm] = useState({
     first_name: "",
@@ -60,10 +62,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
     setLoading(true);
     setError("");
 
-    const res = await fetch("/api/postuler", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const { body, headers } = postBody({
         job_offer_id: jobId,
         applicant_name: `${form.first_name} ${form.last_name}`.trim(),
         applicant_phone: form.phone,
@@ -74,8 +73,8 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
         caces_types: form.caces_types,
         cover_message: form.cover_message || null,
         turnstile_token: captcha,
-      }),
-    });
+      }, cv);
+    const res = await fetch("/api/postuler", { method: "POST", headers, body });
 
     if (res.status === 409) {
       setError(l("Vous avez déjà postulé à cette offre.", "Je hebt al gesolliciteerd voor deze vacature."));
@@ -340,6 +339,8 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
           {form.cover_message.length}/300
         </p>
       </div>
+
+      <CvPicker file={cv} onChange={setCv} />
 
       <Turnstile onToken={setCaptcha} />
 

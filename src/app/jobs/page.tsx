@@ -76,7 +76,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
       <SiteNav />
 
       {/* ══ HERO SOMBRE ════════════════════════════════════ */}
-      <div className="bg-[#0F0E0D] pt-[60px]">
+      <div className="bg-[#10214B] pt-[60px]">
         <div className="max-w-7xl mx-auto px-6 pt-8 pb-6">
 
           {/* Headline */}
@@ -338,7 +338,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
                   alt="Travailleur"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0F0E0D]/80 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#10214B]/80 to-transparent" />
               </div>
               <div className="bg-white p-4 text-center">
                 <p className="font-display font-black text-ink uppercase text-sm leading-tight mb-1">
@@ -359,7 +359,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
             </div>
 
             {/* CTA Recruteur sidebar */}
-            <div className="bg-[#0F0E0D] rounded-2xl p-5">
+            <div className="bg-[#10214B] rounded-2xl p-5">
               <p className="font-display font-black text-white uppercase text-sm leading-tight mb-1">
                 Vous recrutez ?
               </p>
@@ -381,7 +381,7 @@ export default async function JobsPage({ searchParams }: { searchParams: SearchP
       </div>
 
       {/* ══ BARRE STICKY BAS ════════════════════════════════ */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0F0E0D]/95 backdrop-blur-sm border-t border-white/10">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#10214B]/95 backdrop-blur-sm border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           <div>
             <p className="font-display font-black text-white uppercase text-sm leading-none">

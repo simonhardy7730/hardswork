@@ -79,13 +79,13 @@ const FAQS = [
 
 export default function TarifsPage() {
   return (
-    <div className="min-h-screen bg-[#FAFAF8] font-body">
+    <div className="min-h-screen bg-[#FFFBF0] font-body">
       <SiteNav />
 
       <div className="pt-[60px]">
 
         {/* ── HERO sombre ──────────────────────────────── */}
-        <div className="bg-[#0F0E0D] py-20 text-center px-6">
+        <div className="bg-[#10214B] py-20 text-center px-6">
           <span className="inline-block text-[11px] font-black text-brand border border-brand/30 bg-brand/10 px-4 py-1.5 rounded-full uppercase tracking-widest mb-6">
             30 jours gratuits · Sans carte bancaire
           </span>
@@ -218,7 +218,7 @@ export default function TarifsPage() {
         </div>
 
         {/* ── CTA FINAL sombre ─────────────────────────── */}
-        <div className="bg-[#0F0E0D] py-20 text-center px-6">
+        <div className="bg-[#10214B] py-20 text-center px-6">
           <h2
             className="font-display font-black text-white uppercase leading-[0.9] mb-7"
             style={{ fontSize: "clamp(2rem, 5vw, 3.8rem)", letterSpacing: "-0.02em" }}
@@ -239,7 +239,7 @@ export default function TarifsPage() {
         </div>
 
         {/* ── FOOTER ───────────────────────────────────── */}
-        <footer className="border-t border-ink-100 bg-[#FAFAF8] py-8 px-6">
+        <footer className="border-t border-ink-100 bg-[#FFFBF0] py-8 px-6">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-ink-300 text-xs">© 2026 HardSwork · Belgique · Tous droits réservés</p>
             <div className="flex gap-6 text-ink-300 text-xs">

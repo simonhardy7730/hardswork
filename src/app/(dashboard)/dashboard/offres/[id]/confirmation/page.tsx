@@ -50,7 +50,7 @@ export default async function ConfirmationPage({
         <div className="p-6 space-y-5">
           {/* Lien de candidature */}
           <div>
-            <p className="text-sm font-semibold text-[#0F0E0D] mb-2">
+            <p className="text-sm font-semibold text-[#10214B] mb-2">
               🔗 Lien de candidature
             </p>
             <div className="flex items-center gap-2">
@@ -67,7 +67,7 @@ export default async function ConfirmationPage({
 
           {/* QR Code */}
           <div>
-            <p className="text-sm font-semibold text-[#0F0E0D] mb-3">
+            <p className="text-sm font-semibold text-[#10214B] mb-3">
               📱 QR Code — à afficher en agence ou en usine
             </p>
             <QRCodeDisplay url={candidatureUrl} title={offre.title} />

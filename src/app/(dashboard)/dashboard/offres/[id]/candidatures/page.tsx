@@ -63,7 +63,7 @@ export default async function CandidaturesPage({
             <ArrowLeft size={15} />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-[#0F0E0D]">{offre.title}</h1>
+            <h1 className="text-xl font-bold text-[#10214B]">{offre.title}</h1>
             <p className="text-sm text-ink-500 mt-0.5">
               {SECTOR_LABELS[offre.sector]} ·{" "}
               {CONTRACT_LABELS[offre.contract_type]} · {offre.city} ·{" "}

@@ -6,6 +6,7 @@ import { SearchModule } from "@/components/home/SearchModule";
 import { HardSworkLogo, HardieIcon } from "@/components/ui/HardieIcon";
 import { SiteNav } from "@/components/layout/SiteNav";
 
+import { WolfMascot } from "@/components/ui/WolfMascot";
 /* ─── TYPES ──────────────────────────────────────────── */
 interface JobOffer {
   id: string;
@@ -41,7 +42,7 @@ const SECTORS = [
     label: "Logistique",
     count: "840+",
     bg: "linear-gradient(135deg, #1a1512 0%, #2d2420 100%)",
-    accent: "#D93B12",
+    accent: "#FFB703",
     img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&auto=format&fit=crop&q=70",
   },
   {
@@ -148,7 +149,7 @@ export default async function HomePage() {
       <SiteNav />
 
       {/* ── HERO ─────────────────────────────────────── */}
-      <section className="relative min-h-screen flex flex-col justify-end pb-20 pt-[60px] overflow-hidden noise">
+      <section className="brand-on-dark relative min-h-screen flex flex-col justify-end pb-20 pt-[60px] overflow-hidden noise">
         {/* Background — 6 photos, grille 3×2 */}
         <div className="absolute inset-0 grid grid-cols-3 grid-rows-2" style={{ zIndex: 0 }}>
           {HERO_COLLAGE.map((photo, i) => (
@@ -167,7 +168,7 @@ export default async function HomePage() {
         {/* Overlay — réduit pour laisser respirer les photos des deux côtés */}
         <div className="absolute inset-0" style={{
           zIndex: 1,
-          background: "linear-gradient(100deg, rgba(15,14,13,0.78) 0%, rgba(15,14,13,0.62) 30%, rgba(15,14,13,0.35) 58%, rgba(15,14,13,0.06) 100%)",
+          background: "linear-gradient(100deg, rgba(16,33,75,0.78) 0%, rgba(16,33,75,0.62) 30%, rgba(16,33,75,0.35) 58%, rgba(16,33,75,0.06) 100%)",
         }} />
 
         {/* Bottom fade into search section */}
@@ -175,14 +176,19 @@ export default async function HomePage() {
 
         {/* Content */}
         <div className="relative max-w-7xl mx-auto px-6 w-full" style={{ zIndex: 3 }}>
+          {/* Mascotte (desktop : à droite du titre) */}
+          <WolfMascot className="hidden lg:block absolute right-6 bottom-0 w-[300px] xl:w-[340px] drop-shadow-2xl" />
           <div className="max-w-3xl">
 
+
+            {/* Mascotte (mobile : au-dessus du titre) */}
+            <WolfMascot className="lg:hidden w-32 mb-4 drop-shadow-xl animate-fade-up-1" />
 
             {/* Headline */}
             <h1 className="font-display font-black text-white leading-none tracking-tight mb-8 animate-fade-up-1"
               style={{
                 fontSize: "clamp(3.5rem, 8vw, 7.5rem)",
-                textShadow: "0 2px 24px rgba(15,14,13,0.7), 0 1px 6px rgba(15,14,13,0.5)",
+                textShadow: "0 2px 24px rgba(16,33,75,0.7), 0 1px 6px rgba(16,33,75,0.5)",
               }}>
               Recrutez les
               <br />
@@ -195,7 +201,7 @@ export default async function HomePage() {
             <p className="text-white/80 text-lg leading-relaxed max-w-xl mb-10 animate-fade-up-2"
               style={{
                 fontFamily: "var(--font-body)",
-                textShadow: "0 1px 12px rgba(15,14,13,0.8)",
+                textShadow: "0 1px 12px rgba(16,33,75,0.8)",
               }}>
               La plateforme de recrutement pensée pour les professionnels
               du terrain belge — logistique, transport, construction, médical et plus.
@@ -221,7 +227,7 @@ export default async function HomePage() {
 
 
       {/* ── SECTORS ──────────────────────────────────── */}
-      <section id="secteurs" className="bg-[#0F0E0D] pb-24">
+      <section id="secteurs" className="bg-[#10214B] pb-24">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-end justify-between mb-10">
             <div>
@@ -249,7 +255,7 @@ export default async function HomePage() {
                     className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
                   />
                   {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0F0E0D] via-[#0F0E0D]/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#10214B] via-[#10214B]/40 to-transparent" />
 
                   {/* Content */}
                   <div className="absolute inset-0 p-5 flex flex-col justify-between" style={{ zIndex: 2 }}>
@@ -358,14 +364,14 @@ export default async function HomePage() {
       {/* ── AUDIENCE SPLIT ────────────────────────────── */}
       <section className="grid md:grid-cols-2 min-h-[80vh]">
         {/* Recruiter side */}
-        <div className="relative overflow-hidden noise group cursor-pointer">
+        <div className="brand-on-dark relative overflow-hidden noise group cursor-pointer">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=900&auto=format&fit=crop&q=75"
             alt=""
             className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0F0E0D]/95 via-[#0F0E0D]/70 to-[#D93B12]/20" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#10214B]/95 via-[#10214B]/70 to-[#FFB703]/20" />
           <div className="relative h-full flex flex-col justify-end p-10 md:p-14 min-h-[50vh]" style={{ zIndex: 2 }}>
             <p className="section-label text-brand/80 mb-4">Pour les recruteurs</p>
             <h2 className="font-display font-black text-white mb-4"
@@ -396,7 +402,7 @@ export default async function HomePage() {
             alt=""
             className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-[#F2EDE7]/95 via-[#F2EDE7]/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#FBF1D8]/95 via-[#FBF1D8]/70 to-transparent" />
           <div className="relative h-full flex flex-col justify-end p-10 md:p-14 min-h-[50vh]" style={{ zIndex: 2 }}>
             <p className="section-label mb-4">Pour les chercheurs d&apos;emploi</p>
             <h2 className="font-display font-black text-ink"
@@ -473,7 +479,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── CONTACT MASKING ───────────────────────────── */}
-      <section className="bg-[#0F0E0D] py-24 noise">
+      <section className="bg-[#10214B] py-24 noise">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left: copy */}
@@ -609,7 +615,7 @@ export default async function HomePage() {
             </div>
 
             {/* Pro */}
-            <div className="bg-[#0F0E0D] rounded-2xl p-8 relative shadow-2xl">
+            <div className="bg-[#10214B] rounded-2xl p-8 relative shadow-2xl">
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                 <span className="bg-brand text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wide">
                   Plus populaire
@@ -665,7 +671,7 @@ export default async function HomePage() {
           className="absolute inset-0 w-full h-full object-cover object-center"
           style={{ zIndex: 0 }}
         />
-        <div className="absolute inset-0 bg-[#0F0E0D]/90" style={{ zIndex: 1 }} />
+        <div className="absolute inset-0 bg-[#10214B]/90" style={{ zIndex: 1 }} />
 
         <div className="relative max-w-5xl mx-auto px-6 py-28 text-center" style={{ zIndex: 2 }}>
           <h2 className="font-display font-black text-white mb-6"

@@ -47,14 +47,14 @@ export default function CandidatureConfirmationEmail({
       </Preview>
       <Body
         style={{
-          backgroundColor: "#F5F5F0",
+          backgroundColor: "#FFF6DE",
           margin: 0,
           padding: "32px 0",
           fontFamily: "Arial, Helvetica, sans-serif",
         }}
       >
         {/* ── HEADER ─────────────────────────────────────── */}
-        <Section style={{ backgroundColor: "#0F0E0D", padding: "20px 0" }}>
+        <Section style={{ backgroundColor: "#10214B", padding: "20px 0" }}>
           <Container
             style={{ maxWidth: "560px", margin: "0 auto", padding: "0 24px" }}
           >
@@ -66,7 +66,7 @@ export default function CandidatureConfirmationEmail({
                 letterSpacing: "-0.02em",
               }}
             >
-              <span style={{ color: "#D93B12" }}>HARD</span>
+              <span style={{ color: "#FFB703" }}>HARD</span>
               <span style={{ color: "#ffffff" }}>SWORK</span>
             </Text>
           </Container>
@@ -82,7 +82,7 @@ export default function CandidatureConfirmationEmail({
               borderRadius: "16px",
               padding: "32px",
               marginTop: "24px",
-              border: "1px solid #E8E8E0",
+              border: "1px solid #EADFC4",
             }}
           >
             <Text
@@ -94,7 +94,7 @@ export default function CandidatureConfirmationEmail({
               style={{
                 fontSize: "22px",
                 fontWeight: "900",
-                color: "#0F0E0D",
+                color: "#10214B",
                 textAlign: "center",
                 margin: "0 0 10px 0",
                 letterSpacing: "-0.02em",
@@ -112,13 +112,13 @@ export default function CandidatureConfirmationEmail({
               }}
             >
               Bonjour {firstName}, votre candidature a bien été transmise à{" "}
-              <strong style={{ color: "#0F0E0D" }}>{orgName}</strong>.
+              <strong style={{ color: "#10214B" }}>{orgName}</strong>.
             </Text>
 
             <Hr
               style={{
                 border: "none",
-                borderTop: "1px solid #E8E8E0",
+                borderTop: "1px solid #EADFC4",
                 margin: "0 0 24px 0",
               }}
             />
@@ -126,7 +126,7 @@ export default function CandidatureConfirmationEmail({
             {/* Job summary */}
             <Section
               style={{
-                backgroundColor: "#F5F5F0",
+                backgroundColor: "#FFF6DE",
                 borderRadius: "12px",
                 padding: "16px 20px",
                 marginBottom: "24px",
@@ -136,7 +136,7 @@ export default function CandidatureConfirmationEmail({
                 style={{
                   fontSize: "10px",
                   fontWeight: "700",
-                  color: "#D93B12",
+                  color: "#8A5D00",
                   textTransform: "uppercase",
                   letterSpacing: "0.1em",
                   margin: "0 0 6px 0",
@@ -148,7 +148,7 @@ export default function CandidatureConfirmationEmail({
                 style={{
                   fontSize: "17px",
                   fontWeight: "800",
-                  color: "#0F0E0D",
+                  color: "#10214B",
                   margin: "0 0 4px 0",
                   letterSpacing: "-0.01em",
                 }}
@@ -166,7 +166,7 @@ export default function CandidatureConfirmationEmail({
               style={{
                 fontSize: "11px",
                 fontWeight: "700",
-                color: "#0F0E0D",
+                color: "#10214B",
                 margin: "0 0 14px 0",
                 textTransform: "uppercase",
                 letterSpacing: "0.06em",
@@ -197,8 +197,8 @@ export default function CandidatureConfirmationEmail({
                     style={{
                       fontSize: "11px",
                       fontWeight: "900",
-                      color: "#D93B12",
-                      backgroundColor: "#FEF0EC",
+                      color: "#8A5D00",
+                      backgroundColor: "#FFF3CC",
                       borderRadius: "50%",
                       width: "22px",
                       height: "22px",
@@ -241,8 +241,8 @@ export default function CandidatureConfirmationEmail({
             <Button
               href={`${appUrl}/jobs`}
               style={{
-                backgroundColor: "#D93B12",
-                color: "#ffffff",
+                backgroundColor: "#FFB703",
+                color: "#10214B",
                 padding: "12px 28px",
                 borderRadius: "10px",
                 fontSize: "13px",
@@ -256,7 +256,7 @@ export default function CandidatureConfirmationEmail({
 
           {/* Footer */}
           <Section
-            style={{ borderTop: "1px solid #E8E8E0", padding: "20px 0" }}
+            style={{ borderTop: "1px solid #EADFC4", padding: "20px 0" }}
           >
             <Text
               style={{

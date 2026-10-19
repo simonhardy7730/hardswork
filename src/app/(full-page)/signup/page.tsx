@@ -68,10 +68,10 @@ function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0F0E0D] px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-[#10214B] px-4 py-12">
       <div className="w-full max-w-md bg-white/[0.04] rounded-2xl border border-white/[0.08] p-8">
         <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-6">
-          <UserPlus size={18} className="shrink-0" style={{ color: "#D93B12" }} />
+          <UserPlus size={18} className="shrink-0" style={{ color: "var(--brand-text)" }} />
           <div>
             <p className="text-sm font-semibold text-white">Vous avez été invité(e)</p>
             <p className="text-xs text-white/40">
@@ -81,7 +81,7 @@ function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
         </div>
         <h1 className="text-2xl font-bold text-white mb-1">Créer votre compte</h1>
         <p className="text-white/40 text-sm mb-6">
-          Rôle : <span className="font-medium" style={{ color: "#D93B12" }}>
+          Rôle : <span className="font-medium" style={{ color: "var(--brand-text)" }}>
             {role === "admin" ? "Administrateur" : role === "viewer" ? "Observateur" : "Recruteur"}
           </span>
         </p>
@@ -96,20 +96,20 @@ function InviteSignup({ orgId, role }: { orgId: string; role: string }) {
               <input
                 type={f.type} name={f.name} required value={formData[f.name as keyof typeof formData]}
                 onChange={handleChange} placeholder={f.placeholder} minLength={f.minLength}
-                className="w-full px-4 py-2.5 border border-white/10 rounded-xl text-sm bg-white/5 text-white placeholder-white/25 focus:outline-none focus:border-[#D93B12] transition"
+                className="w-full px-4 py-2.5 border border-white/10 rounded-xl text-sm bg-white/5 text-white placeholder-white/25 focus:outline-none focus:border-[#10214B] transition"
               />
             </div>
           ))}
-          {error && <p className="text-sm px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-[#D93B12]">{error}</p>}
+          {error && <p className="text-sm px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-red-700">{error}</p>}
           <button type="submit" disabled={loading}
             className="w-full py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition"
-            style={{ background: loading ? "#F0A090" : "#D93B12" }}>
+            style={{ background: loading ? "#FFD97A" : "#FFB703" }}>
             {loading ? <Loader2 size={16} className="animate-spin" /> : <><span>Rejoindre l&apos;organisation</span><ArrowRight size={16} /></>}
           </button>
         </form>
         <p className="text-center text-sm text-white/40 mt-5">
           Déjà un compte ?{" "}
-          <Link href="/login" className="font-medium hover:underline" style={{ color: "#D93B12" }}>Se connecter</Link>
+          <Link href="/login" className="font-medium hover:underline" style={{ color: "var(--brand-text)" }}>Se connecter</Link>
         </p>
       </div>
     </div>
@@ -167,7 +167,7 @@ function NormalSignup() {
     <div className="min-h-screen flex bg-white" style={{ fontFamily: "var(--font-body, sans-serif)" }}>
 
       {/* ── Colonne gauche ── */}
-      <div className="hidden lg:flex lg:w-[48%] xl:w-[52%] relative flex-col justify-end p-14 overflow-hidden" style={{ background: "#0F0E0D" }}>
+      <div className="hidden lg:flex lg:w-[48%] xl:w-[52%] relative flex-col justify-end p-14 overflow-hidden" style={{ background: "#10214B" }}>
         <div className="absolute inset-0" style={{
           backgroundImage: "url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&q=75')",
           backgroundSize: "cover", backgroundPosition: "center",
@@ -179,7 +179,7 @@ function NormalSignup() {
             <div>
               <h1 className="font-black text-white uppercase leading-none"
                 style={{ fontFamily: "var(--font-display, sans-serif)", fontSize: "clamp(2.8rem, 4.5vw, 4.2rem)", textShadow: "0 2px 20px rgba(0,0,0,0.8)" }}>
-                RECRUTEZ LES<br /><span style={{ color: "#D93B12" }}>[MEILLEURS].</span>
+                RECRUTEZ LES<br /><span style={{ color: "var(--brand-text)" }}>[MEILLEURS].</span>
               </h1>
               <p className="text-white/45 mt-5 text-sm leading-relaxed max-w-xs">
                 La plateforme de recrutement pour les travailleurs de terrain et techniques.
@@ -189,7 +189,7 @@ function NormalSignup() {
             <div>
               <h1 className="font-black text-white uppercase leading-none"
                 style={{ fontFamily: "var(--font-display, sans-serif)", fontSize: "clamp(2.8rem, 4.5vw, 4.2rem)", textShadow: "0 2px 20px rgba(0,0,0,0.8)" }}>
-                CRÉEZ VOTRE<br /><span style={{ color: "#D93B12" }}>[COMPTE].</span>
+                CRÉEZ VOTRE<br /><span style={{ color: "var(--brand-text)" }}>[COMPTE].</span>
               </h1>
               <p className="text-white/45 mt-5 text-sm leading-relaxed max-w-xs">
                 Accédez aux meilleurs talents techniques de Belgique.
@@ -210,7 +210,7 @@ function NormalSignup() {
               <div className="mb-8">
                 <h1 className="font-black text-gray-900 uppercase leading-none text-3xl mb-2"
                   style={{ fontFamily: "var(--font-display, sans-serif)" }}>
-                  Je suis une<br /><span style={{ color: "#D93B12" }}>entreprise ou agence ?</span>
+                  Je suis une<br /><span style={{ color: "var(--brand-text)" }}>entreprise ou agence ?</span>
                 </h1>
                 <p className="text-gray-400 text-sm">Sélectionnez votre profil pour commencer.</p>
               </div>
@@ -220,7 +220,7 @@ function NormalSignup() {
                   return (
                     <button key={r.id} onClick={() => setOrgType(r.id)}
                       className="relative rounded-2xl overflow-hidden text-left transition-all duration-200 group"
-                      style={{ border: isSelected ? "2.5px solid #D93B12" : "2.5px solid #E5E7EB", boxShadow: isSelected ? "0 4px 20px rgba(217,59,18,0.15)" : "none" }}>
+                      style={{ border: isSelected ? "2.5px solid #FFB703" : "2.5px solid #E5E7EB", boxShadow: isSelected ? "0 4px 20px rgba(255,183,3,0.15)" : "none" }}>
                       {/* Photo */}
                       <div className="relative h-44 overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -229,7 +229,7 @@ function NormalSignup() {
                           style={{ filter: "brightness(0.55) saturate(0.8)" }} />
                         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)" }} />
                         {isSelected && (
-                          <span className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center z-10" style={{ background: "#D93B12" }}>
+                          <span className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center z-10" style={{ background: "#FFB703" }}>
                             <Check size={13} className="text-white" strokeWidth={3} />
                           </span>
                         )}
@@ -243,7 +243,7 @@ function NormalSignup() {
                         <ul className="space-y-1.5">
                           {r.features.map((f) => (
                             <li key={f} className="flex items-center gap-1.5 text-xs text-gray-500">
-                              <Check size={11} strokeWidth={3} className="shrink-0" style={{ color: "#D93B12" }} />
+                              <Check size={11} strokeWidth={3} className="shrink-0" style={{ color: "var(--brand-text)" }} />
                               {f}
                             </li>
                           ))}
@@ -256,13 +256,13 @@ function NormalSignup() {
 
               <button onClick={() => orgType && setStep(2)} disabled={!orgType}
                 className="w-full py-4 rounded-xl font-black text-sm tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-200"
-                style={{ background: orgType ? "#D93B12" : "#F3F4F6", color: orgType ? "#fff" : "#9CA3AF", cursor: orgType ? "pointer" : "not-allowed", fontFamily: "var(--font-display, sans-serif)" }}>
+                style={{ background: orgType ? "#FFB703" : "#F3F4F6", color: orgType ? "#10214B" : "#9CA3AF", cursor: orgType ? "pointer" : "not-allowed", fontFamily: "var(--font-display, sans-serif)" }}>
                 Continuer <ArrowRight size={16} strokeWidth={2.5} />
               </button>
 
               <p className="text-center text-sm text-gray-400 mt-5">
                 Déjà un compte ?{" "}
-                <Link href="/login" className="font-semibold hover:underline" style={{ color: "#D93B12" }}>Se connecter</Link>
+                <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>Se connecter</Link>
               </p>
             </div>
           )}
@@ -282,7 +282,7 @@ function NormalSignup() {
                   <h2 className="font-black text-xl text-gray-900 uppercase leading-tight"
                     style={{ fontFamily: "var(--font-display, sans-serif)" }}>
                     Formulaire Inscription —{" "}
-                    <span style={{ color: "#D93B12" }}>{currentRole?.id === "agency" ? "Agence" : "Entreprise"}</span>
+                    <span style={{ color: "var(--brand-text)" }}>{currentRole?.id === "agency" ? "Agence" : "Entreprise"}</span>
                   </h2>
                 </div>
               </div>
@@ -294,7 +294,7 @@ function NormalSignup() {
                   </label>
                   <input type="text" name="org_name" required value={formData.org_name} onChange={handleChange}
                     placeholder={currentRole?.placeholder}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#D93B12] transition-colors" />
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition-colors" />
                 </div>
 
                 <div>
@@ -304,10 +304,10 @@ function NormalSignup() {
                   <div className="grid grid-cols-2 gap-3">
                     <input type="text" name="full_name" required value={formData.full_name} onChange={handleChange}
                       placeholder="Jean Dupont"
-                      className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#D93B12] transition-colors" />
+                      className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition-colors" />
                     <input type="email" name="email" required value={formData.email} onChange={handleChange}
                       placeholder="jean.dupont@entreprise.be"
-                      className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#D93B12] transition-colors" />
+                      className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition-colors" />
                   </div>
                 </div>
 
@@ -317,25 +317,25 @@ function NormalSignup() {
                   </label>
                   <input type="password" name="password" required minLength={8} value={formData.password} onChange={handleChange}
                     placeholder="Minimum 8 caractères"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#D93B12] transition-colors" />
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition-colors" />
                 </div>
 
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input type="checkbox" checked={cgu} onChange={(e) => setCgu(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 shrink-0 rounded" style={{ accentColor: "#D93B12" }} />
+                    className="mt-0.5 w-4 h-4 shrink-0 rounded" style={{ accentColor: "#10214B" }} />
                   <span className="text-xs text-gray-400 leading-relaxed">
                     J&apos;accepte les{" "}
-                    <Link href="/legal/cgu" className="hover:underline" style={{ color: "#D93B12" }} target="_blank">CGU</Link>{" "}
+                    <Link href="/legal/cgu" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">CGU</Link>{" "}
                     et la{" "}
-                    <Link href="/legal/privacy" className="hover:underline" style={{ color: "#D93B12" }} target="_blank">politique de confidentialité</Link>.
+                    <Link href="/legal/privacy" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">politique de confidentialité</Link>.
                   </span>
                 </label>
 
-                {error && <p className="text-xs rounded-xl px-4 py-3 bg-red-50 border border-red-100" style={{ color: "#D93B12" }}>{error}</p>}
+                {error && <p className="text-xs rounded-xl px-4 py-3 bg-red-50 border border-red-100" style={{ color: "#B91C1C" }}>{error}</p>}
 
                 <button type="submit" disabled={loading}
                   className="w-full py-4 text-white font-black text-sm tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 transition-all"
-                  style={{ background: loading ? "#F0A090" : "#D93B12", fontFamily: "var(--font-display, sans-serif)" }}>
+                  style={{ background: loading ? "#FFD97A" : "#FFB703", fontFamily: "var(--font-display, sans-serif)" }}>
                   {loading
                     ? <Loader2 size={16} className="animate-spin" />
                     : <><span>Créer mon compte gratuitement</span><ArrowRight size={15} strokeWidth={2.5} /></>}
@@ -343,7 +343,7 @@ function NormalSignup() {
 
                 <p className="text-center text-sm text-gray-400">
                   Déjà un compte ?{" "}
-                  <Link href="/login" className="font-semibold hover:underline" style={{ color: "#D93B12" }}>Se connecter</Link>
+                  <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>Se connecter</Link>
                 </p>
               </form>
             </div>
@@ -368,7 +368,7 @@ function SignupRouter() {
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0F0E0D]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#10214B]" />}>
       <SignupRouter />
     </Suspense>
   );

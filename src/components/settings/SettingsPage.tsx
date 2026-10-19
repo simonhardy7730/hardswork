@@ -739,12 +739,12 @@ function CustomizationTab({
 }) {
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
-  const [previewColor, setPreviewColor] = useState(org.primary_color ?? "#D93B12");
+  const [previewColor, setPreviewColor] = useState(org.primary_color ?? "#FFB703");
   const [previewLogo, setPreviewLogo] = useState(org.logo_url ?? "");
   const isAdmin = currentUser.role === "admin";
 
   const PRESET_COLORS = [
-    "#D93B12", // REKRUUT blue
+    "#FFB703", // REKRUUT blue
     "#7C3AED", // violet
     "#059669", // green
     "#DC2626", // red
@@ -831,7 +831,7 @@ function CustomizationTab({
                     onClick={() => setPreviewColor(color)}
                     className={`w-7 h-7 rounded-full border-2 transition ${
                       previewColor === color
-                        ? "border-[#0F0E0D] scale-110"
+                        ? "border-[#10214B] scale-110"
                         : "border-transparent hover:scale-110"
                     }`}
                     style={{ backgroundColor: color }}
@@ -854,7 +854,7 @@ function CustomizationTab({
                   value={previewColor}
                   onChange={(e) => setPreviewColor(e.target.value)}
                   disabled={!isAdmin}
-                  placeholder="#D93B12"
+                  placeholder="#FFB703"
                   className="flex-1 px-3 py-2 text-sm border border-ink-100 rounded-lg font-mono focus:outline-none focus:border-brand disabled:bg-surface disabled:text-ink-300 transition"
                 />
               </div>

@@ -76,11 +76,11 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     .eq("job_offer_id", params.id);
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] font-body pb-24">
+    <div className="min-h-screen bg-[#FFFBF0] font-body pb-24">
       <SiteNav />
 
       {/* ══ HERO — image plein écran + titre overlaid ═════ */}
-      <div className="relative pt-[60px]">
+      <div className="brand-on-dark relative pt-[60px]">
         <div className="relative h-[48vh] min-h-[340px] overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -89,7 +89,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
             className="absolute inset-0 w-full h-full object-cover"
           />
           {/* Dégradé sombre vers le bas */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0F0E0D]/20 via-[#0F0E0D]/55 to-[#0F0E0D]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#10214B]/20 via-[#10214B]/55 to-[#10214B]" />
 
           {/* Contenu hero */}
           <div className="relative h-full max-w-6xl mx-auto px-6 flex flex-col justify-end pb-8">
@@ -144,7 +144,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
         </div>
 
         {/* ── STATS STRIP (fond sombre) ────────────────── */}
-        <div className="bg-[#0F0E0D] border-b border-white/10">
+        <div className="bg-[#10214B] border-b border-white/10">
           <div className="max-w-6xl mx-auto px-6 py-3.5 flex flex-wrap items-center gap-x-7 gap-y-2">
             {salary && (
               <div className="flex items-center gap-2">
@@ -235,7 +235,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 ]).map((skill: string) => (
                   <span
                     key={skill}
-                    className="text-[11px] font-black bg-[#F2EDE7] border border-ink-100 text-ink-600 px-3.5 py-2 rounded-lg uppercase tracking-wide"
+                    className="text-[11px] font-black bg-[#FBF1D8] border border-ink-100 text-ink-600 px-3.5 py-2 rounded-lg uppercase tracking-wide"
                   >
                     {skill}
                   </span>
@@ -302,7 +302,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               <div className="flex items-center gap-3 mb-3">
                 <div
                   className="w-11 h-11 rounded-xl border border-ink-100 flex items-center justify-center shrink-0 font-display font-black text-lg text-ink-400"
-                  style={{ background: org?.primary_color ? `${org.primary_color}15` : "#F2EDE7" }}
+                  style={{ background: org?.primary_color ? `${org.primary_color}15` : "#FBF1D8" }}
                 >
                   {org?.logo_url
                     // eslint-disable-next-line @next/next/no-img-element
@@ -407,7 +407,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
       </div>
 
       {/* ══ STICKY BOTTOM BAR ═════════════════════════════ */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0F0E0D]/95 backdrop-blur-sm border-t border-white/10">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#10214B]/95 backdrop-blur-sm border-t border-white/10">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="font-display font-black text-white uppercase text-sm leading-none truncate">

@@ -43,7 +43,7 @@ export function SearchModule() {
   };
 
   return (
-    <section className="bg-[#FAFAF8] border-b border-[#E8E2DA]">
+    <section className="bg-[#FFFBF0] border-b border-[#EADFC4]">
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Label */}
         <p className="section-label mb-6">Recherche d&apos;emploi</p>
@@ -52,11 +52,11 @@ export function SearchModule() {
           {/* Main search bar */}
           <div
             className="flex items-center gap-0 rounded-2xl overflow-hidden border-2 transition-all duration-200 mb-4 bg-white"
-            style={{ borderColor: isFocused ? "#D93B12" : "#E8E2DA" }}
+            style={{ borderColor: isFocused ? "#FFB703" : "#EADFC4" }}
           >
             {/* Search icon */}
             <div className="flex items-center justify-center w-16 h-16 shrink-0">
-              <Search size={20} className="text-[#A89F96]" />
+              <Search size={20} className="text-[#9AA5C4]" />
             </div>
 
             {/* Input */}
@@ -73,16 +73,16 @@ export function SearchModule() {
             />
 
             {/* Divider */}
-            <div className="w-px h-8 bg-[#E8E2DA] shrink-0 hidden md:block" />
+            <div className="w-px h-8 bg-[#EADFC4] shrink-0 hidden md:block" />
 
             {/* Region select */}
             <div className="relative hidden md:flex items-center px-4 py-4 gap-2 shrink-0">
-              <MapPin size={15} className="text-[#A89F96] shrink-0" />
+              <MapPin size={15} className="text-[#9AA5C4] shrink-0" />
               <select
                 name="region"
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
-                className="appearance-none bg-transparent text-sm font-semibold text-[#3A3733] pr-6 cursor-pointer focus:outline-none"
+                className="appearance-none bg-transparent text-sm font-semibold text-[#2B3A66] pr-6 cursor-pointer focus:outline-none"
                 style={{ fontFamily: "var(--font-body)" }}
               >
                 <option value="">Toute la Belgique</option>
@@ -90,7 +90,7 @@ export function SearchModule() {
                   <option key={v} value={v}>{l}</option>
                 ))}
               </select>
-              <ChevronDown size={13} className="absolute right-3 text-[#A89F96] pointer-events-none" />
+              <ChevronDown size={13} className="absolute right-3 text-[#9AA5C4] pointer-events-none" />
             </div>
 
             {/* Submit */}
@@ -105,7 +105,7 @@ export function SearchModule() {
 
           {/* Quick filters */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-[#A89F96] font-medium mr-1">Populaires :</span>
+            <span className="text-xs text-[#9AA5C4] font-medium mr-1">Populaires :</span>
             {[
               { label: "Logistique", sector: "logistique" },
               { label: "Transport", sector: "transport" },
@@ -119,7 +119,7 @@ export function SearchModule() {
                 onClick={() => {
                   window.location.href = `/jobs?secteur=${f.sector}`;
                 }}
-                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-[#E8E2DA] text-[#6B6760] hover:border-[#D93B12] hover:text-[#D93B12] transition-colors bg-white"
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-[#EADFC4] text-[#5A6585] hover:border-[#FFB703] hover:text-brand transition-colors bg-white"
                 style={{ fontFamily: "var(--font-body)" }}
               >
                 {f.label}

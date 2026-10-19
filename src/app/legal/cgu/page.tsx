@@ -8,12 +8,12 @@ export const metadata = {
 
 export default function CGUPage() {
   return (
-    <div className="min-h-screen bg-[#FAFAF8] font-body">
+    <div className="min-h-screen bg-[#FFFBF0] font-body">
       <SiteNav />
 
       <div className="pt-[60px]">
         {/* Hero */}
-        <div className="bg-[#0F0E0D] py-16 px-6">
+        <div className="bg-[#10214B] py-16 px-6">
           <div className="max-w-3xl mx-auto">
             <p className="text-[11px] font-black text-brand/70 uppercase tracking-widest mb-3">Légal</p>
             <h1

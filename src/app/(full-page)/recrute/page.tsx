@@ -6,6 +6,7 @@ import { ArrowRight, ArrowLeft, Check, Loader2, Zap, Users, Clock, Shield } from
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { signUp } from "@/app/actions/auth";
 
+import { WolfMascot } from "@/components/ui/WolfMascot";
 /* ─── Rôles ──────────────────────────────────────────────── */
 const ROLES = [
   {
@@ -84,7 +85,7 @@ export default function RecrutePage() {
 
         {/* ── NAV ─────────────────────────────────────────── */}
         <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b border-white/[0.07]"
-          style={{ background: "rgba(15,14,13,0.98)" }}>
+          style={{ background: "rgba(16,33,75,0.98)" }}>
           <div className="max-w-6xl mx-auto px-6 h-[60px] flex items-center justify-between">
             <Link href="/"><HardSworkLogo size="md" dark /></Link>
             <div className="flex items-center gap-3">
@@ -94,7 +95,7 @@ export default function RecrutePage() {
               <button
                 onClick={() => setShowForm(true)}
                 className="font-display font-black uppercase text-white text-[13px] px-5 py-2.5 rounded-xl transition"
-                style={{ background: "#D93B12", letterSpacing: "0.05em" }}
+                style={{ background: "#FFB703", letterSpacing: "0.05em" }}
               >
                 Commencer
               </button>
@@ -103,7 +104,7 @@ export default function RecrutePage() {
         </header>
 
         {/* ── HERO ─────────────────────────────────────────── */}
-        <div className="relative min-h-[90vh] flex items-center overflow-hidden" style={{ background: "#0F0E0D" }}>
+        <div className="relative min-h-[90vh] flex items-center overflow-hidden" style={{ background: "#10214B" }}>
           {/* Photo background */}
           <div className="absolute inset-0"
             style={{
@@ -113,19 +114,20 @@ export default function RecrutePage() {
               filter: "brightness(0.22) saturate(0.6)",
             }}
           />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(15,14,13,0.95) 0%, rgba(15,14,13,0.6) 100%)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(16,33,75,0.95) 0%, rgba(16,33,75,0.6) 100%)" }} />
 
           <div className="relative max-w-6xl mx-auto px-6 pt-[60px] grid lg:grid-cols-2 gap-12 items-center py-24">
             {/* Texte gauche */}
             <div>
+              <WolfMascot className="lg:hidden w-28 mb-5 drop-shadow-xl" />
               <span className="inline-block text-[11px] font-black border px-4 py-1.5 rounded-full uppercase tracking-widest mb-8"
-                style={{ color: "#D93B12", borderColor: "rgba(217,59,18,0.35)", background: "rgba(217,59,18,0.08)" }}>
+                style={{ color: "var(--brand-text)", borderColor: "rgba(255,183,3,0.35)", background: "rgba(255,183,3,0.08)" }}>
                 30 jours gratuits · Sans carte bancaire
               </span>
               <h1 className="font-display font-black text-white uppercase leading-[0.88] mb-6"
                 style={{ fontSize: "clamp(3rem, 6vw, 5rem)", letterSpacing: "-0.02em" }}>
                 Recrutez les<br />
-                <span style={{ color: "#D93B12" }}>[meilleurs]</span><br />
+                <span style={{ color: "var(--brand-text)" }}>[meilleurs]</span><br />
                 du terrain.
               </h1>
               <p className="text-white/45 text-lg leading-relaxed mb-10 max-w-md">
@@ -136,7 +138,7 @@ export default function RecrutePage() {
                 <button
                   onClick={() => setShowForm(true)}
                   className="inline-flex items-center gap-2 font-display font-black uppercase text-white px-8 py-4 rounded-xl transition text-[14px]"
-                  style={{ background: "#D93B12", letterSpacing: "0.06em" }}
+                  style={{ background: "#FFB703", letterSpacing: "0.06em" }}
                 >
                   Je recrute gratuitement
                   <ArrowRight size={15} />
@@ -150,17 +152,18 @@ export default function RecrutePage() {
             </div>
 
             {/* Mini-form card droite */}
-            <div className="hidden lg:block">
+            <div className="hidden lg:block relative">
+              <WolfMascot className="absolute right-8 bottom-full w-[190px] -mb-1 drop-shadow-xl" />
               <div className="bg-white rounded-2xl p-7 shadow-2xl">
-                <p className="font-display font-black text-[#0F0E0D] uppercase text-sm mb-5">
+                <p className="font-display font-black text-[#10214B] uppercase text-sm mb-5">
                   Commencez maintenant — c&apos;est gratuit
                 </p>
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   {ROLES.map((r) => (
                     <button key={r.id}
                       onClick={() => { setSelected(r.id); setShowForm(true); }}
-                      className="rounded-xl overflow-hidden border-2 border-transparent hover:border-[#D93B12] transition text-left group"
-                      style={{ borderColor: selected === r.id ? "#D93B12" : undefined }}>
+                      className="rounded-xl overflow-hidden border-2 border-transparent hover:border-[#FFB703] transition text-left group"
+                      style={{ borderColor: selected === r.id ? "#FFB703" : undefined }}>
                       <div className="relative h-24 overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={r.photo} alt={r.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -174,11 +177,11 @@ export default function RecrutePage() {
                 </div>
                 <button onClick={() => setShowForm(true)}
                   className="w-full py-3.5 text-white font-display font-black uppercase text-[13px] rounded-xl"
-                  style={{ background: "#D93B12", letterSpacing: "0.05em" }}>
+                  style={{ background: "#FFB703", letterSpacing: "0.05em" }}>
                   Créer mon compte →
                 </button>
                 <p className="text-center text-xs text-gray-400 mt-3">
-                  Déjà un compte ? <Link href="/login" className="text-[#D93B12] font-semibold hover:underline">Se connecter</Link>
+                  Déjà un compte ? <Link href="/login" className="text-brand font-semibold hover:underline">Se connecter</Link>
                 </p>
               </div>
             </div>
@@ -186,7 +189,7 @@ export default function RecrutePage() {
         </div>
 
         {/* ── COMMENT ÇA MARCHE ────────────────────────────── */}
-        <div className="bg-[#FAFAF8] py-20 px-6">
+        <div className="bg-[#FFFBF0] py-20 px-6">
           <div className="max-w-5xl mx-auto">
             <p className="text-[11px] font-black text-brand uppercase tracking-widest mb-3">Processus</p>
             <h2 className="font-display font-black text-ink uppercase leading-[0.9] mb-14"
@@ -207,11 +210,11 @@ export default function RecrutePage() {
         </div>
 
         {/* ── FEATURES ─────────────────────────────────────── */}
-        <div style={{ background: "#0F0E0D" }} className="py-20 px-6">
+        <div style={{ background: "#10214B" }} className="py-20 px-6">
           <div className="max-w-5xl mx-auto">
             <h2 className="font-display font-black text-white uppercase leading-[0.9] mb-12"
               style={{ fontSize: "clamp(2rem, 4vw, 3rem)", letterSpacing: "-0.02em" }}>
-              Pourquoi <span style={{ color: "#D93B12" }}>[HardSwork]</span>&nbsp;?
+              Pourquoi <span style={{ color: "var(--brand-text)" }}>[HardSwork]</span>&nbsp;?
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
               {FEATURES.map((f) => (
@@ -226,7 +229,7 @@ export default function RecrutePage() {
         </div>
 
         {/* ── SECTEURS COUVERTS ────────────────────────────── */}
-        <div className="bg-[#FAFAF8] py-16 px-6">
+        <div className="bg-[#FFFBF0] py-16 px-6">
           <div className="max-w-5xl mx-auto text-center">
             <p className="text-[11px] font-black text-brand uppercase tracking-widest mb-3">Secteurs</p>
             <h2 className="font-display font-black text-ink uppercase mb-8"
@@ -244,7 +247,7 @@ export default function RecrutePage() {
         </div>
 
         {/* ── CTA FINAL ────────────────────────────────────── */}
-        <div style={{ background: "#D93B12" }} className="py-20 px-6 text-center">
+        <div style={{ background: "#FFB703" }} className="py-20 px-6 text-center">
           <h2 className="font-display font-black text-white uppercase leading-[0.9] mb-6"
             style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", letterSpacing: "-0.02em" }}>
             Prêt à trouver<br />vos talents&nbsp;?
@@ -252,14 +255,14 @@ export default function RecrutePage() {
           <p className="text-white/70 mb-8 text-lg">30 jours gratuits · Aucune carte bancaire · Annulation à tout moment</p>
           <button onClick={() => setShowForm(true)}
             className="inline-flex items-center gap-3 bg-white font-display font-black uppercase px-10 py-4 rounded-xl transition text-[14px] hover:bg-white/90"
-            style={{ color: "#D93B12", letterSpacing: "0.08em" }}>
+            style={{ color: "var(--brand-text)", letterSpacing: "0.08em" }}>
             Commencer gratuitement
             <ArrowRight size={16} />
           </button>
         </div>
 
         {/* ── FOOTER ───────────────────────────────────────── */}
-        <footer className="border-t border-ink-100 bg-[#FAFAF8] py-8 px-6">
+        <footer className="border-t border-ink-100 bg-[#FFFBF0] py-8 px-6">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <HardSworkLogo size="sm" dark={false} />
             <p className="text-ink-300 text-xs">© 2026 HardSwork · Belgique · Tous droits réservés</p>
@@ -280,7 +283,7 @@ export default function RecrutePage() {
 
       {/* Colonne gauche */}
       <div className="hidden md:flex md:w-[44%] relative flex-col justify-end p-12 overflow-hidden"
-        style={{ background: "#0F0E0D" }}>
+        style={{ background: "#10214B" }}>
         <div className="absolute inset-0"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&q=75')",
@@ -294,8 +297,8 @@ export default function RecrutePage() {
         <div className="relative z-10">
           <h1 className="font-black text-white uppercase leading-none"
             style={{ fontFamily: "var(--font-display, sans-serif)", fontSize: "clamp(2.8rem, 4.5vw, 4.2rem)" }}>
-            {step === "select" ? <>RECRUTEZ LES<br /><span style={{ color: "#D93B12" }}>[MEILLEURS].</span></>
-              : <>CRÉEZ VOTRE<br /><span style={{ color: "#D93B12" }}>[COMPTE].</span></>}
+            {step === "select" ? <>RECRUTEZ LES<br /><span style={{ color: "var(--brand-text)" }}>[MEILLEURS].</span></>
+              : <>CRÉEZ VOTRE<br /><span style={{ color: "var(--brand-text)" }}>[COMPTE].</span></>}
           </h1>
           <p className="text-white/45 mt-5 text-sm leading-relaxed max-w-xs">
             {step === "select"
@@ -326,7 +329,7 @@ export default function RecrutePage() {
                   return (
                     <button key={r.id} onClick={() => setSelected(r.id)}
                       className="relative rounded-2xl overflow-hidden text-left transition-all group"
-                      style={{ border: isSel ? "2.5px solid #D93B12" : "2.5px solid #E5E7EB", boxShadow: isSel ? "0 4px 20px rgba(217,59,18,0.15)" : "none" }}>
+                      style={{ border: isSel ? "2.5px solid #FFB703" : "2.5px solid #E5E7EB", boxShadow: isSel ? "0 4px 20px rgba(255,183,3,0.15)" : "none" }}>
                       <div className="relative h-32 overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={r.photo} alt={r.title}
@@ -334,7 +337,7 @@ export default function RecrutePage() {
                           style={{ filter: "brightness(0.55) saturate(0.8)" }} />
                         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom,rgba(0,0,0,.1),rgba(0,0,0,.55))" }} />
                         {isSel && (
-                          <span className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center z-10" style={{ background: "#D93B12" }}>
+                          <span className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center z-10" style={{ background: "#FFB703" }}>
                             <Check size={13} className="text-white" strokeWidth={3} />
                           </span>
                         )}
@@ -345,7 +348,7 @@ export default function RecrutePage() {
                         <ul className="space-y-1.5">
                           {r.features.map((f) => (
                             <li key={f} className="flex items-center gap-1.5 text-xs text-gray-500">
-                              <Check size={11} strokeWidth={3} style={{ color: "#D93B12" }} />{f}
+                              <Check size={11} strokeWidth={3} style={{ color: "var(--brand-text)" }} />{f}
                             </li>
                           ))}
                         </ul>
@@ -356,11 +359,11 @@ export default function RecrutePage() {
               </div>
               <button onClick={() => selected && setStep("register")} disabled={!selected}
                 className="w-full py-4 rounded-xl font-bold text-sm tracking-widest uppercase flex items-center justify-center gap-2 transition"
-                style={{ background: selected ? "#D93B12" : "#F3F4F6", color: selected ? "#fff" : "#9CA3AF", fontFamily: "var(--font-display)", cursor: selected ? "pointer" : "not-allowed" }}>
+                style={{ background: selected ? "#FFB703" : "#F3F4F6", color: selected ? "#10214B" : "#9CA3AF", fontFamily: "var(--font-display)", cursor: selected ? "pointer" : "not-allowed" }}>
                 Continuer <ArrowRight size={16} />
               </button>
               <p className="text-center text-sm text-gray-400 mt-5">
-                Déjà un compte ? <Link href="/login" className="font-semibold hover:underline" style={{ color: "#D93B12" }}>Se connecter</Link>
+                Déjà un compte ? <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>Se connecter</Link>
               </p>
             </div>
           )}
@@ -377,7 +380,7 @@ export default function RecrutePage() {
                     {currentRole?.id === "agency" ? "Agence de recrutement" : "Entreprise / PME"}
                   </p>
                   <h2 className="font-black text-xl text-gray-900 uppercase leading-tight" style={{ fontFamily: "var(--font-display)" }}>
-                    Inscription — <span style={{ color: "#D93B12" }}>{currentRole?.id === "agency" ? "Agence" : "Entreprise"}</span>
+                    Inscription — <span style={{ color: "var(--brand-text)" }}>{currentRole?.id === "agency" ? "Agence" : "Entreprise"}</span>
                   </h2>
                 </div>
               </div>
@@ -386,37 +389,37 @@ export default function RecrutePage() {
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">1. Nom de l&apos;entreprise</label>
                   <input type="text" placeholder={currentRole?.placeholder} value={form.orgName} onChange={set("orgName")} required
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#D93B12] transition" />
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">2. Votre identité</label>
                   <div className="grid grid-cols-2 gap-3">
                     <input type="text" placeholder="Jean Dupont" value={form.fullName} onChange={set("fullName")} required
-                      className="border border-gray-200 rounded-xl px-4 py-3 text-sm placeholder-gray-300 focus:outline-none focus:border-[#D93B12] transition" />
+                      className="border border-gray-200 rounded-xl px-4 py-3 text-sm placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition" />
                     <input type="email" placeholder="jean@entreprise.be" value={form.email} onChange={set("email")} required
-                      className="border border-gray-200 rounded-xl px-4 py-3 text-sm placeholder-gray-300 focus:outline-none focus:border-[#D93B12] transition" />
+                      className="border border-gray-200 rounded-xl px-4 py-3 text-sm placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">3. Mot de passe</label>
                   <input type="password" placeholder="Minimum 8 caractères" value={form.password} onChange={set("password")} required minLength={8}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm placeholder-gray-300 focus:outline-none focus:border-[#D93B12] transition" />
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm placeholder-gray-300 focus:outline-none focus:border-[#10214B] transition" />
                 </div>
                 <label className="flex items-start gap-3 cursor-pointer">
-                  <input type="checkbox" checked={form.cgu} onChange={set("cgu")} className="mt-0.5 w-4 h-4 shrink-0 rounded" style={{ accentColor: "#D93B12" }} />
+                  <input type="checkbox" checked={form.cgu} onChange={set("cgu")} className="mt-0.5 w-4 h-4 shrink-0 rounded" style={{ accentColor: "#10214B" }} />
                   <span className="text-xs text-gray-400 leading-relaxed">
-                    J&apos;accepte les <Link href="/legal/cgu" className="hover:underline" style={{ color: "#D93B12" }} target="_blank">CGU</Link>{" "}
-                    et la <Link href="/legal/privacy" className="hover:underline" style={{ color: "#D93B12" }} target="_blank">politique de confidentialité</Link>.
+                    J&apos;accepte les <Link href="/legal/cgu" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">CGU</Link>{" "}
+                    et la <Link href="/legal/privacy" className="hover:underline" style={{ color: "var(--brand-text)" }} target="_blank">politique de confidentialité</Link>.
                   </span>
                 </label>
-                {error && <p className="text-xs rounded-xl px-4 py-3 bg-red-50 border border-red-100" style={{ color: "#D93B12" }}>{error}</p>}
+                {error && <p className="text-xs rounded-xl px-4 py-3 bg-red-50 border border-red-100" style={{ color: "#B91C1C" }}>{error}</p>}
                 <button type="submit" disabled={loading}
                   className="w-full py-4 text-white font-black text-sm tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 transition"
-                  style={{ background: loading ? "#F0A090" : "#D93B12", fontFamily: "var(--font-display)" }}>
+                  style={{ background: loading ? "#FFD97A" : "#FFB703", fontFamily: "var(--font-display)" }}>
                   {loading ? <Loader2 size={16} className="animate-spin" /> : <><span>Créer mon compte gratuitement</span><ArrowRight size={15} /></>}
                 </button>
                 <p className="text-center text-sm text-gray-400">
-                  Déjà un compte ? <Link href="/login" className="font-semibold hover:underline" style={{ color: "#D93B12" }}>Se connecter</Link>
+                  Déjà un compte ? <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--brand-text)" }}>Se connecter</Link>
                 </p>
               </form>
             </div>

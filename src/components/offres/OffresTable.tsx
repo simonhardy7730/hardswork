@@ -101,7 +101,7 @@ export default function OffresTable({ offres }: { offres: JobOffer[] }) {
   if (offres.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-ink-100 py-16 text-center">
-        <Briefcase size={40} className="text-[#E8E2DA] mx-auto mb-4" />
+        <Briefcase size={40} className="text-[#EADFC4] mx-auto mb-4" />
         <h3 className="text-sm font-semibold text-ink mb-1">
           Aucune offre
         </h3>

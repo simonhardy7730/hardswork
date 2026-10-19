@@ -44,7 +44,7 @@ export default function ShareButtons({ url, title }: Props) {
       <button
         onClick={copyLink}
         className="flex-1 text-[10px] font-black rounded-lg py-2 uppercase tracking-wide transition hover:opacity-80 flex items-center justify-center gap-1"
-        style={{ background: "#F2EDE7", color: "#0F0E0D" }}
+        style={{ background: "#FBF1D8", color: "#10214B" }}
       >
         {copied ? <><Check size={10} /> Copié</> : <><Copy size={10} /> Copier</>}
       </button>

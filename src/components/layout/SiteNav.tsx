@@ -3,7 +3,7 @@ import { HardSworkLogo } from "@/components/ui/HardieIcon";
 
 export function SiteNav() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b border-white/[0.07]" style={{ background: "rgba(15,14,13,0.98)" }}>
+    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b border-white/[0.07]" style={{ background: "rgba(16,33,75,0.98)" }}>
       <div className="max-w-7xl mx-auto px-6 h-[60px] flex items-center justify-between">
 
         {/* Logo */}

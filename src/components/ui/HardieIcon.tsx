@@ -10,6 +10,8 @@
  *   > 64px  → Hardie corps entier avec expression (empty states, onboarding)
  */
 
+import { WolfHead } from "./WolfMascot";
+
 interface HardieIconProps {
   size?: number;
   className?: string;
@@ -57,24 +59,24 @@ function HardieHead({ size }: { size: number }) {
       {/* Corps simplifié */}
       <path
         d="M14 52V41C14 33 42 33 42 41V52"
-        fill="#1C1A18"
+        fill="#16295C"
       />
       {/* Bras droit levé */}
       <line x1="42" y1="41" x2="50" y2="30"
-        stroke="#1C1A18" strokeWidth="5" strokeLinecap="round" />
+        stroke="#16295C" strokeWidth="5" strokeLinecap="round" />
       {/* Étoile */}
-      <circle cx="51" cy="27" r="4" fill="#D93B12" />
+      <circle cx="51" cy="27" r="4" fill="#FFB703" />
       {/* Tête */}
-      <circle cx="28" cy="25" r="15" fill="#FDDFC4" />
+      <circle cx="28" cy="25" r="15" fill="#FFE9A8" />
       {/* Yeux */}
-      <circle cx="22" cy="23" r="2.5" fill="#1C1A18" />
-      <circle cx="34" cy="23" r="2.5" fill="#1C1A18" />
+      <circle cx="22" cy="23" r="2.5" fill="#16295C" />
+      <circle cx="34" cy="23" r="2.5" fill="#16295C" />
       {/* Reflets */}
       <circle cx="23.5" cy="21.5" r="1" fill="white" />
       <circle cx="35.5" cy="21.5" r="1" fill="white" />
       {/* Sourire */}
       <path d="M21 30 Q28 36 35 30"
-        stroke="#1C1A18" strokeWidth="2" strokeLinecap="round" fill="none" />
+        stroke="#16295C" strokeWidth="2" strokeLinecap="round" fill="none" />
     </svg>
   );
 }
@@ -90,45 +92,45 @@ function HardieFullBody({ size }: { size: number }) {
       aria-label="Hardie — mascotte HardSwork"
     >
       {/* Jambes */}
-      <rect x="24" y="72" width="12" height="22" rx="6" fill="#1C1A18" />
-      <rect x="44" y="72" width="12" height="22" rx="6" fill="#1C1A18" />
+      <rect x="24" y="72" width="12" height="22" rx="6" fill="#16295C" />
+      <rect x="44" y="72" width="12" height="22" rx="6" fill="#16295C" />
       {/* Corps */}
-      <rect x="18" y="52" width="44" height="24" rx="8" fill="#1C1A18" />
+      <rect x="18" y="52" width="44" height="24" rx="8" fill="#16295C" />
       {/* Badge étoile sur le corps */}
-      <circle cx="40" cy="63" r="7" fill="#D93B12" />
+      <circle cx="40" cy="63" r="7" fill="#FFB703" />
       <path
         d="M40 57.5 L41.5 61.5 L46 61.5 L42.5 64 L44 68 L40 65.5 L36 68 L37.5 64 L34 61.5 L38.5 61.5 Z"
         fill="white"
       />
       {/* Bras gauche (baissé) */}
-      <rect x="6" y="52" width="12" height="6" rx="3" fill="#1C1A18"
+      <rect x="6" y="52" width="12" height="6" rx="3" fill="#16295C"
         transform="rotate(20 12 55)" />
       {/* Bras droit levé ! */}
-      <rect x="62" y="40" width="12" height="6" rx="3" fill="#1C1A18"
+      <rect x="62" y="40" width="12" height="6" rx="3" fill="#16295C"
         transform="rotate(-50 68 43)" />
       {/* Main levée (poing fermé ou doigt pointé) */}
-      <circle cx="74" cy="36" r="5" fill="#FDDFC4" />
+      <circle cx="74" cy="36" r="5" fill="#FFE9A8" />
       {/* Cou */}
-      <rect x="35" y="46" width="10" height="8" rx="4" fill="#FDDFC4" />
+      <rect x="35" y="46" width="10" height="8" rx="4" fill="#FFE9A8" />
       {/* Tête */}
-      <circle cx="40" cy="34" r="18" fill="#FDDFC4" />
+      <circle cx="40" cy="34" r="18" fill="#FFE9A8" />
       {/* Oreilles */}
-      <circle cx="22" cy="34" r="5" fill="#FDDFC4" />
-      <circle cx="58" cy="34" r="5" fill="#FDDFC4" />
+      <circle cx="22" cy="34" r="5" fill="#FFE9A8" />
+      <circle cx="58" cy="34" r="5" fill="#FFE9A8" />
       {/* Yeux */}
-      <circle cx="33" cy="31" r="3.5" fill="#1C1A18" />
-      <circle cx="47" cy="31" r="3.5" fill="#1C1A18" />
+      <circle cx="33" cy="31" r="3.5" fill="#16295C" />
+      <circle cx="47" cy="31" r="3.5" fill="#16295C" />
       {/* Reflets yeux */}
       <circle cx="34.5" cy="29.5" r="1.3" fill="white" />
       <circle cx="48.5" cy="29.5" r="1.3" fill="white" />
       {/* Sourcils expressifs */}
       <path d="M29 25 Q33 22 37 25"
-        stroke="#1C1A18" strokeWidth="2" strokeLinecap="round" fill="none" />
+        stroke="#16295C" strokeWidth="2" strokeLinecap="round" fill="none" />
       <path d="M43 25 Q47 22 51 25"
-        stroke="#1C1A18" strokeWidth="2" strokeLinecap="round" fill="none" />
+        stroke="#16295C" strokeWidth="2" strokeLinecap="round" fill="none" />
       {/* Sourire large */}
       <path d="M30 39 Q40 47 50 39"
-        stroke="#1C1A18" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+        stroke="#16295C" strokeWidth="2.5" strokeLinecap="round" fill="none" />
       {/* Petites joues roses */}
       <circle cx="28" cy="38" r="4" fill="#FFAAAA" opacity="0.4" />
       <circle cx="52" cy="38" r="4" fill="#FFAAAA" opacity="0.4" />
@@ -156,23 +158,17 @@ export function HardSworkLogo({ size = "md", dark = true }: LogoProps) {
 
   return (
     <div className="flex items-center gap-2.5">
-      {/* Fond rouge arrondi + personne SVG */}
-      <div
-        className="flex items-center justify-center shrink-0"
-        style={{
-          width: iconSize,
-          height: iconSize,
-          background: "#D93B12",
-          borderRadius: iconSize * 0.3,
-        }}
-      >
-        <PersonMark size={Math.round(iconSize * 0.78)} />
-      </div>
+      {/* Logo : tête du loup */}
+      <WolfHead
+        width={Math.round(iconSize * 1.35)}
+        height={Math.round(iconSize * 1.35 * (138 / 144))}
+        className="shrink-0"
+      />
 
       {/* Wordmark : Hard·S·work — le S en rouge */}
       <span
         className={`font-display font-black leading-none tracking-tight ${textClass} ${
-          dark ? "text-white" : "text-[#0F0E0D]"
+          dark ? "text-white" : "text-[#10214B]"
         }`}
       >
         Hard<span className="text-brand">S</span>work

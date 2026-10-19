@@ -184,7 +184,7 @@ export default function NouvelleOffreForm({
                     ? "bg-[#10B981] text-white"
                     : step === s.num
                       ? "bg-brand text-white"
-                      : "bg-[#E8E2DA] text-ink-300"
+                      : "bg-[#EADFC4] text-ink-300"
                 }`}
               >
                 {step > s.num ? <Check size={14} /> : s.num}
@@ -197,7 +197,7 @@ export default function NouvelleOffreForm({
             </div>
             {i < STEPS.length - 1 && (
               <div
-                className={`flex-1 h-px ${step > s.num ? "bg-[#10B981]" : "bg-[#E8E2DA]"}`}
+                className={`flex-1 h-px ${step > s.num ? "bg-[#10B981]" : "bg-[#EADFC4]"}`}
               />
             )}
           </div>
@@ -363,7 +363,7 @@ export default function NouvelleOffreForm({
                   </span>
                   <div
                     className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${
-                      form.is_urgent ? "bg-red-500" : "bg-[#E8E2DA]"
+                      form.is_urgent ? "bg-red-500" : "bg-[#EADFC4]"
                     }`}
                   >
                     <div
@@ -397,7 +397,7 @@ export default function NouvelleOffreForm({
                 >
                   <div
                     className={`w-7 h-4 rounded-full transition-colors flex items-center px-0.5 ${
-                      form.show_salary ? "bg-brand" : "bg-[#E8E2DA]"
+                      form.show_salary ? "bg-brand" : "bg-[#EADFC4]"
                     }`}
                   >
                     <div

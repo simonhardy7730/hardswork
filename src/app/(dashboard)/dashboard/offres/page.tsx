@@ -60,7 +60,7 @@ export default async function OffresPage({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[#0F0E0D]">
+          <h1 className="text-xl font-bold text-[#10214B]">
             Offres d&apos;emploi
           </h1>
           <p className="text-sm text-ink-500 mt-0.5">

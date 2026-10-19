@@ -12,7 +12,7 @@ export default function DashboardTopbar({ user }: { user: User }) {
     .slice(0, 2) ?? "?";
 
   return (
-    <header className="h-[60px] bg-[#0F0E0D]/80 backdrop-blur-sm border-b border-white/[0.06] flex items-center justify-between px-6 shrink-0">
+    <header className="h-[60px] bg-[#10214B]/80 backdrop-blur-sm border-b border-white/[0.06] flex items-center justify-between px-6 shrink-0">
       <div />
 
       <div className="flex items-center gap-2.5">

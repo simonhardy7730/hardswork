@@ -57,14 +57,14 @@ export default function NouvelleCandiatureRecruteurEmail({
       </Preview>
       <Body
         style={{
-          backgroundColor: "#F5F5F0",
+          backgroundColor: "#FFF6DE",
           margin: 0,
           padding: "32px 0",
           fontFamily: "Arial, Helvetica, sans-serif",
         }}
       >
         {/* ── HEADER ─────────────────────────────────────── */}
-        <Section style={{ backgroundColor: "#0F0E0D", padding: "20px 0" }}>
+        <Section style={{ backgroundColor: "#10214B", padding: "20px 0" }}>
           <Container
             style={{ maxWidth: "560px", margin: "0 auto", padding: "0 24px" }}
           >
@@ -78,7 +78,7 @@ export default function NouvelleCandiatureRecruteurEmail({
                     letterSpacing: "-0.02em",
                   }}
                 >
-                  <span style={{ color: "#D93B12" }}>HARD</span>
+                  <span style={{ color: "#FFB703" }}>HARD</span>
                   <span style={{ color: "#ffffff" }}>SWORK</span>
                 </Text>
               </Column>
@@ -89,7 +89,7 @@ export default function NouvelleCandiatureRecruteurEmail({
                     fontSize: "10px",
                     fontWeight: "700",
                     color: "#ffffff",
-                    backgroundColor: "#D93B12",
+                    backgroundColor: "#FFB703",
                     padding: "4px 10px",
                     borderRadius: "6px",
                     display: "inline-block",
@@ -113,7 +113,7 @@ export default function NouvelleCandiatureRecruteurEmail({
               style={{
                 fontSize: "22px",
                 fontWeight: "900",
-                color: "#0F0E0D",
+                color: "#10214B",
                 margin: "0 0 6px 0",
                 letterSpacing: "-0.02em",
               }}
@@ -122,7 +122,7 @@ export default function NouvelleCandiatureRecruteurEmail({
             </Heading>
             <Text style={{ fontSize: "13px", color: "#6B6B60", margin: 0 }}>
               Pour :{" "}
-              <strong style={{ color: "#0F0E0D" }}>{jobTitle}</strong> ·{" "}
+              <strong style={{ color: "#10214B" }}>{jobTitle}</strong> ·{" "}
               {jobCity}
             </Text>
           </Section>
@@ -134,14 +134,14 @@ export default function NouvelleCandiatureRecruteurEmail({
               borderRadius: "16px",
               padding: "24px",
               marginTop: "16px",
-              border: "1px solid #E8E8E0",
+              border: "1px solid #EADFC4",
             }}
           >
             <Text
               style={{
                 fontSize: "10px",
                 fontWeight: "700",
-                color: "#D93B12",
+                color: "#8A5D00",
                 textTransform: "uppercase",
                 letterSpacing: "0.1em",
                 margin: "0 0 18px 0",
@@ -168,7 +168,7 @@ export default function NouvelleCandiatureRecruteurEmail({
                   style={{
                     fontSize: "15px",
                     fontWeight: "700",
-                    color: "#0F0E0D",
+                    color: "#10214B",
                     margin: 0,
                   }}
                 >
@@ -191,7 +191,7 @@ export default function NouvelleCandiatureRecruteurEmail({
                   style={{
                     fontSize: "15px",
                     fontWeight: "700",
-                    color: "#0F0E0D",
+                    color: "#10214B",
                     margin: 0,
                   }}
                 >
@@ -203,7 +203,7 @@ export default function NouvelleCandiatureRecruteurEmail({
             <Hr
               style={{
                 border: "none",
-                borderTop: "1px solid #E8E8E0",
+                borderTop: "1px solid #EADFC4",
                 margin: "0 0 16px 0",
               }}
             />
@@ -211,7 +211,7 @@ export default function NouvelleCandiatureRecruteurEmail({
             {/* Phone highlight box */}
             <Section
               style={{
-                backgroundColor: "#FEF0EC",
+                backgroundColor: "#FFF3CC",
                 borderRadius: "10px",
                 padding: "14px 18px",
                 marginBottom: "16px",
@@ -221,7 +221,7 @@ export default function NouvelleCandiatureRecruteurEmail({
               <Text
                 style={{
                   fontSize: "10px",
-                  color: "#D93B12",
+                  color: "#8A5D00",
                   margin: "0 0 4px 0",
                   textTransform: "uppercase",
                   letterSpacing: "0.06em",
@@ -234,7 +234,7 @@ export default function NouvelleCandiatureRecruteurEmail({
                 style={{
                   fontSize: "22px",
                   fontWeight: "900",
-                  color: "#D93B12",
+                  color: "#8A5D00",
                   margin: "0 0 2px 0",
                   letterSpacing: "-0.01em",
                 }}
@@ -271,7 +271,7 @@ export default function NouvelleCandiatureRecruteurEmail({
                   style={{
                     fontSize: "13px",
                     fontWeight: "600",
-                    color: "#0F0E0D",
+                    color: "#10214B",
                     margin: 0,
                   }}
                 >
@@ -294,7 +294,7 @@ export default function NouvelleCandiatureRecruteurEmail({
                   style={{
                     fontSize: "13px",
                     fontWeight: "600",
-                    color: "#0F0E0D",
+                    color: "#10214B",
                     margin: 0,
                   }}
                 >
@@ -313,7 +313,7 @@ export default function NouvelleCandiatureRecruteurEmail({
                 <Hr
                   style={{
                     border: "none",
-                    borderTop: "1px solid #E8E8E0",
+                    borderTop: "1px solid #EADFC4",
                     margin: "16px 0",
                   }}
                 />
@@ -335,7 +335,7 @@ export default function NouvelleCandiatureRecruteurEmail({
                     lineHeight: "1.7",
                     margin: 0,
                     fontStyle: "italic",
-                    backgroundColor: "#F5F5F0",
+                    backgroundColor: "#FFF6DE",
                     borderRadius: "8px",
                     padding: "12px",
                   }}
@@ -351,8 +351,8 @@ export default function NouvelleCandiatureRecruteurEmail({
             <Button
               href={dashboardUrl}
               style={{
-                backgroundColor: "#D93B12",
-                color: "#ffffff",
+                backgroundColor: "#FFB703",
+                color: "#10214B",
                 padding: "14px 36px",
                 borderRadius: "10px",
                 fontSize: "14px",
@@ -377,7 +377,7 @@ export default function NouvelleCandiatureRecruteurEmail({
 
           {/* ── FOOTER ─────────────────────────────────────── */}
           <Section
-            style={{ borderTop: "1px solid #E8E8E0", padding: "20px 0" }}
+            style={{ borderTop: "1px solid #EADFC4", padding: "20px 0" }}
           >
             <Text
               style={{

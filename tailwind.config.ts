@@ -11,22 +11,22 @@ const config: Config = {
     extend: {
       colors: {
         ink: {
-          DEFAULT: "#0F0E0D",
-          900: "#1C1A18",
-          700: "#3A3733",
-          500: "#6B6760",
-          300: "#A89F96",
-          100: "#E8E2DA",
+          DEFAULT: "#10214B",
+          900: "#16295C",
+          700: "#2B3A66",
+          500: "#5A6585",
+          300: "#9AA5C4",
+          100: "#EADFC4",
         },
         surface: {
-          DEFAULT: "#FAFAF8",
-          2: "#F2EDE7",
+          DEFAULT: "#FFFBF0",
+          2: "#FBF1D8",
           3: "#E9E2D8",
         },
         brand: {
-          DEFAULT: "#D93B12",
-          dark: "#B52D0A",
-          light: "#F05733",
+          DEFAULT: "#FFB703",
+          dark: "#E5A000",
+          light: "#FFC933",
         },
         gold: "#B87C2A",
         success: "#1A8048",

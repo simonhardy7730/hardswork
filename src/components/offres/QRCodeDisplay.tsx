@@ -35,12 +35,12 @@ export default function QRCodeDisplay({ url, title }: Props) {
     ctx.drawImage(canvas, padding, padding, size - padding * 2, size - padding * 2);
 
     // Texte
-    ctx.fillStyle = "#0F0E0D";
+    ctx.fillStyle = "#10214B";
     ctx.font = "bold 16px Inter, system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(title, size / 2, size + 22);
     ctx.font = "12px Inter, system-ui, sans-serif";
-    ctx.fillStyle = "#6B6760";
+    ctx.fillStyle = "#5A6585";
     ctx.fillText("Postulez via HardSwork", size / 2, size + 42);
 
     const link = document.createElement("a");
@@ -60,7 +60,7 @@ export default function QRCodeDisplay({ url, title }: Props) {
           size={200}
           level="M"
           includeMargin={false}
-          fgColor="#D93B12"
+          fgColor="#10214B"
           bgColor="#FFFFFF"
         />
       </div>

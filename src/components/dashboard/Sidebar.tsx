@@ -28,7 +28,7 @@ export default function DashboardSidebar({ org }: { org: Organization }) {
   }
 
   return (
-    <aside className="w-[220px] bg-[#0F0E0D] border-r border-white/[0.07] flex flex-col shrink-0">
+    <aside className="w-[220px] bg-[#10214B] border-r border-white/[0.07] flex flex-col shrink-0">
 
       {/* Logo */}
       <div className="px-5 py-4 border-b border-white/[0.06]">

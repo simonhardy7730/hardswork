@@ -136,7 +136,7 @@ export default function OnboardingPage() {
                       ? "bg-[#10B981] text-white"
                       : step === s.num
                         ? "bg-brand text-white"
-                        : "bg-[#E8E2DA] text-ink-300"
+                        : "bg-[#EADFC4] text-ink-300"
                   }`}
                 >
                   {step > s.num ? <Check size={14} /> : s.num}
@@ -151,13 +151,13 @@ export default function OnboardingPage() {
               </div>
               {i < STEPS.length - 1 && (
                 <div
-                  className={`h-px w-8 ${step > s.num ? "bg-[#10B981]" : "bg-[#E8E2DA]"}`}
+                  className={`h-px w-8 ${step > s.num ? "bg-[#10B981]" : "bg-[#EADFC4]"}`}
                 />
               )}
             </div>
           ))}
         </div>
-        <div className="h-1 bg-[#E8E2DA] rounded-full overflow-hidden">
+        <div className="h-1 bg-[#EADFC4] rounded-full overflow-hidden">
           <div
             className="h-full bg-brand transition-all duration-500"
             style={{ width: `${((step - 1) / 2) * 100}%` }}
@@ -313,7 +313,7 @@ export default function OnboardingPage() {
                 />
                 <button
                   onClick={addInvite}
-                  className="px-4 py-2.5 bg-surface-2 border border-ink-100 rounded-lg text-sm font-medium text-ink hover:bg-[#E8E2DA] transition"
+                  className="px-4 py-2.5 bg-surface-2 border border-ink-100 rounded-lg text-sm font-medium text-ink hover:bg-[#EADFC4] transition"
                 >
                   Ajouter
                 </button>

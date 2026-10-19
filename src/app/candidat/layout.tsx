@@ -20,9 +20,9 @@ export default async function CandidatLayout({ children }: { children: React.Rea
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] font-body flex">
+    <div className="min-h-screen bg-[#FFFBF0] font-body flex">
       {/* Sidebar */}
-      <aside className="w-56 shrink-0 bg-[#0F0E0D] flex flex-col hidden md:flex">
+      <aside className="w-56 shrink-0 bg-[#10214B] flex flex-col hidden md:flex">
         {/* Logo */}
         <div className="px-5 py-5 border-b border-white/[0.07]">
           <Link href="/"><HardSworkLogo size="sm" dark /></Link>
@@ -67,7 +67,7 @@ export default async function CandidatLayout({ children }: { children: React.Rea
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar mobile */}
-        <header className="md:hidden bg-[#0F0E0D] h-14 flex items-center justify-between px-4 border-b border-white/[0.07]">
+        <header className="md:hidden bg-[#10214B] h-14 flex items-center justify-between px-4 border-b border-white/[0.07]">
           <Link href="/"><HardSworkLogo size="sm" dark /></Link>
           <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center">
             <span className="font-display font-black text-white text-xs">{initials}</span>

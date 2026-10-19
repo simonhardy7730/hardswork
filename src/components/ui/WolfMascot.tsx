@@ -8,13 +8,13 @@ import type { SVGProps } from "react";
  */
 const WOLF_CSS = `.wf{--fur:#7E8A98;--fur-d:#66717F;--fur-l:#EEF1F5;display:block;overflow:visible}
 .wf-fur{fill:var(--fur)}.wf-fur-d{fill:var(--fur-d)}.wf-light{fill:var(--fur-l)}
-.wf-ink{fill:var(--ink,#0E3B43)}.wf-accent{fill:var(--accent,#FF6B57)}.wf-paper{fill:var(--paper,#FFF6EC)}
+.wf-ink{fill:var(--ink,#10214B)}.wf-accent{fill:var(--accent,#FFB703)}.wf-paper{fill:var(--paper,#FFF8E5)}
 .wf-shadow{fill:rgba(0,0,0,.16)}
-.wf-blush{fill:var(--accent,#FF6B57);opacity:.35}
-.wf-line{stroke:var(--ink,#0E3B43);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.wf-blush{fill:var(--accent,#FFB703);opacity:.35}
+.wf-line{stroke:var(--ink,#10214B);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .wf-arm{stroke:var(--fur);stroke-width:18;stroke-linecap:round;fill:none}
-.wf-board{stroke:var(--ink,#0E3B43);stroke-width:4}
-.wf-text{fill:var(--ink,#0E3B43);font-weight:900;font-size:22px;font-family:var(--font-display,'Arial Black',Impact,sans-serif)}
+.wf-board{stroke:var(--ink,#10214B);stroke-width:4}
+.wf-text{fill:var(--ink,#10214B);font-weight:900;font-size:22px;font-family:var(--font-display,'Arial Black',Impact,sans-serif)}
 .wf-tail,.wf-head,.wf-sign,.wf-ear-l,.wf-ear-r,.wf-eyes{transform-box:view-box}
 .wf-anim .wf-tail{transform-origin:168px 220px;animation:wf-wag 1.3s ease-in-out infinite}
 .wf-anim .wf-head{transform-origin:130px 142px;animation:wf-tilt 5s ease-in-out infinite}
@@ -90,5 +90,18 @@ export function WolfMascot({ animated = true, className, ...rest }: Props) {
 <ellipse className="wf-fur" cx="203" cy="184" rx="14" ry="12"/>
 </g>
 </svg>
+  );
+}
+
+/** Tête seule, statique : logo de la barre de navigation et petites tailles. */
+export function WolfHead(props: Omit<Props, "animated" | "viewBox">) {
+  return (
+    <WolfMascot
+      animated={false}
+      viewBox="58 12 144 138"
+      style={{ overflow: "hidden" }}
+      aria-hidden="true"
+      {...props}
+    />
   );
 }

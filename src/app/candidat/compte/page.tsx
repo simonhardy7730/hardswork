@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import DocumentsUpload from "@/components/candidat/DocumentsUpload";
 import PreferencesEditor from "@/components/candidat/PreferencesEditor";
 import AvailabilityEditor from "@/components/candidat/AvailabilityEditor";
+import DataRights from "@/components/candidat/DataRights";
 import { EMPTY_AVAILABILITY, type AvailabilityState } from "@/lib/candidate/availability";
 import { EMPTY_PREFERENCES, type Preferences } from "@/lib/candidate/preferences";
 import { User, Mail, Phone, Lock, LogOut } from "lucide-react";
@@ -154,6 +155,8 @@ export default async function ComptePage() {
 
       {/* Diplômes & permis */}
       <DocumentsUpload userId={user.id} />
+
+      <DataRights />
 
       {/* Sécurité */}
       <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden">

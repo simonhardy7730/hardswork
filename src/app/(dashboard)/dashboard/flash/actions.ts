@@ -76,6 +76,14 @@ export async function createFlashOrder(input: { quantity: number; offerIds: stri
     unitCents: order.unit_price_cents, discountCents: order.discount_cents, totalHtCents: order.total_ht_cents, vatCents: order.vat_cents, totalTtcCents: order.total_ttc_cents,
   });
   if (sent) await db.from("flash_orders").update({ confirmation_sent_at: new Date().toISOString() }).eq("id", order.id);
+  // Alerte interne : l'équipe Wolko reçoit la commande par e-mail (jamais bloquant pour le client).
+  const notify = (process.env.ADMIN_NOTIFY_EMAIL ?? "hello@wolko.be").split(",").map((s) => s.trim()).filter((s) => s.includes("@"));
+  await sendFlashMail(notify, {
+    kind: "admin_new_order", orderId: order.id, orderNumber: order.order_number, orgName: (org?.name as string) ?? billing.company_name,
+    quantity, totalHtCents: order.total_ht_cents, totalTtcCents: order.total_ttc_cents,
+    contact: String((billing as Record<string, unknown>).contact ?? ""), email: String(billing.email ?? ""),
+    vatNumber: String((billing as Record<string, unknown>).vat_number ?? ""), reference: String((billing as Record<string, unknown>).reference ?? "") || undefined,
+  }).catch(() => false);
   revalidatePath("/dashboard/flash");
   return { ok: true, orderNumber: order.order_number };
 }

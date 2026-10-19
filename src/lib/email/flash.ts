@@ -15,7 +15,8 @@ export type FlashMail =
   | { kind: "payment_confirmed"; orderNumber: number; published: number; available: number }
   | { kind: "reminder"; jobTitle: string; daysLeft: number; expiresAt: string }
   | { kind: "expired"; jobTitle: string }
-  | { kind: "pro_proposal"; orgName: string };
+  | { kind: "pro_proposal"; orgName: string }
+  | { kind: "admin_new_order"; orderId: string; orderNumber: number; orgName: string; quantity: number; totalHtCents: number; totalTtcCents: number; contact: string; email: string; vatNumber: string; reference?: string };
 
 export function buildFlashMail(m: FlashMail): { subject: string; html: string } {
   switch (m.kind) {
@@ -56,6 +57,18 @@ ${li([
         subject: `Votre annonce « ${m.jobTitle} » est terminée`,
         html: layout("Votre annonce Flash est terminée", `<p>L'annonce <strong>${esc(m.jobTitle)}</strong> a atteint ses 30 jours : elle n'est plus visible et n'accepte plus de candidatures. Vos candidatures restent consultables dans votre espace.</p>
 <p>Besoin de continuer à recruter ? Vous pouvez la renouveler pour 30 jours par un nouvel achat (aucun renouvellement automatique).</p>`, { label: "Renouveler pour 30 jours", href: `${FLASH_URL()}/commander` }),
+      };
+    case "admin_new_order":
+      return {
+        subject: `Nouvelle commande WOLKO Flash ${nr(m.orderNumber)} — ${m.orgName} — ${formatEuro(m.totalHtCents)} HTVA`,
+        html: layout("Nouvelle commande Flash à traiter", `<p><strong>${esc(m.orgName)}</strong> vient de commander ${m.quantity} annonce(s) WOLKO Flash (commande ${nr(m.orderNumber)}).</p>
+${li([
+  `Montant : <strong>${formatEuro(m.totalHtCents)}</strong> HTVA (${formatEuro(m.totalTtcCents)} TVAC)`,
+  `N° d'entreprise / TVA : ${esc(m.vatNumber)}`,
+  `Contact : ${esc(m.contact)} — ${esc(m.email)}`,
+  ...(m.reference ? [`Référence interne : ${esc(m.reference)}`] : []),
+])}
+<p><strong>À faire :</strong> émettre la facture, saisir son numéro dans l'administration, puis confirmer le paiement à réception du virement.</p>`, { label: "Ouvrir la commande", href: `${APP()}/admin/flash/${m.orderId}` }),
       };
     case "pro_proposal":
       return {

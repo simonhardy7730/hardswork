@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { questionsFor } from "@/lib/screening";
+import { whatsappLink } from "@/lib/whatsapp";
 import { X, Trash2, Phone, Mail, FileText, Check, Loader2, Send, Clock } from "lucide-react";
 import type { Application } from "@/lib/supabase/types";
 import { useL } from "@/lib/i18n/context";
@@ -97,6 +98,13 @@ export default function ProfileModal({ application: app, hasSubscription, onClos
           {hasSubscription ? (
             <div className="flex flex-wrap gap-3 text-sm">
               <a href={`tel:${app.applicant_phone}`} className="flex items-center gap-1.5 text-brand font-bold hover:underline"><Phone size={14} />{app.applicant_phone}</a>
+              {(() => {
+                const first = app.applicant_name.trim().split(/\s+/)[0] ?? "";
+                const wa = whatsappLink(app.applicant_phone, l(
+                  `Bonjour ${first}, suite à votre candidature${app.job_title ? ` pour « ${app.job_title} »` : ""} sur Wolko, ...`,
+                  `Hallo ${first}, naar aanleiding van je sollicitatie${app.job_title ? ` voor « ${app.job_title} »` : ""} op Wolko, ...`));
+                return wa ? <a href={wa} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 font-bold text-emerald-700 hover:underline">💬 WhatsApp</a> : null;
+              })()}
               {app.applicant_email && <a href={`mailto:${app.applicant_email}`} className="flex items-center gap-1.5 text-ink-500 hover:text-brand"><Mail size={14} />{app.applicant_email}</a>}
             </div>
           ) : (

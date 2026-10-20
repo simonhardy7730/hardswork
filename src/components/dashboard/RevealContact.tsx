@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { revealContact, type RevealResult } from "@/app/(dashboard)/dashboard/candidatheque/actions";
 import { useL } from "@/lib/i18n/context";
+import { whatsappLink } from "@/lib/whatsapp";
 
 export default function RevealContact({ candidateId }: { candidateId: string }) {
   const l = useL();
@@ -14,6 +15,10 @@ export default function RevealContact({ candidateId }: { candidateId: string }) 
       <div className="text-sm text-ink space-y-0.5">
         <p className="font-semibold">{res.name}</p>
         {res.phone && <p><a href={`tel:${res.phone}`} className="underline">{res.phone}</a></p>}
+        {(() => {
+          const wa = whatsappLink(res.phone, l(`Bonjour ${res.name.split(" ")[0]}, j'ai vu votre profil sur Wolko, ...`, `Hallo ${res.name.split(" ")[0]}, ik zag je profiel op Wolko, ...`));
+          return wa ? <p><a href={wa} target="_blank" rel="noopener noreferrer" className="underline text-emerald-700 font-semibold">💬 WhatsApp</a></p> : null;
+        })()}
         {res.email && <p><a href={`mailto:${res.email}`} className="underline break-all">{res.email}</a></p>}
       </div>
     );

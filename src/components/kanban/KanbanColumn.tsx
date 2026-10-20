@@ -23,7 +23,7 @@ export default function KanbanColumn({ column, count, children }: Props) {
 
   return (
     <div
-      className={`flex flex-col w-64 shrink-0 rounded-xl border ${column.color} transition-all ${
+      className={`flex flex-col w-[82vw] max-w-[300px] sm:w-64 shrink-0 snap-start rounded-xl border ${column.color} transition-all ${
         isOver ? "ring-2 ring-brand/40 scale-[1.01]" : ""
       }`}
     >

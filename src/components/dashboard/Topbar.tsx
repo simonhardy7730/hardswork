@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Bell } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
+import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { formatRelative } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@/lib/supabase/types";
@@ -57,8 +58,15 @@ export default function DashboardTopbar({ user, notifications: initialNotifs = [
     .slice(0, 2) ?? "?";
 
   return (
-    <header className="h-[60px] bg-[#101F43]/80 backdrop-blur-sm border-b border-white/[0.06] flex items-center justify-between px-6 shrink-0">
-      <div />
+    <header className="h-[60px] bg-[#101F43] md:bg-[#101F43]/80 backdrop-blur-sm border-b border-white/[0.06] flex items-center justify-between px-3 md:px-6 shrink-0">
+      <div className="flex items-center gap-2 md:hidden">
+        <button type="button" onClick={() => window.dispatchEvent(new Event("wolko:menu"))} aria-label={l("Ouvrir le menu", "Menu openen")}
+          className="w-10 h-10 rounded-xl flex items-center justify-center text-white hover:bg-white/[0.08]">
+          <Menu size={20} />
+        </button>
+        <Link href="/dashboard" aria-label="Wolko"><HardSworkLogo size="sm" dark /></Link>
+      </div>
+      <div className="hidden md:block" />
 
       <div className="flex items-center gap-2.5">
         {/* Notifications */}

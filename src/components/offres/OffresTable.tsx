@@ -156,7 +156,7 @@ export default function OffresTable({ offres, refusedByOffer = {} }: { offres: J
           return (
             <div
               key={offre.id}
-              className="grid lg:grid-cols-[2fr_1fr_1fr_1fr_80px_100px_120px] gap-3 items-center px-5 py-4 hover:bg-surface transition group"
+              className="grid lg:grid-cols-[2fr_1fr_1fr_1fr_80px_100px_120px] gap-3 items-center px-4 lg:px-5 py-4 hover:bg-surface transition group"
             >
               {/* Titre + badges */}
               <div className="flex items-center gap-3">
@@ -167,7 +167,7 @@ export default function OffresTable({ offres, refusedByOffer = {} }: { offres: J
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/dashboard/offres/${offre.id}/candidatures`}
-                      className="text-sm font-semibold text-ink hover:text-brand truncate transition"
+                      className="text-sm font-semibold text-ink hover:text-brand line-clamp-2 lg:truncate transition"
                     >
                       {offre.title}
                     </Link>
@@ -180,6 +180,13 @@ export default function OffresTable({ offres, refusedByOffer = {} }: { offres: J
                   </div>
                   <div className="text-[11px] text-ink-300 mt-0.5">
                     {formatDate(offre.created_at, lang)}
+                  </div>
+                  {/* Téléphone : infos clés sous le titre (les colonnes sont masquées) */}
+                  <div className="lg:hidden text-[12px] text-ink-500 mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
+                    <span>{offre.city}</span>
+                    <span>· {CONTRACT_LABELS[offre.contract_type] ?? offre.contract_type}</span>
+                    <Link href={`/dashboard/offres/${offre.id}/candidatures`} className="font-semibold text-ink">· {offre.applications_count} {l("candidature(s)", "sollicitatie(s)")}</Link>
+                    <span className={`inline-flex items-center gap-1 ${statusCfg.color} px-1.5 rounded-full`}><span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />{l(statusCfg.fr, statusCfg.nl)}</span>
                   </div>
                 </div>
               </div>
@@ -233,7 +240,7 @@ export default function OffresTable({ offres, refusedByOffer = {} }: { offres: J
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-1 justify-end">
+              <div className="flex items-center gap-1 justify-start lg:justify-end -ml-1 lg:ml-0">
                 {/* Voir candidatures */}
                 <Link
                   href={`/dashboard/offres/${offre.id}/candidatures`}

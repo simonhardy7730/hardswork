@@ -14,7 +14,7 @@ export default async function TrialBanner({ access }: { access: Access }) {
 
   return (
     <div
-      className={`px-6 py-3 text-sm flex flex-wrap items-center justify-between gap-3 border-b ${
+      className={`px-4 md:px-6 py-3 text-sm flex flex-wrap items-center justify-between gap-3 border-b ${
         expired ? "bg-red-50 border-red-200 text-red-800" : "bg-[#FFF7DD] border-[#FFE29A] text-[#6B4A00]"
       }`}
       data-testid="trial-banner"

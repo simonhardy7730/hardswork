@@ -6,6 +6,7 @@ import { LayoutDashboard, Search, Bell, User, LogOut, FileText } from "lucide-re
 import { LangSwitch } from "@/components/layout/LangSwitch";
 import { getL } from "@/lib/i18n/server";
 import { getSpace, SPACE_HOME } from "@/lib/auth/space";
+import CandidateBottomNav from "@/components/candidat/CandidateBottomNav";
 
 export default async function CandidatLayout({ children }: { children: React.ReactNode }) {
   const l = await getL();
@@ -85,7 +86,14 @@ export default async function CandidatLayout({ children }: { children: React.Rea
             </div>
           </div>
         </header>
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-x-hidden">{children}</main>
+        <CandidateBottomNav items={[
+          { href: "/candidat/dashboard", label: l("Profil", "Profiel"), icon: "profil" },
+          { href: "/jobs", label: l("Offres", "Vacatures"), icon: "offres" },
+          { href: "/candidat/cv", label: l("Mon CV", "Mijn cv"), icon: "cv" },
+          { href: "/candidat/alertes", label: l("Alertes", "Alerts"), icon: "alertes" },
+          { href: "/candidat/compte", label: l("Compte", "Account"), icon: "compte" },
+        ]} />
       </div>
     </div>
   );

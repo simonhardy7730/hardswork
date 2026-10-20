@@ -222,7 +222,7 @@ export default function KanbanBoard({
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-3 overflow-x-auto pb-4">
+        <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory sm:snap-none -mx-3 px-3 sm:mx-0 sm:px-0">
           {COLUMNS.map(col => {
             const colApps = visible.filter(a => a.status === col.id);
             return (

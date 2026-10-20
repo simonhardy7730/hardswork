@@ -20,7 +20,7 @@ import {
 } from "@/lib/utils";
 import { useL, useLang } from "@/lib/i18n/context";
 import type { JobOfferInsert, Region, Sector, ContractType } from "@/lib/supabase/types";
-import { SCREENING_QUESTIONS } from "@/lib/screening";
+import { SCREENING_QUESTIONS, SECTOR_SUGGESTIONS } from "@/lib/screening";
 import OfferPlanningFields, { EMPTY_PLANNING, type OfferPlanning } from "@/components/offres/OfferPlanningFields";
 
 // ── Types ─────────────────────────────────────────────
@@ -407,7 +407,10 @@ export default function NouvelleOffreForm({
                   <span className="text-ink-300 font-normal">({l("optionnel · max 5, réponse oui/non", "optioneel · max. 5, ja/nee")})</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {SCREENING_QUESTIONS.map((q) => {
+                  {[...SCREENING_QUESTIONS].sort((a, b) => {
+                    const sg = SECTOR_SUGGESTIONS[form.sector] ?? [];
+                    return Number(sg.includes(b.id)) - Number(sg.includes(a.id));
+                  }).map((q) => {
                     const on = screening.includes(q.id);
                     return (
                       <button
@@ -421,7 +424,7 @@ export default function NouvelleOffreForm({
                     );
                   })}
                 </div>
-                <p className="text-[11px] text-ink-300 mt-1.5">{l("Les réponses apparaissent sur la fiche de chaque candidat : vous triez plus vite.", "De antwoorden verschijnen op het dossier van elke kandidaat: sneller selecteren.")}</p>
+                <p className="text-[11px] text-ink-300 mt-1.5">{l("Les questions de votre métier sont affichées en premier. Les réponses apparaissent sur la fiche de chaque candidat : vous triez plus vite.", "De antwoorden verschijnen op het dossier van elke kandidaat: sneller selecteren.")}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-ink mb-1.5">

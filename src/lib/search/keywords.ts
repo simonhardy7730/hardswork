@@ -9,7 +9,10 @@ const SECTOR_WORDS: Record<string, string[]> = {
   nettoyage: ["nettoyage", "schoonmaak"],
   securite: ["securite", "beveiliging", "gardiennage"],
   medical: ["medical", "medisch", "sante"],
-  autre: ["horeca", "autre"],
+  commerce: ["commerce", "vente", "vendeur", "vendeuse", "magasin", "handel", "verkoop"],
+  horeca: ["horeca", "restaurant", "serveur", "serveuse", "cuisine", "barman"],
+  administratif: ["administratif", "administrative", "bureau", "secretariat", "administratie"],
+  autre: ["autre"],
 };
 const CONTRACT_WORDS: Record<string, string[]> = {
   cdi: ["cdi"],

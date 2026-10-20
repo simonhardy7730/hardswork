@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sanitizePreferences } from "@/lib/candidate/preferences";
-import { sanitizeTrades } from "@/lib/candidate/trades";
+import { sanitizeTrades, sanitizeTradeOther } from "@/lib/candidate/trades";
 import { allow, clientKey } from "@/lib/security/abuse";
 import { VISIBILITY_CONSENT_VERSION } from "@/lib/candidate/visibility";
 import { ageFromBirthDate, MIN_AGE, ADULT_AGE } from "@/lib/candidate/age";
@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
       experience_years,
       sectors,
       trades,
+      trade_other,
       preferences,
       visible_to_recruiters,
       birth_date,
@@ -131,8 +132,9 @@ export async function POST(req: NextRequest) {
 
     // Métiers précis (migration 031) : enregistrés à part, sans jamais faire échouer l'inscription.
     const cleanTrades = sanitizeTrades(trades);
-    if (cleanTrades.length) {
-      const { error: tErr } = await admin.from("candidates").update({ trades: cleanTrades }).eq("id", data.id);
+    const cleanOther = sanitizeTradeOther(trade_other);
+    if (cleanTrades.length || cleanOther) {
+      const { error: tErr } = await admin.from("candidates").update({ trades: cleanTrades, trade_other: cleanOther }).eq("id", data.id);
       if (tErr) console.error("trades not stored (migration 031 ?):", tErr.message);
     }
 

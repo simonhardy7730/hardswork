@@ -30,6 +30,9 @@ export const SECTOR_SUGGESTIONS: Record<string, string[]> = {
   industrie: ["soudure_tig", "soudure_mig", "horaires", "securite", "travail_be"],
   nettoyage: ["horaires", "debout", "vehicule", "travail_be"],
   securite: ["horaires", "securite", "travail_be", "langue"],
+  commerce: ["horaires", "langue", "experience", "travail_be"],
+  horeca: ["horaires", "debout", "experience", "travail_be"],
+  administratif: ["langue", "experience", "permis_b", "travail_be"],
 };
 
 export function questionsFor(ids: unknown): ScreeningQ[] {

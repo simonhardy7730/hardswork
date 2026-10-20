@@ -72,6 +72,9 @@ export const SECTOR_LABELS: Record<string, string> = {
   nettoyage: "Nettoyage",
   securite: "Sécurité",
   medical: "Médical",
+  commerce: "Commerce",
+  horeca: "Horeca",
+  administratif: "Administratif",
   autre: "Autre",
 };
 
@@ -102,7 +105,7 @@ export const AVAILABILITY_LABELS: Record<string, string> = {
 /** Libellés néerlandais + accès par langue : labels("nl").sector[key] */
 const NL = {
   contract: { interim: "Interimcontract", interim_cdi: "Interim / Onbepaalde duur", cdi: "Onbepaalde duur", cdd: "Bepaalde duur", apprentissage: "Leercontract", etudiant: "Studentenjob", flexi: "Flexi-job", stage: "Stage" },
-  sector: { logistique: "Logistiek", industrie: "Industrie", construction: "Bouw", transport: "Transport", nettoyage: "Schoonmaak", securite: "Beveiliging", medical: "Medisch", autre: "Andere" },
+  sector: { logistique: "Logistiek", industrie: "Industrie", construction: "Bouw", transport: "Transport", nettoyage: "Schoonmaak", securite: "Beveiliging", medical: "Medisch", commerce: "Handel", horeca: "Horeca", administratif: "Administratie", autre: "Andere" },
   region: { wallonie: "Wallonië", bruxelles: "Brussel", flandre: "Vlaanderen" },
   status: { nouveau: "Nieuw", contacte: "Gecontacteerd", entretien: "Gesprek", place: "Geplaatst", refuse: "Geweigerd", draft: "Concept", active: "Actief", paused: "Gepauzeerd", closed: "Afgesloten" },
   availability: { immediate: "Onmiddellijk", "1_semaine": "Binnen 1 week", "1_mois": "Binnen 1 maand" },
@@ -217,6 +220,44 @@ Profil recherché :
 - Carte professionnelle d'agent de gardiennage en cours de validité
 - SSIAP apprécié
 - Calme, réactif(ve) et sens des responsabilités`,
+
+  commerce: `Nous recrutons un(e) vendeur(se) pour notre magasin.
+
+Missions :
+- Accueillir et conseiller les clients
+- Mise en rayon et présentation du magasin
+- Encaissement et gestion de la caisse
+- Réception des marchandises et inventaires
+
+Profil recherché :
+- Sens du contact et du service
+- Première expérience en vente appréciée
+- Disponible certains samedis`,
+
+  horeca: `Nous recrutons pour notre établissement (restaurant / café / hôtel).
+
+Missions :
+- Service en salle ou au bar / préparation en cuisine
+- Mise en place et rangement
+- Respect des règles d'hygiène (AFSCA)
+
+Profil recherché :
+- Souriant(e), rapide et organisé(e)
+- Disponible en soirée et le week-end
+- Expérience en Horeca appréciée`,
+
+  administratif: `Nous recrutons un(e) employé(e) administratif(ve).
+
+Missions :
+- Accueil téléphonique et des visiteurs
+- Encodage des commandes, factures et documents
+- Classement et suivi administratif
+- Préparation des courriers et devis
+
+Profil recherché :
+- Maîtrise de la suite Office
+- Bonne orthographe et sens de l'organisation
+- Le néerlandais est un atout`,
 
   autre: `Nous recrutons pour le poste de [titre du poste].
 

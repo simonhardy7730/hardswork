@@ -64,19 +64,19 @@ export const TRADES: Trade[] = [
   { key: "aide_menagere_ts", sector: "nettoyage", fr: "Aide-ménager (titres-services)", nl: "Huishoudhulp (dienstencheques)" },
   { key: "laveur_vitres", sector: "nettoyage", fr: "Laveur de vitres / technicien de surface", nl: "Glazenwasser / oppervlaktetechnicus" },
   // Commerce, Horeca, bureau, autres
-  { key: "vendeur", sector: "autre", fr: "Vendeur / caissier", nl: "Verkoper / kassier" },
-  { key: "serveur", sector: "autre", fr: "Serveur / barman", nl: "Kelner / barman" },
-  { key: "cuisinier", sector: "autre", fr: "Cuisinier / commis de cuisine", nl: "Kok / keukenhulp" },
-  { key: "employe_administratif", sector: "autre", fr: "Employé administratif", nl: "Administratief bediende" },
-  { key: "comptable", sector: "autre", fr: "Comptable", nl: "Boekhouder" },
+  { key: "vendeur", sector: "commerce", fr: "Vendeur / caissier", nl: "Verkoper / kassier" },
+  { key: "serveur", sector: "horeca", fr: "Serveur / barman", nl: "Kelner / barman" },
+  { key: "cuisinier", sector: "horeca", fr: "Cuisinier / commis de cuisine", nl: "Kok / keukenhulp" },
+  { key: "employe_administratif", sector: "administratif", fr: "Employé administratif", nl: "Administratief bediende" },
+  { key: "comptable", sector: "administratif", fr: "Comptable", nl: "Boekhouder" },
   { key: "jardinier", sector: "autre", fr: "Jardinier", nl: "Tuinman" },
-  { key: "boulanger_boucher", sector: "autre", fr: "Boulanger / boucher", nl: "Bakker / slager" },
-  { key: "employe_rayon", sector: "autre", fr: "Employé de rayon / réassort", nl: "Rekkenvuller" },
-  { key: "plongeur", sector: "autre", fr: "Plongeur / aide de cuisine", nl: "Afwasser / keukenhulp" },
-  { key: "receptionniste", sector: "autre", fr: "Réceptionniste / accueil", nl: "Receptionist / onthaal" },
-  { key: "secretaire", sector: "autre", fr: "Secrétaire / assistant de direction", nl: "Secretaresse / directieassistent" },
-  { key: "commercial", sector: "autre", fr: "Commercial / représentant", nl: "Vertegenwoordiger / verkoper buitendienst" },
-  { key: "informaticien", sector: "autre", fr: "Informaticien / helpdesk", nl: "Informaticus / helpdesk" },
+  { key: "boulanger_boucher", sector: "commerce", fr: "Boulanger / boucher", nl: "Bakker / slager" },
+  { key: "employe_rayon", sector: "commerce", fr: "Employé de rayon / réassort", nl: "Rekkenvuller" },
+  { key: "plongeur", sector: "horeca", fr: "Plongeur / aide de cuisine", nl: "Afwasser / keukenhulp" },
+  { key: "receptionniste", sector: "administratif", fr: "Réceptionniste / accueil", nl: "Receptionist / onthaal" },
+  { key: "secretaire", sector: "administratif", fr: "Secrétaire / assistant de direction", nl: "Secretaresse / directieassistent" },
+  { key: "commercial", sector: "commerce", fr: "Commercial / représentant", nl: "Vertegenwoordiger / verkoper buitendienst" },
+  { key: "informaticien", sector: "administratif", fr: "Informaticien / helpdesk", nl: "Informaticus / helpdesk" },
   { key: "ouvrier_agricole", sector: "autre", fr: "Ouvrier agricole / horticole", nl: "Land- of tuinbouwarbeider" },
 ];
 
@@ -91,6 +91,13 @@ export function tradeLabel(key: string, lang: string = "fr"): string {
 /** Métiers proposés pour les secteurs choisis (tous si aucun secteur). */
 export function tradesFor(sectors: string[]): Trade[] {
   return sectors.length ? TRADES.filter((t) => sectors.includes(t.sector)) : TRADES;
+}
+
+/** Métier libre (absent de la liste) : texte court, sans caractères spéciaux. */
+export function sanitizeTradeOther(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const t = v.replace(/[^\p{L}\p{N} '\-\/().,&]/gu, " ").replace(/\s+/g, " ").trim().slice(0, 60);
+  return t || null;
 }
 
 /** Ne garde que des clés connues, sans doublon, au plus MAX_TRADES. */

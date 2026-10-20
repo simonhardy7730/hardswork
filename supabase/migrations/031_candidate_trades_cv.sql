@@ -1,7 +1,8 @@
 -- 031 : métiers précis des candidats (candidathèque) + données du CV généré par Wolko.
 ALTER TABLE candidates
   ADD COLUMN IF NOT EXISTS trades text[] NOT NULL DEFAULT '{}',
-  ADD COLUMN IF NOT EXISTS cv_data jsonb NOT NULL DEFAULT '{}'::jsonb;
+  ADD COLUMN IF NOT EXISTS cv_data jsonb NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS trade_other text;
 CREATE INDEX IF NOT EXISTS idx_candidates_trades ON candidates USING gin (trades);
 
 -- ─── Candidathèque réservée aux abonnés payants (Pro / Agence) : ni l'essai gratuit, ni Flash ───
@@ -24,9 +25,9 @@ GRANT EXECUTE ON FUNCTION public.org_has_pool_access(UUID) TO authenticated;
 CREATE OR REPLACE FUNCTION public.search_candidate_pool_v3(
   p_sectors text[] DEFAULT NULL, p_cities text[] DEFAULT NULL, p_job_type text DEFAULT NULL,
   p_availability text DEFAULT NULL, p_days text[] DEFAULT NULL, p_slots text[] DEFAULT NULL,
-  p_trades text[] DEFAULT NULL, p_limit int DEFAULT 24, p_offset int DEFAULT 0)
+  p_trades text[] DEFAULT NULL, p_keyword text DEFAULT NULL, p_limit int DEFAULT 24, p_offset int DEFAULT 0)
 RETURNS TABLE (id uuid, first_name text, last_initial text, city text, sectors text[], availability text,
-               licenses text[], has_caces boolean, experience_years int, job_types text[], is_student boolean, trades text[])
+               licenses text[], has_caces boolean, experience_years int, job_types text[], is_student boolean, trades text[], trade_other text)
 LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
 DECLARE v_org uuid;
 BEGIN
@@ -35,7 +36,7 @@ BEGIN
   IF v_org IS NULL OR NOT public.org_has_pool_access(v_org) THEN RAISE EXCEPTION 'no_access'; END IF;
   RETURN QUERY
     SELECT c.id, c.first_name, upper(left(c.last_name, 1)), c.city, c.sectors, c.availability::text,
-           c.licenses, c.has_caces, c.experience_years, c.job_types, c.is_student, c.trades
+           c.licenses, c.has_caces, c.experience_years, c.job_types, c.is_student, c.trades, c.trade_other
       FROM candidates c
      WHERE c.visible_to_recruiters
        AND c.visibility_consent_at IS NOT NULL
@@ -44,6 +45,7 @@ BEGIN
        AND c.birth_date IS NOT NULL AND c.birth_date <= current_date - interval '18 years'
        AND (p_sectors IS NULL OR c.sectors && p_sectors)
        AND (p_trades IS NULL OR c.trades && p_trades)
+       AND (p_keyword IS NULL OR c.trade_other ILIKE '%' || p_keyword || '%')
        AND (p_cities IS NULL OR lower(c.city) = ANY (SELECT lower(x) FROM unnest(p_cities) x))
        AND (p_job_type IS NULL OR p_job_type = ANY (c.job_types))
        AND (p_availability IS NULL OR c.availability::text = p_availability)
@@ -83,5 +85,5 @@ END $$;
 -- Les anciennes recherches (essai inclus) ne sont plus appelables depuis le site.
 REVOKE EXECUTE ON FUNCTION public.search_candidate_pool(text[], text[], text, text, int, int) FROM authenticated;
 REVOKE EXECUTE ON FUNCTION public.search_candidate_pool_slots(text[], text[], text, text, text[], text[], int, int) FROM authenticated;
-GRANT EXECUTE ON FUNCTION public.search_candidate_pool_v3(text[], text[], text, text, text[], text[], text[], int, int) TO authenticated;
-REVOKE ALL ON FUNCTION public.search_candidate_pool_v3(text[], text[], text, text, text[], text[], text[], int, int) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.search_candidate_pool_v3(text[], text[], text, text, text[], text[], text[], text, int, int) TO authenticated;
+REVOKE ALL ON FUNCTION public.search_candidate_pool_v3(text[], text[], text, text, text[], text[], text[], text, int, int) FROM PUBLIC, anon;

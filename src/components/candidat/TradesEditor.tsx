@@ -7,10 +7,11 @@ import { TRADES, MAX_TRADES } from "@/lib/candidate/trades";
 import { useL, useLang } from "@/lib/i18n/context";
 
 /** Choix des métiers précis (ce que les employeurs filtrent dans la candidathèque). */
-export default function TradesEditor({ initial }: { initial: string[] }) {
+export default function TradesEditor({ initial, initialOther = "" }: { initial: string[]; initialOther?: string }) {
   const l = useL();
   const lang = useLang();
   const [sel, setSel] = useState<string[]>(initial);
+  const [other, setOther] = useState(initialOther);
   const [msg, setMsg] = useState<"" | "ok" | "err">("");
   const [pending, start] = useTransition();
   const toggle = (k: string) => { setMsg(""); setSel((p) => (p.includes(k) ? p.filter((x) => x !== k) : p.length >= MAX_TRADES ? p : [...p, k])); };
@@ -33,9 +34,12 @@ export default function TradesEditor({ initial }: { initial: string[] }) {
             );
           })}
         </div>
+        <input value={other} maxLength={60} onChange={(e) => { setMsg(""); setOther(e.target.value); }}
+          placeholder={l("Autre métier, s'il n'est pas dans la liste (facultatif)", "Ander beroep, als het niet in de lijst staat (optioneel)")}
+          className="w-full h-10 rounded-xl border border-ink-100 px-3 text-sm" />
         <div className="flex items-center gap-3">
           <button type="button" disabled={pending}
-            onClick={() => start(async () => { const r = await saveTrades(sel); setMsg(r.ok ? "ok" : "err"); })}
+            onClick={() => start(async () => { const r = await saveTrades(sel, other); setMsg(r.ok ? "ok" : "err"); })}
             className="h-10 px-5 rounded-xl bg-[#101F43] font-display font-black uppercase text-xs disabled:opacity-50" style={{ color: "#FFFFFF", letterSpacing: "0.05em" }}>
             {l("Enregistrer", "Opslaan")}
           </button>

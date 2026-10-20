@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { maskOrgs } from "@/lib/confidential";
 import Link from "next/link";
 import {
-  ArrowRight, ArrowUpRight, MapPin, CheckCircle, Search, Building2, Zap, LayoutGrid, HeartHandshake,
+  ShoppingBag, FileText, ArrowRight, ArrowUpRight, MapPin, CheckCircle, Search, Building2, Zap, LayoutGrid, HeartHandshake,
   HardHat, Package, Truck, Factory, Stethoscope, ShieldCheck, Sparkles, UtensilsCrossed, Laptop,
 } from "lucide-react";
 import { SearchModule } from "@/components/home/SearchModule";
@@ -55,7 +55,9 @@ const SECTORS = (t: Dict["sectors"]) => [
   { label: t.medical,      icon: Stethoscope,     href: "/jobs?secteur=medical" },
   { label: t.security,     icon: ShieldCheck,     href: "/jobs?secteur=securite" },
   { label: t.cleaning,    icon: Sparkles,        href: "/jobs?secteur=nettoyage" },
-  { label: t.horeca,       icon: UtensilsCrossed, href: "/jobs?secteur=autre" },
+  { label: t.commerce,     icon: ShoppingBag,     href: "/jobs?secteur=commerce" },
+  { label: t.horeca,       icon: UtensilsCrossed, href: "/jobs?secteur=horeca" },
+  { label: t.office,       icon: FileText,        href: "/jobs?secteur=administratif" },
   { label: t.tech,    icon: Laptop,          href: "/jobs?q=informatique" },
 ];
 

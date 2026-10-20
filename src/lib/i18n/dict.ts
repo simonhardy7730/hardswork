@@ -55,7 +55,7 @@ const fr = {
   sectors: {
     label: "Secteurs", title: ["Chaque métier,", "une offre."],
     construction: "Construction", logistics: "Logistique", transport: "Transport", industry: "Industrie",
-    medical: "Médical", security: "Sécurité", cleaning: "Nettoyage", horeca: "Horeca", tech: "Tech & IT",
+    medical: "Médical", security: "Sécurité", cleaning: "Nettoyage", commerce: "Commerce", horeca: "Horeca", office: "Administratif", tech: "Tech & IT",
   },
   recruiters: {
     label: "PME & agences d'intérim", title1: "Vos prochains talents sont ", title2: "peut-être déjà ici.",
@@ -158,7 +158,7 @@ const nl: Dict = {
   sectors: {
     label: "Sectoren", title: ["Elk beroep,", "een vacature."],
     construction: "Bouw", logistics: "Logistiek", transport: "Transport", industry: "Industrie",
-    medical: "Medisch", security: "Beveiliging", cleaning: "Schoonmaak", horeca: "Horeca", tech: "Tech & IT",
+    medical: "Medisch", security: "Beveiliging", cleaning: "Schoonmaak", commerce: "Handel", horeca: "Horeca", office: "Administratie", tech: "Tech & IT",
   },
   recruiters: {
     label: "KMO's & uitzendkantoren", title1: "Je volgende talenten zijn ", title2: "misschien al hier.",

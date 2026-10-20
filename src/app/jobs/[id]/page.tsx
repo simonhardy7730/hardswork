@@ -31,6 +31,9 @@ const SECTOR_PHOTOS: Record<string, string> = {
   medical:      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1400&auto=format&fit=crop&q=80",
   securite:     "https://images.unsplash.com/photo-1582139329536-e7284fece509?w=1400&auto=format&fit=crop&q=80",
   nettoyage:    "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=1400&auto=format&fit=crop&q=80",
+  commerce:     "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1400&auto=format&fit=crop&q=80",
+  horeca:       "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1400&auto=format&fit=crop&q=80",
+  administratif:"https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&auto=format&fit=crop&q=80",
   default:      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1400&auto=format&fit=crop&q=80",
 };
 

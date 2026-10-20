@@ -22,3 +22,11 @@ test("sanitizeCv tronque, filtre et limite", () => {
   assert.equal(cv.education[0].title, "VCA");
   assert.deepEqual(sanitizeCv(null).experiences, []);
 });
+
+import { sanitizeTradeOther } from "../src/lib/candidate/trades";
+test("sanitizeTradeOther nettoie le métier libre", () => {
+  assert.equal(sanitizeTradeOther("  Toiletteur <script>  canin "), "Toiletteur script canin");
+  assert.equal(sanitizeTradeOther("x".repeat(80))!.length, 60);
+  assert.equal(sanitizeTradeOther("   "), null);
+  assert.equal(sanitizeTradeOther(3), null);
+});

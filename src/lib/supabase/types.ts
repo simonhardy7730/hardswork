@@ -18,6 +18,10 @@ export type Sector =
   | "transport"
   | "nettoyage"
   | "securite"
+  | "medical"
+  | "commerce"
+  | "horeca"
+  | "administratif"
   | "autre";
 export type SalaryPeriod = "heure" | "jour" | "mois";
 export type ShiftType = "jour" | "nuit" | "week-end" | "flexible";

@@ -22,7 +22,8 @@ const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "ut
 const SECTORS: [string, string, string][] = [
   ["construction", "Construction", "Bouw"], ["logistique", "Logistique", "Logistiek"], ["transport", "Transport", "Transport"],
   ["industrie", "Industrie", "Industrie"], ["medical", "Santé", "Zorg"], ["securite", "Sécurité", "Veiligheid"],
-  ["nettoyage", "Nettoyage", "Schoonmaak"], ["autre", "Horeca", "Horeca"],
+  ["nettoyage", "Nettoyage", "Schoonmaak"], ["commerce", "Commerce", "Handel"],
+  ["horeca", "Horeca", "Horeca"], ["administratif", "Administratif", "Administratie"],
 ];
 
 export default async function CandidatsLanding(props: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {

@@ -38,7 +38,7 @@ interface Props {
 }
 
 /* ─── Données filtres ────────────────────────────────── */
-const FILTER_SECTOR_KEYS = ["logistique", "construction", "industrie", "transport", "medical", "securite", "nettoyage"];
+const FILTER_SECTOR_KEYS = ["logistique", "construction", "industrie", "transport", "medical", "securite", "nettoyage", "commerce", "horeca", "administratif"];
 
 const FILTER_CERTIFS = [
   { key: "vca",     label: "VCA",                  type: "caces"  },

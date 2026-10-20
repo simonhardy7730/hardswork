@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { labels, formatRelative } from "@/lib/utils";
 import { getLang } from "@/lib/i18n/server";
+import StartChecklist, { type StartStep } from "@/components/dashboard/StartChecklist";
 
 export default async function DashboardPage() {
   const lang = await getLang();
@@ -154,6 +155,32 @@ export default async function DashboardPage() {
     },
   ];
 
+  // Premiers pas (entreprises comme agences) : calculés sur les vraies données du compte.
+  const { data: myOffers } = await supabase.from("job_offers").select("id, status, created_at").eq("organization_id", orgId).order("created_at", { ascending: false }).limit(200);
+  const offerIds = (myOffers ?? []).map((o) => o.id as string);
+  const { data: withQ } = await supabase.from("job_offers").select("id").eq("organization_id", orgId).neq("screening_ids", "{}").limit(1);
+  const [{ count: appsCount }, { count: answered }] = offerIds.length
+    ? await Promise.all([
+        supabase.from("applications").select("id", { count: "exact", head: true }).in("job_offer_id", offerIds),
+        supabase.from("applications").select("id", { count: "exact", head: true }).in("job_offer_id", offerIds).neq("status", "nouveau"),
+      ])
+    : [{ count: 0 }, { count: 0 }];
+  const latestActive = (myOffers ?? []).find((o) => o.status === "active");
+  const startSteps: StartStep[] = [
+    { done: offerIds.length > 0, title: l("Publier votre première annonce", "Uw eerste vacature publiceren"),
+      text: l("3 étapes, 2 minutes. Salaire et contrat clairs = plus de candidatures.", "3 stappen, 2 minuten. Duidelijk loon en contract = meer sollicitaties."),
+      href: "/dashboard/offres/nouvelle", cta: l("Créer l'annonce", "Vacature maken") },
+    { done: (withQ ?? []).length > 0, title: l("Ajouter des questions de présélection", "Voorselectievragen toevoegen"),
+      text: l("Permis, VCA, horaires… Les réponses s'affichent sur chaque fiche : vous triez en un coup d'œil.", "Rijbewijs, VCA, uren… De antwoorden staan op elke fiche: u sorteert in één oogopslag."),
+      href: latestActive ? `/dashboard/offres/${latestActive.id}/modifier` : "/dashboard/offres", cta: l("Ajouter", "Toevoegen") },
+    { done: (appsCount ?? 0) > 0, title: l("Partager votre annonce", "Uw vacature delen"),
+      text: l("Un clic pour la publier sur WhatsApp et Facebook (groupes emploi de votre région) : c'est là que sont les candidats.", "Eén klik om ze op WhatsApp en Facebook te delen (jobgroepen in uw regio): daar zitten de kandidaten."),
+      href: latestActive ? `/dashboard/offres/${latestActive.id}/confirmation` : "/dashboard/offres", cta: l("Partager", "Delen") },
+    { done: (answered ?? 0) > 0, title: l("Répondre à votre premier candidat", "Uw eerste kandidaat antwoorden"),
+      text: l("Changez son statut (contacté, entretien…) : il est prévenu automatiquement. Les candidats qui reçoivent une réponse rapide restent motivés.", "Wijzig zijn status (gecontacteerd, gesprek…): hij wordt automatisch verwittigd."),
+      href: "/dashboard/candidatures", cta: l("Voir les candidatures", "Sollicitaties bekijken") },
+  ];
+
   const STATUS_COLORS: Record<string, string> = {
     nouveau: "bg-blue-100 text-blue-700",
     contacte: "bg-amber-100 text-amber-700",
@@ -184,6 +211,8 @@ export default async function DashboardPage() {
           {l("Nouvelle offre", "Nieuwe vacature")}
         </Link>
       </div>
+
+      <StartChecklist steps={startSteps} lang={lang} />
 
       {/* Métriques */}
       <div className={`grid grid-cols-2 gap-4 ${isAgency ? "lg:grid-cols-3" : "lg:grid-cols-4"}`}>

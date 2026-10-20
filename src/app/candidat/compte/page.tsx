@@ -33,7 +33,7 @@ export default async function ComptePage() {
   const { data: vis } = await supabase
     .from("candidates").select("visible_to_recruiters, birth_date").eq("auth_user_id", user.id).maybeSingle();
   // Métiers (migration 031) : lecture tolérante.
-  const { data: tr } = await supabase.from("candidates").select("trades").eq("auth_user_id", user.id).maybeSingle();
+  const { data: tr } = await supabase.from("candidates").select("trades, trade_other").eq("auth_user_id", user.id).maybeSingle();
   const initialPrefs: Preferences = cand
     ? {
         job_types: (cand.job_types as string[]) ?? [],
@@ -158,7 +158,7 @@ export default async function ComptePage() {
       <VisibilityToggle initial={!!(vis as { visible_to_recruiters?: boolean } | null)?.visible_to_recruiters} birthDate={(vis as { birth_date?: string | null } | null)?.birth_date ?? null} />
 
       {/* Métiers précis */}
-      <TradesEditor initial={((tr as { trades?: string[] } | null)?.trades) ?? []} />
+      <TradesEditor initial={((tr as { trades?: string[] } | null)?.trades) ?? []} initialOther={((tr as { trade_other?: string | null } | null)?.trade_other) ?? ""} />
 
       {/* Mes recherches d'emploi (types d'emploi, profil étudiant / flexi-job) */}
       <PreferencesEditor initial={initialPrefs} />

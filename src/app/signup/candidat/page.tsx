@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   Loader2, ArrowRight, ArrowLeft, Upload, Check,
   MapPin, User, Mail, Lock, Phone,
-  Package, Truck, HardHat, Factory, Stethoscope,
+  Package, Truck, HardHat, Factory, Stethoscope, ShoppingBag, UtensilsCrossed, FileText,
   Shield, Sparkles, Briefcase,
 } from "lucide-react";
 import { HardSworkLogo, HardieIcon } from "@/components/ui/HardieIcon";
@@ -50,6 +50,18 @@ const SECTORS_DATA = [
   {
     key: "nettoyage",    Icon: Sparkles,
     photo: "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=400&auto=format&fit=crop&q=70",
+  },
+  {
+    key: "commerce",     Icon: ShoppingBag,
+    photo: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&auto=format&fit=crop&q=70",
+  },
+  {
+    key: "horeca",       Icon: UtensilsCrossed,
+    photo: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&auto=format&fit=crop&q=70",
+  },
+  {
+    key: "administratif", Icon: FileText,
+    photo: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop&q=70",
   },
   {
     key: "autre",        Icon: Briefcase,
@@ -117,6 +129,7 @@ export default function CandidatSignupPage() {
   /* Étape 1 — secteurs */
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
   const [selectedTrades, setSelectedTrades] = useState<string[]>([]);
+  const [tradeOther, setTradeOther] = useState("");
 
   /* Étape 2 — profil */
   const [profile, setProfile] = useState({
@@ -213,6 +226,7 @@ export default function CandidatSignupPage() {
         experience_years: profile.experience_years || null,
         preferences: prefs,
         sectors: selectedSectors,
+        trade_other: tradeOther,
         trades: selectedTrades.filter((k) => tradesFor(selectedSectors).some((t) => t.key === k)),
         visible_to_recruiters: visible && isAdult,
         birth_date: birth,
@@ -396,6 +410,9 @@ export default function CandidatSignupPage() {
                       );
                     })}
                   </div>
+                  <input value={tradeOther} onChange={(e) => setTradeOther(e.target.value)} maxLength={60}
+                    placeholder={l("Autre métier, s'il n'est pas dans la liste (facultatif)", "Ander beroep, als het niet in de lijst staat (optioneel)")}
+                    className="mt-3 w-full h-11 px-4 bg-white border border-ink-100 rounded-xl text-sm placeholder-ink-300 focus:outline-none focus:border-brand" />
                 </div>
               )}
             </div>

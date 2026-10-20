@@ -66,6 +66,10 @@ const SECTOR_ICONS: Record<string, string> = {
   transport: "🚛",
   nettoyage: "🧹",
   securite: "🛡️",
+  medical: "⚕️",
+  commerce: "🛍️",
+  horeca: "🍽️",
+  administratif: "🗂️",
   autre: "💼",
 };
 

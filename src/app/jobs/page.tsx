@@ -23,7 +23,10 @@ const SECTOR_CHIPS = [
   { key: "industrie",    label: "Industrie"     },
   { key: "securite",     label: "Sécurité"      },
   { key: "nettoyage",    label: "Nettoyage"     },
-  { key: "autre",        label: "Horeca / Autre"},
+  { key: "commerce",     label: "Commerce"      },
+  { key: "horeca",       label: "Horeca"        },
+  { key: "administratif",label: "Administratif" },
+  { key: "autre",        label: "Autre"         },
 ];
 
 interface SearchParams {

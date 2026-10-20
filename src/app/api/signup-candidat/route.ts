@@ -105,23 +105,36 @@ export async function POST(req: NextRequest) {
     // on enregistre le profil sans (aucune inscription ne doit échouer à cause de ça).
     // Préférences (migration 008) : même principe, l'inscription ne doit jamais échouer à cause d'elles.
     const prefs = sanitizePreferences(preferences);
-    let { data, error } = await admin
-      .from("candidates")
-      .insert({ ...row, postal_code: postal_code || null, ...prefs })
-      .select()
-      .single();
-    if (error && /job_types|is_student|student_profile|flexi_|eligibility/.test(error.message ?? "")) {
+    // Profil déjà créé par une candidature rapide (même e-mail, sans compte) : on le rattache au compte au lieu d'un doublon.
+    const { data: orphan } = await admin.from("candidates").select("id").eq("email", cleanEmail).is("auth_user_id", null).limit(1).maybeSingle();
+    let data: { id: string } | null = null;
+    let error: { message?: string } | null = null;
+    if (orphan) {
+      ({ data, error } = await admin.from("candidates").update({ ...row, auth_user_id, postal_code: postal_code || null, ...prefs }).eq("id", orphan.id).select().single());
+      if (error) ({ data, error } = await admin.from("candidates").update({ ...row, auth_user_id }).eq("id", orphan.id).select().single());
+      // Le choix fait à l'inscription remplace celui de la candidature.
+      if (!error && visible_to_recruiters !== true) {
+        await admin.from("candidates").update({ visible_to_recruiters: false, visibility_consent_at: null, visibility_consent_version: null }).eq("id", orphan.id);
+      }
+    } else {
+      ({ data, error } = await admin
+        .from("candidates")
+        .insert({ ...row, postal_code: postal_code || null, ...prefs })
+        .select()
+        .single());
+    }
+    if (!orphan && error && /job_types|is_student|student_profile|flexi_|eligibility/.test(error.message ?? "")) {
       ({ data, error } = await admin
         .from("candidates")
         .insert({ ...row, postal_code: postal_code || null })
         .select()
         .single());
     }
-    if (error && /postal_code/.test(error.message ?? "")) {
+    if (!orphan && error && /postal_code/.test(error.message ?? "")) {
       ({ data, error } = await admin.from("candidates").insert(row).select().single());
     }
 
-    if (error) {
+    if (error || !data) {
       console.error("Candidate insert error:", error);
       return NextResponse.json({ error: "Erreur lors de la création du profil" }, { status: 500 });
     }

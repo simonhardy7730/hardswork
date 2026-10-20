@@ -30,3 +30,11 @@ test("sanitizeTradeOther nettoie le métier libre", () => {
   assert.equal(sanitizeTradeOther("   "), null);
   assert.equal(sanitizeTradeOther(3), null);
 });
+
+import { guessTrades } from "../src/lib/candidate/trades";
+test("guessTrades devine le métier depuis le titre d'offre", () => {
+  assert.deepEqual(guessTrades("Nettoyeur / Nettoyeuse industriel(le)"), ["nettoyeur_industriel", "agent_entretien"]);
+  assert.deepEqual(guessTrades("Ouvrier / Ouvrière de production"), ["operateur_production"]);
+  assert.deepEqual(guessTrades("Vendeur / Vendeuse"), ["vendeur"]);
+  assert.deepEqual(guessTrades("Poste mystère"), []);
+});

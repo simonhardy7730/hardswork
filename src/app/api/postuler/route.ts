@@ -8,6 +8,9 @@ import NouvelleCandiatureRecruteurEmail from "@/emails/NouvelleCandiatureRecrute
 import { allow, clientKey, verifyTurnstile } from "@/lib/security/abuse";
 import { ageFromBirthDate, MIN_AGE } from "@/lib/candidate/age";
 import { sanitizeAnswers, sanitizeScreeningIds } from "@/lib/screening";
+import { guessTrades } from "@/lib/candidate/trades";
+import { VISIBILITY_CONSENT_VERSION } from "@/lib/candidate/visibility";
+import { ADULT_AGE } from "@/lib/candidate/age";
 
 export async function POST(req: NextRequest) {
   const supabaseAdmin = createClient(
@@ -202,6 +205,43 @@ export async function POST(req: NextRequest) {
         }
       } catch (e) {
         console.error("CV error:", e);
+      }
+    }
+
+    // Candidathèque : uniquement si le candidat l'a coché lui-même (case décochée par défaut) et s'il est majeur.
+    // Un échec ne doit jamais faire perdre la candidature.
+    if (body?.pool_optin === true && age >= ADULT_AGE) {
+      try {
+        const nowIso = new Date().toISOString();
+        const [first, ...rest] = applicant_name.split(" ");
+        const sector = (jobData as { sector?: string }).sector;
+        const trades = guessTrades(String(jobData.title ?? ""));
+        const city = str(body?.pool_city, 80) || null;
+        const findBy = async (col: "email" | "phone", v: string) =>
+          (await supabaseAdmin.from("candidates").select("id, auth_user_id, sectors").eq(col, v).limit(1)).data?.[0] ?? null;
+        const existing = (applicant_email ? await findBy("email", applicant_email) : null) ?? (await findBy("phone", applicant_phone));
+        let candidateId: string | null = existing?.id ?? null;
+        if (existing && !existing.auth_user_id) {
+          // Profil créé par une candidature précédente : on le met à jour (le candidat avec compte gère lui-même le sien).
+          const sectors = Array.from(new Set([...(existing.sectors ?? []), ...(sector ? [sector] : [])])).slice(0, 12);
+          await supabaseAdmin.from("candidates").update({
+            phone: applicant_phone, availability, licenses, has_caces, caces_types, sectors, ...(city ? { city } : {}),
+            visible_to_recruiters: true, visibility_consent_at: nowIso, visibility_consent_version: `${VISIBILITY_CONSENT_VERSION}-apply`, status: "actif",
+          }).eq("id", existing.id);
+          if (trades.length) await supabaseAdmin.from("candidates").update({ trades }).eq("id", existing.id).is("trade_other", null);
+        } else if (!existing) {
+          const { data: created, error: cErr } = await supabaseAdmin.from("candidates").insert({
+            first_name: first || applicant_name, last_name: rest.join(" ") || "-", phone: applicant_phone, email: applicant_email || null,
+            city, availability, licenses, has_caces, caces_types, sectors: sector ? [sector] : [], status: "actif", organization_id: null,
+            visible_to_recruiters: true, visibility_consent_at: nowIso, visibility_consent_version: `${VISIBILITY_CONSENT_VERSION}-apply`,
+            birth_date, trades,
+          }).select("id").single();
+          if (cErr) console.error("pool opt-in insert:", cErr.message);
+          candidateId = created?.id ?? null;
+        }
+        if (candidateId) await supabaseAdmin.from("applications").update({ candidate_id: candidateId }).eq("id", application.id);
+      } catch (e) {
+        console.error("pool opt-in error:", e);
       }
     }
 

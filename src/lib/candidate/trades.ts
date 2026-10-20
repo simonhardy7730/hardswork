@@ -100,6 +100,25 @@ export function sanitizeTradeOther(v: unknown): string | null {
   return t || null;
 }
 
+const GUESS: [RegExp, string][] = [
+  [/electricien|électricien/i, "electricien_batiment"], [/macon|maçon/i, "macon"], [/menuisier/i, "menuisier"],
+  [/couvreur/i, "couvreur"], [/plombier|chauffagiste/i, "plombier_chauffagiste"], [/peintre/i, "peintre"],
+  [/carreleur/i, "carreleur"], [/b[aâ]timent|manoeuvre|manœuvre|polyvalent/i, "manoeuvre"],
+  [/production|opérateur|operateur/i, "operateur_production"], [/soudeur|soudure/i, "soudeur"],
+  [/maintenance/i, "technicien_maintenance"], [/m[ée]canicien/i, "mecanicien_auto"], [/cariste/i, "cariste"],
+  [/pr[ée]parateur|picking/i, "preparateur_commandes"], [/magasinier/i, "magasinier"], [/chauffeur.*(ce|c\b|poids)/i, "chauffeur_ce"],
+  [/livreur/i, "chauffeur_livreur"], [/aide[- ]soignant/i, "aide_soignant"], [/infirmier/i, "infirmier"],
+  [/gardiennage|s[ée]curit[ée]|agent de s/i, "agent_gardiennage"], [/nettoyeur.*industriel|nettoyage industriel/i, "nettoyeur_industriel"],
+  [/nettoy|entretien|technicien de surface/i, "agent_entretien"], [/vendeu|caissi/i, "vendeur"], [/serveu|barman/i, "serveur"],
+  [/cuisin|commis/i, "cuisinier"], [/administrati|secr[ée]taire/i, "employe_administratif"], [/comptab/i, "comptable"],
+];
+/** Métiers déduits du titre d'une offre (candidature rapide sans compte). */
+export function guessTrades(title: string): string[] {
+  const out: string[] = [];
+  for (const [re, k] of GUESS) if (re.test(title) && !out.includes(k)) out.push(k);
+  return out.slice(0, MAX_TRADES);
+}
+
 /** Ne garde que des clés connues, sans doublon, au plus MAX_TRADES. */
 export function sanitizeTrades(v: unknown): string[] {
   if (!Array.isArray(v)) return [];

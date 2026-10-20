@@ -1,4 +1,5 @@
 "use client";
+import PoolOptIn from "@/components/candidature/PoolOptIn";
 
 import { useState } from "react";
 import { Loader2, Phone, User, Mail, CheckCircle2 } from "lucide-react";
@@ -33,6 +34,8 @@ export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: P
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [poolOptIn, setPoolOptIn] = useState(false);
+  const [poolCity, setPoolCity] = useState("");
   const [captcha, setCaptcha] = useState("");
   const [cv, setCv] = useState<File | null>(null);
   const [birth, setBirth] = useState("");
@@ -83,6 +86,8 @@ export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: P
         cover_message: form.cover_message || null,
         turnstile_token: captcha,
         birth_date: birth,
+        pool_optin: poolOptIn,
+        pool_city: poolCity,
         screening_answers: answers,
       }, cv);
     const res = await fetch("/api/postuler", { method: "POST", headers, body });
@@ -356,6 +361,8 @@ export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: P
       <ScreeningFields ids={screeningIds} value={answers} onChange={setAnswers} />
 
       <CvPicker file={cv} onChange={setCv} />
+
+      <PoolOptIn checked={poolOptIn} onChange={setPoolOptIn} city={poolCity} onCity={setPoolCity} />
 
       <Turnstile onToken={setCaptcha} />
 

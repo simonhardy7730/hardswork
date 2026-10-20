@@ -1,4 +1,5 @@
 "use client";
+import PoolOptIn from "@/components/candidature/PoolOptIn";
 
 import { useState } from "react";
 import { Loader2, CheckCircle2, Info } from "lucide-react";
@@ -37,6 +38,8 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [poolOptIn, setPoolOptIn] = useState(false);
+  const [poolCity, setPoolCity] = useState("");
   const [captcha, setCaptcha] = useState("");
   const [cv, setCv] = useState<File | null>(null);
   const [birth, setBirth] = useState("");
@@ -63,6 +66,8 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
         screening_answers: answers,
         turnstile_token: captcha,
         birth_date: birth,
+        pool_optin: poolOptIn,
+        pool_city: poolCity,
         availability_slots: slots,
         interest_confirmed: true,
         quick_apply: true,
@@ -171,6 +176,8 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
       </section>
 
       <CvPicker file={cv} onChange={setCv} />
+
+      <PoolOptIn checked={poolOptIn} onChange={setPoolOptIn} city={poolCity} onCity={setPoolCity} />
 
       <ScreeningFields ids={screeningIds} value={answers} onChange={setAnswers} />
 

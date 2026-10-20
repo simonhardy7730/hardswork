@@ -6,6 +6,7 @@ import CandidatureConfirmationEmail from "@/emails/CandidatureConfirmation";
 import NouvelleCandiatureRecruteurEmail from "@/emails/NouvelleCandiatureRecruteur";
 import { allow, clientKey, verifyTurnstile } from "@/lib/security/abuse";
 import { ageFromBirthDate, MIN_AGE } from "@/lib/candidate/age";
+import { sanitizeAnswers, sanitizeScreeningIds } from "@/lib/screening";
 
 export async function POST(req: NextRequest) {
   const supabaseAdmin = createClient(
@@ -100,6 +101,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "already_applied" }, { status: 409 });
     }
 
+    // Questions de présélection : on ne retient que les réponses aux questions réellement demandées par l'offre.
+    const screeningAnswers = sanitizeAnswers(body?.screening_answers, sanitizeScreeningIds((jobData as { screening_ids?: unknown }).screening_ids));
+    const requiredIds = sanitizeScreeningIds((jobData as { screening_ids?: unknown }).screening_ids);
+    if (requiredIds.length && (!screeningAnswers || requiredIds.some((i) => typeof screeningAnswers[i] !== "boolean"))) {
+      return NextResponse.json({ error: "Questions de présélection incomplètes" }, { status: 400 });
+    }
+
     // Insert application
     const baseRow = {
         job_offer_id,
@@ -134,6 +142,12 @@ export async function POST(req: NextRequest) {
         ({ data: application, error: insertError } = await supabaseAdmin.from("applications").insert(withoutBirth).select().single());
       }
       if (!insertError) console.error("applications.birth_date manquante : lancer la migration 021");
+    }
+
+    // Réponses de présélection (migration 025) : enregistrées à part, sans jamais bloquer la candidature.
+    if (!insertError && application && screeningAnswers) {
+      const { error: sErr } = await supabaseAdmin.from("applications").update({ screening_answers: screeningAnswers }).eq("id", application.id);
+      if (sErr) console.error("applications.screening_answers manquante : lancer la migration 025", sErr.message);
     }
 
     if (insertError) {

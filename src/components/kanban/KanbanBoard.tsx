@@ -18,7 +18,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import KanbanColumn from "./KanbanColumn";
 import KanbanCard from "./KanbanCard";
 import ProfileModal from "./ProfileModal";
-import { deleteRefusedApplication } from "@/app/(dashboard)/dashboard/candidatures/actions";
+import { deleteRefusedApplication, updateApplicationStatus } from "@/app/(dashboard)/dashboard/candidatures/actions";
 import { Lock } from "lucide-react";
 import type { Application, ApplicationStatus } from "@/lib/supabase/types";
 import { useL } from "@/lib/i18n/context";
@@ -113,11 +113,9 @@ export default function KanbanBoard({
 
     setApps(prev => prev.map(a => a.id === appId ? { ...a, status: newStatus } : a));
 
-    const supabase = createClient();
-    const { error } = await supabase
-      .from("applications").update({ status: newStatus }).eq("id", appId);
+    const { ok } = await updateApplicationStatus(appId, newStatus);
 
-    if (error) {
+    if (!ok) {
       setApps(prev => prev.map(a => a.id === appId ? { ...a, status: app.status } : a));
     } else {
       router.refresh();
@@ -128,8 +126,8 @@ export default function KanbanBoard({
     const app = apps.find(a => a.id === appId);
     if (!app) return;
     setApps(prev => prev.map(a => a.id === appId ? { ...a, status: newStatus } : a));
-    const supabase = createClient();
-    await supabase.from("applications").update({ status: newStatus }).eq("id", appId);
+    const { ok } = await updateApplicationStatus(appId, newStatus);
+    if (!ok) setApps(prev => prev.map(a => a.id === appId ? { ...a, status: app.status } : a));
     router.refresh();
   }
 

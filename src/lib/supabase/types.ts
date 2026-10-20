@@ -84,6 +84,8 @@ export interface JobOffer {
   views_count: number;
   applications_count: number;
   applications_deleted_count?: number;
+  /** Migration 025 : questions de présélection */
+  screening_ids?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -148,6 +150,9 @@ export interface Application {
   job_title?: string;
   /** Migration 021 */
   birth_date?: string | null;
+  /** Migration 025 */
+  screening_answers?: Record<string, boolean> | null;
+  last_notified_status?: string | null;
 }
 
 export interface Subscription {
@@ -210,6 +215,7 @@ export type UserInsert = {
 };
 
 export type JobOfferInsert = {
+  screening_ids?: string[];
   organization_id: string;
   created_by: string;
   title: string;

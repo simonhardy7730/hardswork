@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getOrgAccess } from "@/lib/billing/access";
 import { flashUnlockedOfferIds } from "@/lib/flash/access";
 import { sendCvRequestEmail } from "@/lib/email/cv-request";
+import { sendApplicationStatusEmail } from "@/lib/email/application-status";
 
 export type CvState =
   | { kind: "none" }
@@ -131,4 +132,44 @@ export async function setRefusedRetention(days: number): Promise<{ ok: boolean }
   if (!profile || profile.role === "viewer") return { ok: false };
   const { error } = await admin().from("organizations").update({ refused_retention_days: days }).eq("id", profile.organization_id);
   return { ok: !error };
+}
+
+const STATUSES = ["nouveau", "contacte", "entretien", "place", "refuse"] as const;
+
+/** Change le statut d'une candidature (droits via RLS) et prévient le candidat par e-mail, une seule fois par statut. */
+export async function updateApplicationStatus(applicationId: string, status: string): Promise<{ ok: boolean }> {
+  if (typeof applicationId !== "string" || !UUID.test(applicationId)) return { ok: false };
+  if (!(STATUSES as readonly string[]).includes(status)) return { ok: false };
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+  // RLS : l'update n'aboutit que si la candidature appartient à l'organisation.
+  const { data: upd, error } = await supabase.from("applications").update({ status }).eq("id", applicationId).select("id");
+  if (error || !upd?.length) return { ok: false };
+  if (status === "nouveau") return { ok: true };
+
+  try {
+    const db = admin();
+    const { data: app, error: e2 } = await db
+      .from("applications")
+      .select("applicant_name, applicant_email, last_notified_status, job_offers(title, organizations(name))")
+      .eq("id", applicationId)
+      .single();
+    if (e2 || !app || !app.applicant_email) return { ok: true }; // colonne absente (migration 025) ou pas d'e-mail
+    if (app.last_notified_status === status) return { ok: true };
+    const job = Array.isArray(app.job_offers) ? app.job_offers[0] : app.job_offers;
+    const orgRaw = (job?.organizations ?? null) as unknown as { name?: string } | { name?: string }[] | null;
+    const org = Array.isArray(orgRaw) ? orgRaw[0] : orgRaw;
+    const sent = await sendApplicationStatusEmail({
+      to: app.applicant_email as string,
+      candidateName: app.applicant_name as string,
+      orgName: org?.name ?? "Le recruteur",
+      jobTitle: (job?.title as string) ?? "votre candidature",
+      status,
+    });
+    if (sent) await db.from("applications").update({ last_notified_status: status }).eq("id", applicationId);
+  } catch (err) {
+    console.error("updateApplicationStatus notify error:", err);
+  }
+  return { ok: true };
 }

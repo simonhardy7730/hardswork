@@ -20,6 +20,7 @@ import {
 } from "@/lib/utils";
 import { useL, useLang } from "@/lib/i18n/context";
 import type { JobOfferInsert, Region, Sector, ContractType } from "@/lib/supabase/types";
+import { SCREENING_QUESTIONS } from "@/lib/screening";
 import OfferPlanningFields, { EMPTY_PLANNING, type OfferPlanning } from "@/components/offres/OfferPlanningFields";
 
 // ── Types ─────────────────────────────────────────────
@@ -88,6 +89,7 @@ export default function NouvelleOffreForm({
     useState(false);
 
   const [planning, setPlanning] = useState<OfferPlanning>(EMPTY_PLANNING);
+  const [screening, setScreening] = useState<string[]>([]);
 
   const [form, setForm] = useState<FormData>({
     title: "",
@@ -161,6 +163,7 @@ export default function NouvelleOffreForm({
       required_languages: form.required_languages,
       description: form.description,
       status,
+      ...(screening.length ? { screening_ids: screening } : {}),
     };
 
     // Planning (migration 010) : uniquement pour les types concernés ; si les colonnes n'existent
@@ -186,6 +189,12 @@ export default function NouvelleOffreForm({
       .select()
       .single();
     // Code postal (migration 018) : tant que la colonne n'existe pas, on publie sans plutôt que d'échouer.
+    // Questions de présélection (migration 025) : on publie sans elles tant que la colonne n'existe pas.
+    if (error && /screening_ids/.test(error.message ?? "")) {
+      const { screening_ids: _s, ...withoutScreening } = payload;
+      void _s;
+      ({ data, error } = await supabase.from("job_offers").insert({ ...withoutScreening, ...planningPayload }).select().single());
+    }
     if (error && /postal_code/.test(error.message ?? "")) {
       const { postal_code: _pc, ...withoutPostal } = payload;
       void _pc;
@@ -391,6 +400,28 @@ export default function NouvelleOffreForm({
                   onChange={(e) => set("start_date", e.target.value)}
                   className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                 />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-ink mb-1.5">
+                  {l("Questions de présélection", "Voorselectievragen")}{" "}
+                  <span className="text-ink-300 font-normal">({l("optionnel · max 5, réponse oui/non", "optioneel · max. 5, ja/nee")})</span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {SCREENING_QUESTIONS.map((q) => {
+                    const on = screening.includes(q.id);
+                    return (
+                      <button
+                        key={q.id}
+                        type="button"
+                        onClick={() => setScreening((p) => on ? p.filter((x) => x !== q.id) : p.length >= 5 ? p : [...p, q.id])}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition ${on ? "bg-brand text-[#101F43] border-brand" : "bg-white text-ink-500 border-ink-100 hover:border-brand"}`}
+                      >
+                        {l(q.fr, q.nl)}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[11px] text-ink-300 mt-1.5">{l("Les réponses apparaissent sur la fiche de chaque candidat : vous triez plus vite.", "De antwoorden verschijnen op het dossier van elke kandidaat: sneller selecteren.")}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-ink mb-1.5">

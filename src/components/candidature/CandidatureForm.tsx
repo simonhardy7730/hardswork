@@ -6,11 +6,13 @@ import { useL } from "@/lib/i18n/context";
 import Turnstile from "@/components/security/Turnstile";
 import CvPicker, { postBody } from "./CvPicker";
 import BirthField from "./BirthField";
+import ScreeningFields, { screeningComplete } from "./ScreeningFields";
 import { ageFromBirthDate, MIN_AGE } from "@/lib/candidate/age";
 
 interface Props {
   jobId: string;
   orgName: string;
+  screeningIds?: string[];
 }
 
 const LICENSES = [
@@ -26,7 +28,7 @@ const CACES_OPTIONS = [
   { value: "CACES5", label: "CACES 5" },
 ];
 
-export default function CandidatureForm({ jobId, orgName }: Props) {
+export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: Props) {
   const l = useL();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,6 +36,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
   const [captcha, setCaptcha] = useState("");
   const [cv, setCv] = useState<File | null>(null);
   const [birth, setBirth] = useState("");
+  const [answers, setAnswers] = useState<Record<string, boolean>>({});
 
   const [form, setForm] = useState({
     first_name: "",
@@ -64,6 +67,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
     e.preventDefault();
     const a = ageFromBirthDate(birth);
     if (a === null || a < MIN_AGE) { setError(l(`Il faut avoir au moins ${MIN_AGE} ans pour postuler.`, `Je moet minstens ${MIN_AGE} jaar zijn om te solliciteren.`)); return; }
+    if (!screeningComplete(screeningIds, answers)) { setError(l("Répondez à toutes les questions.", "Beantwoord alle vragen.")); return; }
     setLoading(true);
     setError("");
 
@@ -79,6 +83,7 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
         cover_message: form.cover_message || null,
         turnstile_token: captcha,
         birth_date: birth,
+        screening_answers: answers,
       }, cv);
     const res = await fetch("/api/postuler", { method: "POST", headers, body });
 
@@ -347,6 +352,8 @@ export default function CandidatureForm({ jobId, orgName }: Props) {
           {form.cover_message.length}/300
         </p>
       </div>
+
+      <ScreeningFields ids={screeningIds} value={answers} onChange={setAnswers} />
 
       <CvPicker file={cv} onChange={setCv} />
 

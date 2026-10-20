@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Loader2, CheckCircle2, Info } from "lucide-react";
 import { useL } from "@/lib/i18n/context";
 import Turnstile from "@/components/security/Turnstile";
+import ScreeningFields, { screeningComplete } from "./ScreeningFields";
 import CvPicker, { postBody } from "./CvPicker";
 import BirthField from "./BirthField";
 import { ageFromBirthDate, MIN_AGE } from "@/lib/candidate/age";
@@ -18,13 +19,14 @@ interface Props {
   offerDays: string[];
   offerSlots: string[];
   prefill: Prefill | null;
+  screeningIds?: string[];
 }
 
 const input =
   "w-full px-3 py-3 border border-ink-100 rounded-xl text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition";
 
 /** Candidature en 3 étapes : intérêt → disponibilités → coordonnées. Aucun long formulaire. */
-export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offerSlots, prefill }: Props) {
+export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offerSlots, prefill, screeningIds = [] }: Props) {
   const l = useL();
   const [interest, setInterest] = useState(false);
   const [slots, setSlots] = useState<string[]>(prefill?.slots ?? []);
@@ -38,6 +40,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
   const [captcha, setCaptcha] = useState("");
   const [cv, setCv] = useState<File | null>(null);
   const [birth, setBirth] = useState("");
+  const [answers, setAnswers] = useState<Record<string, boolean>>({});
   const [done, setDone] = useState(false);
 
   const toggle = (k: string) => setSlots((s) => (s.includes(k) ? s.filter((x) => x !== k) : [...s, k]));
@@ -49,6 +52,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
     const a = ageFromBirthDate(birth);
     if (a === null || a < MIN_AGE) { setError(l(`Il faut avoir au moins ${MIN_AGE} ans pour postuler.`, `Je moet minstens ${MIN_AGE} jaar zijn om te solliciteren.`)); return; }
     if (!interest) { setError(l("Confirmez votre intérêt pour l'offre.", "Bevestig je interesse voor het aanbod.")); return; }
+    if (!screeningComplete(screeningIds, answers)) { setError(l("Répondez à toutes les questions.", "Beantwoord alle vragen.")); return; }
     setLoading(true); setError("");
     const { body, headers } = postBody({
         job_offer_id: jobId,
@@ -56,6 +60,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
         applicant_phone: f.phone,
         applicant_email: f.email || null,
         cover_message: msg || null,
+        screening_answers: answers,
         turnstile_token: captcha,
         birth_date: birth,
         availability_slots: slots,
@@ -166,6 +171,8 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
       </section>
 
       <CvPicker file={cv} onChange={setCv} />
+
+      <ScreeningFields ids={screeningIds} value={answers} onChange={setAnswers} />
 
       <Turnstile onToken={setCaptcha} />
 

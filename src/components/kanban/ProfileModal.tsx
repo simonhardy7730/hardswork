@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { questionsFor } from "@/lib/screening";
 import { X, Trash2, Phone, Mail, FileText, Check, Loader2, Send, Clock } from "lucide-react";
 import type { Application } from "@/lib/supabase/types";
 import { useL } from "@/lib/i18n/context";
@@ -110,6 +111,23 @@ export default function ProfileModal({ application: app, hasSubscription, onClos
                 {app.caces_types?.map((x) => <span key={x} className="text-[11px] font-black px-2 py-0.5 rounded-md bg-surface border border-ink-100 text-ink-500">CACES {x}</span>)}
                 {slots.map((x) => <span key={x} className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-brand">{x}</span>)}
               </div>
+            </div>
+          )}
+
+          {app.screening_answers && Object.keys(app.screening_answers).length > 0 && (
+            <div>
+              <p className={label}>{l("Réponses de présélection", "Voorselectie-antwoorden")}</p>
+              <ul className="space-y-1.5">
+                {questionsFor(Object.keys(app.screening_answers)).map((q) => {
+                  const yes = app.screening_answers?.[q.id] === true;
+                  return (
+                    <li key={q.id} className="flex items-start justify-between gap-3 text-sm bg-surface rounded-xl px-3 py-2">
+                      <span className="text-ink">{l(q.fr, q.nl)}</span>
+                      <span className={`shrink-0 text-xs font-black px-2 py-0.5 rounded-full ${yes ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>{yes ? l("Oui", "Ja") : l("Non", "Nee")}</span>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           )}
 

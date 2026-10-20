@@ -4,6 +4,7 @@ import Link from "next/link";
 import CandidatureForm from "@/components/candidature/CandidatureForm";
 import QuickApplyForm from "@/components/candidature/QuickApplyForm";
 import { labels } from "@/lib/utils";
+import { sanitizeScreeningIds } from "@/lib/screening";
 import { getDict } from "@/lib/i18n/server";
 import { LangSwitch } from "@/components/layout/LangSwitch";
 import type { JobOffer, JobPlanning, Organization } from "@/lib/supabase/types";
@@ -71,6 +72,8 @@ export default async function PostulerPage(
       }
     }
   }
+
+  const screeningIds = sanitizeScreeningIds((job as unknown as { screening_ids?: unknown }).screening_ids);
 
   const sectorLabel = SECTOR_LABELS[job.sector] ?? job.sector;
   const contractLabel = CONTRACT_LABELS[job.contract_type] ?? job.contract_type;
@@ -269,9 +272,10 @@ export default async function PostulerPage(
                   offerDays={(job as JobOffer & JobPlanning).days_needed ?? []}
                   offerSlots={(job as JobOffer & JobPlanning).time_slots ?? []}
                   prefill={prefill}
+                  screeningIds={screeningIds}
                 />
               ) : (
-                <CandidatureForm jobId={job.id} orgName={org?.name ?? "Wolko"} />
+                <CandidatureForm jobId={job.id} orgName={org?.name ?? "Wolko"} screeningIds={screeningIds} />
               )}
             </div>
 

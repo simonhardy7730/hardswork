@@ -45,8 +45,12 @@ export async function signUp(formData: FormData) {
   const orgType = formData.get("org_type") as "agency" | "company";
   const orgName = formData.get("org_name") as string;
   const vatRaw = ((formData.get("vat_number") as string) ?? "").trim();
-  if (!isValidVat(vatRaw)) return { error: "Numéro de TVA invalide. Exemple : BE 0123.456.749" };
-  const vatNumber = normalizeVat(vatRaw);
+  // Exception : les adresses internes de Wolko (variable INTERNAL_SIGNUP_EMAILS, séparées par des virgules) peuvent créer
+  // leur propre compte sans numéro de TVA tant que la société n'existe pas. Le champ reste vide, jamais inventé.
+  const internal = (process.env.INTERNAL_SIGNUP_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+  const isInternal = vatRaw === "" && internal.includes((email ?? "").trim().toLowerCase());
+  if (!isInternal && !isValidVat(vatRaw)) return { error: "Numéro de TVA invalide. Exemple : BE 0123.456.749" };
+  const vatNumber = isInternal ? "" : normalizeVat(vatRaw);
   // Jeton Turnstile : transmis à Supabase, qui le vérifie si la protection CAPTCHA est activée (Authentication > Attack Protection).
   const captchaToken = ((formData.get("captcha_token") as string) ?? "") || undefined;
 

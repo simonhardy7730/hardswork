@@ -77,7 +77,8 @@ export default function RecrutePage() {
     e.preventDefault();
     if (!form.cgu) { setError(l("Veuillez accepter les CGU pour continuer.", "Aanvaard de algemene voorwaarden om verder te gaan.")); return; }
     if (!selected) return;
-    if (!isValidVat(form.vat)) { setError(l("Numéro de TVA invalide. Exemple : BE 0123.456.749", "Ongeldig btw-nummer. Voorbeeld: BE 0123.456.749")); return; }
+    // Un numéro vide est tranché par le serveur (seules les adresses internes de Wolko peuvent s'inscrire sans TVA).
+    if (form.vat.trim() !== "" && !isValidVat(form.vat)) { setError(l("Numéro de TVA invalide. Exemple : BE 0123.456.749", "Ongeldig btw-nummer. Voorbeeld: BE 0123.456.749")); return; }
     setError("");
     setLoading(true);
     try {
@@ -413,7 +414,7 @@ export default function RecrutePage() {
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">{l("Numéro de TVA", "Btw-nummer")}</label>
                   <input type="text" placeholder="BE 0123.456.749" value={form.vat} onChange={set("vat")}
-                    autoComplete="off" required
+                    autoComplete="off"
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition" />
                 </div>
                 <div>

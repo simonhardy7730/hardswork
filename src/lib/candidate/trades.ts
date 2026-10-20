@@ -17,6 +17,13 @@ export const TRADES: Trade[] = [
   { key: "carreleur", sector: "construction", fr: "Carreleur", nl: "Tegelzetter" },
   { key: "plafonneur", sector: "construction", fr: "Plafonneur", nl: "Stukadoor" },
   { key: "conducteur_engins", sector: "construction", fr: "Conducteur d'engins / grutier", nl: "Machinist / kraanman" },
+  { key: "ferrailleur_coffreur", sector: "construction", fr: "Ferrailleur / coffreur", nl: "IJzervlechter / bekister" },
+  { key: "echafaudeur", sector: "construction", fr: "Monteur d'échafaudages", nl: "Steigerbouwer" },
+  { key: "poseur_chassis", sector: "construction", fr: "Poseur de châssis / vitrier", nl: "Plaatser van ramen / glazenmaker" },
+  { key: "installateur_energie", sector: "construction", fr: "Installateur photovoltaïque / pompe à chaleur", nl: "Installateur zonnepanelen / warmtepomp" },
+  { key: "frigoriste", sector: "construction", fr: "Frigoriste / technicien HVAC", nl: "Koeltechnicus / HVAC-technicus" },
+  { key: "ouvrier_voirie", sector: "construction", fr: "Ouvrier de voirie / paveur / terrassier", nl: "Wegenwerker / straatmaker / grondwerker" },
+  { key: "chef_chantier", sector: "construction", fr: "Chef d'équipe / chef de chantier", nl: "Ploegbaas / werfleider" },
   { key: "manoeuvre", sector: "construction", fr: "Manœuvre / ouvrier polyvalent", nl: "Handlanger / polyvalent arbeider" },
   // Industrie
   { key: "operateur_production", sector: "industrie", fr: "Opérateur de production", nl: "Productieoperator" },
@@ -25,10 +32,17 @@ export const TRADES: Trade[] = [
   { key: "mecanicien", sector: "industrie", fr: "Mécanicien", nl: "Mecanicien" },
   { key: "tourneur_fraiseur", sector: "industrie", fr: "Tourneur / fraiseur / CNC", nl: "Draaier / frezer / CNC" },
   { key: "electromecanicien", sector: "industrie", fr: "Électromécanicien", nl: "Elektromecanicien" },
+  { key: "tuyauteur_chaudronnier", sector: "industrie", fr: "Tuyauteur / chaudronnier", nl: "Pijpfitter / plaatwerker" },
+  { key: "conducteur_ligne", sector: "industrie", fr: "Conducteur de ligne / régleur", nl: "Lijnbestuurder / insteller" },
+  { key: "technicien_qualite", sector: "industrie", fr: "Contrôleur / technicien qualité", nl: "Kwaliteitscontroleur" },
+  { key: "mecanicien_auto", sector: "industrie", fr: "Mécanicien auto / poids lourds", nl: "Automonteur / vrachtwagenmecanicien" },
+  { key: "carrossier", sector: "industrie", fr: "Carrossier / peintre auto", nl: "Carrosseriehersteller / autospuiter" },
   // Logistique
   { key: "cariste", sector: "logistique", fr: "Cariste", nl: "Heftruckchauffeur" },
   { key: "preparateur_commandes", sector: "logistique", fr: "Préparateur de commandes", nl: "Orderpicker" },
   { key: "magasinier", sector: "logistique", fr: "Magasinier", nl: "Magazijnier" },
+  { key: "emballeur", sector: "logistique", fr: "Emballeur / manutentionnaire", nl: "Inpakker / behandelaar" },
+  { key: "gestionnaire_stock", sector: "logistique", fr: "Réceptionnaire / gestionnaire de stock", nl: "Ontvanger / voorraadbeheerder" },
   // Transport
   { key: "chauffeur_ce", sector: "transport", fr: "Chauffeur poids lourd (C/CE)", nl: "Vrachtwagenchauffeur (C/CE)" },
   { key: "chauffeur_livreur", sector: "transport", fr: "Chauffeur-livreur (B)", nl: "Chauffeur-koerier (B)" },
@@ -36,12 +50,19 @@ export const TRADES: Trade[] = [
   // Santé
   { key: "aide_soignant", sector: "medical", fr: "Aide-soignant", nl: "Zorgkundige" },
   { key: "infirmier", sector: "medical", fr: "Infirmier", nl: "Verpleegkundige" },
-  { key: "aide_menager", sector: "medical", fr: "Aide-ménager / aide familial", nl: "Huishoudhulp / gezinshulp" },
+  { key: "aide_menager", sector: "medical", fr: "Aide familial / garde à domicile", nl: "Gezinshulp / thuisoppas" },
+  { key: "educateur", sector: "medical", fr: "Éducateur", nl: "Opvoeder" },
+  { key: "puericulteur", sector: "medical", fr: "Puériculteur / accueillant d'enfants", nl: "Kinderverzorger / onthaalouder" },
+  { key: "assistant_pharma", sector: "medical", fr: "Assistant pharmaceutique", nl: "Farmaceutisch-technisch assistent" },
+  { key: "aide_logistique_hopital", sector: "medical", fr: "Aide logistique en hôpital / brancardier", nl: "Logistiek medewerker ziekenhuis / brancardier" },
   // Sécurité
   { key: "agent_gardiennage", sector: "securite", fr: "Agent de gardiennage", nl: "Bewakingsagent" },
+  { key: "steward", sector: "securite", fr: "Steward / agent de prévention", nl: "Steward / preventiemedewerker" },
   // Nettoyage
   { key: "agent_entretien", sector: "nettoyage", fr: "Agent d'entretien", nl: "Schoonmaker" },
   { key: "nettoyeur_industriel", sector: "nettoyage", fr: "Nettoyeur industriel", nl: "Industrieel schoonmaker" },
+  { key: "aide_menagere_ts", sector: "nettoyage", fr: "Aide-ménager (titres-services)", nl: "Huishoudhulp (dienstencheques)" },
+  { key: "laveur_vitres", sector: "nettoyage", fr: "Laveur de vitres / technicien de surface", nl: "Glazenwasser / oppervlaktetechnicus" },
   // Commerce, Horeca, bureau, autres
   { key: "vendeur", sector: "autre", fr: "Vendeur / caissier", nl: "Verkoper / kassier" },
   { key: "serveur", sector: "autre", fr: "Serveur / barman", nl: "Kelner / barman" },
@@ -50,6 +71,13 @@ export const TRADES: Trade[] = [
   { key: "comptable", sector: "autre", fr: "Comptable", nl: "Boekhouder" },
   { key: "jardinier", sector: "autre", fr: "Jardinier", nl: "Tuinman" },
   { key: "boulanger_boucher", sector: "autre", fr: "Boulanger / boucher", nl: "Bakker / slager" },
+  { key: "employe_rayon", sector: "autre", fr: "Employé de rayon / réassort", nl: "Rekkenvuller" },
+  { key: "plongeur", sector: "autre", fr: "Plongeur / aide de cuisine", nl: "Afwasser / keukenhulp" },
+  { key: "receptionniste", sector: "autre", fr: "Réceptionniste / accueil", nl: "Receptionist / onthaal" },
+  { key: "secretaire", sector: "autre", fr: "Secrétaire / assistant de direction", nl: "Secretaresse / directieassistent" },
+  { key: "commercial", sector: "autre", fr: "Commercial / représentant", nl: "Vertegenwoordiger / verkoper buitendienst" },
+  { key: "informaticien", sector: "autre", fr: "Informaticien / helpdesk", nl: "Informaticus / helpdesk" },
+  { key: "ouvrier_agricole", sector: "autre", fr: "Ouvrier agricole / horticole", nl: "Land- of tuinbouwarbeider" },
 ];
 
 export const TRADE_KEYS = new Set(TRADES.map((t) => t.key));

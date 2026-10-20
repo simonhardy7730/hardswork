@@ -4,7 +4,7 @@ export interface OfferForSeo {
   salary_min: number | null; salary_max: number | null; salary_period: string | null; show_salary: boolean | null;
 }
 
-const EMPLOYMENT: Record<string, string> = { cdi: "FULL_TIME", cdd: "TEMPORARY", interim: "TEMPORARY", interim_cdi: "OTHER" };
+const EMPLOYMENT: Record<string, string | string[]> = { cdi: "FULL_TIME", cdd: "TEMPORARY", interim: "TEMPORARY", interim_cdi: ["FULL_TIME", "TEMPORARY"], etudiant: "PART_TIME", flexi: "PART_TIME", stage: "INTERN", apprentissage: "OTHER" };
 
 export function buildJobPosting(o: OfferForSeo, orgName: string, baseUrl = "https://wolko.be") {
   const plain = (o.description ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -21,6 +21,7 @@ export function buildJobPosting(o: OfferForSeo, orgName: string, baseUrl = "http
       "@type": "Place",
       address: { "@type": "PostalAddress", addressLocality: o.city, ...(o.postal_code ? { postalCode: o.postal_code } : {}), addressCountry: "BE" },
     },
+    validThrough: new Date(new Date(o.created_at).getTime() + 60 * 86400000).toISOString(),
     directApply: true,
     url: `${baseUrl}/jobs/${o.id}`,
   };
@@ -32,7 +33,7 @@ export function buildJobPosting(o: OfferForSeo, orgName: string, baseUrl = "http
         "@type": "QuantitativeValue",
         minValue: o.salary_min,
         ...(o.salary_max ? { maxValue: o.salary_max } : {}),
-        unitText: o.salary_period === "heure" ? "HOUR" : "MONTH",
+        unitText: o.salary_period === "heure" ? "HOUR" : o.salary_period === "jour" ? "DAY" : "MONTH",
       },
     };
   }

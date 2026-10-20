@@ -13,6 +13,7 @@ import {
   Briefcase,
   ChevronRight,
   Eye,
+  Pencil,
   MoreVertical,
   X,
   Trash2,
@@ -236,6 +237,15 @@ export default function OffresTable({ offres, refusedByOffer = {} }: { offres: J
                   title={l("Voir les candidatures", "Sollicitaties bekijken")}
                 >
                   <Eye size={15} />
+                </Link>
+
+                {/* Modifier l'annonce */}
+                <Link
+                  href={`/dashboard/offres/${offre.id}/modifier`}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-500 hover:bg-surface-2 hover:text-brand transition"
+                  title={l("Modifier l'annonce", "Vacature bewerken")}
+                >
+                  <Pencil size={15} />
                 </Link>
 
                 {/* Copier lien */}

@@ -19,7 +19,7 @@ import {
   JOB_TITLE_SUGGESTIONS,
 } from "@/lib/utils";
 import { useL, useLang } from "@/lib/i18n/context";
-import type { JobOfferInsert, Region, Sector, ContractType } from "@/lib/supabase/types";
+import type { JobOffer, JobPlanning, JobOfferInsert, Region, Sector, ContractType } from "@/lib/supabase/types";
 import { SCREENING_QUESTIONS, SECTOR_SUGGESTIONS } from "@/lib/screening";
 import OfferPlanningFields, { EMPTY_PLANNING, type OfferPlanning } from "@/components/offres/OfferPlanningFields";
 
@@ -71,12 +71,17 @@ const SECTOR_ICONS: Record<string, string> = {
 
 // ── Composant principal ───────────────────────────────
 
+type EditableOffer = Partial<JobOffer> & JobPlanning & { id: string; postal_code?: string | null; hide_company?: boolean; screening_ids?: string[] };
+
 export default function NouvelleOffreForm({
   organizationId,
   userId,
+  offer,
 }: {
   organizationId: string;
   userId: string;
+  /** Mode « modifier » : l'offre existante (mêmes champs, mise à jour au lieu d'insertion). */
+  offer?: EditableOffer;
 }) {
   const router = useRouter();
   const l = useL();
@@ -88,29 +93,39 @@ export default function NouvelleOffreForm({
   const [descriptionTemplateApplied, setDescriptionTemplateApplied] =
     useState(false);
 
-  const [planning, setPlanning] = useState<OfferPlanning>(EMPTY_PLANNING);
-  const [screening, setScreening] = useState<string[]>([]);
-  const [hideCompany, setHideCompany] = useState(false);
+  const [planning, setPlanning] = useState<OfferPlanning>(() => offer ? {
+    work_date_from: offer.work_date_from ?? "",
+    work_date_to: offer.work_date_to ?? "",
+    days_needed: offer.days_needed ?? [],
+    time_slots: offer.time_slots ?? [],
+    schedule_note: offer.schedule_note ?? "",
+    positions_count: String(offer.positions_count ?? 1),
+    recurrence: offer.recurrence ?? "",
+    requirements: offer.requirements ?? "",
+    work_location: offer.work_location ?? "",
+  } : EMPTY_PLANNING);
+  const [screening, setScreening] = useState<string[]>(offer?.screening_ids ?? []);
+  const [hideCompany, setHideCompany] = useState(offer?.hide_company ?? false);
 
   const [form, setForm] = useState<FormData>({
-    title: "",
-    sector: "logistique",
-    contract_type: "interim",
-    city: "",
-    postal_code: "",
-    region: "wallonie",
-    start_date: "",
-    is_urgent: false,
-    salary_min: "",
-    salary_max: "",
-    salary_period: "heure",
-    show_salary: true,
-    shift_type: "jour",
-    required_licenses: [],
+    title: offer?.title ?? "",
+    sector: offer?.sector ?? "logistique",
+    contract_type: offer?.contract_type ?? "interim",
+    city: offer?.city ?? "",
+    postal_code: offer?.postal_code ?? "",
+    region: offer?.region ?? "wallonie",
+    start_date: offer?.start_date ?? "",
+    is_urgent: offer?.is_urgent ?? false,
+    salary_min: offer?.salary_min != null ? String(offer.salary_min) : "",
+    salary_max: offer?.salary_max != null ? String(offer.salary_max) : "",
+    salary_period: (offer?.salary_period as FormData["salary_period"] | null | undefined) ?? "heure",
+    show_salary: offer?.show_salary ?? true,
+    shift_type: (offer?.shift_type as FormData["shift_type"] | null | undefined) ?? "jour",
+    required_licenses: offer?.required_licenses ?? [],
     required_caces: [],
-    required_languages: ["fr"],
+    required_languages: offer?.required_languages ?? ["fr"],
     experience_years: "",
-    description: "",
+    description: offer?.description ?? "",
   });
 
   function set<K extends keyof FormData>(key: K, value: FormData[K]) {
@@ -185,35 +200,34 @@ export default function NouvelleOffreForm({
         }
       : {};
 
-    let { data, error } = await supabase
-      .from("job_offers")
-      .insert({ ...payload, ...planningPayload })
-      .select()
-      .single();
-    // Code postal (migration 018) : tant que la colonne n'existe pas, on publie sans plutôt que d'échouer.
-    // Questions de présélection (migration 025) : on publie sans elles tant que la colonne n'existe pas.
+    // Création : insertion. Modification : mise à jour de la même offre (l'organisation et l'auteur ne changent jamais).
+    const write = (row: Record<string, unknown>) => {
+      if (!offer) return supabase.from("job_offers").insert(row).select().single();
+      const { organization_id: _a, created_by: _b, ...rest } = row; void _a; void _b;
+      return supabase.from("job_offers").update(rest).eq("id", offer.id).select().single();
+    };
+
+    let { data, error } = await write({ ...payload, ...planningPayload });
+    // Questions de présélection / annonce confidentielle (migrations 025, 028) : on enregistre sans elles tant que les colonnes n'existent pas.
     if (error && /screening_ids|hide_company/.test(error.message ?? "")) {
       const { screening_ids: _s, hide_company: _h, ...withoutScreening } = payload;
       void _s; void _h;
-      ({ data, error } = await supabase.from("job_offers").insert({ ...withoutScreening, ...planningPayload }).select().single());
+      ({ data, error } = await write({ ...withoutScreening, ...planningPayload }));
     }
+    // Code postal (migration 018) : tant que la colonne n'existe pas, on publie sans plutôt que d'échouer.
     if (error && /postal_code/.test(error.message ?? "")) {
       const { postal_code: _pc, ...withoutPostal } = payload;
       void _pc;
-      ({ data, error } = await supabase.from("job_offers").insert({ ...withoutPostal, ...planningPayload }).select().single());
+      ({ data, error } = await write({ ...withoutPostal, ...planningPayload }));
     }
     if (error && hasPlanning && /work_date|days_needed|time_slots|schedule_note|positions_count|recurrence|requirements|work_location/.test(error.message ?? "")) {
-      ({ data, error } = await supabase.from("job_offers").insert(payload).select().single());
+      ({ data, error } = await write(payload));
     }
 
     // Publication refusée par le serveur (ni essai ni abonnement en cours) : l'offre est gardée en brouillon
     // et on propose WOLKO Flash (annonce ponctuelle sans abonnement) pour la publier.
     if (error && status === "active" && error.code === "42501") {
-      const { data: draft } = await supabase
-        .from("job_offers")
-        .insert({ ...payload, ...planningPayload, status: "draft" })
-        .select()
-        .single();
+      const { data: draft } = await write({ ...payload, ...planningPayload, status: "draft" });
       if (draft) {
         router.push(`/dashboard/flash/commander?offre=${draft.id}`);
         return;
@@ -222,11 +236,17 @@ export default function NouvelleOffreForm({
 
     if (error || !data) {
       setLoading(false);
-      alert(l("Erreur lors de la création. Réessayez.", "Fout bij het aanmaken. Probeer opnieuw."));
+      if (/flash_title_locked/.test(error?.message ?? "")) {
+        alert(l("L'intitulé d'une annonce WOLKO Flash publiée ne peut plus être modifié. Les autres champs, oui.", "De titel van een gepubliceerde WOLKO Flash-vacature kan niet meer gewijzigd worden. De andere velden wel."));
+        return;
+      }
+      alert(offer
+        ? l("Erreur lors de l'enregistrement. Réessayez.", "Fout bij het opslaan. Probeer opnieuw.")
+        : l("Erreur lors de la création. Réessayez.", "Fout bij het aanmaken. Probeer opnieuw."));
       return;
     }
 
-    router.push(`/dashboard/offres/${data.id}/confirmation`);
+    router.push(offer ? "/dashboard/offres" : `/dashboard/offres/${data.id}/confirmation`);
   }
 
   return (
@@ -736,15 +756,17 @@ export default function NouvelleOffreForm({
             </button>
           ) : (
             <div className="flex gap-2">
+              {(!offer || offer.status === "draft") && (
+                <button
+                  onClick={() => handleSubmit("draft")}
+                  disabled={loading || !canGoNext()}
+                  className="flex items-center gap-2 px-4 py-2 border border-ink-100 rounded-lg text-sm font-medium text-ink-500 hover:bg-surface-2 transition disabled:opacity-40"
+                >
+                  {l("Sauvegarder en brouillon", "Opslaan als concept")}
+                </button>
+              )}
               <button
-                onClick={() => handleSubmit("draft")}
-                disabled={loading || !canGoNext()}
-                className="flex items-center gap-2 px-4 py-2 border border-ink-100 rounded-lg text-sm font-medium text-ink-500 hover:bg-surface-2 transition disabled:opacity-40"
-              >
-                {l("Sauvegarder en brouillon", "Opslaan als concept")}
-              </button>
-              <button
-                onClick={() => handleSubmit("active")}
+                onClick={() => handleSubmit(!offer || offer.status === "draft" ? "active" : (offer.status as "draft" | "active"))}
                 disabled={loading || !canGoNext()}
                 className="flex items-center gap-2 bg-brand text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-brand-dark transition disabled:opacity-40"
               >
@@ -753,7 +775,9 @@ export default function NouvelleOffreForm({
                 ) : (
                   <Check size={15} />
                 )}
-                {l("Publier l'offre", "Vacature publiceren")}
+                {offer && offer.status !== "draft"
+                  ? l("Enregistrer les modifications", "Wijzigingen opslaan")
+                  : l("Publier l'offre", "Vacature publiceren")}
               </button>
             </div>
           )}

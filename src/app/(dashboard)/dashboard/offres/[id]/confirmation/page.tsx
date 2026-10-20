@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { Check, ArrowRight, Users } from "lucide-react";
 import QRCodeDisplay from "@/components/offres/QRCodeDisplay";
+import ShareButtons from "@/components/offres/ShareButtons";
 import CopyLinkButton from "@/components/offres/CopyLinkButton";
 import { labels } from "@/lib/utils";
 import { getLang } from "@/lib/i18n/server";
@@ -69,6 +70,16 @@ export default async function ConfirmationPage(
               {l("Partagez ce lien par email, WhatsApp, ou affichez-le sur un flyer.", "Deel deze link via e-mail, WhatsApp of toon hem op een flyer.")}
             </p>
           </div>
+
+          {/* Partage */}
+          {offre.status === "active" && (
+            <div>
+              <p className="text-sm font-semibold text-[#101F43] mb-2">
+                {"📣 " + l("Partager l'annonce", "Vacature delen")}
+              </p>
+              <ShareButtons url={`${appUrl}/jobs/${offre.id}`} title={offre.title} city={offre.city} lang={lang} />
+            </div>
+          )}
 
           {/* QR Code */}
           <div>

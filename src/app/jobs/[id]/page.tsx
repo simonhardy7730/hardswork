@@ -10,6 +10,7 @@ import {
   ArrowRight, CheckCircle, ChevronRight,
 } from "lucide-react";
 import { labels } from "@/lib/utils";
+import ShareButtons from "@/components/offres/ShareButtons";
 import { buildJobPosting, jsonLd } from "@/lib/seo/jobposting";
 import { getDict } from "@/lib/i18n/server";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
@@ -256,6 +257,12 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
                 </div>
               );
             })()}
+
+            {/* Partager */}
+            <div className="bg-white border border-ink-100 rounded-2xl p-5">
+              <p className="font-display font-black text-ink uppercase tracking-wide text-[13px] mb-3">{l("Partager cette offre", "Deel deze vacature")}</p>
+              <ShareButtons url={`https://wolko.be/jobs/${offer.id}`} title={offer.title} city={offer.city} lang={lang} />
+            </div>
 
             {/* Notre mission */}
             <div className="bg-white border border-ink-100 rounded-2xl p-6">

@@ -7,7 +7,7 @@ import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { LangSwitcher } from "./LangSwitcher";
 import type { Dict, Lang } from "@/lib/i18n/dict";
 
-const hrefs = { jobs: "/jobs", recruit: "/recrute", pricing: "/tarifs", how: "/#comment-ca-marche", about: "/a-propos" } as const;
+const hrefs = { jobs: "/jobs", recruit: "/recrute", pricing: "/tarifs", how: "/#comment-ca-marche" } as const;
 
 export function SiteNavClient({ lang, t }: { lang: Lang; t: Dict["nav"] }) {
   const [open, setOpen] = useState(false);

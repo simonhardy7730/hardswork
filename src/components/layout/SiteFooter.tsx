@@ -18,7 +18,6 @@ export async function SiteFooter() {
       { label: f.createAccount, href: "/inscription" },
     ] },
     { title: f.info, links: [
-      { label: t.about.nav, href: "/a-propos" },
       { label: f.contact, href: `mailto:${BRAND.contactEmail}` },
       { label: f.cgu, href: "/legal/cgu" },
       { label: f.privacy, href: "/legal/privacy" },

@@ -82,7 +82,7 @@ export default async function PostulerPage(
   const contractLabel = CONTRACT_LABELS[job.contract_type] ?? job.contract_type;
 
   return (
-    <div className="min-h-screen font-body flex">
+    <div className="min-h-screen font-body flex overflow-x-hidden">
 
       {/* ── LEFT PANEL (photo + info) ─────────────────────── */}
       <div className="brand-on-dark hidden lg:flex lg:w-[42%] relative flex-col">
@@ -183,10 +183,10 @@ export default async function PostulerPage(
       </div>
 
       {/* ── RIGHT PANEL (form) ────────────────────────────── */}
-      <div className="flex-1 bg-[#FFFBF2] flex flex-col">
+      <div className="flex-1 min-w-0 bg-[#FFFBF2] flex flex-col">
         {/* Mobile nav */}
         <header className="lg:hidden px-5 h-14 flex items-center justify-between border-b border-ink-100 bg-white">
-          <Link href="/"><HardSworkLogo size="sm" /></Link>
+          <Link href="/"><HardSworkLogo size="sm" dark={false} /></Link>
           <LangSwitch tone="light" />
           <Link href={`/jobs/${job.id}`}
             className="flex items-center gap-1.5 text-xs text-ink-500 hover:text-brand transition-colors font-medium">

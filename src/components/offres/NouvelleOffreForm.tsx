@@ -185,7 +185,7 @@ export default function NouvelleOffreForm({
 
     // Planning (migration 010) : uniquement pour les types concernés ; si les colonnes n'existent
     // pas encore, on enregistre l'offre sans planning plutôt que d'échouer.
-    const hasPlanning = ["etudiant", "flexi", "interim"].includes(form.contract_type);
+    const hasPlanning = ["etudiant", "flexi", "interim", "interim_cdi"].includes(form.contract_type);
     const planningPayload: Partial<JobOfferInsert> = hasPlanning
       ? {
           work_date_from: planning.work_date_from || null,
@@ -581,7 +581,7 @@ export default function NouvelleOffreForm({
             </div>
 
             {/* Planning de la mission (job étudiant, flexi-job, intérim) */}
-            {["etudiant", "flexi", "interim"].includes(form.contract_type) && (
+            {["etudiant", "flexi", "interim", "interim_cdi"].includes(form.contract_type) && (
               <OfferPlanningFields value={planning} onChange={setPlanning} flexi={form.contract_type === "flexi"} />
             )}
 

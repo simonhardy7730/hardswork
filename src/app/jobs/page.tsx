@@ -54,7 +54,8 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
 
   if (searchParams.secteur) query = query.eq("sector",        searchParams.secteur);
   if (searchParams.region)  query = query.eq("region",        searchParams.region);
-  if (searchParams.contrat === "classique") query = query.in("contract_type", ["cdi", "cdd"]);
+  if (searchParams.contrat === "classique") query = query.in("contract_type", ["cdi", "cdd", "interim_cdi"]);
+  else if (searchParams.contrat === "interim" || searchParams.contrat === "cdi") query = query.in("contract_type", [searchParams.contrat, "interim_cdi"]);
   else if (searchParams.contrat) query = query.eq("contract_type", searchParams.contrat);
   // Recherche par mots : chaque mot peut correspondre au titre, à la ville, à la description, au secteur ou au contrat.
   if (searchParams.q) for (const g of keywordGroups(searchParams.q)) query = query.or(g);

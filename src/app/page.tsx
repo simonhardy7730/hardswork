@@ -62,6 +62,7 @@ const CONTRACT_STYLE: Record<string, string> = {
   interim: "bg-orange-50 text-orange-700 border border-orange-200",
   cdi: "bg-emerald-50 text-emerald-700 border border-emerald-200",
   cdd: "bg-blue-50 text-blue-700 border border-blue-200",
+  interim_cdi: "bg-orange-50 text-orange-700 border border-orange-200",
   apprentissage: "bg-purple-50 text-purple-700 border border-purple-200",
 };
 

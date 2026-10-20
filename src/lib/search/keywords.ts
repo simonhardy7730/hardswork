@@ -38,7 +38,7 @@ export function keywordGroups(q: string): string[] {
     }
     const key = strip(w).toLowerCase();
     for (const [sector, ws] of Object.entries(SECTOR_WORDS)) if (ws.includes(key)) parts.push(`sector.eq.${sector}`);
-    for (const [contract, ws] of Object.entries(CONTRACT_WORDS)) if (ws.includes(key)) parts.push(`contract_type.eq.${contract}`);
+    for (const [contract, ws] of Object.entries(CONTRACT_WORDS)) if (ws.includes(key)) { parts.push(`contract_type.eq.${contract}`); if (contract === "interim" || contract === "cdi") parts.push("contract_type.eq.interim_cdi"); };
     return parts.join(",");
   });
 }

@@ -4,7 +4,7 @@ export interface OfferForSeo {
   salary_min: number | null; salary_max: number | null; salary_period: string | null; show_salary: boolean | null;
 }
 
-const EMPLOYMENT: Record<string, string> = { cdi: "FULL_TIME", cdd: "TEMPORARY", interim: "TEMPORARY" };
+const EMPLOYMENT: Record<string, string> = { cdi: "FULL_TIME", cdd: "TEMPORARY", interim: "TEMPORARY", interim_cdi: "OTHER" };
 
 export function buildJobPosting(o: OfferForSeo, orgName: string, baseUrl = "https://wolko.be") {
   const plain = (o.description ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();

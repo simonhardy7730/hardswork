@@ -1,3 +1,5 @@
+import { contractLabel } from "@/lib/contract-label";
+import { CONTRACT_LABELS } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 import { maskOrgs } from "@/lib/confidential";
 import Link from "next/link";
@@ -63,6 +65,8 @@ const CONTRACT_STYLE: Record<string, string> = {
   cdi: "bg-emerald-50 text-emerald-700 border border-emerald-200",
   cdd: "bg-blue-50 text-blue-700 border border-blue-200",
   interim_cdi: "bg-orange-50 text-orange-700 border border-orange-200",
+  flexi: "bg-amber-50 text-amber-700 border border-amber-200",
+  etudiant: "bg-sky-50 text-sky-700 border border-sky-200",
   apprentissage: "bg-purple-50 text-purple-700 border border-purple-200",
 };
 
@@ -196,9 +200,9 @@ export default async function HomePage() {
                   </div>
 
                   {/* Contract badge */}
-                  <div className="shrink-0">
+                  <div className="shrink-0 w-28 flex justify-start">
                     <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${CONTRACT_STYLE[job.contract_type] ?? "bg-surface-2 text-ink-500"}`}>
-                      {t.contracts[job.contract_type] ?? job.contract_type}
+                      {t.contracts[job.contract_type] ?? contractLabel(CONTRACT_LABELS, job)}
                     </span>
                   </div>
 

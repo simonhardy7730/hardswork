@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { HardSworkLogo, HardieIcon } from "@/components/ui/HardieIcon";
 import PreferencesFields from "@/components/candidat/PreferencesFields";
+import Turnstile, { useCaptcha } from "@/components/security/Turnstile";
 import { EMPTY_PREFERENCES, type Preferences } from "@/lib/candidate/preferences";
 import { useLang } from "@/lib/i18n/context";
 import { labels } from "@/lib/utils";
@@ -109,6 +110,7 @@ export default function CandidatSignupPage() {
   const [step, setStep]     = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
   const submitting = useRef(false); // anti double-envoi (double clic / touche Entrée)
+  const captcha = useCaptcha();
   const [error, setError]   = useState("");
 
   /* Étape 1 — secteurs */
@@ -163,8 +165,10 @@ export default function CandidatSignupPage() {
       options: {
         data: { full_name: auth.full_name, user_type: "candidate", lang, ...readCampaign() },
         emailRedirectTo: `${window.location.origin}/auth/callback?next=/candidat/dashboard`,
+        captchaToken: captcha.token || undefined,
       },
     });
+    captcha.reset();
 
     if (authError || !authData.user) {
       setError(friendlyAuthError(authError?.message, l));
@@ -632,6 +636,8 @@ export default function CandidatSignupPage() {
                 style={{ borderTop: "6px solid transparent", borderBottom: "6px solid transparent", borderRight: "8px solid white" }} />
             </div>
           </div>
+
+          {step === 3 && <div className="mb-4"><Turnstile onToken={captcha.setToken} resetKey={captcha.resetKey} /></div>}
 
           {/* Navigation */}
           <div className="flex items-center gap-3">

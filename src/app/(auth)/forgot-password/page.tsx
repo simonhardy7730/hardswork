@@ -5,9 +5,11 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useL } from "@/lib/i18n/context";
+import Turnstile, { useCaptcha } from "@/components/security/Turnstile";
 
 export default function ForgotPasswordPage() {
   const l = useL();
+  const captcha = useCaptcha();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -21,7 +23,9 @@ export default function ForgotPasswordPage() {
     const supabase = createClient();
     const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
+      captchaToken: captcha.token || undefined,
     });
+    captcha.reset();
 
     if (err) {
       setError(l("Impossible d'envoyer l'email. Vérifiez l'adresse saisie.", "De e-mail kon niet worden verstuurd. Controleer het ingevoerde adres."));
@@ -91,6 +95,8 @@ export default function ForgotPasswordPage() {
                 {error}
               </div>
             )}
+
+            <Turnstile onToken={captcha.setToken} resetKey={captcha.resetKey} />
 
             <button
               type="submit"

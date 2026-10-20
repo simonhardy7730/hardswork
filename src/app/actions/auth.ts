@@ -47,6 +47,8 @@ export async function signUp(formData: FormData) {
   const vatRaw = ((formData.get("vat_number") as string) ?? "").trim();
   if (!isValidVat(vatRaw)) return { error: "Numéro de TVA invalide. Exemple : BE 0123.456.749" };
   const vatNumber = normalizeVat(vatRaw);
+  // Jeton Turnstile : transmis à Supabase, qui le vérifie si la protection CAPTCHA est activée (Authentication > Attack Protection).
+  const captchaToken = ((formData.get("captcha_token") as string) ?? "") || undefined;
 
   const supabase = await createClient();
 
@@ -58,6 +60,7 @@ export async function signUp(formData: FormData) {
     options: {
       data: { full_name: fullName, signup_kind: "organization", lang: await getLang(), org_name: orgName, org_type: orgType, vat_number: vatNumber },
       emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      captchaToken,
     },
   });
 

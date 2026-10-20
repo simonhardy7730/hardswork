@@ -18,6 +18,12 @@ export function friendlyAuthError(
       `Er is net een bevestigingsmail verstuurd. Wacht ${sec ?? "een minuut"}${sec ? " seconden" : ""} voor je opnieuw probeert en controleer je mailbox (en spam).`
     );
   }
+  if (m.includes("captcha")) {
+    return l(
+      "La vérification anti-robot a échoué. Attendez la coche verte, puis réessayez (ou rechargez la page).",
+      "De anti-robotcontrole is mislukt. Wacht op het groene vinkje en probeer opnieuw (of herlaad de pagina)."
+    );
+  }
   if (m.includes("already registered") || m.includes("already been registered")) {
     return l(
       "Cette adresse email a déjà un compte. Connecte-toi plutôt.",

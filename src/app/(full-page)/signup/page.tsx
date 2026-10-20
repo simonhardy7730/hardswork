@@ -10,6 +10,7 @@ import { isValidVat } from "@/lib/vat";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { useLang } from "@/lib/i18n/context";
 import { LangSwitch } from "@/components/layout/LangSwitch";
+import Turnstile, { useCaptcha } from "@/components/security/Turnstile";
 
 type OrgType = "agency" | "company";
 
@@ -48,6 +49,7 @@ function InviteSignup({ token }: { token: string }) {
   const [done, setDone] = useState(false);
   const [info, setInfo] = useState<{ org_name: string; email: string; role: string } | null | undefined>(undefined);
   const [formData, setFormData] = useState({ full_name: "", password: "" });
+  const captcha = useCaptcha();
 
   useEffect(() => {
     async function fetchInfo() {
@@ -74,8 +76,10 @@ function InviteSignup({ token }: { token: string }) {
       options: {
         data: { full_name: formData.full_name },
         emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/invite/accept?token=${token}`)}`,
+        captchaToken: captcha.token || undefined,
       },
     });
+    captcha.reset();
     if (authError || !authData.user) { setError(friendlyAuthError(authError?.message, l)); setLoading(false); return; }
     if (authData.session) {
       // Session immédiate (confirmation e-mail désactivée) : on accepte tout de suite.
@@ -139,6 +143,7 @@ function InviteSignup({ token }: { token: string }) {
                   className="w-full px-4 py-2.5 border border-white/10 rounded-xl text-sm bg-white/5 text-white placeholder-white/25 focus:outline-none focus:border-[#FFB900] transition" />
               </div>
               {error && <p className="text-sm px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-red-700">{error}</p>}
+              <Turnstile onToken={captcha.setToken} resetKey={captcha.resetKey} />
               <button type="submit" disabled={loading}
                 className="w-full py-3 rounded-xl font-bold text-sm text-[#101F43] flex items-center justify-center gap-2 transition"
                 style={{ background: loading ? "#FFD97A" : "#FFB900" }}>
@@ -173,6 +178,7 @@ function NormalSignup() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [cgu, setCgu] = useState(false);
+  const captcha = useCaptcha();
   const [formData, setFormData] = useState({ org_name: "", vat_number: "", full_name: "", email: "", password: "" });
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -195,8 +201,10 @@ function NormalSignup() {
       options: {
         data: { full_name: formData.full_name, signup_kind: "organization", lang, org_name: formData.org_name, org_type: orgType, vat_number: formData.vat_number.trim() },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
+        captchaToken: captcha.token || undefined,
       },
     });
+    captcha.reset();
     if (authError || !authData.user) { setError(friendlyAuthError(authError?.message, l)); setLoading(false); return; }
     if (!authData.session) {
       setNotice(l("Compte créé ! Vérifiez votre boîte mail et cliquez sur le lien pour confirmer votre adresse.", "Account aangemaakt! Controleer je mailbox en klik op de link om je e-mailadres te bevestigen."));
@@ -386,6 +394,8 @@ function NormalSignup() {
 
                 {error && <p className="text-xs rounded-xl px-4 py-3 bg-red-50 border border-red-100" style={{ color: "#B91C1C" }}>{error}</p>}
                 {notice && <p className="text-xs rounded-xl px-4 py-3 bg-green-50 border border-green-200 text-green-800">{notice}</p>}
+
+                <Turnstile onToken={captcha.setToken} resetKey={captcha.resetKey} />
 
                 <button type="submit" disabled={loading}
                   className="w-full py-4 text-white font-black text-sm tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 transition-all"

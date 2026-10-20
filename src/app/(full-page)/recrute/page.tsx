@@ -8,6 +8,7 @@ import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { signUp } from "@/app/actions/auth";
 import { useLang } from "@/lib/i18n/context";
 import { LangSwitch } from "@/components/layout/LangSwitch";
+import Turnstile, { useCaptcha } from "@/components/security/Turnstile";
 
 import { WolfBadge } from "@/components/ui/WolfMascot";
 type L = (fr: string, nl: string) => string;
@@ -65,6 +66,7 @@ export default function RecrutePage() {
   const [error, setError]       = useState("");
   const [notice, setNotice]     = useState("");
   const [loading, setLoading]   = useState(false);
+  const captcha = useCaptcha();
 
   function set(field: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -86,12 +88,14 @@ export default function RecrutePage() {
       fd.append("org_type",  selected);
       fd.append("org_name",  form.orgName);
       fd.append("vat_number", form.vat);
+      fd.append("captcha_token", captcha.token);
       const result = await signUp(fd);
       if (result?.error) setError(result.error);
       else if (result && "success" in result && result.success) setNotice(result.success);
     } catch {
       setError(l("Une erreur est survenue. Réessayez.", "Er is een fout opgetreden. Probeer opnieuw."));
     } finally {
+      captcha.reset();
       setLoading(false);
     }
   }
@@ -435,6 +439,7 @@ export default function RecrutePage() {
                 </label>
                 {error && <p className="text-xs rounded-xl px-4 py-3 bg-red-50 border border-red-100" style={{ color: "#B91C1C" }}>{error}</p>}
                 {notice && <p className="text-xs rounded-xl px-4 py-3 bg-green-50 border border-green-200 text-green-800">{notice}</p>}
+                <Turnstile onToken={captcha.setToken} resetKey={captcha.resetKey} />
                 <button type="submit" disabled={loading}
                   className="w-full py-4 text-white font-black text-sm tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 transition"
                   style={{ background: loading ? "#FFD97A" : "#FFB900", fontFamily: "var(--font-display)" }}>

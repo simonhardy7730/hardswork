@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
 import { useL } from "@/lib/i18n/context";
+import Turnstile, { useCaptcha } from "@/components/security/Turnstile";
 
 export default function LoginPage() {
   const router = useRouter();
   const l = useL();
+  const captcha = useCaptcha();
   const [mode, setMode] = useState<"password" | "magic">("password");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +32,9 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
+        options: { captchaToken: captcha.token || undefined },
       });
+      captcha.reset();
       if (error) {
         setMessage({ type: "error", text: l("Email ou mot de passe incorrect.", "Onjuist e-mailadres of wachtwoord.") });
       } else {
@@ -45,8 +49,10 @@ export default function LoginPage() {
         email,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
+          captchaToken: captcha.token || undefined,
         },
       });
+      captcha.reset();
       if (error) {
         setMessage({
           type: "error",
@@ -133,6 +139,8 @@ export default function LoginPage() {
               {message.text}
             </div>
           )}
+
+          <Turnstile onToken={captcha.setToken} resetKey={captcha.resetKey} />
 
           {/* Submit */}
           <button type="submit" disabled={loading}

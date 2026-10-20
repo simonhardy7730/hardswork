@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { orgResponseDays, responseBadge } from "@/lib/response-time";
 import { formatSalary } from "@/lib/salary";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -90,6 +91,8 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
     .from("job_offers")
     .select("id, title, city, contract_type, organizations(name)")
     .eq("status", "active").eq("sector", offer.sector).neq("id", params.id).limit(3);
+
+  const respDays = offer.organization_id ? await orgResponseDays(offer.organization_id as string) : null;
 
   /* Compter les candidatures */
   const { count: nbCandidatures } = await supabase
@@ -346,6 +349,11 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
                   {org?.city && <p className="text-ink-400 text-xs">{org.city}</p>}
                 </div>
               </div>
+              {respDays !== null && (
+                <p className="mb-3 inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1">
+                  ⚡ {responseBadge(respDays, l)}
+                </p>
+              )}
 
               <p className="text-ink-500 text-xs leading-relaxed mb-4 line-clamp-3">
                 {org?.description ?? (lang === "nl" ? `Bedrijf actief in de sector ${sectorLabel.toLowerCase()}. Werft aan via Wolko.` : `Entreprise active dans le secteur ${sectorLabel.toLowerCase()}. Recrutement en cours via Wolko.`)}

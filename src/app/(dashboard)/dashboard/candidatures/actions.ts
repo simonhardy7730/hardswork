@@ -150,6 +150,8 @@ export async function updateApplicationStatus(applicationId: string, status: str
 
   try {
     const db = admin();
+    // Première réponse du recruteur (badge de délai de réponse, migration 026) : sans effet si la colonne manque.
+    await db.from("applications").update({ first_response_at: new Date().toISOString() }).eq("id", applicationId).is("first_response_at", null);
     const { data: app, error: e2 } = await db
       .from("applications")
       .select("applicant_name, applicant_email, last_notified_status, job_offers(title, organizations(name))")

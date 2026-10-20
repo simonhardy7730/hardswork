@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { runApplicationReminders } from "@/lib/email/application-reminder";
 import { adminClient, runSubscriptionLifecycle, runFlashLifecycle } from "@/lib/billing/lifecycle";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +15,8 @@ export async function GET(req: Request) {
     const db = adminClient();
     const stats = await runSubscriptionLifecycle(db);
     const flash = await runFlashLifecycle(db).catch((e) => { console.error('flash lifecycle', e); return { errors: 1 }; });
-    return NextResponse.json({ ok: true, ...stats, flash });
+    const reminders = await runApplicationReminders(db).catch((e) => { console.error('app reminders', e); return { errors: 1 }; });
+    return NextResponse.json({ ok: true, ...stats, flash, reminders });
   } catch (e) {
     console.error("cron subscriptions:", e);
     return NextResponse.json({ error: "failed" }, { status: 500 });

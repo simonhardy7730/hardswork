@@ -20,7 +20,7 @@ const NAV_ITEMS = [
   { href: "/dashboard/settings", icon: Settings,        fr: "Paramètres",      nl: "Instellingen",  exact: false },
 ];
 
-/* Candidathèque : affichée uniquement quand CANDIDATE_POOL_ENABLED=true */
+/* Candidathèque : affichée sauf si CANDIDATE_POOL_ENABLED="false" */
 const POOL_ITEM = { href: "/dashboard/candidatheque", icon: Search, fr: "Candidathèque", nl: "Kandidatenbank", exact: false };
 
 /* Entrées réservées aux agences (les pages vérifient aussi le type côté serveur) */

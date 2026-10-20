@@ -4,7 +4,23 @@ ALTER TABLE candidates
   ADD COLUMN IF NOT EXISTS cv_data jsonb NOT NULL DEFAULT '{}'::jsonb;
 CREATE INDEX IF NOT EXISTS idx_candidates_trades ON candidates USING gin (trades);
 
--- Recherche candidathèque avec filtre par métier (mêmes garde-fous que search_candidate_pool_slots).
+-- ─── Candidathèque réservée aux abonnés payants (Pro / Agence) : ni l'essai gratuit, ni Flash ───
+CREATE OR REPLACE FUNCTION public.org_has_pool_access(p_org UUID)
+RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM subscriptions s
+     WHERE s.organization_id = p_org AND s.plan IN ('pro', 'agency')
+       AND (
+         (s.status = 'active' AND (s.current_period_end IS NULL OR s.current_period_end > now())
+             AND (s.cancel_effective_at IS NULL OR s.cancel_effective_at > now()))
+         OR (s.status = 'cancelled' AND s.current_period_end IS NOT NULL AND s.current_period_end > now())
+       )
+  )
+$$;
+REVOKE ALL ON FUNCTION public.org_has_pool_access(UUID) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.org_has_pool_access(UUID) TO authenticated;
+
+-- Recherche candidathèque avec filtre par métier, réservée à l'abonnement payant.
 CREATE OR REPLACE FUNCTION public.search_candidate_pool_v3(
   p_sectors text[] DEFAULT NULL, p_cities text[] DEFAULT NULL, p_job_type text DEFAULT NULL,
   p_availability text DEFAULT NULL, p_days text[] DEFAULT NULL, p_slots text[] DEFAULT NULL,
@@ -16,7 +32,7 @@ DECLARE v_org uuid;
 BEGIN
   IF auth.uid() IS NULL THEN RAISE EXCEPTION 'forbidden'; END IF;
   SELECT u.organization_id INTO v_org FROM users u WHERE u.id = auth.uid();
-  IF v_org IS NULL OR NOT public.org_has_access(v_org) THEN RAISE EXCEPTION 'no_access'; END IF;
+  IF v_org IS NULL OR NOT public.org_has_pool_access(v_org) THEN RAISE EXCEPTION 'no_access'; END IF;
   RETURN QUERY
     SELECT c.id, c.first_name, upper(left(c.last_name, 1)), c.city, c.sectors, c.availability::text,
            c.licenses, c.has_caces, c.experience_years, c.job_types, c.is_student, c.trades
@@ -39,5 +55,33 @@ BEGIN
      ORDER BY c.visibility_consent_at DESC
      LIMIT greatest(1, least(coalesce(p_limit, 24), 50)) OFFSET greatest(0, coalesce(p_offset, 0));
 END $$;
-REVOKE ALL ON FUNCTION public.search_candidate_pool_v3(text[], text[], text, text, text[], text[], text[], int, int) FROM PUBLIC, anon;
+
+-- Coordonnées : même règle (abonnement payant), même plafond anti-aspiration.
+CREATE OR REPLACE FUNCTION public.reveal_candidate_contact(p_candidate_id uuid)
+RETURNS TABLE (first_name text, last_name text, email text, phone text)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE v_org uuid;
+BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'forbidden'; END IF;
+  SELECT u.organization_id INTO v_org FROM users u WHERE u.id = auth.uid();
+  IF v_org IS NULL OR NOT public.org_has_pool_access(v_org) THEN RAISE EXCEPTION 'no_access'; END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM candidates c
+     WHERE c.id = p_candidate_id AND c.visible_to_recruiters AND c.status = 'actif'
+       AND c.birth_date IS NOT NULL AND c.birth_date <= current_date - interval '18 years'
+       AND c.visibility_consent_at > now() - interval '24 months'
+  ) THEN RAISE EXCEPTION 'not_found'; END IF;
+  IF NOT EXISTS (SELECT 1 FROM candidate_pool_access a WHERE a.organization_id = v_org AND a.candidate_id = p_candidate_id)
+     AND (SELECT count(*) FROM candidate_pool_access a
+           WHERE a.organization_id = v_org AND a.created_at > now() - interval '1 day') >= 100 THEN
+    RAISE EXCEPTION 'quota';
+  END IF;
+  INSERT INTO candidate_pool_access (organization_id, user_id, candidate_id, action) VALUES (v_org, auth.uid(), p_candidate_id, 'reveal');
+  RETURN QUERY SELECT c.first_name, c.last_name, c.email, c.phone FROM candidates c WHERE c.id = p_candidate_id;
+END $$;
+
+-- Les anciennes recherches (essai inclus) ne sont plus appelables depuis le site.
+REVOKE EXECUTE ON FUNCTION public.search_candidate_pool(text[], text[], text, text, int, int) FROM authenticated;
+REVOKE EXECUTE ON FUNCTION public.search_candidate_pool_slots(text[], text[], text, text, text[], text[], int, int) FROM authenticated;
 GRANT EXECUTE ON FUNCTION public.search_candidate_pool_v3(text[], text[], text, text, text[], text[], text[], int, int) TO authenticated;
+REVOKE ALL ON FUNCTION public.search_candidate_pool_v3(text[], text[], text, text, text[], text[], text[], int, int) FROM PUBLIC, anon;

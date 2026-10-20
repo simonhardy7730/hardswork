@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getOrgAccess } from "@/lib/billing/access";
+import { getOrgAccess, hasPoolAccess } from "@/lib/billing/access";
 import { getDict } from "@/lib/i18n/server";
 import { poolEnabled } from "@/lib/candidate/pool";
 import { RADIUS_OPTIONS, citiesWithin } from "@/lib/geo/distance";
@@ -32,7 +32,8 @@ export default async function CandidathequePage(props: { searchParams: Promise<S
   if (!user) redirect("/login");
   const { data: profile } = await supabase.from("users").select("organization_id").eq("id", user.id).single();
   if (!profile) redirect("/onboarding");
-  const { hasAccess } = await getOrgAccess(supabase, profile.organization_id);
+  const access = await getOrgAccess(supabase, profile.organization_id);
+  const hasAccess = hasPoolAccess(access);
 
   const lieu = (sp.lieu ?? "").trim().slice(0, 80);
   const rayon = RADIUS_OPTIONS.find((r) => String(r) === sp.rayon) ?? 0;
@@ -87,14 +88,17 @@ export default async function CandidathequePage(props: { searchParams: Promise<S
           {l("Candidathèque", "Kandidatenbank")}
         </h1>
         <p className="text-ink-500 text-sm mt-1">
-          {l("Profils de candidats qui ont accepté d'être visibles des recruteurs abonnés.", "Profielen van kandidaten die ermee instemden zichtbaar te zijn voor werkgevers met een abonnement.")}
+          {l("Profils de candidats qui ont accepté d'être visibles des recruteurs abonnés (Pro et Agence).", "Profielen van kandidaten die ermee instemden zichtbaar te zijn voor werkgevers met een abonnement (Pro en Kantoor).")}
         </p>
       </div>
 
       {!hasAccess ? (
         <div className="bg-white border border-ink-100 rounded-2xl p-8 text-center">
-          <p className="text-ink font-semibold mb-2">{l("La candidathèque est réservée aux organisations avec un essai ou un abonnement actif.", "De kandidatenbank is voorbehouden aan organisaties met een actieve proefperiode of abonnement.")}</p>
-          <Link href="/dashboard/settings" className="btn-brand inline-flex mt-3">{l("Voir mon abonnement", "Mijn abonnement bekijken")}</Link>
+          <p className="text-ink font-semibold mb-2">{l("La candidathèque est réservée aux abonnés Pro et Agence.", "De kandidatenbank is voorbehouden aan Pro- en Kantoor-abonnees.")}</p>
+          <p className="text-ink-500 text-sm">{access.state === "trial"
+            ? l("Pendant l'essai gratuit, vous publiez vos offres et recevez des candidatures. Passez à un abonnement pour chercher et contacter directement les candidats par métier.", "Tijdens de gratis proefperiode publiceer je vacatures en ontvang je sollicitaties. Neem een abonnement om kandidaten per beroep te zoeken en te contacteren.")
+            : l("Cherchez les candidats par métier, ville et disponibilité, et appelez-les directement.", "Zoek kandidaten op beroep, stad en beschikbaarheid en bel ze rechtstreeks.")}</p>
+          <Link href="/dashboard/settings" className="btn-brand inline-flex mt-3">{l("Choisir mon abonnement", "Mijn abonnement kiezen")}</Link>
         </div>
       ) : (
         <>

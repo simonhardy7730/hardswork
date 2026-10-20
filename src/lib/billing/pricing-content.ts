@@ -32,6 +32,7 @@ export const CONTENT = {
       b("Sans carte bancaire, aucun prélèvement automatique", "Zonder bankkaart, geen automatische afschrijving"),
       b(`${TRIAL_DAYS} jours calendaires, une seule fois par organisation`, `${TRIAL_DAYS} kalenderdagen, slechts één keer per organisatie`),
       b("Vos données sont conservées à la fin de l'essai", "Je gegevens blijven bewaard na de proefperiode"),
+      b("Candidathèque réservée aux abonnés Pro et Agence", "Kandidatendatabank voorbehouden aan Pro- en Kantoor-abonnees"),
     ],
   },
   plans: {
@@ -56,6 +57,7 @@ export const CONTENT = {
       features: [
         b("Gestion des clients et suivi des prospects", "Klantenbeheer en opvolging van prospecten"),
         b("Gestion des candidats", "Kandidatenbeheer"),
+        b("Accès à la candidathèque (recherche par métier)", "Toegang tot de kandidatendatabank (zoeken op beroep)"),
         b("ATS de recrutement (suivi des candidatures)", "ATS voor werving (opvolging van sollicitaties)"),
         b("Suivi des missions de recrutement", "Opvolging van wervingsopdrachten"),
         b("Équipe et rôles (administrateur, recruteur, lecture seule)", "Team en rollen (beheerder, recruiter, enkel lezen)"),

@@ -17,3 +17,6 @@ export function redactContacts<T extends { email?: string | null; phone?: string
   if (hasAccess) return rows;
   return rows.map((r) => ({ ...r, email: null, phone: null }));
 }
+
+/** Candidathèque : réservée aux abonnements payants en cours (Pro / Agence). Ni l'essai gratuit, ni Flash. */
+export const hasPoolAccess = (a: Access) => a.state === "active" || a.state === "cancelled_running";

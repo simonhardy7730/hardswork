@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { resend, FROM_EMAIL, FROM_NAME } from "@/lib/resend";
 import { layout, li, esc, orgRecipients } from "@/lib/email/subscription";
-import { getOrgAccess } from "@/lib/billing/access";
+import { getOrgAccess, hasPoolAccess } from "@/lib/billing/access";
 import { poolEnabled } from "@/lib/candidate/pool";
 import { citiesWithin } from "@/lib/geo/distance";
 
@@ -27,8 +27,7 @@ export async function runMatchingAlerts(db: SupabaseClient, now: Date = new Date
 
   for (const [orgId, list] of byOrg) {
     try {
-      const { hasAccess } = await getOrgAccess(db, orgId, now);
-      if (!hasAccess) continue;
+      if (!hasPoolAccess(await getOrgAccess(db, orgId, now))) continue;
       const lines: string[] = [];
       for (const o of list.slice(0, 5)) {
         const cities = citiesWithin(String(o.city ?? ""), 25)?.names ?? (o.city ? [String(o.city)] : []);

@@ -1,3 +1,4 @@
+import { contractLabel } from "@/lib/contract-label";
 import { createClient } from "@/lib/supabase/server";
 import { maskOrgs } from "@/lib/confidential";
 import Link from "next/link";
@@ -357,7 +358,7 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
                         </div>
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-[11px] bg-ink-100 text-ink-600 font-bold px-2 py-0.5 rounded">
-                            {CONTRACT_LABELS[offer.contract_type] ?? offer.contract_type}
+                            {contractLabel(CONTRACT_LABELS, offer)}
                           </span>
                           <span className="text-[11px] bg-ink-100 text-ink-600 font-bold px-2 py-0.5 rounded">
                             {l("Salaire", "Loon")} : {salary}
@@ -428,7 +429,7 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
                             <p className="text-[10px] text-ink-300 mt-0.5">{l("Salaire : Compétitif", "Loon: Competitief")}</p>
                           )}
                           <span className="inline-block text-[9px] font-black bg-ink-100 text-ink-500 px-2 py-0.5 rounded-full uppercase mt-1">
-                            {CONTRACT_LABELS[p.contract_type] ?? p.contract_type}
+                            {contractLabel(CONTRACT_LABELS, p)}
                           </span>
                         </div>
                       </Link>

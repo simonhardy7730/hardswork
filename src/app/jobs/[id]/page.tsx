@@ -1,3 +1,4 @@
+import { contractLabel } from "@/lib/contract-label";
 import { createClient } from "@/lib/supabase/server";
 import { maskOrgs, publicOrgName } from "@/lib/confidential";
 import { orgResponseDays, responseBadge } from "@/lib/response-time";
@@ -193,7 +194,7 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
               <div className="flex items-center gap-2">
                 <Briefcase size={12} className="text-white/30" />
                 <span className="text-white/60 text-sm font-semibold">
-                  {CONTRACT_LABELS[offer.contract_type] ?? offer.contract_type}
+                  {contractLabel(CONTRACT_LABELS, offer)}
                 </span>
               </div>
             )}
@@ -285,7 +286,7 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
                   ...(offer.caces_types ?? []).map((c: string) => `CACES ${c}`),
                   ...(offer.licenses ?? []).map((lic: string) => `${l("Permis", "Rijbewijs")} ${lic}`),
                   sectorLabel,
-                  CONTRACT_LABELS[offer.contract_type] ?? offer.contract_type,
+                  contractLabel(CONTRACT_LABELS, offer),
                 ].map((skill: string) => (
                   <span
                     key={skill}
@@ -305,7 +306,7 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
               </h2>
               <p className="flex items-start gap-3 text-[15px] text-ink-600">
                 <CheckCircle size={15} className="text-brand shrink-0 mt-0.5" />
-                {l("Contrat", "Contract")} {CONTRACT_LABELS[offer.contract_type] ?? offer.contract_type}{salary ? ` — ${l("Salaire", "Loon")} : ${salary}` : ""}.
+                {l("Contrat", "Contract")} {contractLabel(CONTRACT_LABELS, offer)}{salary ? ` — ${l("Salaire", "Loon")} : ${salary}` : ""}.
               </p>
             </div>
           </div>

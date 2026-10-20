@@ -160,6 +160,11 @@ export default function PrivacyPage() {
                 du service (session, authentification). Nous n&apos;utilisons pas de cookies tiers à des
                 fins publicitaires ou analytiques sans votre consentement explicite.
               </p>
+              <p className="mt-3">
+                Pour mesurer la fréquentation du site (nombre de visites, pages consultées, type d&apos;appareil),
+                nous utilisons Cloudflare Web Analytics. Cet outil ne dépose aucun cookie, ne suit pas les visiteurs
+                d&apos;un site à l&apos;autre et ne nous transmet que des statistiques globales et anonymes.
+              </p>
             </LegalSection>
 
             <LegalSection title="9. Sécurité">

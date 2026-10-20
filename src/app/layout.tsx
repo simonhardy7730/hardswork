@@ -1,3 +1,4 @@
+import Script from "next/script";
 import type { Metadata } from "next";
 import { Inter, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
@@ -56,7 +57,13 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang={await getLang()} className={`${inter.variable} ${barlow.variable}`}>
-      <body className="antialiased"><LangProvider lang={await getLang()}>{children}</LangProvider></body>
+      <body className="antialiased"><LangProvider lang={await getLang()}>{children}</LangProvider>
+        {/* Mesure d'audience Cloudflare : sans cookie, aucune donnée personnelle, uniquement en production. */}
+        {process.env.VERCEL_ENV === "production" && (
+          <Script src="https://static.cloudflareinsights.com/beacon.min.js" strategy="afterInteractive"
+            data-cf-beacon='{"token": "d8c797485f4a45a1bfb07c6ae4bf6f89"}' />
+        )}
+      </body>
     </html>
   );
 }

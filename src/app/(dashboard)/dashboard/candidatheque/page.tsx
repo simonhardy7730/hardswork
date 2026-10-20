@@ -7,15 +7,17 @@ import { poolEnabled } from "@/lib/candidate/pool";
 import { RADIUS_OPTIONS, citiesWithin } from "@/lib/geo/distance";
 import { JOB_TYPES } from "@/lib/candidate/preferences";
 import { labels } from "@/lib/utils";
+import { DAYS, SLOTS } from "@/lib/candidate/availability";
 import RevealContact from "@/components/dashboard/RevealContact";
 
-type SP = { secteur?: string; lieu?: string; rayon?: string; type?: string; dispo?: string; page?: string };
+type SP = { secteur?: string; lieu?: string; rayon?: string; type?: string; dispo?: string; page?: string; jour?: string | string[]; plage?: string | string[] };
 type Row = {
   id: string; first_name: string; last_initial: string; city: string | null; sectors: string[] | null;
   availability: string; licenses: string[] | null; has_caces: boolean | null; experience_years: number | null;
   job_types: string[] | null; is_student: boolean | null;
 };
 const PAGE = 24;
+const csv = (v: string | string[] | undefined) => (Array.isArray(v) ? v.join(",") : v ?? "");
 
 export default async function CandidathequePage(props: { searchParams: Promise<SP> }) {
   if (!poolEnabled()) notFound();
@@ -37,17 +39,26 @@ export default async function CandidathequePage(props: { searchParams: Promise<S
   const cities = around ? around.names : lieu ? [lieu] : null;
   const page = Math.max(0, parseInt(sp.page ?? "0", 10) || 0);
 
+  const jourList = csv(sp.jour).split(",").filter((d) => DAYS.some((x) => x.key === d));
+  const plageList = csv(sp.plage).split(",").filter((d) => SLOTS.some((x) => x.key === d));
   let rows: Row[] = [];
   if (hasAccess) {
-    const { data } = await supabase.rpc("search_candidate_pool", {
+    const base = {
       p_sectors: sp.secteur ? [sp.secteur] : null,
       p_cities: cities,
       p_job_type: JOB_TYPES.some((t) => t.key === sp.type) ? sp.type : null,
       p_availability: ["immediate", "1_semaine", "1_mois"].includes(sp.dispo ?? "") ? sp.dispo : null,
       p_limit: PAGE + 1,
       p_offset: page * PAGE,
-    });
-    rows = (data as Row[] | null) ?? [];
+    };
+    const days = jourList.length ? jourList : null;
+    const slots = plageList.length ? plageList : null;
+    // Recherche par créneaux (migration 027) ; sans elle, on retombe sur la recherche simple.
+    let res = await supabase.rpc("search_candidate_pool_slots", { ...base, p_days: days, p_slots: slots });
+    if (res.error && /search_candidate_pool_slots|function/i.test(res.error.message ?? "") && !days && !slots) {
+      res = await supabase.rpc("search_candidate_pool", base);
+    }
+    rows = (res.data as Row[] | null) ?? [];
   }
   const hasNext = rows.length > PAGE;
   rows = rows.slice(0, PAGE);
@@ -59,7 +70,7 @@ export default async function CandidathequePage(props: { searchParams: Promise<S
   };
   const params = (extra: Record<string, string>) => {
     const p = new URLSearchParams();
-    for (const [k, v] of Object.entries({ ...sp, ...extra })) if (v) p.set(k, String(v));
+    for (const [k, v] of Object.entries({ ...sp, ...extra })) if (v) p.set(k, Array.isArray(v) ? v.join(",") : String(v));
     return `?${p.toString()}`;
   };
   const sel = "h-11 rounded-xl border border-ink-100 bg-white px-3 text-sm";
@@ -100,6 +111,21 @@ export default async function CandidathequePage(props: { searchParams: Promise<S
               <option value="">{l("Toute disponibilité", "Alle beschikbaarheid")}</option>
               {Object.entries(availLbl).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
+            <fieldset className="w-full flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-ink-700">
+              <legend className="sr-only">{l("Disponible aux créneaux", "Beschikbaar op")}</legend>
+              <span className="font-semibold">{l("Dispo (au moins un) :", "Beschikbaar (minstens één):")}</span>
+              {DAYS.filter((d) => d.key !== "holiday").map((d) => (
+                <label key={d.key} className="inline-flex items-center gap-1">
+                  <input type="checkbox" name="jour" value={d.key} defaultChecked={jourList.includes(d.key)} />{l(d.fr, d.nl)}
+                </label>
+              ))}
+              <span className="text-ink-300">|</span>
+              {SLOTS.map((x) => (
+                <label key={x.key} className="inline-flex items-center gap-1">
+                  <input type="checkbox" name="plage" value={x.key} defaultChecked={plageList.includes(x.key)} />{l(x.fr, x.nl)}
+                </label>
+              ))}
+            </fieldset>
             <button type="submit" className="h-11 px-5 rounded-xl bg-[#101F43] font-display font-black uppercase text-xs"
               style={{ letterSpacing: "0.05em", color: "#FFFFFF" }}>{l("Rechercher", "Zoeken")}</button>
           </form>

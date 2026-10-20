@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Link2, MessageCircle, Facebook } from "lucide-react";
+import { Check, Link2, MessageCircle, Share2 } from "lucide-react";
 
 /** Partage d'une annonce : WhatsApp, Facebook, copie du lien. Aucun script externe. */
 export default function ShareButtons({ url, title, city, lang = "fr" }: { url: string; title: string; city?: string | null; lang?: string }) {
@@ -16,7 +16,7 @@ export default function ShareButtons({ url, title, city, lang = "fr" }: { url: s
   return (
     <div className="flex flex-wrap gap-2">
       <a href={wa} target="_blank" rel="noopener noreferrer" className={cls}><MessageCircle size={14} /> WhatsApp</a>
-      <a href={fb} target="_blank" rel="noopener noreferrer" className={cls}><Facebook size={14} /> Facebook</a>
+      <a href={fb} target="_blank" rel="noopener noreferrer" className={cls}><Share2 size={14} /> Facebook</a>
       <button
         type="button"
         className={cls}

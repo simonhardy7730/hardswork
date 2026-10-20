@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { maskOrgs, publicOrgName } from "@/lib/confidential";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
@@ -34,7 +35,7 @@ export default async function CandidatDashboardPage() {
   /* Candidatures du candidat */
   const { data: applications } = await supabase
     .from("applications")
-    .select("*, job_offers(id, title, sector, city, contract_type, organizations(name))")
+    .select("*, job_offers(id, title, sector, city, contract_type, hide_company, organizations(name))")
     .eq("applicant_email", email)
     .order("applied_at", { ascending: false });
 
@@ -50,11 +51,11 @@ export default async function CandidatDashboardPage() {
   /* Offres suggérées (récentes, tout secteur) */
   const { data: suggestedRaw } = await supabase
     .from("job_offers")
-    .select("id, title, sector, city, contract_type, organizations(name)")
+    .select("id, title, sector, city, contract_type, hide_company, organizations(name)")
     .eq("status", "active")
     .order("created_at", { ascending: false })
     .limit(4);
-  const suggested = suggestedRaw ?? [];
+  const suggested = maskOrgs(suggestedRaw, lang);
 
   /* Stats */
   const stats = {
@@ -150,7 +151,7 @@ export default async function CandidatDashboardPage() {
                   organizations: { name: string }[] | { name: string } | null;
                 } | null;
                 const orgRaw = job?.organizations;
-                const org = Array.isArray(orgRaw) ? orgRaw[0] : orgRaw;
+                const org = (job as { hide_company?: boolean } | null)?.hide_company ? { name: publicOrgName(true, null, lang) } : Array.isArray(orgRaw) ? orgRaw[0] : orgRaw;
                 const status = STATUS_CONFIG[app.status] ?? STATUS_CONFIG.nouveau;
                 const Icon = status.icon;
 

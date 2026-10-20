@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { maskOrgs } from "@/lib/confidential";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
@@ -18,7 +19,7 @@ async function load(secteur: string, ville: string) {
   const names = (citiesWithin(city, 15)?.names ?? [city]).map(safeIlikeValue).filter(Boolean);
   const { data } = await supabase
     .from("job_offers")
-    .select("id, title, city, contract_type, salary_min, salary_max, salary_period, show_salary, organizations(name)")
+    .select("id, title, city, contract_type, salary_min, salary_max, salary_period, show_salary, hide_company, organizations(name)")
     .eq("status", "active").eq("sector", secteur)
     .or(names.map((n) => `city.ilike.${n}`).join(","))
     .order("created_at", { ascending: false }).limit(30);
@@ -73,7 +74,7 @@ export default async function EmploiPage(props: { params: Promise<{ secteur: str
             <p className="text-ink-500 text-sm mt-1">{l("Créez une alerte ou parcourez toutes les offres.", "Maak een alert of bekijk alle vacatures.")}</p>
             <Link href={`/jobs?secteur=${secteur}`} className="btn-brand inline-flex mt-4">{l("Voir toutes les offres", "Alle vacatures bekijken")}</Link>
           </div>
-        ) : res.offers.map((o) => {
+        ) : maskOrgs(res.offers, lang).map((o) => {
           const orgRaw = o.organizations as unknown as { name: string }[] | { name: string } | null;
           const org = Array.isArray(orgRaw) ? orgRaw[0] : orgRaw;
           const salary = o.show_salary ? formatSalary(o.salary_min, o.salary_max, o.salary_period, lang) : null;

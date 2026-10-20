@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { maskOrgs } from "@/lib/confidential";
 import Link from "next/link";
 import { MapPin, Search, ArrowRight, Bell } from "lucide-react";
 import { labels } from "@/lib/utils";
@@ -86,17 +87,17 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
   let offersRaw = firstTry;
   // Colonnes de planning absentes (migration 010 non appliquée) : on retombe sur la recherche simple.
   if (offersErr && hasPlanningFilter) offersRaw = (await query).data;
-  const offers = offersRaw ?? [];
+  const offers = maskOrgs(offersRaw, lang);
 
   /* ── Offres premium (urgentes ou récentes) pour sidebar ─ */
   const { data: premiumRaw } = await supabase
     .from("job_offers")
-    .select("id, title, sector, city, contract_type, salary_min, salary_max, salary_period, show_salary, organizations(name)")
+    .select("id, title, sector, city, contract_type, salary_min, salary_max, salary_period, show_salary, hide_company, organizations(name)")
     .eq("status", "active")
     .order("is_urgent", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(4);
-  const premium = premiumRaw ?? [];
+  const premium = maskOrgs(premiumRaw, lang);
 
   const hasFilters = searchParams.secteur || searchParams.region || searchParams.q || searchParams.contrat || lieu || hasPlanningFilter;
 

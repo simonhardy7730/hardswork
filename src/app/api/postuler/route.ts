@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { publicOrgName } from "@/lib/confidential";
 import { createClient } from "@supabase/supabase-js";
 import { resend, FROM_EMAIL, FROM_NAME } from "@/lib/resend";
 import { render } from "@react-email/render";
@@ -208,6 +209,8 @@ export async function POST(req: NextRequest) {
     const org = Array.isArray(orgRaw) ? orgRaw[0] : orgRaw;
     const orgName: string = org?.name ?? "Wolko";
     const orgEmail: string | undefined = org?.email;
+    // Annonce confidentielle : le candidat ne voit jamais le nom de l'entreprise dans ses e-mails.
+    const publicName = publicOrgName((jobData as { hide_company?: boolean }).hide_company, orgName, "fr");
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://wolko.be";
     const dashboardUrl = `${appUrl}/dashboard/offres/${job_offer_id}/candidatures`;
 
@@ -254,13 +257,13 @@ export async function POST(req: NextRequest) {
         .send({
           from: `${FROM_NAME} <${FROM_EMAIL}>`,
           to: applicant_email,
-          subject: `✅ Candidature reçue — ${jobData.title} chez ${orgName}`,
+          subject: `✅ Candidature reçue — ${jobData.title}${(jobData as { hide_company?: boolean }).hide_company ? "" : ` chez ${orgName}`}`,
           html: await render(
             CandidatureConfirmationEmail({
               candidateName: applicant_name,
               jobTitle: jobData.title,
               jobCity: jobData.city,
-              orgName,
+              orgName: publicName,
               availability: availability || "immediate",
             })
           ),

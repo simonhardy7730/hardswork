@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { maskOrgs, publicOrgName } from "@/lib/confidential";
 import { orgResponseDays, responseBadge } from "@/lib/response-time";
 import { formatSalary } from "@/lib/salary";
 import { notFound } from "next/navigation";
@@ -38,13 +39,13 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
   const supabase = await createClient();
   const { data } = await supabase
     .from("job_offers")
-    .select("title, city, sector, organizations(name)")
+    .select("title, city, sector, hide_company, organizations(name)")
     .eq("id", params.id).single();
   const { lang } = await getDict();
   const SECTOR_LABELS = labels(lang).sector;
   if (!data) return { title: lang === "nl" ? "Vacature niet gevonden — Wolko" : "Offre introuvable — Wolko" };
   const orgRaw = data.organizations as unknown as { name: string }[] | { name: string } | null;
-  const org = Array.isArray(orgRaw) ? (orgRaw[0] ?? null) : orgRaw;
+  const org = data.hide_company ? { name: publicOrgName(true, null, lang) } : Array.isArray(orgRaw) ? (orgRaw[0] ?? null) : orgRaw;
   return {
     title: `${data.title} — ${org?.name ?? ""} | Wolko`,
     description: lang === "nl"
@@ -75,7 +76,9 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
 
   if (!offer) notFound();
 
-  const org = offer.organizations as {
+  const org = (offer.hide_company
+    ? { name: publicOrgName(true, null, lang), city: null, logo_url: null, primary_color: null, description: null }
+    : offer.organizations) as {
     name: string; city?: string | null;
     logo_url: string | null; primary_color: string | null;
     description: string | null;
@@ -89,7 +92,7 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
   /* Offres similaires */
   const { data: similar } = await supabase
     .from("job_offers")
-    .select("id, title, city, contract_type, organizations(name)")
+    .select("id, title, city, contract_type, hide_company, organizations(name)")
     .eq("status", "active").eq("sector", offer.sector).neq("id", params.id).limit(3);
 
   const respDays = offer.organization_id ? await orgResponseDays(offer.organization_id as string) : null;
@@ -395,7 +398,7 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
                   {l("Offres similaires", "Vergelijkbare vacatures")}
                 </p>
                 <div className="divide-y divide-ink-50">
-                  {(similar ?? []).map(s => {
+                  {maskOrgs(similar, lang).map(s => {
                     const sOrgRaw = s.organizations as unknown as { name: string }[] | { name: string } | null;
                     const sOrg = Array.isArray(sOrgRaw) ? (sOrgRaw[0] ?? null) : sOrgRaw;
                     return (

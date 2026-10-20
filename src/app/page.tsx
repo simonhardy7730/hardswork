@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { maskOrgs } from "@/lib/confidential";
 import Link from "next/link";
 import {
   ArrowRight, ArrowUpRight, MapPin, CheckCircle, Search, Building2, Zap, LayoutGrid, HeartHandshake,
@@ -74,11 +75,11 @@ export default async function HomePage() {
   /* Offres réelles uniquement — aucune offre factice n'est affichée. */
   const { data: featuredRaw } = await supabase
     .from("job_offers")
-    .select("id, title, city, sector, contract_type, salary_min, salary_max, salary_period, show_salary, is_urgent, organizations(name, primary_color)")
+    .select("id, title, city, sector, contract_type, salary_min, salary_max, salary_period, show_salary, is_urgent, hide_company, organizations(name, primary_color)")
     .eq("status", "active")
     .order("created_at", { ascending: false })
     .limit(8);
-  const displayJobs = (featuredRaw ?? []) as unknown as JobOffer[];
+  const displayJobs = maskOrgs((featuredRaw ?? []) as unknown as (JobOffer & { hide_company?: boolean })[], lang) as unknown as JobOffer[];
 
   return (
     <div className="bg-surface font-body">

@@ -90,6 +90,7 @@ export default function NouvelleOffreForm({
 
   const [planning, setPlanning] = useState<OfferPlanning>(EMPTY_PLANNING);
   const [screening, setScreening] = useState<string[]>([]);
+  const [hideCompany, setHideCompany] = useState(false);
 
   const [form, setForm] = useState<FormData>({
     title: "",
@@ -164,6 +165,7 @@ export default function NouvelleOffreForm({
       description: form.description,
       status,
       ...(screening.length ? { screening_ids: screening } : {}),
+      ...(hideCompany ? { hide_company: true } : {}),
     };
 
     // Planning (migration 010) : uniquement pour les types concernés ; si les colonnes n'existent
@@ -190,9 +192,9 @@ export default function NouvelleOffreForm({
       .single();
     // Code postal (migration 018) : tant que la colonne n'existe pas, on publie sans plutôt que d'échouer.
     // Questions de présélection (migration 025) : on publie sans elles tant que la colonne n'existe pas.
-    if (error && /screening_ids/.test(error.message ?? "")) {
-      const { screening_ids: _s, ...withoutScreening } = payload;
-      void _s;
+    if (error && /screening_ids|hide_company/.test(error.message ?? "")) {
+      const { screening_ids: _s, hide_company: _h, ...withoutScreening } = payload;
+      void _s; void _h;
       ({ data, error } = await supabase.from("job_offers").insert({ ...withoutScreening, ...planningPayload }).select().single());
     }
     if (error && /postal_code/.test(error.message ?? "")) {
@@ -400,6 +402,15 @@ export default function NouvelleOffreForm({
                   onChange={(e) => set("start_date", e.target.value)}
                   className="w-full px-3 py-2.5 border border-ink-100 rounded-lg text-sm focus:outline-none focus:border-brand transition"
                 />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="flex items-start gap-2.5 cursor-pointer">
+                  <input type="checkbox" checked={hideCompany} onChange={(e) => setHideCompany(e.target.checked)} className="mt-1 accent-[#FFB900]" />
+                  <span className="text-sm text-ink">
+                    <span className="font-medium">{l("Annonce confidentielle : masquer le nom de mon entreprise", "Vertrouwelijke vacature: mijn bedrijfsnaam verbergen")}</span>
+                    <span className="block text-[11px] text-ink-300 mt-0.5">{l("Le nom et le logo n'apparaissent pas sur l'annonce ni dans les e-mails envoyés au candidat. Ne citez pas non plus votre entreprise dans la description.", "Naam en logo verschijnen niet in de vacature of in de e-mails aan de kandidaat. Vermeld je bedrijf ook niet in de beschrijving.")}</span>
+                  </span>
+                </label>
               </div>
               <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-ink mb-1.5">

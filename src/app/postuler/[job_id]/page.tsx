@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { publicOrgName } from "@/lib/confidential";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import CandidatureForm from "@/components/candidature/CandidatureForm";
@@ -43,7 +44,9 @@ export default async function PostulerPage(
 
   const job = offre as JobOffer & { organizations: Organization };
   const orgRaw = job.organizations as unknown;
-  const org = Array.isArray(orgRaw) ? (orgRaw as Organization[])[0] : orgRaw as Organization | null;
+  const org = (job as unknown as { hide_company?: boolean }).hide_company
+    ? ({ name: publicOrgName(true, null, lang), logo_url: null, primary_color: null } as unknown as Organization)
+    : Array.isArray(orgRaw) ? (orgRaw as Organization[])[0] : orgRaw as Organization | null;
 
   // Candidature rapide (étudiant / flexi-job) : préremplie si le candidat est connecté.
   const isQuick = job.contract_type === "etudiant" || job.contract_type === "flexi";

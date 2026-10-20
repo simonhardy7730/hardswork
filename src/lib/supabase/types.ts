@@ -86,6 +86,8 @@ export interface JobOffer {
   applications_deleted_count?: number;
   /** Migration 025 : questions de présélection */
   screening_ids?: string[];
+  /** Migration 028 : annonce confidentielle */
+  hide_company?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -216,6 +218,7 @@ export type UserInsert = {
 
 export type JobOfferInsert = {
   screening_ids?: string[];
+  hide_company?: boolean;
   organization_id: string;
   created_by: string;
   title: string;

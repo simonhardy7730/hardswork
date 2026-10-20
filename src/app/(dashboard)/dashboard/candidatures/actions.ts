@@ -154,7 +154,7 @@ export async function updateApplicationStatus(applicationId: string, status: str
     await db.from("applications").update({ first_response_at: new Date().toISOString() }).eq("id", applicationId).is("first_response_at", null);
     const { data: app, error: e2 } = await db
       .from("applications")
-      .select("applicant_name, applicant_email, last_notified_status, job_offers(title, organizations(name))")
+      .select("applicant_name, applicant_email, last_notified_status, job_offers(title, hide_company, organizations(name))")
       .eq("id", applicationId)
       .single();
     if (e2 || !app || !app.applicant_email) return { ok: true }; // colonne absente (migration 025) ou pas d'e-mail
@@ -165,7 +165,7 @@ export async function updateApplicationStatus(applicationId: string, status: str
     const sent = await sendApplicationStatusEmail({
       to: app.applicant_email as string,
       candidateName: app.applicant_name as string,
-      orgName: org?.name ?? "Le recruteur",
+      orgName: job?.hide_company ? "Le recruteur" : (org?.name ?? "Le recruteur"),
       jobTitle: (job?.title as string) ?? "votre candidature",
       status,
     });

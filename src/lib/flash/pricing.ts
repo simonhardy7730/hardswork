@@ -1,3 +1,4 @@
+import { brusselsDay } from "@/lib/billing/contract";
 // WOLKO Flash / Flash Duo — tarification en CENTIMES ENTIERS (aucun calcul flottant).
 // Miroir de flash_create_order() en SQL (migration 024), qui reste la source de vérité côté serveur.
 export const FLASH_UNIT_CENTS = 14_900;       // 149 € HTVA
@@ -58,9 +59,11 @@ export const ORDER_LABEL: Record<OrderStatus, { fr: string; nl: string }> = {
   refunded: { fr: "Remboursée", nl: "Terugbetaald" },
 };
 
-/** Jours entiers restants (arrondi au supérieur), 0 si terminé. */
+/** Jours calendaires restants (heure de Bruxelles : le passage à l'heure d'hiver ne fausse pas le compte), 0 si terminé. */
 export function daysLeft(expiresAtIso: string | null, now: Date): number {
   if (!expiresAtIso) return 0;
-  const ms = new Date(expiresAtIso).getTime() - now.getTime();
-  return ms > 0 ? Math.ceil(ms / 86_400_000) : 0;
+  const exp = new Date(expiresAtIso);
+  if (exp.getTime() <= now.getTime()) return 0;
+  const toDay = (d: Date) => { const [y, m, dd] = brusselsDay(d).split("-").map(Number); return Date.UTC(y, m - 1, dd) / 86_400_000; };
+  return Math.max(1, toDay(exp) - toDay(now)); // encore en ligne aujourd'hui : au moins 1
 }

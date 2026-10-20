@@ -28,7 +28,9 @@ test("quantité invalide refusée, tarif historique conservé si le prix évolue
 test("format monétaire et jours restants", () => {
   assert.equal(formatEuro(22350).replace(/\s/g, " "), "223,50 €");
   assert.equal(formatEuro(-7450), "-74,50 €");
-  assert.equal(daysLeft("2026-11-18T23:00:00Z", new Date("2026-10-19T22:00:00Z")), 31);
+  assert.equal(daysLeft("2026-11-18T23:00:00Z", new Date("2026-10-19T22:00:00Z")), 30);
+  // publiée le 20/10 à 09h (heure d'été), expire le 19/11 à 09h (heure d'hiver) : 30 jours, pas 31
+  assert.equal(daysLeft("2026-11-19T08:00:00Z", new Date("2026-10-20T07:00:00Z")), 30);
   assert.equal(daysLeft("2026-10-19T21:00:00Z", new Date("2026-10-19T22:00:00Z")), 0);
   assert.equal(daysLeft(null, new Date()), 0);
 });

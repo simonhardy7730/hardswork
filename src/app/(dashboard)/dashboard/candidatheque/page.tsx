@@ -9,12 +9,13 @@ import { JOB_TYPES } from "@/lib/candidate/preferences";
 import { labels } from "@/lib/utils";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
 import RevealContact from "@/components/dashboard/RevealContact";
+import { TRADES, TRADE_KEYS, tradeLabel } from "@/lib/candidate/trades";
 
-type SP = { secteur?: string; lieu?: string; rayon?: string; type?: string; dispo?: string; page?: string; jour?: string | string[]; plage?: string | string[] };
+type SP = { metier?: string; secteur?: string; lieu?: string; rayon?: string; type?: string; dispo?: string; page?: string; jour?: string | string[]; plage?: string | string[] };
 type Row = {
   id: string; first_name: string; last_initial: string; city: string | null; sectors: string[] | null;
   availability: string; licenses: string[] | null; has_caces: boolean | null; experience_years: number | null;
-  job_types: string[] | null; is_student: boolean | null;
+  job_types: string[] | null; is_student: boolean | null; trades?: string[] | null;
 };
 const PAGE = 24;
 const csv = (v: string | string[] | undefined) => (Array.isArray(v) ? v.join(",") : v ?? "");
@@ -53,8 +54,12 @@ export default async function CandidathequePage(props: { searchParams: Promise<S
     };
     const days = jourList.length ? jourList : null;
     const slots = plageList.length ? plageList : null;
-    // Recherche par créneaux (migration 027) ; sans elle, on retombe sur la recherche simple.
-    let res = await supabase.rpc("search_candidate_pool_slots", { ...base, p_days: days, p_slots: slots });
+    const trade = sp.metier && TRADE_KEYS.has(sp.metier) ? sp.metier : null;
+    // Recherche par métier (migration 031), sinon par créneaux (027), sinon simple.
+    let res = await supabase.rpc("search_candidate_pool_v3", { ...base, p_days: days, p_slots: slots, p_trades: trade ? [trade] : null });
+    if (res.error && /search_candidate_pool_v3|function/i.test(res.error.message ?? "") && !trade) {
+      res = await supabase.rpc("search_candidate_pool_slots", { ...base, p_days: days, p_slots: slots });
+    }
     if (res.error && /search_candidate_pool_slots|function/i.test(res.error.message ?? "") && !days && !slots) {
       res = await supabase.rpc("search_candidate_pool", base);
     }
@@ -94,8 +99,12 @@ export default async function CandidathequePage(props: { searchParams: Promise<S
       ) : (
         <>
           <form method="GET" className="flex flex-wrap gap-2 items-center">
-            <select name="secteur" defaultValue={sp.secteur ?? ""} className={sel} aria-label={l("Métier", "Beroep")}>
+            <select name="metier" defaultValue={sp.metier ?? ""} className={sel} aria-label={l("Métier", "Beroep")}>
               <option value="">{l("Tous les métiers", "Alle beroepen")}</option>
+              {TRADES.map((t) => <option key={t.key} value={t.key}>{l(t.fr, t.nl)}</option>)}
+            </select>
+            <select name="secteur" defaultValue={sp.secteur ?? ""} className={sel} aria-label={l("Secteur", "Sector")}>
+              <option value="">{l("Tous les secteurs", "Alle sectoren")}</option>
               {Object.entries(LB.sector).map(([k, v]) => <option key={k} value={k}>{v as string}</option>)}
             </select>
             <input name="lieu" defaultValue={lieu} placeholder={l("Ville", "Stad")} className={`${sel} w-40`} />
@@ -141,6 +150,7 @@ export default async function CandidathequePage(props: { searchParams: Promise<S
                     <p className="text-ink-500 text-sm">{[c.city, availLbl[c.availability]].filter(Boolean).join(" · ")}</p>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
+                    {(c.trades ?? []).map((k) => <span key={k} className="text-xs bg-brand text-[#101F43] font-bold rounded-full px-2.5 py-1">{tradeLabel(k, lang)}</span>)}
                     {(c.sectors ?? []).map((s) => <span key={s} className="text-xs bg-surface-2 text-ink rounded-full px-2.5 py-1">{(LB.sector as Record<string, string>)[s] ?? s}</span>)}
                     {(c.job_types ?? []).map((t) => { const jt = JOB_TYPES.find((x) => x.key === t); return jt ? <span key={t} className="text-xs border border-ink-100 text-ink-700 rounded-full px-2.5 py-1">{l(jt.fr, jt.nl)}</span> : null; })}
                     {c.has_caces && <span className="text-xs border border-ink-100 text-ink-700 rounded-full px-2.5 py-1">CACES</span>}

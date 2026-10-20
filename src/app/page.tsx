@@ -1,3 +1,4 @@
+import ProfileCta from "@/components/candidat/ProfileCta";
 import { contractLabel } from "@/lib/contract-label";
 import { CONTRACT_LABELS } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
@@ -228,6 +229,11 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* ── PAS D'OFFRE POUR TOI ? DÉPOSE TON PROFIL ──────── */}
+      <section className="px-4 sm:px-6 pb-16">
+        <div className="max-w-5xl mx-auto"><ProfileCta lang={lang} /></div>
+      </section>
 
       {/* ── UN JOB ADAPTÉ À VOTRE RYTHME ──────────────── */}
       <section className="bg-surface py-16" aria-labelledby="rythme-title">

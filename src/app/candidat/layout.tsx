@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
-import { LayoutDashboard, Search, Bell, User, LogOut } from "lucide-react";
+import { LayoutDashboard, Search, Bell, User, LogOut, FileText } from "lucide-react";
 import { LangSwitch } from "@/components/layout/LangSwitch";
 import { getL } from "@/lib/i18n/server";
 import { getSpace, SPACE_HOME } from "@/lib/auth/space";
@@ -22,6 +22,7 @@ export default async function CandidatLayout({ children }: { children: React.Rea
   const NAV = [
     { href: "/candidat/dashboard", label: l("Mon profil", "Mijn profiel"),      icon: LayoutDashboard },
     { href: "/jobs",               label: l("Offres d'emploi", "Vacatures"), icon: Search           },
+    { href: "/candidat/cv",        label: l("Mon CV", "Mijn cv"),              icon: FileText         },
     { href: "/candidat/alertes",   label: l("Mes alertes", "Mijn alerts"),     icon: Bell             },
     { href: "/candidat/compte",    label: l("Mon compte", "Mijn account"),      icon: User             },
   ];

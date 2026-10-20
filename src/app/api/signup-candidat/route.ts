@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sanitizePreferences } from "@/lib/candidate/preferences";
+import { sanitizeTrades } from "@/lib/candidate/trades";
 import { allow, clientKey } from "@/lib/security/abuse";
 import { VISIBILITY_CONSENT_VERSION } from "@/lib/candidate/visibility";
 import { ageFromBirthDate, MIN_AGE, ADULT_AGE } from "@/lib/candidate/age";
@@ -28,6 +29,7 @@ export async function POST(req: NextRequest) {
       caces_types,
       experience_years,
       sectors,
+      trades,
       preferences,
       visible_to_recruiters,
       birth_date,
@@ -126,6 +128,13 @@ export async function POST(req: NextRequest) {
     // Date de naissance (migration 016) : enregistrée à part ; l'inscription ne doit pas échouer si la colonne manque encore.
     const { error: bErr } = await admin.from("candidates").update({ birth_date: birth }).eq("id", data.id);
     if (bErr) console.error("birth_date not stored (migration 016 ?):", bErr.message);
+
+    // Métiers précis (migration 031) : enregistrés à part, sans jamais faire échouer l'inscription.
+    const cleanTrades = sanitizeTrades(trades);
+    if (cleanTrades.length) {
+      const { error: tErr } = await admin.from("candidates").update({ trades: cleanTrades }).eq("id", data.id);
+      if (tErr) console.error("trades not stored (migration 031 ?):", tErr.message);
+    }
 
     // Accord de visibilité (migration 016) : case facultative, décochée par défaut ; l'inscription ne dépend jamais de lui.
     if (visible_to_recruiters === true && age >= ADULT_AGE) {

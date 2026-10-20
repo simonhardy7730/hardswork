@@ -19,6 +19,7 @@ import Turnstile, { useCaptcha } from "@/components/security/Turnstile";
 import { EMPTY_PREFERENCES, type Preferences } from "@/lib/candidate/preferences";
 import { useLang } from "@/lib/i18n/context";
 import { labels } from "@/lib/utils";
+import { tradesFor, MAX_TRADES } from "@/lib/candidate/trades";
 
 /* ─── Données secteurs ────────────────────────────────── */
 const SECTORS_DATA = [
@@ -115,6 +116,7 @@ export default function CandidatSignupPage() {
 
   /* Étape 1 — secteurs */
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
+  const [selectedTrades, setSelectedTrades] = useState<string[]>([]);
 
   /* Étape 2 — profil */
   const [profile, setProfile] = useState({
@@ -211,6 +213,7 @@ export default function CandidatSignupPage() {
         experience_years: profile.experience_years || null,
         preferences: prefs,
         sectors: selectedSectors,
+        trades: selectedTrades.filter((k) => tradesFor(selectedSectors).some((t) => t.key === k)),
         visible_to_recruiters: visible && isAdult,
         birth_date: birth,
       }),
@@ -374,6 +377,27 @@ export default function CandidatSignupPage() {
                   );
                 })}
               </div>
+
+              {/* Métier précis : c'est ce que les employeurs recherchent dans la candidathèque */}
+              {selectedSectors.length > 0 && (
+                <div className="mt-6">
+                  <p className="text-sm font-bold text-ink mb-1">{l("Votre métier précis", "Jouw precieze beroep")} <span className="font-normal text-ink-400">{l(`(jusqu'à ${MAX_TRADES})`, `(max. ${MAX_TRADES})`)}</span></p>
+                  <p className="text-xs text-ink-500 mb-3">{l("Les employeurs vous trouvent par métier, même s'il n'y a pas d'annonce pour vous aujourd'hui.", "Werkgevers vinden je op beroep, ook als er vandaag geen vacature voor je is.")}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {tradesFor(selectedSectors).map((t) => {
+                      const on = selectedTrades.includes(t.key);
+                      const full = !on && selectedTrades.length >= MAX_TRADES;
+                      return (
+                        <button key={t.key} type="button" disabled={full}
+                          onClick={() => setSelectedTrades((prev) => on ? prev.filter((x) => x !== t.key) : [...prev, t.key])}
+                          className={`px-3 py-2 rounded-full text-xs font-bold border transition ${on ? "bg-brand border-brand text-[#101F43]" : "bg-white border-ink-100 text-ink-500 hover:border-brand"} ${full ? "opacity-40" : ""}`}>
+                          {on && <Check size={11} className="inline mr-1 -mt-0.5" />}{lang === "nl" ? t.nl : t.fr}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

@@ -1,3 +1,4 @@
+import ProfileCta from "@/components/candidat/ProfileCta";
 import Link from "next/link";
 import { maskOrgs } from "@/lib/confidential";
 import { notFound } from "next/navigation";
@@ -88,6 +89,7 @@ export default async function EmploiPage(props: { params: Promise<{ secteur: str
           );
         })}
       </div>
+      <div className="mt-8"><ProfileCta lang={lang} compact /></div>
     </div>
   );
 }

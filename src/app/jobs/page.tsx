@@ -1,3 +1,4 @@
+import ProfileCta from "@/components/candidat/ProfileCta";
 import { contractLabel } from "@/lib/contract-label";
 import { createClient } from "@/lib/supabase/server";
 import { maskOrgs } from "@/lib/confidential";
@@ -388,6 +389,9 @@ export default async function JobsPage(props: { searchParams: Promise<SearchPara
                 })}
               </div>
             )}
+
+            {/* Pas d'offre qui correspond : dépôt de profil dans la candidathèque */}
+            <div className="mt-6"><ProfileCta lang={lang} /></div>
 
           </div>
 

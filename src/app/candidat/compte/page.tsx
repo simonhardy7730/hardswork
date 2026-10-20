@@ -4,6 +4,7 @@ import DocumentsUpload from "@/components/candidat/DocumentsUpload";
 import PreferencesEditor from "@/components/candidat/PreferencesEditor";
 import VisibilityToggle from "@/components/candidat/VisibilityToggle";
 import AvailabilityEditor from "@/components/candidat/AvailabilityEditor";
+import TradesEditor from "@/components/candidat/TradesEditor";
 import DataRights from "@/components/candidat/DataRights";
 import { EMPTY_AVAILABILITY, type AvailabilityState } from "@/lib/candidate/availability";
 import { EMPTY_PREFERENCES, type Preferences } from "@/lib/candidate/preferences";
@@ -31,6 +32,8 @@ export default async function ComptePage() {
   // Visibilité (migration 016) : lecture séparée, tolérante si la colonne n'existe pas encore.
   const { data: vis } = await supabase
     .from("candidates").select("visible_to_recruiters, birth_date").eq("auth_user_id", user.id).maybeSingle();
+  // Métiers (migration 031) : lecture tolérante.
+  const { data: tr } = await supabase.from("candidates").select("trades").eq("auth_user_id", user.id).maybeSingle();
   const initialPrefs: Preferences = cand
     ? {
         job_types: (cand.job_types as string[]) ?? [],
@@ -153,6 +156,9 @@ export default async function ComptePage() {
 
       {/* Visibilité auprès des recruteurs abonnés (candidathèque) */}
       <VisibilityToggle initial={!!(vis as { visible_to_recruiters?: boolean } | null)?.visible_to_recruiters} birthDate={(vis as { birth_date?: string | null } | null)?.birth_date ?? null} />
+
+      {/* Métiers précis */}
+      <TradesEditor initial={((tr as { trades?: string[] } | null)?.trades) ?? []} />
 
       {/* Mes recherches d'emploi (types d'emploi, profil étudiant / flexi-job) */}
       <PreferencesEditor initial={initialPrefs} />

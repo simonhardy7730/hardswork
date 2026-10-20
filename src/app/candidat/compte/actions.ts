@@ -86,3 +86,29 @@ export async function saveBirthDate(value: string): Promise<{ ok: boolean }> {
   revalidatePath("/candidat/compte");
   return { ok: true };
 }
+
+import { sanitizeTrades } from "@/lib/candidate/trades";
+import { sanitizeCv, type CvData } from "@/lib/candidate/cv";
+
+/** Métiers précis du candidat connecté (max 3, clés connues uniquement). */
+export async function saveTrades(raw: unknown): Promise<{ ok: boolean }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+  const { error } = await supabase.from("candidates").update({ trades: sanitizeTrades(raw) }).eq("auth_user_id", user.id);
+  if (error) { console.error("saveTrades:", error.message); return { ok: false }; }
+  revalidatePath("/candidat/compte");
+  return { ok: true };
+}
+
+/** Contenu du CV généré par Wolko (texte saisi par le candidat, aucune IA). */
+export async function saveCv(raw: unknown): Promise<{ ok: boolean; cv?: CvData }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+  const cv = sanitizeCv(raw);
+  const { error } = await supabase.from("candidates").update({ cv_data: cv }).eq("auth_user_id", user.id);
+  if (error) { console.error("saveCv:", error.message); return { ok: false }; }
+  revalidatePath("/candidat/cv");
+  return { ok: true, cv };
+}

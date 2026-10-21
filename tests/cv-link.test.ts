@@ -24,3 +24,21 @@ test("fichier CV reconnu par son contenu", async () => {
   assert.equal(await checkCvFile(exe, 1e6), null);
   assert.equal(await checkCvFile(pdf, 3), null);
 });
+
+import { sanitizeMini, miniToCv, miniReady, isMiniPath } from "../src/lib/candidate/mini-cv";
+
+test("mini-CV : nettoyage et conversion", () => {
+  assert.equal(sanitizeMini(null), null);
+  assert.equal(sanitizeMini({ jobs: [{ role: "" }] }), null);
+  const m = sanitizeMini({ jobs: [{ role: " Magasinier ", company: "Colruyt", duration: "3y5y" }, { role: "x".repeat(200), duration: "bidon" }, { role: "trop" }], diploma: "VCA" })!;
+  assert.equal(m.jobs.length, 2);
+  assert.equal(m.jobs[1].role.length, 80);
+  assert.equal(m.jobs[1].duration, "");
+  assert.ok(miniReady(m));
+  const cv = miniToCv(m);
+  assert.equal(cv.headline, "Magasinier");
+  assert.equal(cv.experiences[0].from, "3 à 5 ans");
+  assert.equal(cv.education[0].title, "VCA");
+  assert.ok(miniReady(sanitizeMini({ firstJob: true })!));
+  assert.ok(isMiniPath("applications/x/mini-cv.wolko.json") && !isMiniPath("applications/x/cv.pdf"));
+});

@@ -6,6 +6,8 @@ import { getOrgAccess } from "@/lib/billing/access";
 import { flashUnlockedOfferIds } from "@/lib/flash/access";
 import { sendCvRequestEmail } from "@/lib/email/cv-request";
 import { sendApplicationStatusEmail } from "@/lib/email/application-status";
+import { isMiniPath, type MiniDoc } from "@/lib/candidate/mini-cv";
+import { loadMiniDoc } from "@/lib/candidate/pool-cv";
 
 export type CvState =
   | { kind: "none" }
@@ -101,6 +103,7 @@ export async function getCvUrl(applicationId: string): Promise<string | null> {
     .eq("organization_id", ctx.orgId)
     .maybeSingle();
   if (!data || data.status !== "fulfilled" || !data.cv_path) return null;
+  if (isMiniPath(data.cv_path)) return `/dashboard/candidatures/cv/${applicationId}`;
   const { data: signed } = await db.storage.from("candidate-documents").createSignedUrl(data.cv_path, 60);
   return signed?.signedUrl ?? null;
 }
@@ -174,4 +177,13 @@ export async function updateApplicationStatus(applicationId: string, status: str
     console.error("updateApplicationStatus notify error:", err);
   }
   return { ok: true };
+}
+
+/** Mini-CV (créé en postulant) d'une candidature de son organisation. */
+export async function getMiniCv(applicationId: string): Promise<MiniDoc | null> {
+  const ctx = await authorize(applicationId);
+  if (!ctx) return null;
+  const { data } = await admin().from("cv_requests").select("cv_path, status").eq("application_id", applicationId).eq("organization_id", ctx.orgId).maybeSingle();
+  if (!data || data.status !== "fulfilled" || !isMiniPath(data.cv_path)) return null;
+  return loadMiniDoc(data.cv_path as string);
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient as createAdmin } from "@supabase/supabase-js";
 import { readCvToken } from "@/lib/candidate/cv-link";
 import { checkCvFile } from "@/lib/candidate/cv-file";
+import { isMiniPath } from "@/lib/candidate/mini-cv";
 
 const MAX = 4.4 * 1024 * 1024; // limite de requête Vercel ≈ 4,5 Mo
 const one = <T,>(v: T | T[] | null | undefined): T | null => (Array.isArray(v) ? v[0] ?? null : v ?? null);
@@ -41,16 +42,17 @@ export async function POST(req: Request) {
     }
     const [{ data: apps }, { data: reqs }] = await Promise.all([
       db.from("applications").select("id, job_offers(title, organization_id, organizations(name))").in("id", ids),
-      db.from("cv_requests").select("application_id, status").in("application_id", ids),
+      db.from("cv_requests").select("application_id, status, cv_path").in("application_id", ids),
     ]);
     const reqBy = new Map((reqs ?? []).map((r) => [r.application_id as string, r.status as string]));
+    const miniBy = new Set((reqs ?? []).filter((r) => isMiniPath(r.cv_path as string | null)).map((r) => r.application_id as string));
     const now = new Date().toISOString();
     const fields = { status: "fulfilled", cv_path: path, cv_name: file.name.slice(0, 150), fulfilled_at: now };
     let attached = 0;
     for (const a of apps ?? []) {
       const id = a.id as string;
       const st = reqBy.get(id);
-      if (st === "fulfilled" && id !== appId) continue; // ne remplace pas un CV déjà envoyé à un autre employeur
+      if (st === "fulfilled" && id !== appId && !miniBy.has(id)) continue; // ne remplace pas un vrai CV déjà envoyé à un autre employeur (un mini-CV, si)
       const j = one(a.job_offers as unknown as { title: string; organization_id: string; organizations: unknown } | null);
       if (!j) continue;
       const org = one(j.organizations as { name?: string } | { name?: string }[] | null);

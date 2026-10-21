@@ -6,7 +6,9 @@ import { Loader2, Phone, User, Mail, CheckCircle2 } from "lucide-react";
 import CvDrop from "@/components/candidature/CvDrop";
 import { useL } from "@/lib/i18n/context";
 import Turnstile from "@/components/security/Turnstile";
-import CvPicker, { postBody } from "./CvPicker";
+import { postBody } from "./CvPicker";
+import CvChoice, { type CvMode } from "./CvChoice";
+import { EMPTY_MINI, miniReady, type MiniInput } from "@/lib/candidate/mini-cv";
 import BirthField from "./BirthField";
 import ScreeningFields, { screeningComplete } from "./ScreeningFields";
 import { ageFromBirthDate, MIN_AGE } from "@/lib/candidate/age";
@@ -35,6 +37,9 @@ export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: P
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [cvTok, setCvTok] = useState<string | null>(null);
+  const [miniDone, setMiniDone] = useState(false);
+  const [cvMode, setCvMode] = useState<CvMode>("");
+  const [mini, setMini] = useState<MiniInput>(EMPTY_MINI);
   const [error, setError] = useState("");
   const [poolOptIn, setPoolOptIn] = useState(false);
   const [poolCity, setPoolCity] = useState("");
@@ -73,10 +78,14 @@ export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: P
     const a = ageFromBirthDate(birth);
     if (a === null || a < MIN_AGE) { setError(l(`Il faut avoir au moins ${MIN_AGE} ans pour postuler.`, `Je moet minstens ${MIN_AGE} jaar zijn om te solliciteren.`)); return; }
     if (!screeningComplete(screeningIds, answers)) { setError(l("Répondez à toutes les questions.", "Beantwoord alle vragen.")); return; }
+    if (cvMode === "") { setError(l("Réponds à la question « As-tu un CV ? ».", "Beantwoord de vraag « Heb je een cv? ».")); return; }
+    if (cvMode === "file" && !cv) { setError(l("Ajoute ton CV (photo ou fichier), ou choisis « Non, pas de CV ».", "Voeg je cv toe (foto of bestand), of kies « Nee, geen cv ».")); return; }
+    if (cvMode === "mini" && !miniReady(mini)) { setError(l("Indique ton dernier travail, ou coche « C'est mon premier emploi ».", "Vul je laatste job in, of vink « Dit is mijn eerste job » aan.")); return; }
     setLoading(true);
     setError("");
 
     const { body, headers } = postBody({
+        mini_cv: cvMode === "mini" ? mini : null,
         job_offer_id: jobId,
         applicant_name: `${form.first_name} ${form.last_name}`.trim(),
         applicant_phone: form.phone,
@@ -105,7 +114,9 @@ export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: P
       return;
     }
 
-    setCvTok(((await res.json().catch(() => ({}))) as { cvToken?: string | null }).cvToken ?? null);
+    const out = (await res.json().catch(() => ({}))) as { cvToken?: string | null; miniCv?: boolean };
+    setCvTok(out.cvToken ?? null);
+    setMiniDone(out.miniCv === true);
     setSubmitted(true);
   }
 
@@ -123,7 +134,7 @@ export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: P
             {l("Votre candidature a bien été transmise.", "Je sollicitatie is goed doorgestuurd.")}
           </p>
         </div>
-        {cvTok && <CvDrop token={cvTok} />}
+        {cvTok && <CvDrop token={cvTok} soft={miniDone} />}
         <p className="text-xs text-ink-300">
           {l("Vous pouvez fermer cette page.", "Je kunt deze pagina sluiten.")}
         </p>
@@ -364,7 +375,7 @@ export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: P
 
       <ScreeningFields ids={screeningIds} value={answers} onChange={setAnswers} />
 
-      <CvPicker file={cv} onChange={setCv} />
+      <CvChoice mode={cvMode} onMode={setCvMode} file={cv} onFile={setCv} mini={mini} onMini={setMini} />
 
       <PoolOptIn checked={poolOptIn} onChange={setPoolOptIn} city={poolCity} onCity={setPoolCity} />
 

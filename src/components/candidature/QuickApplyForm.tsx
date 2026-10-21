@@ -7,7 +7,9 @@ import CvDrop from "@/components/candidature/CvDrop";
 import { useL } from "@/lib/i18n/context";
 import Turnstile from "@/components/security/Turnstile";
 import ScreeningFields, { screeningComplete } from "./ScreeningFields";
-import CvPicker, { postBody } from "./CvPicker";
+import { postBody } from "./CvPicker";
+import CvChoice, { type CvMode } from "./CvChoice";
+import { EMPTY_MINI, miniReady, type MiniInput } from "@/lib/candidate/mini-cv";
 import BirthField from "./BirthField";
 import { ageFromBirthDate, MIN_AGE } from "@/lib/candidate/age";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
@@ -39,6 +41,9 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [cvTok, setCvTok] = useState<string | null>(null);
+  const [miniDone, setMiniDone] = useState(false);
+  const [cvMode, setCvMode] = useState<CvMode>("");
+  const [mini, setMini] = useState<MiniInput>(EMPTY_MINI);
   const [error, setError] = useState("");
   const [poolOptIn, setPoolOptIn] = useState(false);
   const [poolCity, setPoolCity] = useState("");
@@ -58,8 +63,12 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
     if (a === null || a < MIN_AGE) { setError(l(`Il faut avoir au moins ${MIN_AGE} ans pour postuler.`, `Je moet minstens ${MIN_AGE} jaar zijn om te solliciteren.`)); return; }
     if (!interest) { setError(l("Confirmez votre intérêt pour l'offre.", "Bevestig je interesse voor het aanbod.")); return; }
     if (!screeningComplete(screeningIds, answers)) { setError(l("Répondez à toutes les questions.", "Beantwoord alle vragen.")); return; }
+    if (cvMode === "") { setError(l("Réponds à la question « As-tu un CV ? ».", "Beantwoord de vraag « Heb je een cv? ».")); return; }
+    if (cvMode === "file" && !cv) { setError(l("Ajoute ton CV (photo ou fichier), ou choisis « Non, pas de CV ».", "Voeg je cv toe (foto of bestand), of kies « Nee, geen cv ».")); return; }
+    if (cvMode === "mini" && !miniReady(mini)) { setError(l("Indique ton dernier travail, ou coche « C'est mon premier emploi ».", "Vul je laatste job in, of vink « Dit is mijn eerste job » aan.")); return; }
     setLoading(true); setError("");
     const { body, headers } = postBody({
+        mini_cv: cvMode === "mini" ? mini : null,
         job_offer_id: jobId,
         applicant_name: `${f.first_name} ${f.last_name}`.trim(),
         applicant_phone: f.phone,
@@ -85,7 +94,9 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
       setLoading(false);
       return;
     }
-    setCvTok(((await res.json().catch(() => ({}))) as { cvToken?: string | null }).cvToken ?? null);
+    const out = (await res.json().catch(() => ({}))) as { cvToken?: string | null; miniCv?: boolean };
+    setCvTok(out.cvToken ?? null);
+    setMiniDone(out.miniCv === true);
     setDone(true);
   }
 
@@ -99,7 +110,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
         <p className="text-sm text-ink-500">
           {l("Votre candidature a bien été transmise.", "Je sollicitatie is goed doorgestuurd.")}
         </p>
-        {cvTok && <CvDrop token={cvTok} />}
+        {cvTok && <CvDrop token={cvTok} soft={miniDone} />}
       </div>
     );
   }
@@ -179,7 +190,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
         <textarea rows={2} className={`${input} resize-none`} value={msg} maxLength={300} placeholder={l("Un mot pour l'employeur (optionnel)", "Een woordje voor de werkgever (optioneel)")} onChange={(e) => setMsg(e.target.value.slice(0, 300))} />
       </section>
 
-      <CvPicker file={cv} onChange={setCv} />
+      <CvChoice mode={cvMode} onMode={setCvMode} file={cv} onFile={setCv} mini={mini} onMini={setMini} />
 
       <PoolOptIn checked={poolOptIn} onChange={setPoolOptIn} city={poolCity} onCity={setPoolCity} />
 

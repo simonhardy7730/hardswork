@@ -1,5 +1,6 @@
 import { createClient as createAdmin } from "@supabase/supabase-js";
 import { asCv, type CvData } from "@/lib/candidate/cv";
+import { isMiniPath, type MiniDoc } from "@/lib/candidate/mini-cv";
 
 export type PoolCv = { kind: "file"; path: string; name: string } | { kind: "built" };
 
@@ -36,6 +37,7 @@ export async function findPoolCvs(ids: string[]): Promise<Map<string, PoolCv>> {
     }
   }
 
+  const minis = new Map<string, PoolCv>();
   const missing = list.filter((c) => !out.has(c.id));
   if (missing.length) {
     const emails = new Map(missing.filter((c) => c.email).map((c) => [c.email!.toLowerCase(), c.id]));
@@ -54,16 +56,31 @@ export async function findPoolCvs(ids: string[]): Promise<Map<string, PoolCv>> {
         .order("fulfilled_at", { ascending: false });
       for (const r of (reqs ?? []) as { application_id: string; cv_path: string; cv_name: string | null }[]) {
         const cid = appTo.get(r.application_id);
-        if (cid && !out.has(cid)) out.set(cid, { kind: "file", path: r.cv_path, name: r.cv_name ?? "CV" });
+        if (!cid) continue;
+        // Un vrai CV passe avant un mini-CV ; le mini-CV n'est gardé qu'en dernier recours.
+        if (isMiniPath(r.cv_path)) { if (!minis.has(cid)) minis.set(cid, { kind: "file", path: r.cv_path, name: r.cv_name ?? "CV" }); continue; }
+        if (!out.has(cid)) out.set(cid, { kind: "file", path: r.cv_path, name: r.cv_name ?? "CV" });
       }
     }
   }
 
   for (const c of list) if (!out.has(c.id) && cvFilled(asCv(c.cv_data))) out.set(c.id, { kind: "built" });
+  for (const [cid, m] of minis) if (!out.has(cid)) out.set(cid, m);
   return out;
 }
 
 export async function signedCvUrl(path: string): Promise<string | null> {
   const { data } = await admin().storage.from("candidate-documents").createSignedUrl(path, 120);
   return data?.signedUrl ?? null;
+}
+
+/** Lit un mini-CV (JSON) stocké à côté d'une candidature. */
+export async function loadMiniDoc(path: string): Promise<MiniDoc | null> {
+  if (!isMiniPath(path)) return null;
+  const { data } = await admin().storage.from("candidate-documents").download(path);
+  if (!data) return null;
+  try {
+    const d = JSON.parse(await data.text()) as MiniDoc;
+    return d && d.v === 1 && d.base && d.cv ? { v: 1, base: d.base, cv: asCv(d.cv) } : null;
+  } catch { return null; }
 }

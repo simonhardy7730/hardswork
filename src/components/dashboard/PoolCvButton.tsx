@@ -15,7 +15,7 @@ export default function PoolCvButton({ candidateId }: { candidateId: string }) {
     const w = window.open("about:blank", "_blank");
     start(async () => {
       const r = await openPoolCv(candidateId);
-      if (r.ok) { if (w) w.location.href = r.url; else window.location.href = r.url; return; }
+      if (r.ok) { const abs = new URL(r.url, window.location.origin).href; if (w) w.location.href = abs; else window.location.href = abs; return; }
       w?.close();
       setErr(r.error === "quota" ? l("Limite quotidienne atteinte.", "Dagelijkse limiet bereikt.")
         : r.error === "no_access" ? l("Abonnement requis.", "Abonnement vereist.")

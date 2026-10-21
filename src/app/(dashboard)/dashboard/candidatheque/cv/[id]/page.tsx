@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getLang } from "@/lib/i18n/server";
 import { poolEnabled } from "@/lib/candidate/pool";
 import { asCv } from "@/lib/candidate/cv";
+import { cvFilled, findPoolCvs, loadMiniDoc } from "@/lib/candidate/pool-cv";
 import { tradeLabel } from "@/lib/candidate/trades";
 import { labels } from "@/lib/utils";
 import CvSheet, { CV_PRINT_CSS } from "@/components/candidat/CvSheet";
@@ -42,6 +43,12 @@ export default async function PoolCvPage(props: { params: Promise<{ id: string }
     experienceYears: (c.experience_years as number | null) ?? null,
     availability: LB.availability?.[c.availability as string] ?? "",
   };
+  let cv = asCv(c.cv_data);
+  if (!cvFilled(cv)) {
+    const found = (await findPoolCvs([id])).get(id);
+    const doc = found?.kind === "file" ? await loadMiniDoc(found.path) : null;
+    if (doc) cv = doc.cv;
+  }
   return (
     <div className="max-w-3xl space-y-4">
       <style>{CV_PRINT_CSS}</style>
@@ -49,7 +56,7 @@ export default async function PoolCvPage(props: { params: Promise<{ id: string }
         <a href="/dashboard/candidatheque" className="text-sm font-semibold underline">← {lang === "nl" ? "Kandidatenbank" : "Candidathèque"}</a>
         <PrintButton label={lang === "nl" ? "Downloaden (pdf)" : "Télécharger (PDF)"} />
       </div>
-      <div className="overflow-x-auto"><CvSheet base={base} cv={asCv(c.cv_data)} /></div>
+      <div className="overflow-x-auto"><CvSheet base={base} cv={cv} /></div>
     </div>
   );
 }

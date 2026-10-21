@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cvToken, cvLink } from "@/lib/candidate/cv-link";
 import { checkCvFile } from "@/lib/candidate/cv-file";
+import { sanitizeMini, miniToCv, MINI_SUFFIX, type MiniDoc } from "@/lib/candidate/mini-cv";
 import { publicOrgName } from "@/lib/confidential";
 import { createClient } from "@supabase/supabase-js";
 import { resend, FROM_EMAIL, FROM_NAME } from "@/lib/resend";
@@ -11,6 +12,7 @@ import { allow, clientKey, verifyTurnstile } from "@/lib/security/abuse";
 import { ageFromBirthDate, MIN_AGE } from "@/lib/candidate/age";
 import { sanitizeAnswers, sanitizeScreeningIds } from "@/lib/screening";
 import { guessTrades } from "@/lib/candidate/trades";
+import { SECTOR_LABELS, AVAILABILITY_LABELS } from "@/lib/utils";
 import { VISIBILITY_CONSENT_VERSION } from "@/lib/candidate/visibility";
 import { ADULT_AGE } from "@/lib/candidate/age";
 
@@ -199,6 +201,40 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Pas de CV : mini-CV créé à partir des réponses (« As-tu un CV ? » → Non). Sans IA, uniquement ce qu'il a écrit.
+    const mini = cvSaved ? null : sanitizeMini(body?.mini_cv);
+    let miniCv: ReturnType<typeof miniToCv> | null = null;
+    if (mini) {
+      try {
+        miniCv = miniToCv(mini);
+        const sector = (jobData as { sector?: string }).sector;
+        const doc: MiniDoc = {
+          v: 1,
+          cv: miniCv,
+          base: {
+            name: applicant_name, phone: applicant_phone, email: applicant_email || "",
+            city: str(body?.pool_city, 80),
+            trades: [], sectors: sector ? [SECTOR_LABELS[sector as keyof typeof SECTOR_LABELS] ?? sector] : [],
+            licenses, caces: has_caces ? caces_types : [], languages: [],
+            experienceYears: null, availability: AVAILABILITY_LABELS[availability as keyof typeof AVAILABILITY_LABELS] ?? "",
+          },
+        };
+        const path = `applications/${application.id}/mini-cv${MINI_SUFFIX}`;
+        const up = await supabaseAdmin.storage.from("candidate-documents")
+          .upload(path, new Blob([JSON.stringify(doc)], { type: "application/json" }), { contentType: "application/json", upsert: true });
+        if (!up.error) {
+          const orgR = jobData.organizations;
+          const o = Array.isArray(orgR) ? orgR[0] : orgR;
+          const { error: mErr } = await supabaseAdmin.from("cv_requests").insert({
+            application_id: application.id, organization_id: jobData.organization_id, candidate_email: applicant_email || "",
+            org_name: o?.name ?? "", job_title: jobData.title, status: "fulfilled", cv_path: path,
+            cv_name: "CV Wolko (créé en postulant)", fulfilled_at: new Date().toISOString(),
+          });
+          if (mErr) console.error("mini CV row:", mErr.message);
+        } else console.error("mini CV upload:", up.error.message);
+      } catch (e) { console.error("mini CV:", e); }
+    }
+
     // Candidathèque : uniquement si le candidat l'a coché lui-même (case décochée par défaut) et s'il est majeur.
     // Un échec ne doit jamais faire perdre la candidature.
     if (body?.pool_optin === true && age >= ADULT_AGE) {
@@ -231,6 +267,8 @@ export async function POST(req: NextRequest) {
           candidateId = created?.id ?? null;
         }
         if (candidateId) await supabaseAdmin.from("applications").update({ candidate_id: candidateId }).eq("id", application.id);
+        // Son mini-CV devient le CV de son profil (seulement s'il n'en a pas déjà un).
+        if (candidateId && miniCv) await supabaseAdmin.from("candidates").update({ cv_data: miniCv }).eq("id", candidateId).is("cv_data", null);
       } catch (e) {
         console.error("pool opt-in error:", e);
       }
@@ -296,7 +334,7 @@ export async function POST(req: NextRequest) {
               jobCity: jobData.city,
               orgName: publicName,
               availability: availability || "immediate",
-              cvUrl: cvSaved ? null : cvLink(application.id),
+              cvUrl: cvSaved || miniCv ? null : cvLink(application.id),
             })
           ),
         })
@@ -306,7 +344,7 @@ export async function POST(req: NextRequest) {
 
     await Promise.allSettled(sends);
 
-    return NextResponse.json({ success: true, applicationId: application.id, cvToken: cvSaved ? null : cvToken(application.id) });
+    return NextResponse.json({ success: true, applicationId: application.id, cvToken: cvSaved ? null : cvToken(application.id), miniCv: Boolean(miniCv) });
   } catch (err) {
     console.error("Postuler API error:", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });

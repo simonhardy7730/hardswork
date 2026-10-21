@@ -32,7 +32,8 @@ export async function openPoolCv(candidateId: string): Promise<CvOpenResult> {
   const { findPoolCvs, signedCvUrl } = await import("@/lib/candidate/pool-cv");
   const cv = (await findPoolCvs([candidateId])).get(candidateId);
   if (!cv) return { ok: false, error: "no_cv" };
-  if (cv.kind === "built") return { ok: true, url: `/dashboard/candidatheque/cv/${candidateId}` };
+  const { isMiniPath } = await import("@/lib/candidate/mini-cv");
+  if (cv.kind === "built" || isMiniPath(cv.path)) return { ok: true, url: `/dashboard/candidatheque/cv/${candidateId}` };
   const url = await signedCvUrl(cv.path);
   return url ? { ok: true, url } : { ok: false, error: "error" };
 }

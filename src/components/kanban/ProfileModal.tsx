@@ -59,7 +59,7 @@ export default function ProfileModal({ application: app, hasSubscription, onClos
     const w = window.open("about:blank", "_blank");
     const url = await getCvUrl(app.id);
     setBusy(false);
-    if (url) { if (w) w.location.href = url; else window.location.href = url; }
+    if (url) { { const abs = new URL(url, window.location.origin).href; if (w) w.location.href = abs; else window.location.href = abs; } }
     else { w?.close(); }
     if (!url) setMsg(l("CV introuvable. Réessayez dans un instant.", "CV niet gevonden. Probeer zo opnieuw."));
   }

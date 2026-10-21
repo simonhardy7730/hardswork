@@ -6,7 +6,7 @@ import { useL } from "@/lib/i18n/context";
 import { shrinkImage as shrink } from "@/lib/candidate/shrink-image";
 
 /** Dépôt du CV après coup (lien personnel) : photo du CV papier ou fichier. */
-export default function CvDrop({ token, compact = false }: { token: string; compact?: boolean }) {
+export default function CvDrop({ token, compact = false, soft = false }: { token: string; compact?: boolean; soft?: boolean }) {
   const l = useL();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -41,8 +41,10 @@ export default function CvDrop({ token, compact = false }: { token: string; comp
   return (
     <div className={`bg-[#101F43] rounded-2xl p-5 text-white space-y-3 text-left ${compact ? "" : "max-w-md mx-auto"}`}>
       <div>
-        <p className="font-display font-black uppercase text-lg leading-tight">{l("Dernière étape : ton CV", "Laatste stap: je cv")} <span className="text-brand">📄</span></p>
-        <p className="text-sm text-white/75 mt-1">{l("Les candidats avec CV sont appelés en premier. Prends simplement ton CV papier en photo.", "Kandidaten met een cv worden eerst gebeld. Neem gewoon een foto van je papieren cv.")}</p>
+        <p className="font-display font-black uppercase text-lg leading-tight">{soft ? l("Ton CV Wolko est prêt ✅", "Je Wolko-cv is klaar ✅") : <>{l("Dernière étape : ton CV", "Laatste stap: je cv")} <span className="text-brand">📄</span></>}</p>
+        <p className="text-sm text-white/75 mt-1">{soft
+          ? l("L'employeur a reçu le CV créé avec tes réponses. Tu retrouves un vieux CV papier ? Prends-le en photo pour le compléter (facultatif).", "De werkgever kreeg het cv gemaakt met je antwoorden. Vind je een oud papieren cv? Neem er een foto van (optioneel).")
+          : l("Les candidats avec CV sont appelés en premier. Prends simplement ton CV papier en photo.", "Kandidaten met een cv worden eerst gebeld. Neem gewoon een foto van je papieren cv.")}</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <label className={`${btn} bg-brand text-[#101F43]`}>

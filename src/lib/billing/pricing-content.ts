@@ -31,7 +31,7 @@ export const CONTENT = {
     notes: [
       b("Sans carte bancaire, aucun prélèvement automatique", "Zonder bankkaart, geen automatische afschrijving"),
       b(`${TRIAL_DAYS} jours calendaires, une seule fois par organisation`, `${TRIAL_DAYS} kalenderdagen, slechts één keer per organisatie`),
-      b("Vos données sont conservées à la fin de l'essai", "Je gegevens blijven bewaard na de proefperiode"),
+      b("Aucun abonnement n'est activé automatiquement à la fin de l'essai", "Na de proefperiode wordt niet automatisch een abonnement geactiveerd"),
       b("Candidathèque réservée aux abonnés Pro et Agence", "Kandidatendatabank voorbehouden aan Pro- en Kantoor-abonnees"),
     ],
   },
@@ -92,8 +92,8 @@ export const CONTENT = {
   },
   /** Mention contractuelle affichée sous les offres. */
   contractNote: b(
-    "7 jours d'essai gratuits, sans engagement. Puis abonnement professionnel avec engagement initial de 12 mois, facturé mensuellement. Préavis de 30 jours avant échéance. Après la première année, abonnement mensuel résiliable avec un préavis de 30 jours. Tarifs HTVA.",
-    "7 dagen gratis proefperiode, zonder verbintenis. Daarna professioneel abonnement met een initiële verbintenis van 12 maanden, maandelijks gefactureerd. Opzegtermijn van 30 dagen voor de vervaldatum. Na het eerste jaar maandelijks abonnement, opzegbaar met een opzegtermijn van 30 dagen. Prijzen excl. btw."
+    "7 jours d'essai gratuits, sans carte bancaire et sans engagement. Après l'essai, abonnement payant sur souscription expresse, avec engagement initial de 12 mois et facturation mensuelle. Résiliation possible à l'échéance annuelle moyennant un préavis de 30 jours. Tarifs HTVA.",
+    "7 dagen gratis proefperiode, zonder bankkaart en zonder verbintenis. Na de proefperiode volgt een betalend abonnement uitsluitend na uitdrukkelijke onderschrijving, met een initiële verbintenis van 12 maanden en maandelijkse facturatie. Opzegging is mogelijk op de jaarlijkse vervaldatum mits een opzegtermijn van 30 dagen. Prijzen excl. btw."
   ),
   conditions: {
     title: b("Conditions de l'offre", "Voorwaarden van het aanbod"),
@@ -123,15 +123,15 @@ export const CONTENT = {
     {
       q: b("Comment fonctionne l'essai gratuit ?", "Hoe werkt de gratis proefperiode?"),
       a: b(
-        "7 jours calendaires, une seule fois par organisation, sans carte bancaire. À la fin de l'essai, vos données sont conservées ; vous choisissez ensuite votre abonnement pour continuer à publier et à contacter les candidats.",
-        "7 kalenderdagen, slechts één keer per organisatie, zonder bankkaart. Na de proefperiode blijven je gegevens bewaard; daarna kies je een abonnement om te blijven publiceren en kandidaten te contacteren."
+        "7 jours calendaires, une seule fois par organisation, sans carte bancaire. À la fin de l'essai, aucun abonnement n'est activé automatiquement et aucune facture n'est émise : pour continuer à publier et à contacter les candidats, vous choisissez expressément une formule payante avec notre équipe. Vos données sont conservées selon notre politique de confidentialité.",
+        "7 kalenderdagen, slechts één keer per organisatie, zonder bankkaart. Na de proefperiode wordt niet automatisch een abonnement geactiveerd en volgt geen factuur: om te blijven publiceren en kandidaten te contacteren kies je uitdrukkelijk een betalende formule met ons team. Je gegevens worden bewaard volgens ons privacybeleid."
       ),
     },
     {
       q: b("Quel est l'engagement de l'abonnement ?", "Wat is de verbintenis van het abonnement?"),
       a: b(
-        "L'abonnement payant comporte un engagement initial de 12 mois, facturé mensuellement. Pour ne pas poursuivre après ces 12 mois, demandez la non-reconduction au moins 30 jours avant l'échéance. Ensuite, l'abonnement continue à durée indéterminée, facturé mensuellement, et peut être résilié avec un préavis de 30 jours. Vous retrouvez toutes les dates dans « Mon abonnement ».",
-        "Het betalende abonnement heeft een initiële verbintenis van 12 maanden, maandelijks gefactureerd. Om na die 12 maanden niet verder te gaan, vraagt u de niet-verlenging minstens 30 dagen voor de vervaldatum aan. Daarna loopt het abonnement voor onbepaalde duur door, maandelijks gefactureerd, en kan het met 30 dagen opzegtermijn worden opgezegd. Alle data vindt u terug in « Mijn abonnement »."
+        "L'abonnement payant (Pro ou Agence) se souscrit expressément avec notre équipe. Il comporte un engagement initial de 12 mois à compter de son activation, facturé mensuellement. Pour mettre fin au contrat à l'échéance annuelle, la demande doit nous parvenir au moins 30 jours avant cette échéance. Les dates exactes figurent dans « Mon abonnement ».",
+        "Het betalende abonnement (Pro of Kantoor) wordt uitdrukkelijk afgesloten met ons team. Het heeft een initiële verbintenis van 12 maanden vanaf de activering, maandelijks gefactureerd. Om het contract op de jaarlijkse vervaldatum te beëindigen, moet de aanvraag ons minstens 30 dagen voor die vervaldatum bereiken. De exacte data vindt u terug in « Mijn abonnement »."
       ),
     },
     {

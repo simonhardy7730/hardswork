@@ -22,8 +22,8 @@ export default async function TrialBanner({ access }: { access: Access }) {
       <p className="font-medium">
         {expired
           ? l(
-              "Votre essai gratuit est terminé. Vos données sont conservées. Choisissez un abonnement pour continuer à publier et à contacter les candidats.",
-              "Je gratis proefperiode is afgelopen. Je gegevens blijven bewaard. Kies een abonnement om te blijven publiceren en kandidaten te contacteren."
+              "Votre essai gratuit est terminé. Vos données sont conservées selon notre politique de confidentialité. Choisissez un abonnement pour continuer à publier et à contacter les candidats.",
+              "Je gratis proefperiode is afgelopen. Je gegevens worden bewaard volgens ons privacybeleid. Kies een abonnement om te blijven publiceren en kandidaten te contacteren."
             )
           : l(
               `Essai gratuit : ${access.trialDaysLeft} jour${access.trialDaysLeft > 1 ? "s" : ""} restant${access.trialDaysLeft > 1 ? "s" : ""}${end ? ` (fin le ${end})` : ""}.`,

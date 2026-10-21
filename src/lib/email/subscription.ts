@@ -40,7 +40,7 @@ export function buildSubscriptionMail(m: SubscriptionMail): { subject: string; h
       return {
         subject: `Votre essai gratuit WOLKO se termine ${m.daysLeft <= 1 ? "demain" : `dans ${m.daysLeft} jours`}`,
         html: layout("Votre essai se termine bientôt", `<p>Bonjour, l'essai gratuit de <strong>${esc(m.orgName)}</strong> se termine le ${d(m.endDay)}.</p>
-<p>Aucun paiement n'est prélevé automatiquement. Pour continuer à publier vos offres et à contacter les candidats, vous devrez choisir explicitement un abonnement. Vos données sont conservées.</p>`, { label: "Voir mon abonnement", href: link() }),
+<p>Aucun paiement n'est prélevé automatiquement. Pour continuer à publier vos offres et à contacter les candidats, vous devrez choisir explicitement un abonnement. Vos données sont conservées selon notre politique de confidentialité.</p>`, { label: "Voir mon abonnement", href: link() }),
       };
     case "trial_expired":
       return {

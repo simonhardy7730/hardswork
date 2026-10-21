@@ -257,7 +257,7 @@ export default async function TarifsPage() {
             </div>
           </div>
 
-          <p className="mt-6 text-center text-[13px] text-ink-500 leading-relaxed max-w-3xl mx-auto" data-testid="contract-note">{t(C.contractNote)}</p>
+          <p className="mt-6 text-center text-[13px] sm:text-sm text-[#101F43] font-medium leading-relaxed max-w-3xl mx-auto rounded-xl border border-brand/40 bg-white px-4 py-3" data-testid="contract-note">{t(C.contractNote)}</p>
 
           {/* ── CONDITIONS ── */}
           <div className="mt-6 mb-14 rounded-2xl bg-white border border-ink-100 p-5 sm:p-6" data-testid="conditions">

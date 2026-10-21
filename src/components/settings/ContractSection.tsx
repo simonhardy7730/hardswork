@@ -76,6 +76,12 @@ export default function ContractSection({ billing, plan, priceCents, isAdmin }: 
             </strong>
           </div>
         </div>
+        {c.phase === "initial" && (
+          <p className="text-sm text-ink mt-3 font-medium" data-testid="commitment-sentence">
+            {l(`Votre engagement initial se termine le ${day(c.endDay)}. Pour résilier à cette échéance, votre demande doit nous parvenir au plus tard le ${day(c.noticeDeadlineDay)}.`,
+               `Uw initiële verbintenis eindigt op ${day(c.endDay)}. Om op deze vervaldatum op te zeggen, moet uw aanvraag ons uiterlijk op ${day(c.noticeDeadlineDay)} bereiken.`)}
+          </p>
+        )}
         {c.phase === "initial" && !cancel_ && (
           <p className="text-xs text-ink-400 mt-3">
             {l(`À l'issue de l'engagement, l'abonnement continue à durée indéterminée (${eur(c.priceAfterCents)}), résiliable avec 30 jours de préavis. Pour ne pas poursuivre, demandez la non-reconduction avant le ${day(c.noticeDeadlineDay)}.`,

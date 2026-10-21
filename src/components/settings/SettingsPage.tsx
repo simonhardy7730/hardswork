@@ -690,10 +690,10 @@ function SubscriptionTab({ subscription, billing, isAdmin }: { subscription: Sub
         {(state === "trial_expired" || state === "ended") && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-4 text-sm text-red-700">
             {state === "trial_expired"
-              ? l("Votre essai gratuit est terminé. Vos données sont conservées. Choisissez un abonnement pour continuer à publier des offres et à contacter les candidats.",
-                  "Je gratis proefperiode is afgelopen. Je gegevens blijven bewaard. Kies een abonnement om vacatures te blijven publiceren en kandidaten te contacteren.")
-              : l("Vous n'avez pas d'abonnement actif. Vos données sont conservées. Choisissez un abonnement pour retrouver l'accès complet.",
-                  "Je hebt geen actief abonnement. Je gegevens blijven bewaard. Kies een abonnement om weer volledige toegang te krijgen.")}
+              ? l("Votre essai gratuit est terminé. Vos données sont conservées selon notre politique de confidentialité. Choisissez un abonnement pour continuer à publier des offres et à contacter les candidats.",
+                  "Je gratis proefperiode is afgelopen. Je gegevens worden bewaard volgens ons privacybeleid. Kies een abonnement om vacatures te blijven publiceren en kandidaten te contacteren.")
+              : l("Vous n'avez pas d'abonnement actif. Vos données sont conservées selon notre politique de confidentialité. Choisissez un abonnement pour retrouver l'accès complet.",
+                  "Je hebt geen actief abonnement. Je gegevens worden bewaard volgens ons privacybeleid. Kies een abonnement om weer volledige toegang te krijgen.")}
           </div>
         )}
 
@@ -758,8 +758,8 @@ function SubscriptionTab({ subscription, billing, isAdmin }: { subscription: Sub
         </div>
         <p className="px-6 py-3 text-[11px] text-ink-400 border-t border-[#F1F5F9]" data-testid="contract-note">
           {l(
-            "7 jours d'essai gratuits, sans engagement. Puis abonnement professionnel avec engagement initial de 12 mois, facturé mensuellement. Préavis de 30 jours avant échéance. Après la première année, abonnement mensuel résiliable avec un préavis de 30 jours. Tarifs HTVA.",
-            "7 dagen gratis proefperiode, zonder verbintenis. Daarna professioneel abonnement met een initiële verbintenis van 12 maanden, maandelijks gefactureerd. Opzegtermijn van 30 dagen voor de vervaldatum. Na het eerste jaar maandelijks abonnement, opzegbaar met een opzegtermijn van 30 dagen. Prijzen excl. btw."
+            "7 jours d'essai gratuits, sans carte bancaire et sans engagement. Après l'essai, abonnement payant sur souscription expresse, avec engagement initial de 12 mois et facturation mensuelle. Résiliation possible à l'échéance annuelle moyennant un préavis de 30 jours. Tarifs HTVA.",
+            "7 dagen gratis proefperiode, zonder bankkaart en zonder verbintenis. Na de proefperiode volgt een betalend abonnement uitsluitend na uitdrukkelijke onderschrijving, met een initiële verbintenis van 12 maanden en maandelijkse facturatie. Opzegging is mogelijk op de jaarlijkse vervaldatum mits een opzegtermijn van 30 dagen. Prijzen excl. btw."
           )}
         </p>
         <p className="px-6 pb-3 text-[11px] text-ink-400">

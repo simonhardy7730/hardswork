@@ -75,7 +75,7 @@ export default function CGUPage() {
               <p>
                 <strong>Essai gratuit.</strong> Tout compte entreprise ou agence bénéficie d&apos;un essai gratuit de
                 7 jours calendaires, une seule fois par organisation, sans carte bancaire. Aucun prélèvement n&apos;est
-                effectué sans votre accord explicite. À la fin de l&apos;essai, vos données sont conservées ; l&apos;accès
+                effectué sans votre accord explicite. À la fin de l&apos;essai, aucun abonnement n&apos;est activé automatiquement et aucune facture d&apos;abonnement n&apos;est émise ; vos données sont conservées selon la durée prévue par la <Link href="/legal/privacy">Politique de Confidentialité</Link> ; l&apos;accès
                 à la publication d&apos;offres et aux coordonnées des candidats est suspendu jusqu&apos;à la souscription
                 d&apos;un abonnement.
               </p>

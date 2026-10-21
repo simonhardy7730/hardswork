@@ -1,5 +1,6 @@
 import { HardieIcon } from "@/components/ui/HardieIcon";
 import { createClient } from "@/lib/supabase/server";
+import { adminClient } from "@/lib/billing/lifecycle";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
@@ -77,11 +78,13 @@ export default async function DashboardPage() {
           ).data?.map((j) => j.id) ?? []
         ),
 
-      // Total candidats
-      supabase
+      // Profils visibles dans la candidathèque (un simple total, aucune donnée personnelle)
+      adminClient()
         .from("candidates")
-        .select("id", { count: "exact" })
-        .eq("organization_id", orgId),
+        .select("id", { count: "exact", head: true })
+        .eq("visible_to_recruiters", true)
+        .eq("status", "actif")
+        .gt("visibility_consent_at", new Date(Date.now() - 730 * 86400000).toISOString()),
 
       // Placements ce mois
       supabase
@@ -140,11 +143,11 @@ export default async function DashboardPage() {
       href: "/dashboard/offres",
     },
     {
-      label: l("Candidats dans la base", "Kandidaten in de database"),
+      label: l("Profils dans la candidathèque", "Profielen in de kandidatenbank"),
       value: candidatsResult.count ?? 0,
       icon: Users,
       color: "bg-purple-50 text-purple-600",
-      href: "/dashboard/candidats",
+      href: "/dashboard/candidatheque",
     },
     {
       label: l("Placements ce mois", "Plaatsingen deze maand"),
@@ -354,7 +357,7 @@ export default async function DashboardPage() {
           </div>
         </Link>
         <Link
-          href="/dashboard/candidats"
+          href="/dashboard/candidatheque"
           className="bg-white rounded-xl border border-ink-100 p-4 hover:shadow-sm hover:border-brand/30 transition-all flex items-center gap-3"
         >
           <div className="w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center">
@@ -362,9 +365,9 @@ export default async function DashboardPage() {
           </div>
           <div>
             <div className="text-sm font-medium text-[#101F43]">
-              {l("Base candidats", "Kandidatendatabase")}
+              {l("Candidathèque", "Kandidatenbank")}
             </div>
-            <div className="text-xs text-ink-300">{l("Gérer vos profils", "Beheer uw profielen")}</div>
+            <div className="text-xs text-ink-300">{l("Chercher par métier", "Zoeken op beroep")}</div>
           </div>
         </Link>
         <Link

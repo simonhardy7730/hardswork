@@ -17,7 +17,6 @@ const NAV_ITEMS = [
   { href: "/dashboard/offres",   icon: Briefcase,       fr: "Offres d'emploi", nl: "Vacatures",     exact: false },
   { href: "/dashboard/candidatures", icon: Kanban,    fr: "Candidatures",    nl: "Sollicitaties", exact: false },
   { href: "/dashboard/flash",   icon: Zap,             fr: "WOLKO Flash",     nl: "WOLKO Flash",   exact: false },
-  { href: "/dashboard/candidats",icon: Users,           fr: "Candidats",       nl: "Kandidaten",    exact: false },
   { href: "/dashboard/settings", icon: Settings,        fr: "Paramètres",      nl: "Instellingen",  exact: false },
 ];
 

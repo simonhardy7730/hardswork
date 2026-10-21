@@ -115,7 +115,7 @@ export default async function CandidatDetailPage(
         <div className="max-w-5xl mx-auto px-6 py-8">
 
           {/* Breadcrumb */}
-          <Link href="/dashboard/candidats"
+          <Link href="/dashboard/candidatheque"
             className="inline-flex items-center gap-1.5 text-white/40 hover:text-white/70 text-sm font-medium transition-colors mb-6">
             <ChevronLeft size={14} />
             {l("Retour à la candidathèque", "Terug naar de kandidatendatabase")}

@@ -10,7 +10,7 @@ import {
   ArrowRight, CheckCircle, ChevronRight,
 } from "lucide-react";
 import { labels } from "@/lib/utils";
-import { buildJobPosting, jsonLd } from "@/lib/seo/jobposting";
+import { buildJobPosting, jobSeo, jsonLd } from "@/lib/seo/jobposting";
 import { getDict } from "@/lib/i18n/server";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
 import type { JobPlanning } from "@/lib/supabase/types";
@@ -43,18 +43,17 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
   const supabase = await createClient();
   const { data } = await supabase
     .from("job_offers")
-    .select("title, city, sector, hide_company, organizations(name)")
+    .select("title, city, sector, description, contract_type, hide_company, organizations(name)")
     .eq("id", params.id).single();
   const { lang } = await getDict();
   const SECTOR_LABELS = labels(lang).sector;
   if (!data) return { title: lang === "nl" ? "Vacature niet gevonden — Wolko" : "Offre introuvable — Wolko" };
-  const orgRaw = data.organizations as unknown as { name: string }[] | { name: string } | null;
-  const org = data.hide_company ? { name: publicOrgName(true, null, lang) } : Array.isArray(orgRaw) ? (orgRaw[0] ?? null) : orgRaw;
+  const seo = jobSeo(data, lang === "nl" ? "nl" : "fr", (labels(lang).contract as Record<string, string>)[data.contract_type] ?? undefined);
   return {
-    title: `${data.title} — ${org?.name ?? ""} | Wolko`,
-    description: lang === "nl"
-      ? `Vacature ${SECTOR_LABELS[data.sector] ?? data.sector} in ${data.city}. Solliciteer nu op Wolko.`
-      : `Offre ${SECTOR_LABELS[data.sector] ?? data.sector} à ${data.city}. Postulez maintenant sur Wolko.`,
+    title: seo.title,
+    description: seo.description,
+    alternates: { canonical: `https://wolko.be/jobs/${params.id}` },
+    openGraph: { title: seo.title, description: seo.description, url: `https://wolko.be/jobs/${params.id}`, type: "article" as const },
   };
 }
 

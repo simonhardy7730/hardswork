@@ -32,3 +32,16 @@ test("JobPosting : région belge et salaire sans maximum", () => {
   const fourchette = buildJobPosting({ ...base, salary_min: 14, salary_max: 16 }, "Wolko") as { baseSalary: { value: Record<string, unknown> } };
   assert.equal(fourchette.baseSalary.value.maxValue, 16);
 });
+
+import { jobSeo } from "../src/lib/seo/jobposting";
+test("JobPosting : fin de validité réelle et titre propre à l'offre", () => {
+  const o = { id: "x", title: "Cariste", description: "<p>Conduite de chariot élévateur en entrepôt. Horaires de jour.</p>", contract_type: "cdi", city: "Mouscron", created_at: "2026-10-20T10:00:00Z", salary_min: null, salary_max: null, salary_period: null, show_salary: false };
+  const p1 = buildJobPosting({ ...o, expires_at: "2026-11-19T10:00:00Z" }, "Wolko") as { validThrough: string };
+  assert.equal(p1.validThrough, "2026-11-19T10:00:00.000Z");
+  const p2 = buildJobPosting(o, "Wolko") as { validThrough: string };
+  assert.equal(p2.validThrough.slice(0, 10), "2026-12-19");
+  const seo = jobSeo(o, "fr", "CDI");
+  assert.equal(seo.title, "Cariste à Mouscron — Emploi | Wolko");
+  assert.ok(seo.description.includes("Mouscron") && !seo.description.includes("<"));
+  assert.ok(seo.description.length <= 300);
+});

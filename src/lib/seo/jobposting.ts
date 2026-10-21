@@ -2,6 +2,8 @@
 export interface OfferForSeo {
   id: string; title: string; description: string | null; contract_type: string; city: string; postal_code?: string | null; created_at: string;
   salary_min: number | null; salary_max: number | null; salary_period: string | null; show_salary: boolean | null;
+  /** Fin réelle de l'annonce (Flash : 30 jours). Absente : on garde 60 jours après la publication. */
+  expires_at?: string | null;
 }
 
 const EMPLOYMENT: Record<string, string | string[]> = { cdi: "FULL_TIME", cdd: "TEMPORARY", interim: "TEMPORARY", interim_cdi: ["FULL_TIME", "TEMPORARY"], etudiant: "PART_TIME", flexi: "PART_TIME", stage: "INTERN", apprentissage: "OTHER" };
@@ -50,7 +52,8 @@ export function buildJobPosting(o: OfferForSeo, orgName: string, baseUrl = "http
       "@type": "Place",
       address: { "@type": "PostalAddress", addressLocality: o.city, ...(regionOf(o.postal_code, o.city) ? { addressRegion: regionOf(o.postal_code, o.city) } : {}), ...(o.postal_code ? { postalCode: o.postal_code } : {}), addressCountry: "BE" },
     },
-    validThrough: new Date(new Date(o.created_at).getTime() + 60 * 86400000).toISOString(),
+    validThrough: (o.expires_at && !Number.isNaN(Date.parse(o.expires_at))
+      ? new Date(o.expires_at) : new Date(new Date(o.created_at).getTime() + 60 * 86400000)).toISOString(),
     directApply: true,
     url: `${baseUrl}/jobs/${o.id}`,
   };
@@ -72,4 +75,17 @@ export function buildJobPosting(o: OfferForSeo, orgName: string, baseUrl = "http
 /** Sérialisation sûre à l'intérieur d'une balise <script>. */
 export function jsonLd(data: unknown): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
+/** Titre et description de page : propres à chaque offre, sans jamais nommer un client confidentiel. */
+export function jobSeo(o: { title: string; city: string; contract_type?: string | null; description?: string | null }, lang: "fr" | "nl", contractLabel?: string) {
+  const plain = (o.description ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const title = lang === "nl" ? `${o.title} in ${o.city} — Vacature | Wolko` : `${o.title} à ${o.city} — Emploi | Wolko`;
+  const lead = lang === "nl"
+    ? `${o.title} in ${o.city}${contractLabel ? ` (${contractLabel})` : ""}. `
+    : `${o.title} à ${o.city}${contractLabel ? ` (${contractLabel})` : ""}. `;
+  const tail = lang === "nl" ? "Solliciteer snel op Wolko, zonder account." : "Postulez en 1 minute sur Wolko, sans compte.";
+  const body = plain ? `${plain.slice(0, 110).replace(/\s+\S*$/, "")}… ` : "";
+  const description = (lead + body + tail).slice(0, 300);
+  return { title, description };
 }

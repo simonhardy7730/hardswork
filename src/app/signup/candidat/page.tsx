@@ -151,6 +151,7 @@ export default function CandidatSignupPage() {
   /* Étape 3 — compte + CV */
   const [auth, setAuth]     = useState({ full_name: "", email: "", password: "", phone: "" });
   const [cvFile, setCvFile] = useState<File | null>(null);
+  const [accountExists, setAccountExists] = useState(false);
   const [cvMode, setCvMode] = useState<CvMode>("");
   const [mini, setMini] = useState<MiniInput>(EMPTY_MINI);
   const [birth, setBirth] = useState("");
@@ -195,6 +196,13 @@ export default function CandidatSignupPage() {
 
     if (authError || !authData.user) {
       setError(friendlyAuthError(authError?.message, l));
+      setLoading(false);
+      return;
+    }
+    // E-mail déjà inscrit : Supabase renvoie un faux compte sans identité (aucune erreur). On l'envoie se connecter.
+    if (Array.isArray(authData.user.identities) && authData.user.identities.length === 0) {
+      setError(l("Un compte existe déjà avec cet e-mail. Connecte-toi (ou « mot de passe oublié ») pour retrouver ton profil.", "Er bestaat al een account met dit e-mailadres. Log in (of « wachtwoord vergeten ») om je profiel terug te vinden."));
+      setAccountExists(true);
       setLoading(false);
       return;
     }
@@ -244,8 +252,22 @@ export default function CandidatSignupPage() {
       }),
     });
 
+    if (res.status === 409) { router.push("/candidat/dashboard"); return; }
     if (!res.ok) {
-      setError(l("Erreur lors de la création du profil. Réessayez.", "Fout bij het aanmaken van je profiel. Probeer opnieuw."));
+      const code = ((await res.json().catch(() => ({}))) as { error?: string }).error ?? "";
+      if (res.status === 403) {
+        setError(l("Un compte existe déjà avec cet e-mail. Connecte-toi pour retrouver ton profil.", "Er bestaat al een account met dit e-mailadres. Log in om je profiel terug te vinden."));
+        setAccountExists(true);
+      } else if (res.status === 429) {
+        setError(l("Trop de tentatives depuis cette connexion. Réessaie dans une heure.", "Te veel pogingen. Probeer over een uur opnieuw."));
+      } else if (code === "age") {
+        setError(l(`Inscription à partir de ${MIN_AGE} ans : vérifie ta date de naissance.`, `Inschrijving vanaf ${MIN_AGE} jaar: controleer je geboortedatum.`));
+      } else if (res.status === 400) {
+        setError(l("Vérifie ton prénom, ton téléphone (ex : 0475 12 34 56) et ton e-mail.", "Controleer je voornaam, telefoon (bv. 0475 12 34 56) en e-mail."));
+      } else {
+        setError(l("Ton compte est créé mais le profil n'a pas pu être enregistré. Connecte-toi pour le terminer.", "Je account is aangemaakt maar je profiel kon niet worden opgeslagen. Log in om het af te werken."));
+        setAccountExists(true);
+      }
       setLoading(false);
       return;
     }
@@ -639,6 +661,11 @@ export default function CandidatSignupPage() {
               {error && (
                 <div className="text-sm px-4 py-3 rounded-xl bg-red-50 text-red-600 border border-red-200">
                   {error}
+                  {accountExists && (
+                    <Link href="/login" className="mt-2 flex h-10 items-center justify-center rounded-lg bg-[#101F43] text-white font-bold">
+                      {l("Me connecter", "Inloggen")}
+                    </Link>
+                  )}
                 </div>
               )}
             </div>

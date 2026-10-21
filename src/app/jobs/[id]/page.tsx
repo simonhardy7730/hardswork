@@ -160,6 +160,11 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
                     {org.name}
                   </p>
                 )}
+                {offer.hide_company && (
+                  <p className="text-white/60 text-xs mt-1">
+                    {l("Offre publiée sur Wolko pour une entreprise de la région", "Vacature op Wolko voor een bedrijf uit de regio")}
+                  </p>
+                )}
               </div>
 
               {/* POSTULER — desktop */}

@@ -14,11 +14,11 @@ const fr = {
     rights: "Tous droits réservés",
   },
   hero: {
-    h1a: "Le bon talent.", h1b: "La bonne ", h1c: "entreprise.",
-    sub: "La plateforme belge qui rapproche les candidats, les entreprises et les agences d'intérim. Trouvez un emploi ou recrutez plus simplement, près de chez vous.",
+    h1a: "Trouve un job près de chez toi.", h1b: "Postule en 1 minute, ", h1c: "sans compte.",
+    sub: "Wolko est une plateforme d'offres d'emploi, pas une agence d'intérim : tu postules directement chez l'employeur.",
     candTitle: "Je cherche un emploi", candText: "Découvrez les opportunités près de chez vous et postulez facilement.", candCta: "Trouver un emploi",
     recTitle: "Je recrute", recText: "Publiez vos offres et rencontrez vos futurs collaborateurs.", recCta: "Je recrute",
-    signature: "WOLKO — Le recrutement a du flair.",
+    signature: "Gratuit · Sans compte · Réponse directe de l'employeur",
   },
   mosaic: { construction: "Construction", health: "Santé", transport: "Transport", industry: "Industrie", logistics: "Logistique", office: "Bureau" },
   search: {
@@ -117,11 +117,11 @@ const nl: Dict = {
     rights: "Alle rechten voorbehouden",
   },
   hero: {
-    h1a: "Het juiste talent.", h1b: "Het juiste ", h1c: "bedrijf.",
-    sub: "Het Belgische platform dat kandidaten, bedrijven en uitzendkantoren samenbrengt. Vind een job of werf eenvoudiger aan, dicht bij huis.",
+    h1a: "Vind een job dicht bij huis.", h1b: "Solliciteer in 1 minuut, ", h1c: "zonder account.",
+    sub: "Wolko is een vacatureplatform, geen uitzendkantoor: je solliciteert rechtstreeks bij de werkgever.",
     candTitle: "Ik zoek een job", candText: "Ontdek de kansen in je buurt en solliciteer eenvoudig.", candCta: "Vind een job",
     recTitle: "Ik werf aan", recText: "Plaats je vacatures en ontmoet je toekomstige collega's.", recCta: "Ik werf aan",
-    signature: "WOLKO — Recruteren met flair.",
+    signature: "Gratis · Zonder account · Rechtstreeks antwoord van de werkgever",
   },
   mosaic: { construction: "Bouw", health: "Zorg", transport: "Transport", industry: "Industrie", logistics: "Logistiek", office: "Kantoor" },
   search: {

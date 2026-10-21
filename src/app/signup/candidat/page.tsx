@@ -194,7 +194,8 @@ export default function CandidatSignupPage() {
     // 2. CV : dépôt dans le bucket PRIVÉ (jamais de lien public), possible dès qu'une session existe.
     // Sans session (confirmation e-mail activée), le CV se dépose depuis « Mon compte » après connexion.
     if (cvFile && authData.session) {
-      const okType = ["application/pdf", "image/jpeg", "image/png", "image/webp"].includes(cvFile.type);
+      const okType = ["application/pdf", "image/jpeg", "image/png", "image/webp", "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"].includes(cvFile.type);
       if (okType && cvFile.size <= 8 * 1024 * 1024) {
         const safe = cvFile.name.replace(/[^\w.\-]+/g, "_").slice(-80);
         const path = `${authData.user.id}/${Date.now()}_${safe}`;
@@ -610,13 +611,14 @@ export default function CandidatSignupPage() {
 
               {/* Upload CV */}
               <div>
-                <label className={labelCls}>{l("CV (optionnel)", "Cv (optioneel)")}</label>
+                <label className={labelCls}>{l("CV", "Cv")} <span className="text-emerald-700 normal-case">{l("· recommandé", "· aanbevolen")}</span></label>
+                <p className="text-xs text-ink-500 mb-2">{l("Les employeurs contactent d'abord les profils avec CV. Pas de fichier ? Prends ton CV papier en photo 📸 — ou crée-le gratuitement sur Wolko après l'inscription.", "Werkgevers contacteren eerst profielen met een cv. Geen bestand? Neem een foto van je papieren cv 📸 — of maak het gratis op Wolko na je inschrijving.")}</p>
                 <label className={`block border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition ${
                   cvFile
                     ? "border-brand bg-brand/5"
                     : "border-ink-100 hover:border-brand/40 hover:bg-surface-2"
                 }`}>
-                  <input type="file" accept=".pdf,.doc,.docx" className="hidden"
+                  <input type="file" accept=".pdf,.doc,.docx,image/jpeg,image/png,image/webp" className="hidden"
                     onChange={e => setCvFile(e.target.files?.[0] ?? null)} />
                   {cvFile ? (
                     <div className="flex items-center justify-center gap-3">
@@ -630,8 +632,8 @@ export default function CandidatSignupPage() {
                     <div className="flex items-center justify-center gap-3">
                       <Upload size={18} className="text-ink-300" />
                       <div className="text-left">
-                        <p className="text-sm font-bold text-ink-700">{l("Déposez votre CV ici", "Sleep je cv hierheen")}</p>
-                        <p className="text-xs text-ink-300">{l("PDF, DOC — 5 MB max", "PDF, DOC — max. 5 MB")}</p>
+                        <p className="text-sm font-bold text-ink-700">{l("Ajouter mon CV", "Mijn cv toevoegen")}</p>
+                        <p className="text-xs text-ink-300">{l("PDF, Word ou photo — 8 Mo max", "PDF, Word of foto — max. 8 MB")}</p>
                       </div>
                     </div>
                   )}

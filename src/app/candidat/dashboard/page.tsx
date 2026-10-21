@@ -9,6 +9,9 @@ import {
 import { formatRelative } from "@/lib/utils";
 import { getDict } from "@/lib/i18n/server";
 import CvRequests, { type CvRequestRow } from "@/components/candidat/CvRequests";
+import CvNudge from "@/components/candidat/CvNudge";
+import { asCv } from "@/lib/candidate/cv";
+import { cvFilled } from "@/lib/candidate/pool-cv";
 
 export async function generateMetadata() {
   return { title: (await getDict()).lang === "nl" ? "Mijn dashboard — Wolko" : "Mon tableau de bord — Wolko" };
@@ -48,6 +51,14 @@ export default async function CandidatDashboardPage() {
     .order("created_at", { ascending: false });
   const cvRequests = (cvReqRaw ?? []) as CvRequestRow[];
 
+  /* A-t-il un CV ? (document « CV », CV joint à une candidature, ou CV créé sur Wolko) */
+  const [{ count: docCount }, { data: candRow }] = await Promise.all([
+    supabase.from("candidate_documents").select("id", { count: "exact", head: true }).ilike("label", "cv%"),
+    supabase.from("candidates").select("cv_data").eq("auth_user_id", user.id).maybeSingle(),
+  ]);
+  const hasCv = (docCount ?? 0) > 0 || cvRequests.some((r) => r.status === "fulfilled")
+    || cvFilled(asCv((candRow as { cv_data?: unknown } | null)?.cv_data));
+
   /* Offres suggérées (récentes, tout secteur) */
   const { data: suggestedRaw } = await supabase
     .from("job_offers")
@@ -78,6 +89,7 @@ export default async function CandidatDashboardPage() {
     <div className="space-y-6 max-w-4xl">
 
       <CvRequests userId={user.id} requests={cvRequests} />
+      {!hasCv && <CvNudge userId={user.id} />}
 
       {/* ── WELCOME ─────────────────────────────────────── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">

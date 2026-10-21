@@ -34,6 +34,13 @@ export default function ProfileModal({ application: app, hasSubscription, onClos
     return () => { alive = false; };
   }, [app.id, hasSubscription]);
 
+  // Bloque le défilement de la page derrière la fiche (téléphone).
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
@@ -48,10 +55,13 @@ export default function ProfileModal({ application: app, hasSubscription, onClos
 
   async function openCv() {
     setBusy(true); setMsg("");
+    // Fenêtre ouverte pendant le clic : sinon Safari / Chrome mobile la bloquent après l'attente.
+    const w = window.open("about:blank", "_blank");
     const url = await getCvUrl(app.id);
     setBusy(false);
-    if (url) window.open(url, "_blank", "noopener");
-    else setMsg(l("CV introuvable. Réessayez dans un instant.", "CV niet gevonden. Probeer zo opnieuw."));
+    if (url) { if (w) w.location.href = url; else window.location.href = url; }
+    else { w?.close(); }
+    if (!url) setMsg(l("CV introuvable. Réessayez dans un instant.", "CV niet gevonden. Probeer zo opnieuw."));
   }
 
   async function ask() {
@@ -79,9 +89,9 @@ export default function ProfileModal({ application: app, hasSubscription, onClos
   const label = "text-[11px] font-black uppercase tracking-widest text-ink-300 mb-1.5";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={onClose} role="dialog" aria-modal="true">
-      <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-ink-100">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-4 bg-black/40" onClick={onClose} role="dialog" aria-modal="true">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-lg max-h-[88dvh] sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl pb-[env(safe-area-inset-bottom)]" onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
+        <div className="sticky top-0 z-10 bg-white flex items-start justify-between gap-3 px-5 py-4 border-b border-ink-100">
           <div className="min-w-0">
             <h3 className="font-display font-black uppercase text-ink text-lg leading-tight truncate">{app.applicant_name}</h3>
             {app.job_title && <p className="text-xs text-ink-500 mt-0.5 truncate">{app.job_title}</p>}
@@ -89,14 +99,14 @@ export default function ProfileModal({ application: app, hasSubscription, onClos
               <p className="text-xs text-ink-500 mt-0.5">{ageFromBirthDate(app.birth_date)} {l("ans", "jaar")}</p>
             )}
           </div>
-          <button onClick={onClose} aria-label={l("Fermer", "Sluiten")} className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-300 hover:bg-surface-2 shrink-0">
+          <button onClick={onClose} aria-label={l("Fermer", "Sluiten")} className="w-10 h-10 -mr-2 rounded-lg flex items-center justify-center text-ink-400 hover:bg-surface-2 shrink-0">
             <X size={16} />
           </button>
         </div>
 
         <div className="p-5 space-y-5">
           {hasSubscription ? (
-            <div className="flex flex-wrap gap-3 text-sm">
+            <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm [&_a]:min-h-[36px] [&_a]:break-all">
               <a href={`tel:${app.applicant_phone}`} className="flex items-center gap-1.5 text-brand font-bold hover:underline"><Phone size={14} />{app.applicant_phone}</a>
               {(() => {
                 const first = app.applicant_name.trim().split(/\s+/)[0] ?? "";

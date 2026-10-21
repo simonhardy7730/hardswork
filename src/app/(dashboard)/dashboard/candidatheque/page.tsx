@@ -9,6 +9,8 @@ import { JOB_TYPES } from "@/lib/candidate/preferences";
 import { labels } from "@/lib/utils";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
 import RevealContact from "@/components/dashboard/RevealContact";
+import PoolCvButton from "@/components/dashboard/PoolCvButton";
+import { findPoolCvs, type PoolCv } from "@/lib/candidate/pool-cv";
 import { TRADES, TRADE_KEYS, tradeLabel, sanitizeTradeOther } from "@/lib/candidate/trades";
 
 type SP = { mot?: string; metier?: string; secteur?: string; lieu?: string; rayon?: string; type?: string; dispo?: string; page?: string; jour?: string | string[]; plage?: string | string[] };
@@ -69,6 +71,10 @@ export default async function CandidathequePage(props: { searchParams: Promise<S
   }
   const hasNext = rows.length > PAGE;
   rows = rows.slice(0, PAGE);
+  // CV disponibles (compte, candidature ou créateur Wolko) : les profils avec CV passent en premier.
+  let cvs = new Map<string, PoolCv>();
+  try { cvs = await findPoolCvs(rows.map((r) => r.id)); } catch { /* sans CV, la page reste utilisable */ }
+  rows = [...rows].sort((a, b) => Number(cvs.has(b.id)) - Number(cvs.has(a.id)));
 
   const availLbl: Record<string, string> = {
     immediate: l("Disponible tout de suite", "Onmiddellijk beschikbaar"),
@@ -151,8 +157,9 @@ export default async function CandidathequePage(props: { searchParams: Promise<S
             <ul className="grid md:grid-cols-2 gap-3">
               {rows.map((c) => (
                 <li key={c.id} className="bg-white border border-ink-100 rounded-2xl p-4 flex flex-col gap-3">
-                  <div>
-                    <p className="font-display font-black text-ink text-xl leading-tight">{c.first_name} {c.last_initial}.</p>
+                  <div className="relative pr-16">
+                    {cvs.has(c.id) && <span className="absolute right-0 top-0 text-[10px] font-black uppercase bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2 py-0.5">CV ✓</span>}
+                    <p className="font-display font-black text-ink text-xl leading-tight break-words">{c.first_name} {c.last_initial}.</p>
                     <p className="text-ink-500 text-sm">{[c.city, availLbl[c.availability]].filter(Boolean).join(" · ")}</p>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -164,7 +171,10 @@ export default async function CandidathequePage(props: { searchParams: Promise<S
                     {(c.licenses ?? []).map((x) => <span key={x} className="text-xs border border-ink-100 text-ink-700 rounded-full px-2.5 py-1">{x}</span>)}
                   </div>
                   {c.experience_years != null && <p className="text-xs text-ink-500">{l(`${c.experience_years} an(s) d'expérience`, `${c.experience_years} jaar ervaring`)}</p>}
-                  <RevealContact candidateId={c.id} />
+                  <div className="flex flex-wrap items-start gap-2">
+                    {cvs.has(c.id) && <PoolCvButton candidateId={c.id} />}
+                    <RevealContact candidateId={c.id} />
+                  </div>
                 </li>
               ))}
             </ul>

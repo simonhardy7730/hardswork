@@ -7,7 +7,7 @@ import Link from "next/link";
 import {
   DndContext,
   DragOverlay,
-  PointerSensor,
+  MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
@@ -89,8 +89,8 @@ export default function KanbanBoard({
   const [openId, setOpenId] = useState<string | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 350, tolerance: 8 } })
   );
 
   const activeApp = apps.find(a => a.id === activeId);

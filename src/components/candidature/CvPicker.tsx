@@ -32,16 +32,17 @@ export default function CvPicker({ file, onChange }: { file: File | null; onChan
   return (
     <div>
       <label className="block text-sm font-medium text-ink mb-1.5">
-        {l("CV", "CV")} <span className="text-ink-300 font-normal">({l("optionnel · PDF, Word, JPG ou PNG, 4 Mo max", "optioneel · PDF, Word, JPG of PNG, max. 4 MB")})</span>
+        {l("CV", "CV")} <span className="text-emerald-700 font-bold text-xs">{l("· recommandé", "· aanbevolen")}</span>
       </label>
+      <p className="text-xs text-ink-500 mb-2">{l("Les employeurs appellent d'abord les candidats avec CV. Pas de fichier ? Prends ton CV papier en photo 📸", "Werkgevers bellen eerst kandidaten met een cv. Geen bestand? Neem een foto van je papieren cv 📸")}</p>
       {file ? (
         <div className="flex items-center justify-between gap-2 border border-ink-100 rounded-xl px-3 py-2.5 text-sm">
           <span className="flex items-center gap-2 min-w-0"><FileText size={15} className="text-brand shrink-0" /><span className="truncate">{file.name}</span></span>
           <button type="button" onClick={() => onChange(null)} aria-label={l("Retirer", "Verwijderen")} className="text-ink-300 hover:text-ink"><X size={15} /></button>
         </div>
       ) : (
-        <label className="flex items-center justify-center gap-2 border border-dashed border-ink-100 rounded-xl px-3 py-3 text-sm text-ink-500 cursor-pointer hover:border-brand hover:text-brand transition">
-          <FileText size={15} />{l("Ajouter mon CV", "Mijn CV toevoegen")}
+        <label className="flex items-center justify-center gap-2 border-2 border-dashed border-brand/60 bg-brand/5 rounded-xl px-3 py-3.5 text-sm font-bold text-ink cursor-pointer hover:border-brand hover:text-brand transition">
+          <FileText size={15} />{l("Ajouter mon CV (PDF, Word ou photo)", "Mijn cv toevoegen (pdf, Word of foto)")}
           <input type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" className="hidden" onChange={pick} />
         </label>
       )}

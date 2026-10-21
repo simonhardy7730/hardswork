@@ -11,7 +11,7 @@ export default function PoolOptIn({ checked, onChange, city, onCity }: { checked
         <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-1 w-4 h-4 accent-[#FFB900]" />
         <span className="text-sm text-ink">
           <strong>{l("Être aussi contacté pour d'autres offres", "Ook gecontacteerd worden voor andere vacatures")}</strong>
-          <span className="block text-xs text-ink-500 mt-0.5">{l("Votre profil (métier, ville, disponibilité, permis) devient visible des employeurs abonnés de la région, qui peuvent vous appeler. Réservé aux 18 ans et plus. Vous pouvez le retirer à tout moment.", "Je profiel (beroep, stad, beschikbaarheid, rijbewijs) wordt zichtbaar voor werkgevers met een abonnement in de regio. Vanaf 18 jaar. Je kunt dit altijd intrekken.")}</span>
+          <span className="block text-xs text-ink-500 mt-0.5">{l("Votre profil (métier, ville, disponibilité, permis, CV) devient visible des employeurs abonnés de la région, qui peuvent vous appeler. Réservé aux 18 ans et plus. Vous pouvez le retirer à tout moment.", "Je profiel (beroep, stad, beschikbaarheid, rijbewijs, cv) wordt zichtbaar voor werkgevers met een abonnement in de regio. Vanaf 18 jaar. Je kunt dit altijd intrekken.")}</span>
         </span>
       </label>
       {checked && (

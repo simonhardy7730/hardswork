@@ -59,7 +59,7 @@ export default function PrivacyPage() {
               <p>
                 Si vous cochez, de façon facultative, la case « J&apos;accepte que mon profil soit consulté par des recruteurs
                 abonnés à Wolko » (à l&apos;inscription ou dans Mon compte), les organisations disposant d&apos;un abonnement
-                actif peuvent rechercher votre profil et vous contacter pour des offres. Cet accord est la base légale de
+                actif peuvent rechercher votre profil, consulter votre CV (déposé dans votre compte, joint à une candidature ou créé sur Wolko) et vous contacter pour des offres. Cet accord est la base légale de
                 ce traitement : il n&apos;est jamais pré-coché, la date et la version du texte sont conservées, et vous
                 pouvez le retirer à tout moment dans Mon compte (le profil disparaît alors de la recherche). Une candidature
                 ne vaut jamais accord de visibilité générale.

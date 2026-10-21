@@ -22,3 +22,17 @@ export async function revealContact(candidateId: string): Promise<RevealResult> 
   if (!row) return { ok: false, error: "not_found" };
   return { ok: true, name: `${row.first_name} ${row.last_name}`, email: row.email, phone: row.phone };
 }
+
+export type CvOpenResult = { ok: true; url: string } | { ok: false; error: "closed" | "no_access" | "quota" | "not_found" | "no_cv" | "error" };
+
+/** Ouvre le CV d'un profil : même contrôle et même journal que « Voir les coordonnées ». */
+export async function openPoolCv(candidateId: string): Promise<CvOpenResult> {
+  const r = await revealContact(candidateId);
+  if (!r.ok) return { ok: false, error: r.error };
+  const { findPoolCvs, signedCvUrl } = await import("@/lib/candidate/pool-cv");
+  const cv = (await findPoolCvs([candidateId])).get(candidateId);
+  if (!cv) return { ok: false, error: "no_cv" };
+  if (cv.kind === "built") return { ok: true, url: `/dashboard/candidatheque/cv/${candidateId}` };
+  const url = await signedCvUrl(cv.path);
+  return url ? { ok: true, url } : { ok: false, error: "error" };
+}

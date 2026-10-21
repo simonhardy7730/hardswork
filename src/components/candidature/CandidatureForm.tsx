@@ -3,6 +3,7 @@ import PoolOptIn from "@/components/candidature/PoolOptIn";
 
 import { useState } from "react";
 import { Loader2, Phone, User, Mail, CheckCircle2 } from "lucide-react";
+import CvDrop from "@/components/candidature/CvDrop";
 import { useL } from "@/lib/i18n/context";
 import Turnstile from "@/components/security/Turnstile";
 import CvPicker, { postBody } from "./CvPicker";
@@ -33,6 +34,7 @@ export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: P
   const l = useL();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [cvTok, setCvTok] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [poolOptIn, setPoolOptIn] = useState(false);
   const [poolCity, setPoolCity] = useState("");
@@ -103,6 +105,7 @@ export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: P
       return;
     }
 
+    setCvTok(((await res.json().catch(() => ({}))) as { cvToken?: string | null }).cvToken ?? null);
     setSubmitted(true);
   }
 
@@ -120,6 +123,7 @@ export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: P
             {l("Votre candidature a bien été transmise.", "Je sollicitatie is goed doorgestuurd.")}
           </p>
         </div>
+        {cvTok && <CvDrop token={cvTok} />}
         <p className="text-xs text-ink-300">
           {l("Vous pouvez fermer cette page.", "Je kunt deze pagina sluiten.")}
         </p>

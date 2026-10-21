@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { runApplicationReminders } from "@/lib/email/application-reminder";
 import { runMatchingAlerts } from "@/lib/email/matching-alerts";
-import { runCvReminders } from "@/lib/email/cv-reminder";
+import { runCvReminders, runApplicantCvReminders } from "@/lib/email/cv-reminder";
 import { adminClient, runSubscriptionLifecycle, runFlashLifecycle } from "@/lib/billing/lifecycle";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,8 @@ export async function GET(req: Request) {
     const reminders = await runApplicationReminders(db).catch((e) => { console.error('app reminders', e); return { errors: 1 }; });
     const matching = await runMatchingAlerts(db).catch((e) => { console.error('matching alerts', e); return { errors: 1 }; });
     const cv = await runCvReminders(db).catch((e) => { console.error('cv reminders', e); return { errors: 1 }; });
-    return NextResponse.json({ ok: true, ...stats, flash, reminders, matching, cv });
+    const applicantCv = await runApplicantCvReminders(db).catch((e) => { console.error('applicant cv', e); return { errors: 1 }; });
+    return NextResponse.json({ ok: true, ...stats, flash, reminders, matching, cv, applicantCv });
   } catch (e) {
     console.error("cron subscriptions:", e);
     return NextResponse.json({ error: "failed" }, { status: 500 });

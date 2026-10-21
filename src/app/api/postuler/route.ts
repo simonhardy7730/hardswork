@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cvToken, cvLink } from "@/lib/candidate/cv-link";
+import { checkCvFile } from "@/lib/candidate/cv-file";
 import { publicOrgName } from "@/lib/confidential";
 import { createClient } from "@supabase/supabase-js";
 import { resend, FROM_EMAIL, FROM_NAME } from "@/lib/resend";
@@ -164,26 +166,14 @@ export async function POST(req: NextRequest) {
 
     // CV déposé sans compte (facultatif) : fichier privé, lisible seulement par l'entreprise via un lien temporaire.
     // Un échec ne doit jamais faire perdre la candidature.
+    let cvSaved = false;
     if (cvFile) {
       try {
-        const CV_TYPES: Record<string, string> = {
-          pdf: "application/pdf", doc: "application/msword",
-          docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png",
-        };
-        const ext = (cvFile.name.split(".").pop() ?? "").toLowerCase();
-        const head = new Uint8Array(await cvFile.slice(0, 4).arrayBuffer());
-        const isPdf = head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46; // %PDF
-        const isZip = head[0] === 0x50 && head[1] === 0x4b; // docx
-        const isOle = head[0] === 0xd0 && head[1] === 0xcf; // doc
-        const isJpg = head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff;
-        const isPng = head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47;
-        const okType = (ext === "pdf" && isPdf) || (ext === "docx" && isZip) || (ext === "doc" && isOle)
-          || ((ext === "jpg" || ext === "jpeg") && isJpg) || (ext === "png" && isPng);
-        if (okType && cvFile.size <= 4 * 1024 * 1024 && CV_TYPES[ext]) {
+        const cvType = await checkCvFile(cvFile, 4 * 1024 * 1024);
+        if (cvType) {
           const safe = cvFile.name.replace(/[^\w.\-]+/g, "_").slice(-80);
           const path = `applications/${application.id}/${Date.now()}_${safe}`;
-          const up = await supabaseAdmin.storage.from("candidate-documents").upload(path, cvFile, { contentType: CV_TYPES[ext] });
+          const up = await supabaseAdmin.storage.from("candidate-documents").upload(path, cvFile, { contentType: cvType });
           if (!up.error) {
             const orgR = jobData.organizations;
             const o = Array.isArray(orgR) ? orgR[0] : orgR;
@@ -199,6 +189,7 @@ export async function POST(req: NextRequest) {
               fulfilled_at: new Date().toISOString(),
             });
             if (cvErr) { console.error("CV row error:", cvErr.message); await supabaseAdmin.storage.from("candidate-documents").remove([path]); }
+            else cvSaved = true;
           } else {
             console.error("CV upload error:", up.error.message);
           }
@@ -305,6 +296,7 @@ export async function POST(req: NextRequest) {
               jobCity: jobData.city,
               orgName: publicName,
               availability: availability || "immediate",
+              cvUrl: cvSaved ? null : cvLink(application.id),
             })
           ),
         })
@@ -314,7 +306,7 @@ export async function POST(req: NextRequest) {
 
     await Promise.allSettled(sends);
 
-    return NextResponse.json({ success: true, applicationId: application.id });
+    return NextResponse.json({ success: true, applicationId: application.id, cvToken: cvSaved ? null : cvToken(application.id) });
   } catch (err) {
     console.error("Postuler API error:", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });

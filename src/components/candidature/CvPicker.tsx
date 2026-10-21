@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FileText, X } from "lucide-react";
 import { useL } from "@/lib/i18n/context";
+import { shrinkImage } from "@/lib/candidate/shrink-image";
 
 const MAX = 4 * 1024 * 1024;
 
@@ -19,12 +20,13 @@ export default function CvPicker({ file, onChange }: { file: File | null; onChan
   const l = useL();
   const [err, setErr] = useState("");
 
-  function pick(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
+  async function pick(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = e.target.files?.[0];
+    const f = raw ? await shrinkImage(raw) : undefined;
     e.target.value = "";
     if (!f) return;
     const ext = (f.name.split(".").pop() ?? "").toLowerCase();
-    if (!["pdf", "doc", "docx", "jpg", "jpeg", "png"].includes(ext)) return setErr(l("Format accepté : PDF, Word, JPG ou PNG.", "Toegelaten formaten: PDF, Word, JPG of PNG."));
+    if (!["pdf", "doc", "docx", "jpg", "jpeg", "png"].includes(ext) && !f.type.startsWith("image/jpeg") && !f.type.startsWith("image/png")) return setErr(l("Format accepté : PDF, Word, JPG ou PNG.", "Toegelaten formaten: PDF, Word, JPG of PNG."));
     if (f.size > MAX) return setErr(l("Fichier trop lourd (4 Mo maximum).", "Bestand te zwaar (max. 4 MB)."));
     setErr(""); onChange(f);
   }

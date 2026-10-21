@@ -3,6 +3,7 @@ import PoolOptIn from "@/components/candidature/PoolOptIn";
 
 import { useState } from "react";
 import { Loader2, CheckCircle2, Info } from "lucide-react";
+import CvDrop from "@/components/candidature/CvDrop";
 import { useL } from "@/lib/i18n/context";
 import Turnstile from "@/components/security/Turnstile";
 import ScreeningFields, { screeningComplete } from "./ScreeningFields";
@@ -37,6 +38,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
   });
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const [cvTok, setCvTok] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [poolOptIn, setPoolOptIn] = useState(false);
   const [poolCity, setPoolCity] = useState("");
@@ -83,6 +85,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
       setLoading(false);
       return;
     }
+    setCvTok(((await res.json().catch(() => ({}))) as { cvToken?: string | null }).cvToken ?? null);
     setDone(true);
   }
 
@@ -96,6 +99,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
         <p className="text-sm text-ink-500">
           {l("Votre candidature a bien été transmise.", "Je sollicitatie is goed doorgestuurd.")}
         </p>
+        {cvTok && <CvDrop token={cvTok} />}
       </div>
     );
   }

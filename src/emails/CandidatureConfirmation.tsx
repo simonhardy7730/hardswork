@@ -21,6 +21,8 @@ interface Props {
   jobCity: string;
   orgName: string;
   availability: string;
+  /** Lien personnel pour ajouter le CV (seulement si aucun CV n'a été joint). */
+  cvUrl?: string | null;
 }
 
 const AVAIL_LABELS: Record<string, string> = {
@@ -35,6 +37,7 @@ export default function CandidatureConfirmationEmail({
   jobCity = "Bruxelles",
   orgName = "Wolko",
   availability = "immediate",
+  cvUrl = null,
 }: Props) {
   const firstName = candidateName.split(" ")[0];
   const appUrl = "https://wolko.be";
@@ -228,6 +231,18 @@ export default function CandidatureConfirmationEmail({
               </Row>
             ))}
           </Section>
+
+          {cvUrl && (
+            <Section style={{ backgroundColor: "#FFF3C4", border: "2px solid #FFB900", borderRadius: "14px", padding: "22px 24px", margin: "16px 0 0 0", textAlign: "center" }}>
+              <Heading as="h2" style={{ fontSize: "18px", color: "#101F43", margin: "0 0 8px 0" }}>📄 Ajoute ton CV (1 minute)</Heading>
+              <Text style={{ fontSize: "14px", color: "#101F43", margin: "0 0 16px 0", lineHeight: "1.6" }}>
+                Les employeurs appellent d&apos;abord les candidats qui ont un CV. Pas besoin d&apos;ordinateur : prends simplement ton CV papier en photo.
+              </Text>
+              <Button href={cvUrl} style={{ backgroundColor: "#101F43", color: "#FFFFFF", padding: "13px 26px", borderRadius: "10px", fontSize: "14px", fontWeight: "700", textDecoration: "none" }}>
+                Ajouter mon CV →
+              </Button>
+            </Section>
+          )}
 
           {/* Inscription : plus d'offres, alertes, suivi */}
           <Section

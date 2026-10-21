@@ -1,4 +1,5 @@
 import { adminClient } from "@/lib/billing/lifecycle";
+import RemindCvButton from "@/components/admin/RemindCvButton";
 
 export const dynamic = "force-dynamic";
 
@@ -50,11 +51,21 @@ export default async function AdminStatsPage() {
     return { id: o.id as string, title: o.title as string, city: o.city as string, status: o.status as string, org: org?.name ?? "—", n: byOffer.get(o.id as string) ?? 0 };
   }).filter((o) => o.status === "active" || o.n > 0).sort((a, b) => b.n - a.n);
 
+  // CV : candidatures avec CV, et candidatures récentes sans CV jamais relancées.
+  const [cvCount, recentWithMail, recentReqs] = await Promise.all([
+    count(db.from("cv_requests").select("id", { count: "exact", head: true }).eq("status", "fulfilled")),
+    db.from("applications").select("id").not("applicant_email", "is", null).gte("applied_at", new Date(now - 45 * DAY).toISOString()).limit(2000),
+    db.from("cv_requests").select("application_id").gte("created_at", new Date(now - 60 * DAY).toISOString()).limit(5000),
+  ]);
+  const asked = new Set((recentReqs.data ?? []).map((r) => r.application_id as string));
+  const missingCv = (recentWithMail.data ?? []).filter((a) => !asked.has(a.id as string)).length;
+
   const tiles: [string, string, string][] = [
     ["Candidatures aujourd'hui", String(appsToday), `${app7} sur 7 jours · ${appTotal} au total`],
     ["Nouveaux candidats aujourd'hui", String(candsToday), `${cand7} sur 7 jours · ${candTotal} au total`],
     ["Candidats avec un compte", String(candAccounts), "inscrits via l'espace candidat"],
     ["Offres actives", String(offersActive), `${orgCompany} entreprises · ${orgAgency} agences inscrites`],
+    ["Candidatures avec CV", String(cvCount), `sur ${appTotal} candidatures (${appTotal ? Math.round((cvCount / appTotal) * 100) : 0} %)`],
   ];
 
   return (
@@ -64,6 +75,8 @@ export default async function AdminStatsPage() {
         <a href="https://dash.cloudflare.com/?to=/:account/web-analytics" target="_blank" rel="noopener noreferrer"
           className="text-sm font-bold text-[#101F43] underline">Visites du site (Cloudflare) →</a>
       </div>
+
+      <RemindCvButton missing={missingCv} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {tiles.map(([k, v, sub]) => (

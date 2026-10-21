@@ -187,6 +187,10 @@ export interface Subscription {
   confirmation_sent_at?: string | null;
   renewal_reminder_sent_at?: string | null;
   end_sent_at?: string | null;
+  /** Migration 035 : frais de mise en service */
+  setup_fee_cents?: number | null;
+  setup_fee_status?: "due" | "invoiced" | "paid" | "waived" | null;
+  setup_fee_reference?: string | null;
   created_at: string;
 }
 

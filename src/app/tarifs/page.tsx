@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 import { getDict } from "@/lib/i18n/server";
 import { CONTENT, type Bi } from "@/lib/billing/pricing-content";
 import { flashQuote, formatEuro } from "@/lib/flash/pricing";
-import { NETWORK_FROM_EUR, publicPrice, isLaunchOfferActive, type BillablePlan } from "@/lib/billing/pricing";
+import { NETWORK_FROM_EUR, SETUP_FEES, publicPrice, isLaunchOfferActive, type BillablePlan } from "@/lib/billing/pricing";
 
 // Les prix dépendent de la date : jamais de page figée, toujours l'horloge du serveur.
 export const dynamic = "force-dynamic";
@@ -199,6 +199,8 @@ export default async function TarifsPage() {
                     ) : (
                       <p className="text-[12px] text-transparent select-none mb-1" aria-hidden>.</p>
                     )}
+                    <p className="text-[13px] font-bold text-[#101F43] mb-1" data-testid={`setup-fee-${id}`}>{t(C.labels2.setupFee(SETUP_FEES[id]))}</p>
+                    <p className="text-[12px] text-ink-500 mb-1">{t(C.labels2.trialLine)} · {t(C.labels2.commitLine)}</p>
                     <p className="text-ink-400 text-xs mb-5">{t(P.description)}</p>
 
                     <ul className="space-y-2.5 mb-7 flex-1">
@@ -238,6 +240,7 @@ export default async function TarifsPage() {
                   </span>
                 </div>
                 <p className="text-white/50 text-[12px] font-bold mb-1">{t(C.plans.network.priceNote)}</p>
+                <p className="text-brand text-[13px] font-bold mb-1" data-testid="setup-fee-network">{t(C.labels2.setupQuote)}</p>
                 <p className="text-white/45 text-xs mb-5">{t(C.plans.network.description)}</p>
                 <ul className="space-y-2.5 mb-7 flex-1">
                   {C.plans.network.features.map((f) => (
@@ -257,7 +260,29 @@ export default async function TarifsPage() {
             </div>
           </div>
 
-          <p className="mt-6 text-center text-[13px] sm:text-sm text-[#101F43] font-medium leading-relaxed max-w-3xl mx-auto rounded-xl border border-brand/40 bg-white px-4 py-3" data-testid="contract-note">{t(C.contractNote)}</p>
+          {launch && (
+            <p className="mt-6 text-center text-[13px] font-bold text-[#B87C2A] max-w-3xl mx-auto" data-testid="launch-guarantee">{t(C.launchGuarantee)}</p>
+          )}
+
+          <p className="mt-4 text-center text-[13px] sm:text-sm text-[#101F43] font-medium leading-relaxed max-w-3xl mx-auto rounded-xl border border-brand/40 bg-white px-4 py-3" data-testid="contract-note">{t(C.contractNote)}</p>
+
+          {/* ── POURQUOI DES FRAIS DE MISE EN SERVICE ── */}
+          <section className="mt-10 rounded-2xl bg-white border border-ink-100 p-6 sm:p-8" data-testid="setup-why">
+            <h2 className="font-display font-black text-[#101F43] uppercase text-xl sm:text-2xl mb-2">{t(C.setupWhy.title)}</h2>
+            <p className="text-sm text-ink-500 leading-relaxed mb-5 max-w-3xl">{t(C.setupWhy.intro)}</p>
+            <div className="grid md:grid-cols-3 gap-5">
+              {[C.setupWhy.pro, C.setupWhy.agency, C.setupWhy.network].map((blk) => (
+                <div key={blk.title.fr}>
+                  <p className="font-display font-black text-[#101F43] text-[13px] uppercase tracking-wide mb-2">{t(blk.title)}</p>
+                  <ul className="space-y-1.5">
+                    {blk.items.map((i) => (
+                      <li key={i.fr} className="flex items-start gap-2 text-[13px] text-ink-700"><Check size={13} className="text-brand shrink-0 mt-0.5" strokeWidth={3} /> {t(i)}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* ── CONDITIONS ── */}
           <div className="mt-6 mb-14 rounded-2xl bg-white border border-ink-100 p-5 sm:p-6" data-testid="conditions">

@@ -84,8 +84,16 @@ export default function CGUPage() {
                 dont les tarifs sont indiqués en euros hors TVA sur la page <Link href="/tarifs">/tarifs</Link>.
               </p>
               <p>
-                <strong>Offre de lancement.</strong> Toute souscription conclue au plus tard le 31 décembre 2026 conserve
-                son tarif de lancement pendant 12 mois à compter de la date de souscription, y compris lors des
+                <strong>Frais de mise en service.</strong> La souscription d&apos;un abonnement payant donne lieu à des
+                frais de mise en service uniques de 199 € HTVA (Pro) ou 499 € HTVA (Agence) ; pour Agence Réseau, ils sont
+                fixés dans le devis. Ces frais couvrent l&apos;accompagnement initial, ne sont jamais dus pendant l&apos;essai
+                gratuit, sont facturés une seule fois par facture lors de la souscription expresse et ne sont pas
+                refacturés aux renouvellements. Ils ne s&apos;appliquent pas aux contrats souscrits avant leur introduction
+                ni à WOLKO Flash.
+              </p>
+              <p>
+                <strong>Offre de lancement.</strong> Toute souscription conclue au plus tard le 31 décembre 2026 (la date de souscription acceptée fait foi, non celle du début de l&apos;essai) conserve
+                son tarif mensuel de lancement pendant 12 mois à compter de la date de souscription, y compris lors des
                 renouvellements. À partir du 1er janvier 2027, les nouvelles souscriptions sont facturées au tarif standard
                 en vigueur à la date de souscription. Les conditions d&apos;un abonnement déjà souscrit ne sont pas modifiées
                 rétroactivement.

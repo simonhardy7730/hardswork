@@ -169,3 +169,33 @@ test("la page tarifs utilise l'horloge du serveur (jamais figée ni côté navig
   assert.match(src, /new Date\(\)/);
   assert.ok(!/use client/.test(src));
 });
+
+// ── Frais de mise en service ────────────────────────────────────────────────────
+import { SETUP_FEES, setupFeeCents, subscriptionQuote } from "../src/lib/billing/pricing";
+
+test("frais de mise en service : Pro 199 €, Agence 499 €", () => {
+  assert.deepEqual(SETUP_FEES, { pro: 199, agency: 499 });
+  assert.equal(setupFeeCents("pro"), 19900);
+  assert.equal(setupFeeCents("agency"), 49900);
+});
+
+test("devis de souscription : mensualité + frais, promotion selon la date de souscription (pas de l'essai)", () => {
+  const q = subscriptionQuote("pro", d("2026-12-31T22:59:59Z"));
+  assert.deepEqual([q.monthlyCents, q.setupFeeCents, q.firstInvoiceCents, q.launch], [8900, 19900, 28800, true]);
+  const a = subscriptionQuote("agency", d("2026-12-31T22:59:59Z"));
+  assert.deepEqual([a.monthlyCents, a.setupFeeCents, a.firstInvoiceCents], [24900, 49900, 74800]);
+  const after = subscriptionQuote("pro", d("2027-01-01T00:00:00Z"));
+  assert.deepEqual([after.monthlyCents, after.launch], [11900, false], "1er janvier 2027 : tarif standard");
+  assert.equal(subscriptionQuote("agency", d("2027-03-01T00:00:00Z"), false).setupFeeCents, 0, "réactivation : pas de frais");
+  assert.equal(q.commitmentMonths, 12); assert.equal(q.noticeDays, 30);
+});
+
+test("contenu : frais affichés FR/NL sans mention 'sans engagement' pour l'abonnement payant", () => {
+  const C = CONTENT;
+  assert.match(C.labels2.setupFee(199).fr, /199 € HTVA/);
+  assert.match(C.labels2.setupFee(499).nl, /499 € excl\. btw/);
+  assert.match(C.labels2.setupQuote.fr, /sur devis/);
+  assert.match(C.contractNote.fr, /12 mois/); assert.match(C.contractNote.nl, /12 maanden/);
+  assert.match(C.contractNote.fr, /30 jours/); assert.match(C.contractNote.nl, /30 dagen/);
+  assert.match(C.launchGuarantee.fr, /31\/12\/2026/); assert.match(C.launchGuarantee.nl, /31\/12\/2026/);
+});

@@ -28,7 +28,7 @@ const link = () => `${APP()}/dashboard/settings?tab=abonnement`;
 export type SubscriptionMail =
   | { kind: "trial_reminder"; orgName: string; endDay: Ymd; daysLeft: number }
   | { kind: "trial_expired"; orgName: string }
-  | { kind: "subscribed"; orgName: string; planName: string; priceCents: number; startDay: Ymd; endDay: Ymd; noticeDeadlineDay: Ymd; priceAfterCents: number; founder: boolean; termsVersion: string }
+  | { kind: "subscribed"; orgName: string; planName: string; priceCents: number; startDay: Ymd; endDay: Ymd; noticeDeadlineDay: Ymd; priceAfterCents: number; founder: boolean; termsVersion: string; setupFeeCents?: number | null }
   | { kind: "renewal_reminder"; orgName: string; planName: string; endDay: Ymd; noticeDeadlineDay: Ymd; priceCents: number; priceAfterCents: number }
   | { kind: "cancel_confirmation"; orgName: string; planName: string; requestedDay: Ymd; lastDay: Ymd; noticeRespected: boolean }
   | { kind: "ended"; orgName: string };
@@ -54,6 +54,7 @@ export function buildSubscriptionMail(m: SubscriptionMail): { subject: string; h
         html: layout("Votre abonnement est activé", `<p>Merci ! L'abonnement <strong>${esc(m.planName)}</strong> de <strong>${esc(m.orgName)}</strong> est activé. Voici le récapitulatif :</p>
 ${li([
   `Prix : <strong>${eur(m.priceCents)}</strong>${m.founder ? " (tarif de lancement)" : ""}, facturation mensuelle`,
+  ...(m.setupFeeCents ? [`Frais de mise en service : <strong>${(m.setupFeeCents / 100).toLocaleString("fr-BE")} € HTVA</strong>, facturés une seule fois (pas à chaque renouvellement)`] : []),
   `Début de l'engagement : ${d(m.startDay)}`,
   `Engagement initial de 12 mois, jusqu'au ${d(m.endDay)} inclus`,
   `Préavis : pour ne pas poursuivre après l'engagement, demandez la non-reconduction au plus tard le ${d(m.noticeDeadlineDay)} (30 jours avant l'échéance)`,

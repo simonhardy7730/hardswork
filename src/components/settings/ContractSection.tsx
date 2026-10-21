@@ -66,6 +66,16 @@ export default function ContractSection({ billing, plan, priceCents, isAdmin }: 
           <div className={row}><span className="text-ink-500">{l("Début du contrat", "Start van het contract")}</span><strong>{day(c.startDay)}</strong></div>
           <div className={row}><span className="text-ink-500">{l("Fin de l'engagement initial (12 mois)", "Einde van de initiële verbintenis (12 maanden)")}</span><strong>{day(c.endDay)}</strong></div>
           <div className={row}><span className="text-ink-500">{l("Date limite de non-reconduction", "Uiterste datum niet-verlenging")}</span><strong>{day(c.noticeDeadlineDay)}</strong></div>
+          {c.setupFee && (
+            <div className={row}>
+              <span className="text-ink-500">{l("Frais de mise en service (unique)", "Opstartkosten (eenmalig)")}</span>
+              <strong>
+                {(c.setupFee.cents / 100).toLocaleString(locale)} € {l("HTVA", "excl. btw")}
+                {" — "}
+                {c.setupFee.status === "paid" ? l("payés", "betaald") : c.setupFee.status === "invoiced" ? l("facturés", "gefactureerd") : c.setupFee.status === "waived" ? l("offerts", "kwijtgescholden") : l("à facturer", "te factureren")}
+              </strong>
+            </div>
+          )}
           {c.nextBillingDay && <div className={row}><span className="text-ink-500">{l("Prochaine échéance de facturation", "Volgende factuurdatum")}</span><strong>{day(c.nextBillingDay)}</strong></div>}
           <div className={row}>
             <span className="text-ink-500">{l("Statut", "Status")}</span>

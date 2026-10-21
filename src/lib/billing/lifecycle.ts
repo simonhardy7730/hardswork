@@ -67,7 +67,7 @@ export async function runSubscriptionLifecycle(db: SupabaseClient, now: Date = n
       if (!s.confirmation_sent_at) {
         if (await claimAndSend(db, s.id, s.organization_id, "confirmation_sent_at", {
           kind: "subscribed", orgName, planName: planName(plan), priceCents, startDay: c.startDay, endDay: c.endDay,
-          noticeDeadlineDay: c.noticeDeadlineDay, priceAfterCents, founder: !!terms.founderPriceCents, termsVersion: s.terms_version ?? TERMS_VERSION,
+          noticeDeadlineDay: c.noticeDeadlineDay, priceAfterCents, founder: !!terms.founderPriceCents, termsVersion: s.terms_version ?? TERMS_VERSION, setupFeeCents: s.setup_fee_cents ?? null,
         }, now)) stats.subscribed++;
       }
 

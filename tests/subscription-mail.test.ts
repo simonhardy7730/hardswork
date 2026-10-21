@@ -40,5 +40,5 @@ test("textes : pas de « résiliable à tout moment » ni de rétractation 14 jo
   assert.ok(!all.includes("sans frais de résiliation"));
   assert.ok(!all.includes("rétractation"));
   assert.ok(!all.includes("14 jours"));
-  assert.ok(CONTENT.contractNote.fr.includes("engagement initial de 12 mois"));
+  assert.ok(CONTENT.contractNote.fr.includes("engagement de 12 mois") && CONTENT.contractNote.fr.includes("Préavis de 30 jours"));
 });

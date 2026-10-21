@@ -71,6 +71,7 @@ export default async function SettingsRoute() {
       nextBillingDay: cancelEnd ? null : nextBillingDay(at, now),
       priceAfterCents: priceAfterCommitment(sub.plan, { founderPriceCents: sub.founder_price_cents ?? null, founderEndsAt: sub.founder_price_ends_at ? new Date(sub.founder_price_ends_at) : null }, at),
       termsVersion: sub.terms_version ?? null,
+      setupFee: sub.setup_fee_cents ? { cents: sub.setup_fee_cents, status: sub.setup_fee_status ?? "due" } : null,
       cancel: sub.cancel_requested_at && cancelEnd
         ? { requestedDay: brusselsDay(new Date(sub.cancel_requested_at)), lastDay: brusselsDay(new Date(cancelEnd.getTime() - 1)), noticeRespected: sub.cancel_notice_respected !== false, effective: cancelEnd.getTime() > now.getTime() }
         : null,

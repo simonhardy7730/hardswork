@@ -20,6 +20,7 @@ import {
 import type { Organization, User, Subscription, UserRole } from "@/lib/supabase/types";
 import { labels } from "@/lib/utils";
 import { useL, useLang } from "@/lib/i18n/context";
+import { CONTENT } from "@/lib/billing/pricing-content";
 import {
   updateOrganization,
   updateCustomization,
@@ -56,6 +57,7 @@ export interface BillingView {
   contract: {
     startDay: string; endDay: string; noticeDeadlineDay: string; phase: "initial" | "indefinite";
     nextBillingDay: string | null; priceAfterCents: number; termsVersion: string | null;
+    setupFee: { cents: number; status: "due" | "invoiced" | "paid" | "waived" } | null;
     cancel: { requestedDay: string; lastDay: string; noticeRespected: boolean; effective: boolean } | null;
   } | null;
   history: { id: string; type: string; at: string }[];
@@ -757,10 +759,7 @@ function SubscriptionTab({ subscription, billing, isAdmin }: { subscription: Sub
           })}
         </div>
         <p className="px-6 py-3 text-[11px] text-ink-400 border-t border-[#F1F5F9]" data-testid="contract-note">
-          {l(
-            "7 jours d'essai gratuits, sans carte bancaire et sans engagement. Après l'essai, abonnement payant sur souscription expresse, avec engagement initial de 12 mois et facturation mensuelle. Résiliation possible à l'échéance annuelle moyennant un préavis de 30 jours. Tarifs HTVA.",
-            "7 dagen gratis proefperiode, zonder bankkaart en zonder verbintenis. Na de proefperiode volgt een betalend abonnement uitsluitend na uitdrukkelijke onderschrijving, met een initiële verbintenis van 12 maanden en maandelijkse facturatie. Opzegging is mogelijk op de jaarlijkse vervaldatum mits een opzegtermijn van 30 dagen. Prijzen excl. btw."
-          )}
+          {lang === "nl" ? CONTENT.contractNote.nl : CONTENT.contractNote.fr}
         </p>
         <p className="px-6 pb-3 text-[11px] text-ink-400">
           {l(

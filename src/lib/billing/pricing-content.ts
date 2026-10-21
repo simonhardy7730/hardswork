@@ -1,6 +1,6 @@
 // Textes commerciaux FR/NL de la page tarifs et des espaces recruteur.
 // Uniquement des fonctionnalités RÉELLEMENT disponibles dans la plateforme.
-import { LAUNCH_END_LABEL, TRIAL_DAYS, FOUNDER_MONTHS, PRICES } from "./pricing";
+import { LAUNCH_END_LABEL, TRIAL_DAYS, FOUNDER_MONTHS, PRICES, SETUP_FEES } from "./pricing";
 
 export type Bi = { fr: string; nl: string };
 const b = (fr: string, nl: string): Bi => ({ fr, nl });
@@ -29,7 +29,7 @@ export const CONTENT = {
     primary: b("Démarrer mes 7 jours d'essai", "Mijn 7 proefdagen starten"),
     secondary: b("Demander une démonstration", "Een demo aanvragen"),
     notes: [
-      b("Sans carte bancaire, aucun prélèvement automatique", "Zonder bankkaart, geen automatische afschrijving"),
+      b("Sans carte bancaire, sans frais de mise en service, aucun prélèvement automatique", "Zonder bankkaart, zonder opstartkosten, geen automatische afschrijving"),
       b(`${TRIAL_DAYS} jours calendaires, une seule fois par organisation`, `${TRIAL_DAYS} kalenderdagen, slechts één keer per organisatie`),
       b("Aucun abonnement n'est activé automatiquement à la fin de l'essai", "Na de proefperiode wordt niet automatisch een abonnement geactiveerd"),
       b("Candidathèque réservée aux abonnés Pro et Agence", "Kandidatendatabank voorbehouden aan Pro- en Kantoor-abonnees"),
@@ -92,9 +92,53 @@ export const CONTENT = {
   },
   /** Mention contractuelle affichée sous les offres. */
   contractNote: b(
-    "7 jours d'essai gratuits, sans carte bancaire et sans engagement. Après l'essai, abonnement payant sur souscription expresse, avec engagement initial de 12 mois et facturation mensuelle. Résiliation possible à l'échéance annuelle moyennant un préavis de 30 jours. Tarifs HTVA.",
-    "7 dagen gratis proefperiode, zonder bankkaart en zonder verbintenis. Na de proefperiode volgt een betalend abonnement uitsluitend na uitdrukkelijke onderschrijving, met een initiële verbintenis van 12 maanden en maandelijkse facturatie. Opzegging is mogelijk op de jaarlijkse vervaldatum mits een opzegtermijn van 30 dagen. Prijzen excl. btw."
+    "L'essai de 7 jours est entièrement gratuit et sans engagement. Les frais de mise en service et l'engagement de 12 mois ne s'appliquent qu'après acceptation explicite d'un abonnement payant. Préavis de 30 jours avant l'échéance annuelle. Tarifs HTVA.",
+    "De proefperiode van 7 dagen is volledig gratis en vrijblijvend. De opstartkosten en de verbintenis van 12 maanden gelden pas na uitdrukkelijke aanvaarding van een betalend abonnement. Opzegtermijn van 30 dagen vóór de jaarlijkse vervaldatum. Prijzen excl. btw."
   ),
+  /** Mention promotionnelle sous les cartes (seulement pendant l'offre de lancement). */
+  launchGuarantee: b(
+    "Tarifs de lancement jusqu'au 31/12/2026. Prix mensuel garanti pendant les 12 premiers mois pour toute souscription éligible.",
+    "Lanceringstarieven tot 31/12/2026. Maandprijs gegarandeerd gedurende de eerste 12 maanden voor elk in aanmerking komend abonnement."
+  ),
+  labels2: {
+    setupFee: (eur: number): Bi => b(`Frais de mise en service : ${eur} € HTVA, une seule fois`, `Opstartkosten: ${eur} € excl. btw, eenmalig`),
+    setupQuote: b("Frais de mise en service sur devis", "Opstartkosten op offerte"),
+    trialLine: b("7 jours d'essai gratuits", "7 dagen gratis proefperiode"),
+    commitLine: b("Engagement de 12 mois après souscription", "Verbintenis van 12 maanden na onderschrijving"),
+  },
+  setupWhy: {
+    title: b("Pourquoi des frais de mise en service ?", "Waarom opstartkosten?"),
+    intro: b(
+      "Les frais de mise en service couvrent l'accompagnement initial de l'entreprise ou de l'agence lors de son démarrage sur WOLKO. Ils sont facturés une seule fois, uniquement si vous souscrivez un abonnement payant après l'essai, et jamais pendant l'essai ni à chaque renouvellement.",
+      "De opstartkosten dekken de eerste begeleiding van het bedrijf of kantoor bij de start op WOLKO. Ze worden slechts één keer aangerekend, enkel als u na de proefperiode een betalend abonnement afsluit, en nooit tijdens de proefperiode of bij elke verlenging."
+    ),
+    pro: {
+      title: b(`Pro — ${SETUP_FEES.pro} € HTVA`, `Pro — ${SETUP_FEES.pro} € excl. btw`),
+      items: [
+        b("Assistance à la configuration du compte", "Hulp bij de configuratie van het account"),
+        b("Aide à la première publication d'offre", "Hulp bij de eerste publicatie van een vacature"),
+        b("Présentation du tableau de bord", "Voorstelling van het dashboard"),
+      ],
+    },
+    agency: {
+      title: b(`Agence — ${SETUP_FEES.agency} € HTVA`, `Kantoor — ${SETUP_FEES.agency} € excl. btw`),
+      items: [
+        b("Paramétrage initial de l'espace agence", "Eerste configuratie van de kantoorruimte"),
+        b("Présentation du CRM et de l'ATS", "Voorstelling van de CRM en de ATS"),
+        b("Configuration des accès utilisateurs", "Configuratie van de gebruikerstoegangen"),
+        b("Formation de prise en main", "Opleiding voor de eerste stappen"),
+      ],
+    },
+    network: {
+      title: b("Agence Réseau — sur devis", "Netwerkkantoor — op offerte"),
+      items: [
+        b("Étude des besoins", "Behoeftenanalyse"),
+        b("Configuration personnalisée", "Configuratie op maat"),
+        b("Accompagnement au déploiement", "Begeleiding bij de uitrol"),
+        b("Migrations ou intégrations éventuelles : uniquement si elles figurent au devis", "Eventuele migraties of integraties: enkel indien opgenomen in de offerte"),
+      ],
+    },
+  },
   conditions: {
     title: b("Conditions de l'offre", "Voorwaarden van het aanbod"),
     launch: [
@@ -109,6 +153,10 @@ export const CONTENT = {
     ],
     common: [
       b("Prix exprimés hors TVA, par mois.", "Prijzen exclusief btw, per maand."),
+      b(
+        `Frais de mise en service uniques (Pro ${SETUP_FEES.pro} € HTVA, Agence ${SETUP_FEES.agency} € HTVA, Agence Réseau sur devis) : dus uniquement à la souscription d'un abonnement payant, jamais pendant l'essai, une seule fois et non à chaque renouvellement.`,
+        `Eenmalige opstartkosten (Pro ${SETUP_FEES.pro} € excl. btw, Kantoor ${SETUP_FEES.agency} € excl. btw, Netwerkkantoor op offerte): enkel verschuldigd bij het afsluiten van een betalend abonnement, nooit tijdens de proefperiode, eenmalig en niet bij elke verlenging.`
+      ),
       b(
         `Essai gratuit de ${TRIAL_DAYS} jours sans carte bancaire : aucun prélèvement sans votre accord explicite.`,
         `Gratis proefperiode van ${TRIAL_DAYS} dagen zonder bankkaart: geen afschrijving zonder jouw uitdrukkelijke toestemming.`

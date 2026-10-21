@@ -19,6 +19,31 @@ export const PRICES = {
   launch: { pro: 89, agency: 249 },
 } as const;
 
+/** Frais de mise en service uniques (€ HTVA), dus à la 1re souscription payante seulement. Réseau : sur devis. Miroir SQL : migration 035. */
+export const SETUP_FEES = { pro: 199, agency: 499 } as const;
+
+export function setupFeeCents(plan: BillablePlan): number {
+  return SETUP_FEES[plan] * 100;
+}
+
+export interface SubscriptionQuote {
+  plan: BillablePlan;
+  monthlyCents: number;
+  setupFeeCents: number;
+  /** Première facture : 1re mensualité + frais de mise en service (facturation par facture, pas de paiement en ligne) */
+  firstInvoiceCents: number;
+  commitmentMonths: number;
+  noticeDays: number;
+  launch: boolean;
+}
+
+/** Récapitulatif d'une NOUVELLE souscription à la date `at` (date de la souscription acceptée, pas celle de l'essai). */
+export function subscriptionQuote(plan: BillablePlan, at: Date, firstContract = true): SubscriptionQuote {
+  const monthlyCents = newSubscriptionPriceCents(plan, at);
+  const fee = firstContract ? setupFeeCents(plan) : 0;
+  return { plan, monthlyCents, setupFeeCents: fee, firstInvoiceCents: monthlyCents + fee, commitmentMonths: 12, noticeDays: 30, launch: isLaunchOfferActive(at) };
+}
+
 export function isLaunchOfferActive(now: Date): boolean {
   return now.getTime() < LAUNCH_END.getTime();
 }

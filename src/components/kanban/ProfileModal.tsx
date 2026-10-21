@@ -165,7 +165,7 @@ export default function ProfileModal({ application: app, hasSubscription, onClos
             ) : cv.kind === "fulfilled" ? (
               <button onClick={openCv} disabled={busy} className="flex items-center gap-2 text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 hover:bg-emerald-100 transition">
                 {busy ? <Loader2 size={14} className="animate-spin" /> : <FileText size={14} />}
-                {l("Voir le CV", "CV bekijken")}{cv.fileName ? ` — ${cv.fileName}` : ""}
+                {cv.fileName?.startsWith("CV Wolko") ? l("Voir le CV (créé par Wolko)", "Cv bekijken (gemaakt door Wolko)") : <>{l("Voir le CV", "CV bekijken")}{cv.fileName ? ` — ${cv.fileName}` : ""}</>}
               </button>
             ) : cv.kind === "pending" ? (
               <p className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2">

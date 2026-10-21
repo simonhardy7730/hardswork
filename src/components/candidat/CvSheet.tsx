@@ -26,7 +26,12 @@ export default function CvSheet({ base, cv }: { base: CvBase; cv: CvData }) {
   const headline = cv.headline || base.trades[0] || "";
   return (
     <div id="cv-sheet" className="bg-white border border-ink-100 rounded-xl shadow-sm overflow-hidden text-[#101F43]" style={{ fontFamily: "Inter, Arial, sans-serif" }}>
-      <div style={{ background: "#101F43", color: "#fff", padding: "28px 32px" }}>
+      <div style={{ background: "#101F43", color: "#fff", padding: "42px 32px 28px", position: "relative" }}>
+        <div style={{ position: "absolute", top: 14, right: 16, display: "flex", alignItems: "center", gap: 6, background: "#FFB900", color: "#101F43", borderRadius: 999, padding: "4px 10px", fontSize: 10, fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icon.svg" alt="" width={14} height={14} style={{ borderRadius: 3 }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+          {l("CV créé avec Wolko", "Cv gemaakt met Wolko")}
+        </div>
         <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-0.01em" }}>{base.name || l("Ton nom", "Je naam")}</div>
         {headline && <div style={{ color: "#FFB900", fontWeight: 800, fontSize: 15, marginTop: 4, textTransform: "uppercase", letterSpacing: "0.04em" }}>{headline}</div>}
         <div style={{ fontSize: 12, marginTop: 10, opacity: 0.9, display: "flex", flexWrap: "wrap", gap: "4px 16px" }}>
@@ -81,7 +86,7 @@ export default function CvSheet({ base, cv }: { base: CvBase; cv: CvData }) {
           )}
         </div>
       </div>
-      <div style={{ fontSize: 9.5, color: "#94A3B8", textAlign: "right", padding: "6px 16px 10px" }}>{l("CV créé gratuitement sur wolko.be", "Cv gratis gemaakt op wolko.be")}</div>
+      <div style={{ fontSize: 9.5, color: "#94A3B8", textAlign: "right", padding: "6px 16px 10px" }}>{l("CV créé par Wolko à partir des informations données par le candidat · wolko.be", "Cv gemaakt door Wolko op basis van de gegevens van de kandidaat · wolko.be")}</div>
     </div>
   );
 }

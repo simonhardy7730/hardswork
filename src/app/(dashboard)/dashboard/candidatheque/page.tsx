@@ -11,6 +11,10 @@ import { DAYS, SLOTS } from "@/lib/candidate/availability";
 import RevealContact from "@/components/dashboard/RevealContact";
 import PoolCvButton from "@/components/dashboard/PoolCvButton";
 import { findPoolCvs, type PoolCv } from "@/lib/candidate/pool-cv";
+import { isMiniPath } from "@/lib/candidate/mini-cv";
+
+/** CV fabriqué par Wolko (créateur de CV ou réponses « pas de CV »), par opposition au CV propre du candidat. */
+const wolkoCv = (cv: PoolCv | undefined) => !!cv && (cv.kind === "built" || isMiniPath(cv.path));
 import { TRADES, TRADE_KEYS, tradeLabel, sanitizeTradeOther } from "@/lib/candidate/trades";
 
 type SP = { mot?: string; metier?: string; secteur?: string; lieu?: string; rayon?: string; type?: string; dispo?: string; page?: string; jour?: string | string[]; plage?: string | string[] };
@@ -157,8 +161,10 @@ export default async function CandidathequePage(props: { searchParams: Promise<S
             <ul className="grid md:grid-cols-2 gap-3">
               {rows.map((c) => (
                 <li key={c.id} className="bg-white border border-ink-100 rounded-2xl p-4 flex flex-col gap-3">
-                  <div className="relative pr-16">
-                    {cvs.has(c.id) && <span className="absolute right-0 top-0 text-[10px] font-black uppercase bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2 py-0.5">CV ✓</span>}
+                  <div className="relative pr-20">
+                    {cvs.has(c.id) && (wolkoCv(cvs.get(c.id))
+                      ? <span className="absolute right-0 top-0 text-[10px] font-black uppercase bg-brand/15 text-[#8A5D00] border border-brand/40 rounded-full px-2 py-0.5" title={l("CV créé par Wolko avec les réponses du candidat", "Cv gemaakt door Wolko met de antwoorden van de kandidaat")}>CV Wolko</span>
+                      : <span className="absolute right-0 top-0 text-[10px] font-black uppercase bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2 py-0.5">CV ✓</span>)}
                     <p className="font-display font-black text-ink text-xl leading-tight break-words">{c.first_name} {c.last_initial}.</p>
                     <p className="text-ink-500 text-sm">{[c.city, availLbl[c.availability]].filter(Boolean).join(" · ")}</p>
                   </div>

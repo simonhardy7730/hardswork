@@ -56,6 +56,9 @@ export default async function PoolCvPage(props: { params: Promise<{ id: string }
         <a href="/dashboard/candidatheque" className="text-sm font-semibold underline">← {lang === "nl" ? "Kandidatenbank" : "Candidathèque"}</a>
         <PrintButton label={lang === "nl" ? "Downloaden (pdf)" : "Télécharger (PDF)"} />
       </div>
+      <p className="text-xs text-ink-500 print:hidden">{lang === "nl"
+        ? "Cv gemaakt door Wolko met de gegevens die de kandidaat zelf invulde (geen AI, niets toegevoegd)."
+        : "CV créé par Wolko avec les informations remplies par le candidat lui-même (sans IA, rien d'inventé)."}</p>
       <div className="overflow-x-auto"><CvSheet base={base} cv={cv} /></div>
     </div>
   );

@@ -8,6 +8,7 @@ import { useL } from "@/lib/i18n/context";
 import Turnstile from "@/components/security/Turnstile";
 import ScreeningFields, { screeningComplete } from "./ScreeningFields";
 import { postBody } from "./CvPicker";
+import { currentSource } from "@/lib/source";
 import CvChoice, { type CvMode } from "./CvChoice";
 import { EMPTY_MINI, miniReady, type MiniInput } from "@/lib/candidate/mini-cv";
 import BirthField from "./BirthField";
@@ -69,6 +70,7 @@ export default function QuickApplyForm({ jobId, orgName, flexi, offerDays, offer
     setLoading(true); setError("");
     const { body, headers } = postBody({
         mini_cv: cvMode === "mini" ? mini : null,
+        source: currentSource(),
         job_offer_id: jobId,
         applicant_name: `${f.first_name} ${f.last_name}`.trim(),
         applicant_phone: f.phone,

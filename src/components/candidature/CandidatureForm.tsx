@@ -7,6 +7,7 @@ import CvDrop from "@/components/candidature/CvDrop";
 import { useL } from "@/lib/i18n/context";
 import Turnstile from "@/components/security/Turnstile";
 import { postBody } from "./CvPicker";
+import { currentSource } from "@/lib/source";
 import CvChoice, { type CvMode } from "./CvChoice";
 import { EMPTY_MINI, miniReady, type MiniInput } from "@/lib/candidate/mini-cv";
 import BirthField from "./BirthField";
@@ -86,6 +87,7 @@ export default function CandidatureForm({ jobId, orgName, screeningIds = [] }: P
 
     const { body, headers } = postBody({
         mini_cv: cvMode === "mini" ? mini : null,
+        source: currentSource(),
         job_offer_id: jobId,
         applicant_name: `${form.first_name} ${form.last_name}`.trim(),
         applicant_phone: form.phone,

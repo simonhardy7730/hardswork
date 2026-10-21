@@ -60,6 +60,19 @@ export default async function AdminStatsPage() {
   const asked = new Set((recentReqs.data ?? []).map((r) => r.application_id as string));
   const missingCv = (recentWithMail.data ?? []).filter((a) => !asked.has(a.id as string)).length;
 
+  // Provenance (migration 033) : candidatures et inscriptions par lien / groupe, 30 jours.
+  const [srcApps, srcCands] = await Promise.all([
+    db.from("applications").select("source").gte("applied_at", since30).limit(5000),
+    db.from("candidates").select("source").gte("created_at", since30).limit(5000),
+  ]);
+  const srcReady = !srcApps.error && !srcCands.error;
+  const bySrc = new Map<string, { a: number; c: number }>();
+  if (srcReady) {
+    for (const r of srcApps.data ?? []) { const k = (r.source as string | null) ?? "inconnu"; const v = bySrc.get(k) ?? { a: 0, c: 0 }; v.a++; bySrc.set(k, v); }
+    for (const r of srcCands.data ?? []) { const k = (r.source as string | null) ?? "inconnu"; const v = bySrc.get(k) ?? { a: 0, c: 0 }; v.c++; bySrc.set(k, v); }
+  }
+  const sources = [...bySrc.entries()].sort((x, y) => (y[1].a + y[1].c) - (x[1].a + x[1].c));
+
   const tiles: [string, string, string][] = [
     ["Candidatures aujourd'hui", String(appsToday), `${app7} sur 7 jours · ${appTotal} au total`],
     ["Nouveaux candidats aujourd'hui", String(candsToday), `${cand7} sur 7 jours · ${candTotal} au total`],
@@ -105,6 +118,23 @@ export default async function AdminStatsPage() {
           ))}
         </div>
         <div className="flex justify-between text-[10px] text-ink-400 mt-1"><span>{label(days[0])}</span><span>{label(days[14])}</span><span>{label(today)}</span></div>
+      </div>
+
+      <div className="bg-white border border-ink-100 rounded-xl overflow-x-auto">
+        <h2 className="font-black text-[#101F43] p-4 pb-1">D&apos;où viennent les candidats (30 jours)</h2>
+        <p className="text-xs text-ink-500 px-4 pb-2">Vrais résultats (candidatures et inscriptions), par lien. « inconnu » = arrivés avant le suivi. Ajoute <code>?g=nom-du-groupe</code> à tes liens Facebook pour voir quel groupe marche.</p>
+        {!srcReady ? (
+          <p className="text-sm text-amber-700 px-4 pb-4">Suivi pas encore activé : lancer la migration 033 dans Supabase.</p>
+        ) : sources.length === 0 ? (
+          <p className="text-sm text-ink-500 px-4 pb-4">Rien pour l&apos;instant.</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead><tr className="text-left text-xs uppercase text-ink-400"><th className="px-4 py-2">Provenance</th><th className="px-4 py-2 text-right">Candidatures</th><th className="px-4 py-2 text-right">Inscriptions</th></tr></thead>
+            <tbody>{sources.map(([k, v]) => (
+              <tr key={k} className="border-t border-ink-100"><td className="px-4 py-2 font-semibold">{k}</td><td className="px-4 py-2 text-right tabular-nums">{v.a}</td><td className="px-4 py-2 text-right tabular-nums">{v.c}</td></tr>
+            ))}</tbody>
+          </table>
+        )}
       </div>
 
       <div className="bg-white border border-ink-100 rounded-xl overflow-x-auto">

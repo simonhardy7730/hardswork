@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cvToken, cvLink } from "@/lib/candidate/cv-link";
+import { sanitizeSource } from "@/lib/source";
 import { checkCvFile } from "@/lib/candidate/cv-file";
 import { sanitizeMini, miniToCv, MINI_SUFFIX, type MiniDoc } from "@/lib/candidate/mini-cv";
 import { publicOrgName } from "@/lib/confidential";
@@ -168,6 +169,12 @@ export async function POST(req: NextRequest) {
 
     // CV déposé sans compte (facultatif) : fichier privé, lisible seulement par l'entreprise via un lien temporaire.
     // Un échec ne doit jamais faire perdre la candidature.
+    // Provenance (migration 033) : jamais bloquante.
+    {
+      const src = sanitizeSource(body?.source);
+      if (src) { const { error: sErr } = await supabaseAdmin.from("applications").update({ source: src }).eq("id", application.id); if (sErr) console.error("source:", sErr.message); }
+    }
+
     let cvSaved = false;
     if (cvFile) {
       try {

@@ -1,3 +1,4 @@
+import { sanitizeSource } from "@/lib/source";
 import { sanitizeMini, miniToCv } from "@/lib/candidate/mini-cv";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
       trades,
       trade_other,
       mini_cv,
+      source,
       preferences,
       visible_to_recruiters,
       birth_date,
@@ -152,6 +154,10 @@ export async function POST(req: NextRequest) {
       const { error: tErr } = await admin.from("candidates").update({ trades: cleanTrades, trade_other: cleanOther }).eq("id", data.id);
       if (tErr) console.error("trades not stored (migration 031 ?):", tErr.message);
     }
+
+    // Provenance (migration 033) : jamais bloquante.
+    const src = sanitizeSource(source);
+    if (src) { const { error: sErr } = await admin.from("candidates").update({ source: src }).eq("id", data.id).is("source", null); if (sErr) console.error("source:", sErr.message); }
 
     // « Pas de CV » : CV Wolko créé à partir de ses réponses (modifiable ensuite dans « Mon CV »).
     const mini = sanitizeMini(mini_cv);

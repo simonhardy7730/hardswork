@@ -42,3 +42,15 @@ test("mini-CV : nettoyage et conversion", () => {
   assert.ok(miniReady(sanitizeMini({ firstJob: true })!));
   assert.ok(isMiniPath("applications/x/mini-cv.wolko.json") && !isMiniPath("applications/x/cv.pdf"));
 });
+
+import { sourceFromLanding, sanitizeSource } from "../src/lib/source";
+
+test("provenance : ?g=, utm, referrer", () => {
+  assert.equal(sourceFromLanding("?g=Emploi Tournai", ""), "fb:emploi-tournai");
+  assert.equal(sourceFromLanding("?utm_source=fb&utm_campaign=groupe-x", ""), "fb:groupe-x");
+  assert.equal(sourceFromLanding("", "https://lm.facebook.com/l.php?u=x"), "facebook");
+  assert.equal(sourceFromLanding("", "https://www.google.be/"), "google");
+  assert.equal(sourceFromLanding("", "https://wolko.be/jobs"), null);
+  assert.equal(sourceFromLanding("", ""), null);
+  assert.equal(sanitizeSource("FB:Groupe <x>"), "fb:groupe-x-");
+});

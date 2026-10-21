@@ -20,6 +20,7 @@ import { EMPTY_PREFERENCES, type Preferences } from "@/lib/candidate/preferences
 import { useLang } from "@/lib/i18n/context";
 import { labels } from "@/lib/utils";
 import { tradesFor, MAX_TRADES } from "@/lib/candidate/trades";
+import { currentSource } from "@/lib/source";
 import CvChoice, { type CvMode } from "@/components/candidature/CvChoice";
 import { EMPTY_MINI, miniReady, type MiniInput } from "@/lib/candidate/mini-cv";
 
@@ -236,6 +237,7 @@ export default function CandidatSignupPage() {
         sectors: selectedSectors,
         trade_other: tradeOther,
         mini_cv: cvMode === "mini" ? mini : null,
+        source: currentSource(),
         trades: selectedTrades.filter((k) => tradesFor(selectedSectors).some((t) => t.key === k)),
         visible_to_recruiters: visible && isAdult,
         birth_date: birth,

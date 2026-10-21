@@ -355,6 +355,17 @@ export default async function HomePage() {
       </section>
 
       <SiteFooter />
+
+      {/* Barre d'action mobile : toujours visible (77 % des visites sont sur téléphone, souvent depuis Facebook). */}
+      <div className="md:hidden h-20" aria-hidden />
+      <div className="md:hidden fixed inset-x-0 bottom-0 z-40 bg-[#101F43]/95 backdrop-blur border-t border-white/10 px-3 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] grid grid-cols-2 gap-2">
+        <Link href="/jobs" className="h-12 rounded-xl bg-brand text-[#101F43] font-display font-black uppercase text-sm flex items-center justify-center gap-1.5" style={{ letterSpacing: "0.03em" }}>
+          {displayJobs.length > 0 ? l(`Voir les ${displayJobs.length}${displayJobs.length >= 8 ? "+" : ""} offres`, `Bekijk ${displayJobs.length}${displayJobs.length >= 8 ? "+" : ""} vacatures`) : l("Voir les offres", "Bekijk vacatures")}
+        </Link>
+        <Link href="/signup/candidat" className="h-12 rounded-xl bg-white text-[#101F43] font-display font-black uppercase text-sm flex items-center justify-center" style={{ letterSpacing: "0.03em" }}>
+          {l("Déposer mon profil", "Mijn profiel")}
+        </Link>
+      </div>
     </div>
   );
 }

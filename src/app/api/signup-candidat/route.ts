@@ -1,3 +1,4 @@
+import { sanitizeMini, miniToCv } from "@/lib/candidate/mini-cv";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sanitizePreferences } from "@/lib/candidate/preferences";
@@ -31,6 +32,7 @@ export async function POST(req: NextRequest) {
       sectors,
       trades,
       trade_other,
+      mini_cv,
       preferences,
       visible_to_recruiters,
       birth_date,
@@ -149,6 +151,13 @@ export async function POST(req: NextRequest) {
     if (cleanTrades.length || cleanOther) {
       const { error: tErr } = await admin.from("candidates").update({ trades: cleanTrades, trade_other: cleanOther }).eq("id", data.id);
       if (tErr) console.error("trades not stored (migration 031 ?):", tErr.message);
+    }
+
+    // « Pas de CV » : CV Wolko créé à partir de ses réponses (modifiable ensuite dans « Mon CV »).
+    const mini = sanitizeMini(mini_cv);
+    if (mini) {
+      const { error: mErr } = await admin.from("candidates").update({ cv_data: miniToCv(mini) }).eq("id", data.id).is("cv_data", null);
+      if (mErr) console.error("mini CV not stored:", mErr.message);
     }
 
     // Accord de visibilité (migration 016) : case facultative, décochée par défaut ; l'inscription ne dépend jamais de lui.

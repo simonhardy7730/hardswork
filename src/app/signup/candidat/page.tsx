@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
-  Loader2, ArrowRight, ArrowLeft, Upload, Check,
+  Loader2, ArrowRight, ArrowLeft, Check,
   MapPin, User, Mail, Lock, Phone,
   Package, Truck, HardHat, Factory, Stethoscope, ShoppingBag, UtensilsCrossed, FileText,
   Shield, Sparkles, Briefcase,
@@ -20,6 +20,8 @@ import { EMPTY_PREFERENCES, type Preferences } from "@/lib/candidate/preferences
 import { useLang } from "@/lib/i18n/context";
 import { labels } from "@/lib/utils";
 import { tradesFor, MAX_TRADES } from "@/lib/candidate/trades";
+import CvChoice, { type CvMode } from "@/components/candidature/CvChoice";
+import { EMPTY_MINI, miniReady, type MiniInput } from "@/lib/candidate/mini-cv";
 
 /* ─── Données secteurs ────────────────────────────────── */
 const SECTORS_DATA = [
@@ -148,6 +150,8 @@ export default function CandidatSignupPage() {
   /* Étape 3 — compte + CV */
   const [auth, setAuth]     = useState({ full_name: "", email: "", password: "", phone: "" });
   const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvMode, setCvMode] = useState<CvMode>("");
+  const [mini, setMini] = useState<MiniInput>(EMPTY_MINI);
   const [birth, setBirth] = useState("");
   const birthAge = ageFromBirthDate(birth);
   const isAdult = birthAge !== null && birthAge >= ADULT_AGE;
@@ -166,6 +170,9 @@ export default function CandidatSignupPage() {
 
   async function doSubmit() {
     setError("");
+    if (cvMode === "") { setError(l("Réponds à la question « As-tu un CV ? ».", "Beantwoord de vraag « Heb je een cv? ».")); return; }
+    if (cvMode === "file" && !cvFile) { setError(l("Ajoute ton CV (photo ou fichier), ou choisis « Non, pas de CV ».", "Voeg je cv toe (foto of bestand), of kies « Nee, geen cv ».")); return; }
+    if (cvMode === "mini" && !miniReady(mini)) { setError(l("Indique ton dernier travail, ou coche « C'est mon premier emploi ».", "Vul je laatste job in, of vink « Dit is mijn eerste job » aan.")); return; }
     if (birthAge === null || birthAge < MIN_AGE) {
       setError(l(`Indiquez votre date de naissance (inscription à partir de ${MIN_AGE} ans).`, `Geef je geboortedatum op (inschrijving vanaf ${MIN_AGE} jaar).`));
       return;
@@ -228,6 +235,7 @@ export default function CandidatSignupPage() {
         preferences: prefs,
         sectors: selectedSectors,
         trade_other: tradeOther,
+        mini_cv: cvMode === "mini" ? mini : null,
         trades: selectedTrades.filter((k) => tradesFor(selectedSectors).some((t) => t.key === k)),
         visible_to_recruiters: visible && isAdult,
         birth_date: birth,
@@ -609,35 +617,9 @@ export default function CandidatSignupPage() {
                 </div>
               </div>
 
-              {/* Upload CV */}
+              {/* CV : « As-tu un CV ? » — Oui : photo / fichier ; Non : 3 questions → CV Wolko */}
               <div>
-                <label className={labelCls}>{l("CV", "Cv")} <span className="text-emerald-700 normal-case">{l("· recommandé", "· aanbevolen")}</span></label>
-                <p className="text-xs text-ink-500 mb-2">{l("Les employeurs contactent d'abord les profils avec CV. Pas de fichier ? Prends ton CV papier en photo 📸 — ou crée-le gratuitement sur Wolko après l'inscription.", "Werkgevers contacteren eerst profielen met een cv. Geen bestand? Neem een foto van je papieren cv 📸 — of maak het gratis op Wolko na je inschrijving.")}</p>
-                <label className={`block border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition ${
-                  cvFile
-                    ? "border-brand bg-brand/5"
-                    : "border-ink-100 hover:border-brand/40 hover:bg-surface-2"
-                }`}>
-                  <input type="file" accept=".pdf,.doc,.docx,image/jpeg,image/png,image/webp" className="hidden"
-                    onChange={e => setCvFile(e.target.files?.[0] ?? null)} />
-                  {cvFile ? (
-                    <div className="flex items-center justify-center gap-3">
-                      <span className="text-2xl">📄</span>
-                      <div className="text-left">
-                        <p className="text-sm font-bold text-brand">{cvFile.name}</p>
-                        <p className="text-xs text-ink-300">{(cvFile.size / 1024).toFixed(0)} KB · {l("Cliquez pour changer", "Klik om te wijzigen")}</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-3">
-                      <Upload size={18} className="text-ink-300" />
-                      <div className="text-left">
-                        <p className="text-sm font-bold text-ink-700">{l("Ajouter mon CV", "Mijn cv toevoegen")}</p>
-                        <p className="text-xs text-ink-300">{l("PDF, Word ou photo — 8 Mo max", "PDF, Word of foto — max. 8 MB")}</p>
-                      </div>
-                    </div>
-                  )}
-                </label>
+                <CvChoice mode={cvMode} onMode={setCvMode} file={cvFile} onFile={setCvFile} mini={mini} onMini={setMini} />
                 <p className="text-xs text-ink-400 mt-2">
                   {l("Vos diplômes et permis ? Vous pourrez les ajouter depuis votre compte, une fois inscrit.", "Je diploma's en rijbewijzen? Je kunt ze toevoegen vanuit je account, zodra je ingeschreven bent.")}
                 </p>

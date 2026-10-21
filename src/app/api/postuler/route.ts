@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cvToken, cvLink } from "@/lib/candidate/cv-link";
 import { sanitizeSource } from "@/lib/source";
+import { asCv } from "@/lib/candidate/cv";
+import { cvFilled } from "@/lib/candidate/pool-cv";
 import { checkCvFile } from "@/lib/candidate/cv-file";
 import { sanitizeMini, miniToCv, MINI_SUFFIX, type MiniDoc } from "@/lib/candidate/mini-cv";
 import { publicOrgName } from "@/lib/confidential";
@@ -275,7 +277,11 @@ export async function POST(req: NextRequest) {
         }
         if (candidateId) await supabaseAdmin.from("applications").update({ candidate_id: candidateId }).eq("id", application.id);
         // Son mini-CV devient le CV de son profil (seulement s'il n'en a pas déjà un).
-        if (candidateId && miniCv) await supabaseAdmin.from("candidates").update({ cv_data: miniCv }).eq("id", candidateId).is("cv_data", null);
+        if (candidateId && miniCv) {
+          // cv_data vaut {} par défaut (jamais null) : on ne remplace pas un vrai CV Wolko déjà rempli.
+          const { data: cur } = await supabaseAdmin.from("candidates").select("cv_data").eq("id", candidateId).maybeSingle();
+          if (!cvFilled(asCv(cur?.cv_data))) await supabaseAdmin.from("candidates").update({ cv_data: miniCv }).eq("id", candidateId);
+        }
       } catch (e) {
         console.error("pool opt-in error:", e);
       }

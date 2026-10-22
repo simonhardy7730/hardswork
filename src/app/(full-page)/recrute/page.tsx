@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, ArrowLeft, Check, Loader2, Zap, Users, Clock, Shield } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, Loader2 } from "lucide-react";
 import { isValidVat } from "@/lib/vat";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { signUp } from "@/app/actions/auth";
@@ -11,6 +11,8 @@ import { LangSwitch } from "@/components/layout/LangSwitch";
 import Turnstile, { useCaptcha } from "@/components/security/Turnstile";
 
 import { WolfBadge } from "@/components/ui/WolfMascot";
+import { RC } from "@/lib/recruiter-content";
+const DEMO_MAIL = "mailto:hello@wolko.be?subject=Demande%20de%20d%C3%A9monstration%20WOLKO";
 type L = (fr: string, nl: string) => string;
 
 /* ─── Rôles ──────────────────────────────────────────────── */
@@ -19,7 +21,7 @@ function makeRoles(l: L) {
     {
       id: "agency" as const,
       title: l("AGENCE DE\nRECRUTEMENT", "WERVINGS-\nKANTOOR"),
-      features: [l("Multi-sites", "Meerdere vestigingen"), l("Gestion d'intérim", "Interimbeheer"), l("Sourcing illimité", "Onbeperkt sourcen")],
+      features: [l("ATS et CRM", "ATS en CRM"), l("Clients et missions", "Klanten en opdrachten"), l("Équipe et rôles", "Team en rollen")],
       photo: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
       placeholder: l("Ex: Recrutement Pro", "Bv. Werving Pro"),
     },
@@ -41,15 +43,6 @@ function makeSteps(l: L) {
   ];
 }
 
-function makeFeatures(l: L) {
-  return [
-    { icon: <Zap size={20} className="text-brand" />, title: l("Publier en 2 min", "Plaatsen in 2 min"), desc: l("Formulaire guidé, pas de jargon RH inutile.", "Begeleid formulier, geen nutteloos HR-jargon.") },
-    { icon: <Users size={20} className="text-brand" />, title: l("Des candidats près de chez vous", "Kandidaten in je buurt"), desc: l("Des profils de tous les métiers, dans votre région.", "Profielen van alle beroepen, in jouw regio.") },
-    { icon: <Clock size={20} className="text-brand" />, title: l("Tout au même endroit", "Alles op één plek"), desc: l("Toutes vos candidatures dans un seul tableau de bord.", "Al je sollicitaties in één dashboard.") },
-    { icon: <Shield size={20} className="text-brand" />, title: l("Vos données", "Je gegevens"), desc: l("Traitées selon notre politique de confidentialité.", "Verwerkt volgens ons privacybeleid.") },
-  ];
-}
-
 type OrgType = "agency" | "company";
 type Step = "select" | "register";
 
@@ -58,7 +51,6 @@ export default function RecrutePage() {
   const l: L = (fr, nl) => (lang === "nl" ? nl : fr);
   const ROLES = makeRoles(l);
   const STEPS = makeSteps(l);
-  const FEATURES = makeFeatures(l);
   const [showForm, setShowForm] = useState(false);
   const [step, setStep]         = useState<Step>("select");
   const [selected, setSelected] = useState<OrgType | null>(null);
@@ -148,12 +140,12 @@ export default function RecrutePage() {
               <WolfBadge className="lg:hidden w-36 mb-5" />
               <h1 className="font-display font-black text-white uppercase leading-[0.88] mb-6"
                 style={{ fontSize: "clamp(3rem, 6vw, 5rem)", letterSpacing: "-0.02em" }}>
-                {l("Recrutez les", "Werf de")}<br />
-                <span style={{ color: "var(--brand-text)" }}>{l("[meilleurs]", "[beste]")}</span><br />
-                {l("talents.", "talenten aan.")}
+                {l(RC.hero.l1.fr, RC.hero.l1.nl)}<br />
+                <span style={{ color: "var(--brand-text)" }}>{l(RC.hero.l2.fr, RC.hero.l2.nl)}</span><br />
+                {l(RC.hero.l3.fr, RC.hero.l3.nl)}
               </h1>
               <p className="text-white/80 text-lg leading-relaxed mb-10 max-w-md">
-                {l("La plateforme de recrutement pour tous les métiers. Construction, logistique, transport, industrie, santé, restauration et plus.", "Het wervingsplatform voor alle beroepen. Bouw, logistiek, transport, industrie, zorg, horeca en meer.")}
+                {l(RC.hero.sub.fr, RC.hero.sub.nl)}
               </p>
               <div className="flex flex-wrap gap-3">
                 <button
@@ -161,15 +153,16 @@ export default function RecrutePage() {
                   className="inline-flex items-center gap-2 font-display font-black uppercase text-white px-8 py-4 rounded-xl transition text-[14px]"
                   style={{ background: "#FFB900", letterSpacing: "0.06em" }}
                 >
-                  {l("Je recrute — 7 jours d'essai offerts", "Ik werf aan — 7 dagen gratis proef")}
+                  {l(RC.hero.cta.fr, RC.hero.cta.nl)}
                   <ArrowRight size={15} />
                 </button>
                 <Link href="/tarifs"
                   className="inline-flex items-center gap-2 font-display font-black uppercase text-white/60 hover:text-white border border-white/15 hover:border-white/30 px-8 py-4 rounded-xl transition text-[14px]"
                   style={{ letterSpacing: "0.06em" }}>
-                  {l("Voir les tarifs", "Bekijk de tarieven")}
+                  {l(RC.hero.ctaPrice.fr, RC.hero.ctaPrice.nl)}
                 </Link>
               </div>
+              <p className="text-white/70 text-[13px] mt-4 max-w-md">{l(RC.trialLine.fr, RC.trialLine.nl)}</p>
             </div>
 
             {/* Mini-form card droite */}
@@ -230,22 +223,96 @@ export default function RecrutePage() {
           </div>
         </div>
 
-        {/* ── FEATURES ─────────────────────────────────────── */}
+        {/* ── BÉNÉFICES ─────────────────────────────────────── */}
         <div style={{ background: "#101F43" }} className="py-20 px-6">
           <div className="max-w-5xl mx-auto">
+            <p className="text-[11px] font-black uppercase tracking-widest mb-3" style={{ color: "var(--brand-text)" }}>{l(RC.benefits.label.fr, RC.benefits.label.nl)}</p>
             <h2 className="font-display font-black text-white uppercase leading-[0.9] mb-12"
               style={{ fontSize: "clamp(2rem, 4vw, 3rem)", letterSpacing: "-0.02em" }}>
-              {l("Pourquoi", "Waarom")} <span style={{ color: "var(--brand-text)" }}>[Wolko]</span>&nbsp;?
+              {l(RC.benefits.title.fr, RC.benefits.title.nl)}
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-              {FEATURES.map((f) => (
-                <div key={f.title} className="rounded-2xl p-6 border border-white/8" style={{ background: "rgba(255,255,255,0.04)" }}>
-                  <div className="mb-4">{f.icon}</div>
-                  <h3 className="font-display font-black text-white uppercase text-sm mb-2">{f.title}</h3>
-                  <p className="text-white/40 text-sm leading-relaxed">{f.desc}</p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {RC.benefits.items.map((f) => (
+                <div key={f.t.fr} className="rounded-2xl p-6 border border-white/8" style={{ background: "rgba(255,255,255,0.04)" }}>
+                  <h3 className="font-display font-black text-white uppercase text-sm mb-2">{l(f.t.fr, f.t.nl)}</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">{l(f.d.fr, f.d.nl)}</p>
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* ── DÉJÀ ÉQUIPÉ D'UN LOGICIEL RH ? ──────────────────── */}
+        <div className="bg-[#FFFBF2] py-20 px-6" data-testid="equipped-section">
+          <div className="max-w-5xl mx-auto">
+            <p className="text-[11px] font-black text-brand uppercase tracking-widest mb-3">{l(RC.equipped.label.fr, RC.equipped.label.nl)}</p>
+            <h2 className="font-display font-black text-ink uppercase leading-[0.95] mb-4"
+              style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.6rem)", letterSpacing: "-0.02em" }}>
+              {l(RC.equipped.title.fr, RC.equipped.title.nl)}
+            </h2>
+            <p className="text-ink-500 text-base leading-relaxed max-w-3xl mb-10">{l(RC.equipped.text.fr, RC.equipped.text.nl)}</p>
+            <div className="grid md:grid-cols-2 gap-5">
+              {[RC.equipped.withAts, RC.equipped.without].map((blk) => (
+                <div key={blk.title.fr} className="bg-white rounded-2xl border border-ink-100 p-6">
+                  <h3 className="font-display font-black text-[#101F43] uppercase text-sm mb-3">{l(blk.title.fr, blk.title.nl)}</h3>
+                  <ul className="space-y-2">
+                    {blk.items.map((i) => (
+                      <li key={i.fr} className="flex items-start gap-2 text-sm text-ink-700"><Check size={14} className="text-brand shrink-0 mt-0.5" strokeWidth={3} /> {l(i.fr, i.nl)}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            <p className="text-[13px] text-ink-500 mt-5 max-w-3xl">{l(RC.equipped.note.fr, RC.equipped.note.nl)}</p>
+            <Link href="/recrute/deja-equipe" className="inline-flex items-center gap-2 mt-4 text-sm font-bold text-[#101F43] hover:underline">
+              {l(RC.equipped.more.fr, RC.equipped.more.nl)} <ArrowRight size={14} />
+            </Link>
+          </div>
+        </div>
+
+        {/* ── VOTRE ESPACE PROFESSIONNEL ────────────────────────── */}
+        <div style={{ background: "#101F43" }} className="py-20 px-6" data-testid="space-section">
+          <div className="max-w-5xl mx-auto">
+            <p className="text-[11px] font-black uppercase tracking-widest mb-3" style={{ color: "var(--brand-text)" }}>{l(RC.space.label.fr, RC.space.label.nl)}</p>
+            <h2 className="font-display font-black text-white uppercase leading-[0.9] mb-4"
+              style={{ fontSize: "clamp(2rem, 4vw, 3rem)", letterSpacing: "-0.02em" }}>
+              {l(RC.space.title.fr, RC.space.title.nl)}
+            </h2>
+            <p className="text-white/60 text-sm max-w-2xl mb-10">{l(RC.space.note.fr, RC.space.note.nl)}</p>
+            <div className="grid md:grid-cols-2 gap-5">
+              {[RC.space.company, RC.space.agency].map((blk) => (
+                <div key={blk.title.fr} className="rounded-2xl p-6 border border-white/10" style={{ background: "rgba(255,255,255,0.04)" }}>
+                  <h3 className="font-display font-black text-white uppercase text-sm mb-3">{l(blk.title.fr, blk.title.nl)}</h3>
+                  <ul className="space-y-2">
+                    {blk.items.map((i) => (
+                      <li key={i.fr} className="flex items-start gap-2 text-sm text-white/80"><Check size={14} className="text-brand shrink-0 mt-0.5" strokeWidth={3} /> {l(i.fr, i.nl)}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            <a href={DEMO_MAIL} className="inline-flex items-center gap-2 mt-8 border border-white/25 hover:border-brand text-white font-display font-black uppercase text-[13px] px-6 py-3 rounded-xl transition" style={{ letterSpacing: "0.05em" }}>
+              {l(RC.space.cta.fr, RC.space.cta.nl)} <ArrowRight size={14} />
+            </a>
+          </div>
+        </div>
+
+        {/* ── RÉASSURANCE ─────────────────────────────────────── */}
+        <div className="bg-[#FFFBF2] py-20 px-6" data-testid="trust-section">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="font-display font-black text-ink uppercase leading-[0.95] mb-10"
+              style={{ fontSize: "clamp(1.6rem, 3vw, 2.3rem)", letterSpacing: "-0.02em" }}>
+              {l(RC.trust.label.fr, RC.trust.label.nl)}
+            </h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {RC.trust.items.map((i) => (
+                <div key={i.t.fr}>
+                  <h3 className="font-display font-black text-[#101F43] uppercase text-[13px] mb-1">{l(i.t.fr, i.t.nl)}</h3>
+                  <p className="text-sm text-ink-500 leading-relaxed">{l(i.d.fr, i.d.nl)}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-[13px] text-ink-500 mt-8 max-w-3xl">{l(RC.trust.note.fr, RC.trust.note.nl)}</p>
           </div>
         </div>
 
@@ -271,7 +338,7 @@ export default function RecrutePage() {
         <div style={{ background: "#FFB900" }} className="py-20 px-6 text-center">
           <h2 className="font-display font-black text-white uppercase leading-[0.9] mb-6"
             style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", letterSpacing: "-0.02em" }}>
-            {l("Prêt à trouver", "Klaar om")}<br />{l("vos talents", "je talenten te vinden")}&nbsp;?
+            {l(RC.finalCta.fr, RC.finalCta.nl)}
           </h2>
           <button onClick={() => setShowForm(true)}
             className="inline-flex items-center gap-3 bg-white font-display font-black uppercase px-10 py-4 rounded-xl transition text-[14px] hover:bg-white/90"
@@ -279,6 +346,7 @@ export default function RecrutePage() {
             {l("Démarrer mes 7 jours d'essai", "Mijn 7 proefdagen starten")}
             <ArrowRight size={16} />
           </button>
+          <p className="text-[#101F43]/80 text-sm mt-4 max-w-xl mx-auto">{l(RC.trialLine.fr, RC.trialLine.nl)}</p>
         </div>
 
         {/* ── FOOTER ───────────────────────────────────────── */}

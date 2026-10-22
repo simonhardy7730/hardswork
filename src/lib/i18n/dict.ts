@@ -58,7 +58,7 @@ const fr = {
     medical: "Médical", security: "Sécurité", cleaning: "Nettoyage", commerce: "Commerce", horeca: "Horeca", office: "Administratif", tech: "Tech & IT",
   },
   recruiters: {
-    label: "PME & agences d'intérim", title1: "Vos prochains talents sont ", title2: "peut-être déjà ici.",
+    label: "Entreprises & agences de recrutement", title1: "Vos prochains talents sont ", title2: "peut-être déjà ici.",
     points: [
       { t: "Publiez vos offres facilement", b: "Un formulaire simple, adapté à chaque métier." },
       { t: "Centralisez vos candidatures", b: "Retrouvez tous vos candidats au même endroit." },
@@ -161,7 +161,7 @@ const nl: Dict = {
     medical: "Medisch", security: "Beveiliging", cleaning: "Schoonmaak", commerce: "Handel", horeca: "Horeca", office: "Administratie", tech: "Tech & IT",
   },
   recruiters: {
-    label: "KMO's & uitzendkantoren", title1: "Je volgende talenten zijn ", title2: "misschien al hier.",
+    label: "Bedrijven & wervingskantoren", title1: "Je volgende talenten zijn ", title2: "misschien al hier.",
     points: [
       { t: "Plaats eenvoudig je vacatures", b: "Een eenvoudig formulier, aangepast aan elk beroep." },
       { t: "Centraliseer je sollicitaties", b: "Vind al je kandidaten op één plek." },

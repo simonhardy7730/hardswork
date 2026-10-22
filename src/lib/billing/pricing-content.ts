@@ -107,35 +107,33 @@ export const CONTENT = {
     commitLine: b("Engagement de 12 mois après souscription", "Verbintenis van 12 maanden na onderschrijving"),
   },
   setupWhy: {
-    title: b("Pourquoi des frais de mise en service ?", "Waarom opstartkosten?"),
+    title: b("Un accompagnement dès le départ", "Begeleiding vanaf dag één"),
     intro: b(
-      "Les frais de mise en service couvrent l'accompagnement initial de l'entreprise ou de l'agence lors de son démarrage sur WOLKO. Ils sont facturés une seule fois, uniquement si vous souscrivez un abonnement payant après l'essai, et jamais pendant l'essai ni à chaque renouvellement.",
-      "De opstartkosten dekken de eerste begeleiding van het bedrijf of kantoor bij de start op WOLKO. Ze worden slechts één keer aangerekend, enkel als u na de proefperiode een betalend abonnement afsluit, en nooit tijdens de proefperiode of bij elke verlenging."
+      "Nos frais de mise en service correspondent à l'accompagnement initial nécessaire pour prendre en main WOLKO et configurer votre espace professionnel. Ils sont facturés une seule fois, uniquement si vous souscrivez un abonnement payant après l'essai, et jamais pendant l'essai ni à chaque renouvellement.",
+      "Onze opstartkosten komen overeen met de eerste begeleiding om WOLKO onder de knie te krijgen en je professionele ruimte te configureren. Ze worden slechts één keer aangerekend, enkel als je na de proefperiode een betalend abonnement afsluit, en nooit tijdens de proefperiode of bij elke verlenging."
     ),
     pro: {
       title: b(`Pro — ${SETUP_FEES.pro} € HTVA`, `Pro — ${SETUP_FEES.pro} € excl. btw`),
       items: [
-        b("Assistance à la configuration du compte", "Hulp bij de configuratie van het account"),
-        b("Aide à la première publication d'offre", "Hulp bij de eerste publicatie van een vacature"),
-        b("Présentation du tableau de bord", "Voorstelling van het dashboard"),
+        b("Configuration du compte", "Configuratie van het account"),
+        b("Assistance à la première publication", "Hulp bij de eerste publicatie"),
+        b("Présentation de l'espace de recrutement", "Voorstelling van de wervingsruimte"),
       ],
     },
     agency: {
       title: b(`Agence — ${SETUP_FEES.agency} € HTVA`, `Kantoor — ${SETUP_FEES.agency} € excl. btw`),
       items: [
-        b("Paramétrage initial de l'espace agence", "Eerste configuratie van de kantoorruimte"),
+        b("Paramétrage de l'espace agence", "Configuratie van de kantoorruimte"),
+        b("Configuration des utilisateurs", "Configuratie van de gebruikers"),
         b("Présentation du CRM et de l'ATS", "Voorstelling van de CRM en de ATS"),
-        b("Configuration des accès utilisateurs", "Configuratie van de gebruikerstoegangen"),
-        b("Formation de prise en main", "Opleiding voor de eerste stappen"),
+        b("Accompagnement initial", "Eerste begeleiding"),
       ],
     },
     network: {
       title: b("Agence Réseau — sur devis", "Netwerkkantoor — op offerte"),
       items: [
-        b("Étude des besoins", "Behoeftenanalyse"),
-        b("Configuration personnalisée", "Configuratie op maat"),
-        b("Accompagnement au déploiement", "Begeleiding bij de uitrol"),
-        b("Migrations ou intégrations éventuelles : uniquement si elles figurent au devis", "Eventuele migraties of integraties: enkel indien opgenomen in de offerte"),
+        b("Déploiement personnalisé", "Uitrol op maat"),
+        b("Prestations définies sur devis (migrations ou intégrations éventuelles : uniquement si elles figurent au devis)", "Prestaties vastgelegd in de offerte (eventuele migraties of integraties: enkel indien opgenomen in de offerte)"),
       ],
     },
   },
@@ -180,6 +178,13 @@ export const CONTENT = {
       a: b(
         "L'abonnement payant (Pro ou Agence) se souscrit expressément avec notre équipe. Il comporte un engagement initial de 12 mois à compter de son activation, facturé mensuellement. Pour mettre fin au contrat à l'échéance annuelle, la demande doit nous parvenir au moins 30 jours avant cette échéance. Les dates exactes figurent dans « Mon abonnement ».",
         "Het betalende abonnement (Pro of Kantoor) wordt uitdrukkelijk afgesloten met ons team. Het heeft een initiële verbintenis van 12 maanden vanaf de activering, maandelijks gefactureerd. Om het contract op de jaarlijkse vervaldatum te beëindigen, moet de aanvraag ons minstens 30 dagen voor die vervaldatum bereiken. De exacte data vindt u terug in « Mijn abonnement »."
+      ),
+    },
+    {
+      q: b("J'ai déjà un logiciel de recrutement (ATS) : WOLKO m'est-il utile ?", "Ik heb al recruitmentsoftware (ATS): is WOLKO nuttig voor mij?"),
+      a: b(
+        "WOLKO peut être un canal supplémentaire pour publier vos offres et toucher des candidats de votre région, en plus de votre logiciel habituel. Il n'existe pas, à ce jour, de synchronisation automatique avec les logiciels RH tiers : les candidatures reçues sur WOLKO se gèrent dans WOLKO. L'essai gratuit de 7 jours permet de juger si ce canal vous convient.",
+        "WOLKO kan een extra kanaal zijn om je vacatures te publiceren en kandidaten uit je regio te bereiken, naast je gebruikelijke software. Er bestaat vandaag geen automatische synchronisatie met HR-software van derden: sollicitaties via WOLKO beheer je in WOLKO. Met de gratis proefperiode van 7 dagen kun je beoordelen of dit kanaal bij je past."
       ),
     },
     {

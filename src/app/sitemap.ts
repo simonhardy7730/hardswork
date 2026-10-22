@@ -7,7 +7,7 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = "https://wolko.be";
-  const pages: MetadataRoute.Sitemap = ["", "/jobs", "/candidats", "/recrute", "/tarifs", "/legal/cgu", "/legal/privacy"]
+  const pages: MetadataRoute.Sitemap = ["", "/jobs", "/candidats", "/recrute", "/recrute/deja-equipe", "/tarifs", "/legal/cgu", "/legal/privacy"]
     .map((p) => ({ url: `${base}${p}`, changeFrequency: "weekly" as const, priority: p === "" ? 1 : 0.7 }));
 
   try {

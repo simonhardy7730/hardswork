@@ -70,7 +70,7 @@ ${li([
 ${li([
   `Sans action de votre part, l'abonnement continue à durée indéterminée, facturé mensuellement.`,
   m.priceAfterCents !== m.priceCents
-    ? `Information tarifaire : à l'issue de l'engagement, le tarif standard de <strong>${eur(m.priceAfterCents)}</strong> s'applique (au lieu de ${eur(m.priceCents)}).`
+    ? `Information tarifaire : à l'issue de l'engagement, le tarif standard de <strong>${eur(m.priceAfterCents)}</strong> peut s'appliquer, après information préalable de notre part (au lieu de ${eur(m.priceCents)}).`
     : `Votre tarif reste de <strong>${eur(m.priceAfterCents)}</strong>.`,
   `Pour ne pas poursuivre, demandez la non-reconduction au plus tard le ${d(m.noticeDeadlineDay)}.`,
   `Après l'engagement, vous pouvez résilier avec un préavis de 30 jours.`,

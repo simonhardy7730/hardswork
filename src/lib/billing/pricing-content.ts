@@ -143,8 +143,8 @@ export const CONTENT = {
     title: b("Conditions de l'offre", "Voorwaarden van het aanbod"),
     launch: [
       b(
-        `Tarif de lancement : toute souscription conclue au plus tard le ${LAUNCH_END_LABEL.fr} conserve son prix pendant ${FOUNDER_MONTHS} mois à compter de la date de souscription, y compris aux renouvellements.`,
-        `Lanceringstarief: elk abonnement afgesloten uiterlijk op ${LAUNCH_END_LABEL.nl} behoudt zijn prijs gedurende ${FOUNDER_MONTHS} maanden vanaf de datum van onderschrijving, ook bij verlengingen.`
+        `Tarif de lancement : toute souscription conclue au plus tard le ${LAUNCH_END_LABEL.fr} conserve son tarif mensuel de lancement pendant les ${FOUNDER_MONTHS} premiers mois du contrat, à compter de la date de souscription. Ensuite, le tarif standard peut s'appliquer, après information préalable du client.`,
+        `Lanceringstarief: elk abonnement afgesloten uiterlijk op ${LAUNCH_END_LABEL.nl} behoudt zijn lanceringsmaandtarief gedurende de eerste ${FOUNDER_MONTHS} maanden van het contract, vanaf de datum van onderschrijving. Daarna kan het standaardtarief van toepassing zijn, na voorafgaande informatie aan de klant.`
       ),
       b(
         `À partir du 1er janvier 2027, les nouvelles souscriptions sont facturées aux tarifs standards (Pro ${PRICES.standard.pro} €/mois HT, Agence ${PRICES.standard.agency} €/mois HT).`,

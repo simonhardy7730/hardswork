@@ -1,5 +1,6 @@
 "use client";
 
+import PasswordInput from "@/components/ui/PasswordInput";
 import { useState, useEffect, Suspense } from "react";
 import { friendlyAuthError } from "@/lib/auth-errors";
 import Link from "next/link";
@@ -138,7 +139,7 @@ function InviteSignup({ token }: { token: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-white mb-1.5">{l("Mot de passe", "Wachtwoord")}</label>
-                <input type="password" name="password" required minLength={8} value={formData.password} onChange={handleChange}
+                <PasswordInput tone="dark" name="password" required minLength={8} value={formData.password} onChange={handleChange}
                   placeholder={l("Minimum 8 caractères", "Minimum 8 tekens")}
                   className="w-full px-4 py-2.5 border border-white/10 rounded-xl text-sm bg-white/5 text-white placeholder-white/25 focus:outline-none focus:border-[#FFB900] transition" />
               </div>
@@ -376,7 +377,7 @@ function NormalSignup() {
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">
                     3. {l("Sécurité", "Beveiliging")}
                   </label>
-                  <input type="password" name="password" required minLength={8} value={formData.password} onChange={handleChange}
+                  <PasswordInput name="password" required minLength={8} value={formData.password} onChange={handleChange}
                     placeholder={l("Minimum 8 caractères", "Minimum 8 tekens")}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition-colors" />
                 </div>

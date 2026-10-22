@@ -1,5 +1,6 @@
 "use client";
 
+import PasswordInput from "@/components/ui/PasswordInput";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -121,7 +122,7 @@ export default function LoginPage() {
               </div>
               <div className="relative">
                 <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
-                <input type="password" required value={password}
+                <PasswordInput tone="dark" required value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className={inputClass} />

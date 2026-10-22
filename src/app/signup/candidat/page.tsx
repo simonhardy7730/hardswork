@@ -1,5 +1,6 @@
 "use client";
 
+import PasswordInput from "@/components/ui/PasswordInput";
 import { useRef, useState } from "react";
 import { VISIBILITY_LABEL } from "@/lib/candidate/visibility";
 import { ageFromBirthDate, MIN_AGE, ADULT_AGE } from "@/lib/candidate/age";
@@ -635,9 +636,9 @@ export default function CandidatSignupPage() {
                 <label className={labelCls}>{l("Mot de passe", "Wachtwoord")}</label>
                 <div className="relative">
                   <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
-                  <input value={auth.password}
+                  <PasswordInput value={auth.password}
                     onChange={e => setAuth(p => ({ ...p, password: e.target.value }))}
-                    placeholder={l("Minimum 8 caractères", "Minimum 8 tekens")} type="password" minLength={8}
+                    placeholder={l("Minimum 8 caractères", "Minimum 8 tekens")} minLength={8}
                     required className={inputCls} />
                 </div>
               </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import PasswordInput from "@/components/ui/PasswordInput";
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowLeft, Check, Loader2 } from "lucide-react";
@@ -496,7 +497,7 @@ export default function RecrutePage() {
                 </div>
                 <div>
                   <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">3. {l("Mot de passe", "Wachtwoord")}</label>
-                  <input type="password" placeholder={l("Minimum 8 caractères", "Minimum 8 tekens")} value={form.password} onChange={set("password")} required minLength={8}
+                  <PasswordInput placeholder={l("Minimum 8 caractères", "Minimum 8 tekens")} value={form.password} onChange={set("password")} required minLength={8}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm placeholder-gray-300 focus:outline-none focus:border-[#101F43] transition" />
                 </div>
                 <label className="flex items-start gap-3 cursor-pointer">

@@ -14,7 +14,7 @@ export const RC = {
       "Plaats je vacatures, ontdek kandidaten uit je regio en volg je aanwervingen eenvoudig op. Met of zonder bestaande HR-software."
     ),
     cta: b("Essayer gratuitement pendant 7 jours", "7 dagen gratis proberen"),
-    ctaPrice: b("Voir les tarifs", "Bekijk de tarieven"),
+    ctaPrice: b("Découvrir les tarifs", "Ontdek de tarieven"),
   },
   benefits: {
     label: b("Ce que WOLKO vous apporte", "Wat WOLKO je biedt"),
@@ -29,34 +29,23 @@ export const RC = {
     ],
   },
   equipped: {
-    label: b("Vous avez déjà un logiciel RH ?", "Heb je al HR-software?"),
-    title: b("Déjà équipé d'un logiciel de recrutement ? WOLKO peut aussi vous être utile.", "Al uitgerust met recruitmentsoftware? WOLKO kan ook nuttig zijn."),
-    text: b(
-      "Vous utilisez déjà un ATS pour gérer vos recrutements ? WOLKO peut compléter votre stratégie en vous offrant un canal supplémentaire pour publier vos offres et toucher des candidats de votre région.",
-      "Gebruik je al een ATS om je aanwervingen te beheren? WOLKO kan je strategie aanvullen met een extra kanaal om je vacatures te publiceren en kandidaten uit je regio te bereiken."
-    ),
-    withAts: {
-      title: b("Je possède déjà un ATS", "Ik heb al een ATS"),
-      items: [
-        b("Je conserve mon logiciel habituel.", "Ik behoud mijn gewoonlijke software."),
-        b("Je publie mes offres sur WOLKO.", "Ik publiceer mijn vacatures op WOLKO."),
-        b("Je touche une audience complémentaire.", "Ik bereik een aanvullend publiek."),
-        b("Je consulte et gère les candidatures reçues sur WOLKO dans mon espace WOLKO.", "Ik raadpleeg en beheer de sollicitaties via WOLKO in mijn WOLKO-ruimte."),
-      ],
-    },
-    without: {
-      title: b("Je n'ai pas de logiciel de recrutement", "Ik heb geen recruitmentsoftware"),
-      items: [
-        b("Je publie mes offres sur WOLKO.", "Ik publiceer mijn vacatures op WOLKO."),
-        b("Je centralise mes candidatures.", "Ik centraliseer mijn sollicitaties."),
-        b("Je suis l'avancement de mes recrutements.", "Ik volg de voortgang van mijn aanwervingen op."),
-        b("Je dispose d'un espace professionnel simple.", "Ik beschik over een eenvoudige professionele ruimte."),
-      ],
-    },
+    label: b("Avec ou sans ATS", "Met of zonder ATS"),
+    title: b("Vous utilisez déjà un logiciel de recrutement ?", "Gebruik je al recruitmentsoftware?"),
+    text: [
+      b("Vous utilisez déjà un ATS pour gérer vos candidatures ? Pas besoin de tout changer pour découvrir WOLKO.", "Gebruik je al een ATS om je sollicitaties te beheren? Je hoeft niet alles te veranderen om WOLKO te ontdekken."),
+      b("Notre plateforme peut compléter vos outils existants en vous offrant un canal supplémentaire pour diffuser vos offres et toucher des candidats de votre région.", "Ons platform kan je bestaande tools aanvullen met een extra kanaal om je vacatures te verspreiden en kandidaten uit je regio te bereiken."),
+      b("Vous conservez vos habitudes de recrutement tout en développant votre visibilité auprès de nouveaux profils.", "Je behoudt je wervingsgewoonten en vergroot tegelijk je zichtbaarheid bij nieuwe profielen."),
+    ],
+    advantages: [
+      { t: b("Gardez vos outils", "Behoud je tools"), d: b("Vous pouvez continuer à utiliser votre logiciel de recrutement habituel.", "Je kunt je gebruikelijke recruitmentsoftware blijven gebruiken.") },
+      { t: b("Touchez d'autres candidats", "Bereik andere kandidaten"), d: b("Publiez vos offres sur WOLKO pour développer votre visibilité locale.", "Publiceer je vacatures op WOLKO om je lokale zichtbaarheid te vergroten.") },
+      { t: b("Testez sans engagement", "Test vrijblijvend"), d: b("Découvrez la plateforme gratuitement pendant 7 jours, sans carte bancaire.", "Ontdek het platform 7 dagen gratis, zonder bankkaart.") },
+    ],
     note: b(
       "À ce jour, WOLKO ne se synchronise pas avec les logiciels RH tiers : les candidatures reçues sur WOLKO se gèrent dans WOLKO.",
       "Op dit moment synchroniseert WOLKO niet met HR-software van derden: sollicitaties via WOLKO beheer je in WOLKO."
     ),
+    faqLink: b("En savoir plus dans notre FAQ", "Meer weten in onze FAQ"),
     more: b("Comment ça fonctionne en complément d'un ATS", "Hoe het werkt naast een ATS"),
   },
   space: {

@@ -2,10 +2,11 @@ import Link from "next/link";
 import { Check, ArrowRight, ChevronDown, Sparkles } from "lucide-react";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import FaqOpenOnHash from "@/components/tarifs/FaqOpenOnHash";
 import { getDict } from "@/lib/i18n/server";
 import { CONTENT, type Bi } from "@/lib/billing/pricing-content";
 import { flashQuote, formatEuro } from "@/lib/flash/pricing";
-import { NETWORK_FROM_EUR, SETUP_FEES, publicPrice, isLaunchOfferActive, type BillablePlan } from "@/lib/billing/pricing";
+import { NETWORK_FROM_EUR, SETUP_FEES, firstYearCostEur, publicPrice, isLaunchOfferActive, type BillablePlan } from "@/lib/billing/pricing";
 
 // Les prix dépendent de la date : jamais de page figée, toujours l'horloge du serveur.
 export const dynamic = "force-dynamic";
@@ -200,6 +201,8 @@ export default async function TarifsPage() {
                       <p className="text-[12px] text-transparent select-none mb-1" aria-hidden>.</p>
                     )}
                     <p className="text-[13px] font-bold text-[#101F43] mb-1" data-testid={`setup-fee-${id}`}>{t(C.labels2.setupFee(SETUP_FEES[id]))}</p>
+                    <p className="text-[12px] text-ink-500 mb-0.5" data-testid={`first-year-${id}`}>{t(C.labels2.firstYear((firstYearCostEur(id, now)).toLocaleString(loc)))}</p>
+                    <p className="text-[11px] text-ink-400 mb-1.5">{t(C.labels2.firstYearNote)}</p>
                     <p className="text-[12px] text-ink-500 mb-1">{t(C.labels2.trialLine)} · {t(C.labels2.commitLine)}</p>
                     <p className="text-ink-400 text-xs mb-5">{t(P.description)}</p>
 
@@ -302,18 +305,20 @@ export default async function TarifsPage() {
               FAQ.
             </h2>
             <div className="divide-y divide-ink-100">
-              {C.faqs.map(({ q, a }) => (
-                <details key={q.fr} className="group">
+              {C.faqs.map((f) => { const { q, a } = f; return (
+                <details key={q.fr} id={"id" in f ? `faq-${f.id}` : undefined} className="group scroll-mt-24">
                   <summary className="flex items-center justify-between gap-6 py-5 cursor-pointer list-none">
                     <span className="font-display font-black text-ink uppercase text-[13px] tracking-wide">{t(q)}</span>
                     <ChevronDown size={16} className="text-ink-300 shrink-0 transition-transform duration-200 group-open:rotate-180" />
                   </summary>
                   <p className="pb-6 text-ink-500 text-sm leading-relaxed">{t(a)}</p>
                 </details>
-              ))}
+              ); })}
             </div>
           </div>
         </div>
+
+        <FaqOpenOnHash />
 
         {/* ── CTA FINAL ── */}
         <div className="bg-[#101F43] py-20 text-center px-6">

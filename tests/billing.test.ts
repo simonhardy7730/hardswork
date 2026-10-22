@@ -199,3 +199,17 @@ test("contenu : frais affichés FR/NL sans mention 'sans engagement' pour l'abon
   assert.match(C.contractNote.fr, /30 jours/); assert.match(C.contractNote.nl, /30 dagen/);
   assert.match(C.launchGuarantee.fr, /31\/12\/2026/); assert.match(C.launchGuarantee.nl, /31\/12\/2026/);
 });
+
+import { firstYearCostEur } from "../src/lib/billing/pricing";
+test("coût des 12 premiers mois, frais inclus : Pro 1 267 €, Agence 3 487 € (promo) ; standard après le 31/12/2026", () => {
+  assert.equal(firstYearCostEur("pro", d("2026-12-31T22:59:59Z")), 1267);
+  assert.equal(firstYearCostEur("agency", d("2026-12-31T22:59:59Z")), 3487);
+  assert.equal(firstYearCostEur("pro", d("2027-01-01T00:00:00Z")), 199 + 119 * 12);
+  assert.equal(firstYearCostEur("agency", d("2027-01-01T00:00:00Z")), 499 + 349 * 12);
+});
+test("contenu : ligne du coût annuel FR/NL et ancre FAQ ATS", () => {
+  assert.match(CONTENT.labels2.firstYear("1 267").fr, /Coût des 12 premiers mois, frais de mise en service inclus : 1 267 € HTVA/);
+  assert.match(CONTENT.labels2.firstYear("1 267").nl, /eerste 12 maanden/);
+  const f = CONTENT.faqs.find((x) => "id" in x && x.id === "ats");
+  assert.ok(f, "la FAQ ATS existante garde son ancre");
+});

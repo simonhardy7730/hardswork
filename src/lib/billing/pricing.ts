@@ -26,6 +26,12 @@ export function setupFeeCents(plan: BillablePlan): number {
   return SETUP_FEES[plan] * 100;
 }
 
+/** Coût contractuel des 12 premiers mois (€ HTVA), frais de mise en service compris : frais + 12 × mensualité.
+ * Information seulement : la facturation reste mensuelle, les frais ne sont facturés qu'une fois, à la souscription. */
+export function firstYearCostEur(plan: BillablePlan, now: Date): number {
+  return SETUP_FEES[plan] + publicPrice(plan, now).price * 12;
+}
+
 export interface SubscriptionQuote {
   plan: BillablePlan;
   monthlyCents: number;

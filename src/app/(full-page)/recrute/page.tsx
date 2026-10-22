@@ -250,23 +250,23 @@ export default function RecrutePage() {
               style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.6rem)", letterSpacing: "-0.02em" }}>
               {l(RC.equipped.title.fr, RC.equipped.title.nl)}
             </h2>
-            <p className="text-ink-500 text-base leading-relaxed max-w-3xl mb-10">{l(RC.equipped.text.fr, RC.equipped.text.nl)}</p>
-            <div className="grid md:grid-cols-2 gap-5">
-              {[RC.equipped.withAts, RC.equipped.without].map((blk) => (
-                <div key={blk.title.fr} className="bg-white rounded-2xl border border-ink-100 p-6">
-                  <h3 className="font-display font-black text-[#101F43] uppercase text-sm mb-3">{l(blk.title.fr, blk.title.nl)}</h3>
-                  <ul className="space-y-2">
-                    {blk.items.map((i) => (
-                      <li key={i.fr} className="flex items-start gap-2 text-sm text-ink-700"><Check size={14} className="text-brand shrink-0 mt-0.5" strokeWidth={3} /> {l(i.fr, i.nl)}</li>
-                    ))}
-                  </ul>
+            <div className="space-y-3 max-w-3xl mb-10 text-ink-500 text-base leading-relaxed">
+              {RC.equipped.text.map((x) => <p key={x.fr}>{l(x.fr, x.nl)}</p>)}
+            </div>
+            <div className="grid md:grid-cols-3 gap-5">
+              {RC.equipped.advantages.map((blk) => (
+                <div key={blk.t.fr} className="bg-white rounded-2xl border border-ink-100 p-6">
+                  <h3 className="font-display font-black text-[#101F43] uppercase text-sm mb-2">{l(blk.t.fr, blk.t.nl)}</h3>
+                  <p className="text-sm text-ink-600 leading-relaxed">{l(blk.d.fr, blk.d.nl)}</p>
                 </div>
               ))}
             </div>
             <p className="text-[13px] text-ink-500 mt-5 max-w-3xl">{l(RC.equipped.note.fr, RC.equipped.note.nl)}</p>
-            <Link href="/recrute/deja-equipe" className="inline-flex items-center gap-2 mt-4 text-sm font-bold text-[#101F43] hover:underline">
-              {l(RC.equipped.more.fr, RC.equipped.more.nl)} <ArrowRight size={14} />
-            </Link>
+            <p className="mt-4 text-sm">
+              <Link href="/tarifs#faq-ats" className="font-bold text-[#101F43] underline underline-offset-4 hover:text-brand-dark">{l(RC.equipped.faqLink.fr, RC.equipped.faqLink.nl)}</Link>
+              <span className="text-ink-300"> · </span>
+              <Link href="/recrute/deja-equipe" className="text-ink-500 hover:text-[#101F43] hover:underline">{l(RC.equipped.more.fr, RC.equipped.more.nl)}</Link>
+            </p>
           </div>
         </div>
 

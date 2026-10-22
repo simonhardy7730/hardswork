@@ -102,6 +102,8 @@ export const CONTENT = {
   ),
   labels2: {
     setupFee: (eur: number): Bi => b(`Frais de mise en service : ${eur} € HTVA, une seule fois`, `Opstartkosten: ${eur} € excl. btw, eenmalig`),
+    firstYear: (eur: string): Bi => b(`Coût des 12 premiers mois, frais de mise en service inclus : ${eur} € HTVA`, `Kostprijs van de eerste 12 maanden, opstartkosten inbegrepen: ${eur} € excl. btw`),
+    firstYearNote: b("Facturation mensuelle ; frais de mise en service facturés une seule fois à la souscription.", "Maandelijkse facturatie; opstartkosten slechts één keer aangerekend bij de onderschrijving."),
     setupQuote: b("Frais de mise en service sur devis", "Opstartkosten op offerte"),
     trialLine: b("7 jours d'essai gratuits", "7 dagen gratis proefperiode"),
     commitLine: b("Engagement de 12 mois après souscription", "Verbintenis van 12 maanden na onderschrijving"),
@@ -181,6 +183,7 @@ export const CONTENT = {
       ),
     },
     {
+      id: "ats",
       q: b("J'ai déjà un logiciel de recrutement (ATS) : WOLKO m'est-il utile ?", "Ik heb al recruitmentsoftware (ATS): is WOLKO nuttig voor mij?"),
       a: b(
         "WOLKO peut être un canal supplémentaire pour publier vos offres et toucher des candidats de votre région, en plus de votre logiciel habituel. Il n'existe pas, à ce jour, de synchronisation automatique avec les logiciels RH tiers : les candidatures reçues sur WOLKO se gèrent dans WOLKO. L'essai gratuit de 7 jours permet de juger si ce canal vous convient.",

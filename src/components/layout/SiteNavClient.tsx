@@ -11,7 +11,7 @@ const hrefs = { jobs: "/jobs", recruit: "/recrute", pricing: "/tarifs", how: "/#
 
 export function SiteNavClient({ lang, t }: { lang: Lang; t: Dict["nav"] }) {
   const [open, setOpen] = useState(false);
-  const NAV_LINKS = (Object.keys(hrefs) as (keyof typeof hrefs)[]).map((k) => ({ label: t[k], href: hrefs[k] }));
+  const NAV_LINKS = [...(Object.keys(hrefs) as (keyof typeof hrefs)[]).map((k) => ({ label: t[k], href: hrefs[k] })), { label: "Ressources", href: "/ressources" }];
 
   useEffect(() => {
     if (!open) return;

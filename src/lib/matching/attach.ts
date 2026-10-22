@@ -49,11 +49,13 @@ export async function matchesFor(apps: AppRow[], offers: Map<string, MatchOffer>
       // Profil avec compte : ses infos (ville, secteurs, métiers, CV Wolko) ne servent que si la candidature est bien liée à CE compte.
       const usable = p && (!p.auth || (a.account_user_id && a.account_user_id === p.auth)) ? p : undefined;
       const path = cvPath.get(a.id) ?? (a.account_user_id ? accountCv.get(a.account_user_id) : undefined);
-      const text = path ? await cvTextFor(path, budget) : null;
+      const read = path ? await cvTextFor(path, budget) : null;
+      const text = read?.state === "ok" ? read.text : null;
+      const cvStatus = !path ? "none" : read?.state === "ok" ? "ok" : read?.state === "empty" ? "unreadable" : "pending";
       const cv = text ? analyzeCv(text, (offer.required_licenses?.length ? offer.required_licenses : softRequirements(offer)) ?? [], titleWords(offer.title), offer.sector) : null;
       // Secteurs/métiers : pour un profil créé en postulant (sans compte), ils sont déduits de l'offre elle-même : ignorés.
       const prof = usable ? { city: usable.city, sectors: usable.auth ? usable.sectors : [], trades: usable.auth ? usable.trades : [], experienceRoles: usable.roles } : {};
-      out.set(a.id, scoreApplication(a, offer, { ...prof, cv }));
+      out.set(a.id, scoreApplication(a, offer, { ...prof, cv, cvStatus }));
     }
   } catch (e) { console.error("matchesFor:", (e as Error).message); }
   return out;

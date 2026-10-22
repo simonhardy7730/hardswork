@@ -72,3 +72,29 @@ test("mini-CV créé en postulant : lu comme un CV, sans compte", async () => {
   assert.deepEqual(analyzeCv(txt, ["CACES"], ["cariste"]).titleHits, ["cariste"]);
   assert.equal(cvToText({ headline: "", summary: "", experiences: [], education: [], skills: [], hobbies: "" }), "");
 });
+
+import { parseExperiences } from "../src/lib/matching/cvtext";
+const CV_TXT = `Angélique NUTTIN\nPermis B\nSODALIS\nAide ménagère à domicile du 06/2026 à aujourd’hui (CDI)\nEntretien des domiciles, nettoyage des pièces.\nYOURCE\nAgent call center de 10/2020 à 09/2025\nEncodage des bons de commandes.\nDAMART\nConseillère de vente par téléphone de 2018 à 2020`;
+test("expériences repérées par leurs dates, avec durée et lien au poste", () => {
+  const e = parseExperiences(CV_TXT, ["nettoyeur", "industriel"], "nettoyage", new Date("2026-10-22"));
+  assert.equal(e.length, 3);
+  assert.deepEqual(e.map((x) => x.rel), ["domain", "other", "other"]);
+  assert.equal(e[1].months, 60);
+  assert.match(e[0].role, /Aide ménagère/);
+});
+test("régression Angélique : 5 mois de ménage + beaucoup de call center ne donnent pas un A/B pour du nettoyage industriel", () => {
+  const cv = analyzeCv(CV_TXT, ["B"], ["nettoyeur", "industriel"], "nettoyage", new Date("2026-10-22"));
+  const m = scoreApplication({ licenses: ["B"], screening_answers: { langue: true, travail_be: true } },
+    { title: "Nettoyeur industriel", sector: "nettoyage", city: "Tournai", description: "Permis B conseillé", screening_ids: ["langue", "travail_be"] },
+    { city: "Pecq", cv, cvStatus: "ok" });
+  assert.ok(m.grade === "C" || m.grade === "D", `grade=${m.grade}`);
+  assert.ok(m.check.some((c) => /expérience/.test(c.fr)));
+  assert.equal(m.cv?.exps.length, 3);
+});
+test("vrai métier du poste : bonne note", () => {
+  const txt = "Cariste chez LOGI SA du 03/2019 à 12/2023\nConduite de chariot frontal, CACES 3.";
+  const cv = analyzeCv(txt, ["B"], ["cariste"], "logistique", new Date("2026-10-22"));
+  const m = scoreApplication({ licenses: ["B"] }, { title: "Cariste", sector: "logistique", city: "Tournai", required_licenses: ["B"] }, { city: "Tournai", cv, cvStatus: "ok" });
+  assert.equal(m.grade, "A");
+  assert.match(summarize(m, "fr", "Marc"), /ans d'expérience dans ce poste/);
+});

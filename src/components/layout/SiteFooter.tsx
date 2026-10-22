@@ -11,6 +11,7 @@ export async function SiteFooter() {
       { label: f.findJob, href: "/jobs" },
       { label: f.createProfile, href: "/signup/candidat" },
       { label: f.login, href: "/login" },
+      { label: "Tes droits (guides)", href: "/ressources" },
     ] },
     { title: f.recruiters, links: [
       { label: f.recruiterSpace, href: "/recrute" },

@@ -2,7 +2,6 @@ import { createClient as createAdmin } from "@supabase/supabase-js";
 import { asCv } from "@/lib/candidate/cv";
 import { scoreApplication, softRequirements, titleWords, type MatchOffer, type MatchResult } from "./score";
 import { analyzeCv, cvTextFor } from "./cvtext";
-import { isMiniPath } from "@/lib/candidate/mini-cv";
 
 type AppRow = { id: string; account_user_id?: string | null; job_offer_id: string; candidate_id: string | null; licenses?: string[] | null; has_caces?: boolean | null; caces_types?: string[] | null; availability_slots?: string[] | null; screening_answers?: Record<string, boolean> | null };
 
@@ -32,7 +31,7 @@ export async function matchesFor(apps: AppRow[], offers: Map<string, MatchOffer>
     const cvPath = new Map<string, string>();
     if (db && apps.length) {
       const { data } = await db.from("cv_requests").select("application_id, cv_path").in("application_id", apps.map((a) => a.id)).eq("status", "fulfilled").not("cv_path", "is", null);
-      for (const r of (data ?? []) as { application_id: string; cv_path: string }[]) if (!isMiniPath(r.cv_path)) cvPath.set(r.application_id, r.cv_path);
+      for (const r of (data ?? []) as { application_id: string; cv_path: string }[]) cvPath.set(r.application_id, r.cv_path); // CV déposé en postulant, mini-CV Wolko ou CV envoyé à la demande de l'entreprise
     }
     // CV déjà enregistré dans le compte du candidat : uniquement si la candidature a été envoyée CONNECTÉ à ce compte (lien vérifié par la session, migration 037).
     const accounts = Array.from(new Set(apps.map((a) => a.account_user_id).filter((x): x is string => !!x)));
@@ -42,7 +41,7 @@ export async function matchesFor(apps: AppRow[], offers: Map<string, MatchOffer>
       for (const d of (data ?? []) as { auth_user_id: string; file_path: string }[]) if (!accountCv.has(d.auth_user_id)) accountCv.set(d.auth_user_id, d.file_path);
     }
 
-    const budget = { left: 4 }; // nouveaux fichiers lus par affichage (le reste suit au prochain chargement)
+    const budget = { left: 8 }; // nouveaux fichiers lus par affichage (le reste suit au chargement suivant ; les CV déposés en postulant sont déjà lus en arrière-plan)
     for (const a of apps) {
       const offer = offers.get(a.job_offer_id);
       if (!offer) continue;

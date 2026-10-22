@@ -63,3 +63,12 @@ test("exigences lues dans le texte de l'annonce", () => {
   
   assert.deepEqual(softRequirements({ title: "X", sector: null, city: null, description: "Permis B conseillé. VCA est un plus." }), ["B", "VCA"]);
 });
+
+import { extractText, cvToText } from "../src/lib/matching/cvtext";
+test("mini-CV créé en postulant : lu comme un CV, sans compte", async () => {
+  const doc = { v: 1, base: {}, cv: { headline: "", summary: "", experiences: [{ role: "Cariste", company: "Logi SA", city: "", from: "", to: "", details: "CACES 3" }], education: [], skills: [], hobbies: "" } };
+  const txt = await extractText(Buffer.from(JSON.stringify(doc)), "applications/x/mini-cv.wolko.json");
+  assert.match(txt, /Cariste/);
+  assert.deepEqual(analyzeCv(txt, ["CACES"], ["cariste"]).titleHits, ["cariste"]);
+  assert.equal(cvToText({ headline: "", summary: "", experiences: [], education: [], skills: [], hobbies: "" }), "");
+});

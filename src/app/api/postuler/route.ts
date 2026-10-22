@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
+import { cvTextFor } from "@/lib/matching/cvtext";
 import { cvToken, cvLink } from "@/lib/candidate/cv-link";
 import { sanitizeSource } from "@/lib/source";
 import { asCv } from "@/lib/candidate/cv";
@@ -191,6 +192,7 @@ export async function POST(req: NextRequest) {
     }
 
     let cvSaved = false;
+    const warm: string[] = []; // CV à lire en arrière-plan pour que la note A→E soit prête dès que l'entreprise ouvre la candidature
     if (cvFile) {
       try {
         const cvType = await checkCvFile(cvFile, 4 * 1024 * 1024);
@@ -213,7 +215,7 @@ export async function POST(req: NextRequest) {
               fulfilled_at: new Date().toISOString(),
             });
             if (cvErr) { console.error("CV row error:", cvErr.message); await supabaseAdmin.storage.from("candidate-documents").remove([path]); }
-            else cvSaved = true;
+            else { cvSaved = true; warm.push(path); }
           } else {
             console.error("CV upload error:", up.error.message);
           }
@@ -252,7 +254,7 @@ export async function POST(req: NextRequest) {
             org_name: o?.name ?? "", job_title: jobData.title, status: "fulfilled", cv_path: path,
             cv_name: "CV Wolko (créé en postulant)", fulfilled_at: new Date().toISOString(),
           });
-          if (mErr) console.error("mini CV row:", mErr.message);
+          if (mErr) console.error("mini CV row:", mErr.message); else warm.push(path);
         } else console.error("mini CV upload:", up.error.message);
       } catch (e) { console.error("mini CV:", e); }
     }
@@ -370,6 +372,7 @@ export async function POST(req: NextRequest) {
 
     await Promise.allSettled(sends);
 
+    if (warm.length) after(async () => { for (const p of warm) { try { await cvTextFor(p, { left: 1 }); } catch { /* lu plus tard à l'affichage */ } } });
     return NextResponse.json({ success: true, applicationId: application.id, cvToken: cvSaved ? null : cvToken(application.id), miniCv: Boolean(miniCv) });
   } catch (err) {
     console.error("Postuler API error:", err);

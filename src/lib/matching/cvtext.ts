@@ -1,14 +1,23 @@
 // Lecture GRATUITE du texte des CV (PDF avec texte, Word). Pas d'IA, pas d'OCR : une photo ou un scan reste « non lu ».
 // Le texte est mis en cache (table cv_text_cache, serveur uniquement) pour ne lire chaque fichier qu'une fois.
 import { createClient as createAdmin } from "@supabase/supabase-js";
+import { asCv, type CvData } from "@/lib/candidate/cv";
 
 const BUCKET = "candidate-documents";
 const MAX_BYTES = 8 * 1024 * 1024;
 const MAX_CHARS = 20000;
 const admin = () => createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
 
+/** CV structuré (créé sur Wolko ou mini-CV du formulaire) → texte à analyser comme un CV déposé. */
+export function cvToText(cv: CvData): string {
+  return [cv.headline, cv.summary, ...cv.experiences.flatMap((e) => [e.role, e.company, e.details]), ...cv.education.flatMap((e) => [e.title, e.school]), ...cv.skills].filter(Boolean).join(". ");
+}
+
 export async function extractText(buf: Buffer, name: string): Promise<string> {
   const n = name.toLowerCase();
+  if (n.endsWith(".wolko.json")) { // mini-CV créé en postulant (« je n'ai pas de CV »)
+    try { const d = JSON.parse(buf.toString("utf8")) as { cv?: unknown }; return cvToText(asCv(d?.cv)); } catch { return ""; }
+  }
   if (n.endsWith(".pdf")) {
     const { extractText: pdfText, getDocumentProxy } = await import("unpdf");
     const pdf = await getDocumentProxy(new Uint8Array(buf));

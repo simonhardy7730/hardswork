@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpen } from "lucide-react";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import AlertPromo from "@/components/ressources/AlertPromo";
 import { GUIDES } from "@/lib/ressources/guides";
 
 export const metadata: Metadata = {
@@ -45,6 +46,7 @@ export default function RessourcesPage() {
               </div>
             </Link>
           ))}
+          <AlertPromo className="mt-6" />
           <p className="text-xs text-[#101F43]/55 pt-4">Information générale, pas un conseil juridique. Simulateur de salaire net : bientôt.</p>
         </div>
       </main>

@@ -10,6 +10,8 @@ import { formatRelative } from "@/lib/utils";
 import { getDict } from "@/lib/i18n/server";
 import CvRequests, { type CvRequestRow } from "@/components/candidat/CvRequests";
 import CvNudge from "@/components/candidat/CvNudge";
+import AlertPromo from "@/components/ressources/AlertPromo";
+import { adminClient } from "@/lib/billing/lifecycle";
 import { asCv } from "@/lib/candidate/cv";
 import { cvFilled } from "@/lib/candidate/pool-cv";
 import { profileCompletion, COMPLETION_LABEL } from "@/lib/candidate/completion";
@@ -72,6 +74,9 @@ export default async function CandidatDashboardPage() {
   const hasCv = (docCount ?? 0) > 0 || cvRequests.some((r) => r.status === "fulfilled")
     || cvFilled(asCv((candRow as { cv_data?: unknown } | null)?.cv_data));
 
+  const { data: alertRow } = await adminClient().from("job_alerts").select("active").eq("user_id", user.id).maybeSingle();
+  const alertActive = !!alertRow?.active;
+
   /* Profil → complétion réelle + offres suggérées (règles explicables, voir lib/candidate/suggestions) */
   const profile = {
     city: (base?.city as string | null) ?? null,
@@ -125,6 +130,7 @@ export default async function CandidatDashboardPage() {
 
       <CvRequests userId={user.id} requests={cvRequests} />
       {!hasCv && <CvNudge userId={user.id} />}
+      {!alertActive && <AlertPromo />}
       {hasCv && (
         <div className="bg-white border border-ink-100 rounded-2xl p-4 flex items-center gap-3 flex-wrap">
           <FileText size={18} className="text-brand shrink-0" />

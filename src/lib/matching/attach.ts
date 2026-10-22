@@ -1,3 +1,4 @@
+import { MATCH_ENABLED } from "@/lib/matching/enabled";
 import { createClient as createAdmin } from "@supabase/supabase-js";
 import { asCv } from "@/lib/candidate/cv";
 import { scoreApplication, softRequirements, titleWords, offerKeywords, type MatchOffer, type MatchResult } from "./score";
@@ -12,6 +13,7 @@ type AppRow = { id: string; account_user_id?: string | null; job_offer_id: strin
  */
 export async function matchesFor(apps: AppRow[], offers: Map<string, MatchOffer>): Promise<Map<string, MatchResult>> {
   const out = new Map<string, MatchResult>();
+  if (!MATCH_ENABLED) return out;
   try {
     const ok = !!(process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL);
     const db = ok ? createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } }) : null;

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse, after } from "next/server";
+import { MATCH_ENABLED } from "@/lib/matching/enabled";
 import { cvTextFor } from "@/lib/matching/cvtext";
 import { cvToken, cvLink } from "@/lib/candidate/cv-link";
 import { sanitizeSource } from "@/lib/source";
@@ -372,7 +373,7 @@ export async function POST(req: NextRequest) {
 
     await Promise.allSettled(sends);
 
-    if (warm.length) after(async () => { for (const p of warm) { try { await cvTextFor(p, { left: 1 }); } catch { /* lu plus tard à l'affichage */ } } });
+    if (MATCH_ENABLED && warm.length) after(async () => { for (const p of warm) { try { await cvTextFor(p, { left: 1 }); } catch { /* lu plus tard à l'affichage */ } } });
     return NextResponse.json({ success: true, applicationId: application.id, cvToken: cvSaved ? null : cvToken(application.id), miniCv: Boolean(miniCv) });
   } catch (err) {
     console.error("Postuler API error:", err);

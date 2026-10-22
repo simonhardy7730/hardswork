@@ -18,6 +18,13 @@ const firstWord = (s: unknown) => (typeof s === "string" ? s.trim().split(/\s+/)
 export async function sendWelcomeIfPending(userId: string): Promise<"sent" | "skipped" | "failed"> {
   const db = admin();
   try {
+    // Désactivé par défaut (22/10/2026) : la formule gratuite de Resend est limitée à 100 e-mails/jour et chaque
+    // inscription en consomme déjà un (confirmation). Pour le réactiver : WELCOME_EMAIL_ENABLED=1 sur Vercel.
+    // On clôt la ligne en file pour qu'un futur réactivation n'envoie pas d'e-mails de bienvenue à d'anciens comptes.
+    if (process.env.WELCOME_EMAIL_ENABLED !== "1") {
+      await db.from("welcome_emails").update({ status: "sent", last_error: "disabled_not_sent" }).eq("user_id", userId).in("status", ["pending", "failed"]);
+      return "skipped";
+    }
     const { data: claimed, error: claimErr } = await db.rpc("claim_welcome_email", { p_user: userId });
     if (claimErr || claimed !== true) return "skipped"; // pas en file, déjà envoyé, ou pris par une autre requête
 

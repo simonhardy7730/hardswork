@@ -31,3 +31,18 @@ test("candidat éloigné et secteur différent : note basse", () => {
   assert.ok(m.grade === "D" || m.grade === "E" || m.grade === "C");
   assert.ok(m.check.some((c) => /km/.test(c.fr)));
 });
+
+import { analyzeCv } from "../src/lib/matching/cvtext";
+test("lecture du texte d'un CV : permis, métier, années", () => {
+  const a = analyzeCv("Marc Dupont — Cariste expérimenté. Permis B. CACES R489 cat 3. 6 ans d'expérience en entrepôt.", ["B", "CACES", "CE"], ["cariste", "magasinier"]);
+  assert.deepEqual(a.licenses, ["B", "CACES"]);
+  assert.deepEqual(a.titleHits, ["cariste"]);
+  assert.equal(a.years, 6);
+});
+test("un permis lu dans le CV compte et le résumé le dit", () => {
+  const m = scoreApplication({ licenses: [] }, { title: "Cariste", sector: "logistique", city: "Tournai", required_licenses: ["B"] },
+    { city: "Tournai", cv: { licenses: ["B"], titleHits: ["cariste"], years: 6 } });
+  assert.ok(["A", "B"].includes(m.grade!));
+  assert.match(summarize(m, "fr", "Marc"), /lu dans son CV/);
+  assert.match(summarize(m, "fr", "Marc"), /6 ans d'expérience/);
+});

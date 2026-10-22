@@ -19,6 +19,8 @@ export interface MatchApplication {
 export interface MatchProfile {
   city?: string | null; sectors?: string[] | null; trades?: string[] | null;
   experienceRoles?: string[]; // intitulés de poste du CV créé sur Wolko
+  /** Ce qui a été retrouvé dans le texte du CV déposé (PDF/Word), voir cvtext.analyzeCv */
+  cv?: { licenses: string[]; titleHits: string[]; years: number | null } | null;
 }
 export interface Criterion { key: string; weight: number; ratio: number; fr: string; nl: string }
 export interface MatchResult {
@@ -28,6 +30,7 @@ export interface MatchResult {
 
 const MIN_INFO = 30; // poids minimal de critères évaluables pour oser une note
 const STOP = new Set(["de", "du", "des", "la", "le", "les", "et", "en", "au", "aux", "un", "une", "h", "f", "m", "x", "d", "l", "cdi", "cdd", "interim", "int"]);
+export const titleWords = (s: string) => words(s);
 const words = (s: string) => normalizePlace(s).split(/[^a-z0-9]+/).filter((w) => w.length >= 4 && !STOP.has(w));
 const NO_GO = ["travail_be"]; // réponse « non » = pas de note au-dessus de E
 
@@ -39,11 +42,13 @@ export function scoreApplication(app: MatchApplication, offer: MatchOffer, profi
   // 1. Permis / qualifications demandés
   const req = (offer.required_licenses ?? []).filter(Boolean);
   if (req.length) {
-    const have = new Set([...(app.licenses ?? []), ...(app.has_caces ? ["CACES"] : [])].map((x) => x.toUpperCase()));
+    const fromCv = new Set((profile.cv?.licenses ?? []).map((x) => x.toUpperCase()));
+    const have = new Set([...(app.licenses ?? []), ...(app.has_caces ? ["CACES"] : []), ...fromCv].map((x) => x.toUpperCase()));
     const ok = req.filter((r) => have.has(r.toUpperCase()));
     const ratio = ok.length / req.length;
     cr.push({ key: "licenses", weight: 25, ratio, fr: "", nl: "" });
-    if (ratio === 1) good.push({ fr: `a les permis/qualifications demandés (${req.join(", ")})`, nl: `heeft de gevraagde rijbewijzen/kwalificaties (${req.join(", ")})` });
+    const onlyCv = req.filter((r) => fromCv.has(r.toUpperCase()) && !(app.licenses ?? []).map((x) => x.toUpperCase()).includes(r.toUpperCase()));
+    if (ratio === 1) good.push({ fr: `a les permis/qualifications demandés (${req.join(", ")})${onlyCv.length ? ` — ${onlyCv.join(", ")} lu dans son CV` : ""}`, nl: `heeft de gevraagde rijbewijzen/kwalificaties (${req.join(", ")})${onlyCv.length ? ` — ${onlyCv.join(", ")} gelezen in zijn cv` : ""}` });
     else { const miss = req.filter((r) => !have.has(r.toUpperCase())); check.push({ fr: `permis/qualifications manquants : ${miss.join(", ")}`, nl: `ontbrekende rijbewijzen/kwalificaties: ${miss.join(", ")}` }); if (ratio === 0) missingRequired = true; }
   }
 
@@ -97,14 +102,18 @@ export function scoreApplication(app: MatchApplication, offer: MatchOffer, profi
   const roleHit = roles.some((r) => words(r).some((w) => t.includes(w)));
   const tradeHit = (profile.trades ?? []).some((k) => t.some((w) => normalizePlace(k.replace(/_/g, " ")).includes(w)));
   const sectorHit = !!offer.sector && (profile.sectors ?? []).includes(offer.sector);
-  if (roles.length || (profile.sectors ?? []).length || (profile.trades ?? []).length) {
-    const ratio = roleHit ? 1 : tradeHit ? 0.9 : sectorHit ? 0.6 : roles.length ? 0.25 : 0.2;
+  const cvHit = (profile.cv?.titleHits.length ?? 0) > 0;
+  if (roles.length || (profile.sectors ?? []).length || (profile.trades ?? []).length || profile.cv) {
+    const ratio = roleHit || cvHit ? 1 : profile.cv && !tradeHit && !sectorHit ? 0.25 : tradeHit ? 0.9 : sectorHit ? 0.6 : roles.length ? 0.25 : 0.2;
     cr.push({ key: "fit", weight: 15, ratio, fr: "", nl: "" });
-    if (roleHit) good.push({ fr: "son CV mentionne une expérience dans un poste proche", nl: "zijn cv vermeldt ervaring in een gelijkaardige functie" });
+    if (cvHit) good.push({ fr: `son CV mentionne « ${profile.cv!.titleHits.slice(0, 2).join(", ")} »`, nl: `zijn cv vermeldt “${profile.cv!.titleHits.slice(0, 2).join(", ")}”` });
+    else if (roleHit) good.push({ fr: "son CV mentionne une expérience dans un poste proche", nl: "zijn cv vermeldt ervaring in een gelijkaardige functie" });
     else if (tradeHit) good.push({ fr: "recherche précisément ce métier", nl: "zoekt precies dit beroep" });
     else if (sectorHit) good.push({ fr: "cherche dans ce secteur", nl: "zoekt in deze sector" });
     else check.push({ fr: "métier/secteur recherché différent de l'offre", nl: "gezocht beroep/sector wijkt af van de vacature" });
   }
+
+  if (profile.cv?.years) good.push({ fr: `annonce ${profile.cv.years} an${profile.cv.years > 1 ? "s" : ""} d'expérience dans son CV`, nl: `vermeldt ${profile.cv.years} jaar ervaring in zijn cv` });
 
   const total = cr.reduce((s, c) => s + c.weight, 0);
   if (total < MIN_INFO) return { grade: null, percent: null, good, check };

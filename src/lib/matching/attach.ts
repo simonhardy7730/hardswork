@@ -1,6 +1,8 @@
 import { createClient as createAdmin } from "@supabase/supabase-js";
 import { asCv } from "@/lib/candidate/cv";
-import { scoreApplication, type MatchOffer, type MatchResult } from "./score";
+import { scoreApplication, titleWords, type MatchOffer, type MatchResult } from "./score";
+import { analyzeCv, cvTextFor } from "./cvtext";
+import { isMiniPath } from "@/lib/candidate/mini-cv";
 
 type AppRow = { id: string; job_offer_id: string; candidate_id: string | null; licenses?: string[] | null; has_caces?: boolean | null; caces_types?: string[] | null; availability_slots?: string[] | null; screening_answers?: Record<string, boolean> | null };
 
@@ -21,11 +23,22 @@ export async function matchesFor(apps: AppRow[], offers: Map<string, MatchOffer>
         profiles.set(c.id, { city: c.city, sectors: c.sectors ?? [], trades: c.trades ?? [], roles: asCv(c.cv_data).experiences.map((e) => e.role) });
       }
     }
+    // CV joint À CETTE candidature (envoyé à la demande de l'entreprise) : seul celui-là est lu, jamais les documents privés du compte.
+    const cvPath = new Map<string, string>();
+    if (apps.length && process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      const db = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+      const { data } = await db.from("cv_requests").select("application_id, cv_path").in("application_id", apps.map((a) => a.id)).eq("status", "fulfilled").not("cv_path", "is", null);
+      for (const r of (data ?? []) as { application_id: string; cv_path: string }[]) if (!isMiniPath(r.cv_path)) cvPath.set(r.application_id, r.cv_path);
+    }
+    const budget = { left: 4 }; // nouveaux fichiers lus par affichage (le reste suit au prochain chargement)
     for (const a of apps) {
       const offer = offers.get(a.job_offer_id);
       if (!offer) continue;
       const p = a.candidate_id ? profiles.get(a.candidate_id) : undefined;
-      out.set(a.id, scoreApplication(a, offer, p ? { city: p.city, sectors: p.sectors, trades: p.trades, experienceRoles: p.roles } : {}));
+      const path = cvPath.get(a.id);
+      const text = path ? await cvTextFor(path, budget) : null;
+      const cv = text ? analyzeCv(text, offer.required_licenses ?? [], titleWords(offer.title)) : null;
+      out.set(a.id, scoreApplication(a, offer, { ...(p ? { city: p.city, sectors: p.sectors, trades: p.trades, experienceRoles: p.roles } : {}), cv }));
     }
   } catch (e) { console.error("matchesFor:", (e as Error).message); }
   return out;

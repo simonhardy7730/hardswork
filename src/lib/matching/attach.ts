@@ -1,0 +1,32 @@
+import { createClient as createAdmin } from "@supabase/supabase-js";
+import { asCv } from "@/lib/candidate/cv";
+import { scoreApplication, type MatchOffer, type MatchResult } from "./score";
+
+type AppRow = { id: string; job_offer_id: string; candidate_id: string | null; licenses?: string[] | null; has_caces?: boolean | null; caces_types?: string[] | null; availability_slots?: string[] | null; screening_answers?: Record<string, boolean> | null };
+
+/**
+ * Calcule la note de chaque candidature (côté serveur, uniquement pour l'organisation qui y a accès).
+ * Le profil du candidat est lu avec la clé serveur pour calculer la note ; seule la note + les raisons sont renvoyées
+ * (aucune coordonnée, aucun CV). Tout échec = pas de note, jamais d'erreur visible.
+ */
+export async function matchesFor(apps: AppRow[], offers: Map<string, MatchOffer>): Promise<Map<string, MatchResult>> {
+  const out = new Map<string, MatchResult>();
+  try {
+    const ids = Array.from(new Set(apps.map((a) => a.candidate_id).filter((x): x is string => !!x)));
+    const profiles = new Map<string, { city: string | null; sectors: string[]; trades: string[]; roles: string[] }>();
+    if (ids.length && process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      const db = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+      const { data } = await db.from("candidates").select("id, city, sectors, trades, cv_data").in("id", ids);
+      for (const c of (data ?? []) as { id: string; city: string | null; sectors: string[] | null; trades: string[] | null; cv_data: unknown }[]) {
+        profiles.set(c.id, { city: c.city, sectors: c.sectors ?? [], trades: c.trades ?? [], roles: asCv(c.cv_data).experiences.map((e) => e.role) });
+      }
+    }
+    for (const a of apps) {
+      const offer = offers.get(a.job_offer_id);
+      if (!offer) continue;
+      const p = a.candidate_id ? profiles.get(a.candidate_id) : undefined;
+      out.set(a.id, scoreApplication(a, offer, p ? { city: p.city, sectors: p.sectors, trades: p.trades, experienceRoles: p.roles } : {}));
+    }
+  } catch (e) { console.error("matchesFor:", (e as Error).message); }
+  return out;
+}

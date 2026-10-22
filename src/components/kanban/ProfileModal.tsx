@@ -9,6 +9,7 @@ import { useL } from "@/lib/i18n/context";
 import { getCvState, requestCv, getCvUrl, type CvState } from "@/app/(dashboard)/dashboard/candidatures/actions";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
 import { ageFromBirthDate } from "@/lib/candidate/age";
+import { GradePanel } from "./GradeBadge";
 
 interface Props {
   application: Application;
@@ -120,6 +121,8 @@ export default function ProfileModal({ application: app, hasSubscription, onClos
           ) : (
             <p className="text-sm text-ink-500">{l("Coordonnées verrouillées : choisissez un abonnement pour les voir.", "Contactgegevens vergrendeld: kies een abonnement om ze te zien.")}</p>
           )}
+
+          {hasSubscription && <GradePanel match={app.match} name={app.applicant_name} />}
 
           {(app.licenses?.length > 0 || app.has_caces || slots.length > 0) && (
             <div>

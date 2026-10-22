@@ -159,6 +159,8 @@ export interface Application {
   /** Migration 025 */
   screening_answers?: Record<string, boolean> | null;
   last_notified_status?: string | null;
+  /** Calculé côté serveur (lib/matching) : note A→E, jamais stocké */
+  match?: import("@/lib/matching/score").MatchResult | null;
 }
 
 export interface Subscription {

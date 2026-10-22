@@ -8,6 +8,7 @@ import { getLang } from "@/lib/i18n/server";
 import { purgeRefused } from "@/lib/purge-refused";
 import RetentionSelect from "@/components/kanban/RetentionSelect";
 import type { Application } from "@/lib/supabase/types";
+import { matchesFor } from "@/lib/matching/attach";
 
 export default async function CandidaturesGlobalPage(props: {
   searchParams: Promise<{ offre?: string }>;
@@ -29,7 +30,7 @@ export default async function CandidaturesGlobalPage(props: {
 
   const { data: offers } = await supabase
     .from("job_offers")
-    .select("id, title")
+    .select("*")
     .eq("organization_id", profile.organization_id)
     .order("created_at", { ascending: false });
   const titles = new Map((offers ?? []).map((o) => [o.id as string, o.title as string]));
@@ -39,9 +40,12 @@ export default async function CandidaturesGlobalPage(props: {
   q = selected ? q.eq("job_offer_id", selected) : q.in("job_offer_id", Array.from(titles.keys()));
   const { data: applications } = titles.size > 0 ? await q : { data: [] as Application[] };
 
+  const offerMap = new Map((offers ?? []).map((o) => [o.id as string, o as never]));
+  const accessible = ((applications ?? []) as Application[]).filter((a) => hasAccess || flashIds.has(a.job_offer_id));
+  const matches = await matchesFor(accessible, offerMap);
   const apps = ((applications ?? []) as Application[]).map((a) => {
-    const withTitle = { ...a, job_title: titles.get(a.job_offer_id) };
-    return hasAccess || flashIds.has(a.job_offer_id) ? withTitle : { ...withTitle, applicant_email: null, applicant_phone: "" };
+    const withTitle = { ...a, job_title: titles.get(a.job_offer_id), match: matches.get(a.id) ?? null };
+    return hasAccess || flashIds.has(a.job_offer_id) ? withTitle : { ...withTitle, match: null, applicant_email: null, applicant_phone: "" };
   });
 
   return (

@@ -14,6 +14,7 @@ import { COLUMNS } from "./KanbanBoard";
 import { DAYS, SLOTS } from "@/lib/candidate/availability";
 import { ageFromBirthDate } from "@/lib/candidate/age";
 import { useL, useLang } from "@/lib/i18n/context";
+import { GradeChip } from "./GradeBadge";
 
 interface Props {
   application: Application;
@@ -185,6 +186,8 @@ export default function KanbanCard({
           )}
         </div>
       </div>
+
+      {!isLocked && app.match?.grade && <div className="mb-2"><GradeChip match={app.match} /></div>}
 
       {/* ── CONTACT (si débloqué) ── */}
       {!isLocked && (

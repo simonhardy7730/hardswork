@@ -10,6 +10,7 @@ import { getLang } from "@/lib/i18n/server";
 import { purgeRefused } from "@/lib/purge-refused";
 import RetentionSelect from "@/components/kanban/RetentionSelect";
 import type { Application } from "@/lib/supabase/types";
+import { matchesFor } from "@/lib/matching/attach";
 
 export default async function CandidaturesPage(
   props: {
@@ -53,6 +54,8 @@ export default async function CandidaturesPage(
     .select("*")
     .eq("job_offer_id", params.id)
     .order("applied_at", { ascending: false });
+
+  const matches = hasSubscription ? await matchesFor((applications ?? []) as Application[], new Map([[params.id, offre as never]])) : new Map();
 
   const appUrl =
     process.env.NEXT_PUBLIC_APP_URL ?? "https://wolko.be";
@@ -104,7 +107,7 @@ export default async function CandidaturesPage(
 
       {/* Kanban */}
       <KanbanBoard
-        applications={((applications ?? []) as Application[]).map((a) => (hasSubscription ? a : { ...a, applicant_email: null, applicant_phone: "" }))}
+        applications={((applications ?? []) as Application[]).map((a) => (hasSubscription ? { ...a, match: matches.get(a.id) ?? null } : { ...a, applicant_email: null, applicant_phone: "" }))}
         jobOfferId={params.id}
         candidatureUrl={`${appUrl}/postuler/${offre.id}`}
         hasSubscription={hasSubscription}

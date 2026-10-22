@@ -187,7 +187,7 @@ export default function KanbanCard({
         </div>
       </div>
 
-      {!isLocked && app.match?.grade && <div className="mb-2"><GradeChip match={app.match} /></div>}
+      {!isLocked && app.match && <div className="mb-2"><GradeChip match={app.match} /></div>}
 
       {/* ── CONTACT (si débloqué) ── */}
       {!isLocked && (

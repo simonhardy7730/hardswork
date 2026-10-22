@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { scoreApplication, summarize } from "../src/lib/matching/score";
+import { scoreApplication, summarize, softRequirements } from "../src/lib/matching/score";
 
 const offer = { title: "Cariste (H/F)", sector: "logistique", city: "Tournai", required_licenses: ["B"], screening_ids: ["caces", "horaires"], days_needed: ["mon", "tue"], time_slots: ["morning"] };
 
@@ -41,8 +41,25 @@ test("lecture du texte d'un CV : permis, métier, années", () => {
 });
 test("un permis lu dans le CV compte et le résumé le dit", () => {
   const m = scoreApplication({ licenses: [] }, { title: "Cariste", sector: "logistique", city: "Tournai", required_licenses: ["B"] },
-    { city: "Tournai", cv: { licenses: ["B"], titleHits: ["cariste"], years: 6 } });
+    { city: "Tournai", cv: { licenses: ["B"], titleHits: ["cariste"], sectorHits: [], years: 6 } });
   assert.ok(["A", "B"].includes(m.grade!));
   assert.match(summarize(m, "fr", "Marc"), /lu dans son CV/);
   assert.match(summarize(m, "fr", "Marc"), /6 ans d'expérience/);
+});
+
+test("régression : proche + oui aux questions de base + permis B ne font pas un A si le parcours ne colle pas", () => {
+  const cleaning = { title: "Nettoyeur / Nettoyeuse industriel(le)", sector: "nettoyage", city: "Tournai", description: "Permis B conseillé. VCA est un plus.", screening_ids: ["langue", "travail_be"] };
+  const m = scoreApplication({ licenses: ["B"], screening_answers: { langue: true, travail_be: true } }, cleaning,
+    { city: "Pecq", cv: { licenses: [], titleHits: [], sectorHits: ["call center".slice(0, 0) || "accueil"], years: null } });
+  assert.ok(m.grade && !["A"].includes(m.grade), `grade=${m.grade}`);
+  assert.ok(m.rows.some((r) => r.key === "availability" && r.status === "unknown"));
+});
+test("sans CV lisible ni infos fiables : jamais A, et le recruteur voit pourquoi", () => {
+  const m = scoreApplication({ licenses: ["B"], screening_answers: { langue: true } }, { title: "Employé administratif", sector: "administratif", city: "Tournai", screening_ids: ["langue"] }, { city: "Tournai" });
+  assert.ok(m.grade === null || m.grade === "C");
+  assert.ok(m.rows.some((r) => r.key === "fit" && r.status === "unknown" && /CV/i.test(r.fr)));
+});
+test("exigences lues dans le texte de l'annonce", () => {
+  
+  assert.deepEqual(softRequirements({ title: "X", sector: null, city: null, description: "Permis B conseillé. VCA est un plus." }), ["B", "VCA"]);
 });

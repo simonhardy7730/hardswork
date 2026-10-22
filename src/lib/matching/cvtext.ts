@@ -45,17 +45,32 @@ export async function cvTextFor(path: string, limitNew: { left: number }): Promi
 
 const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
+/** Mots-clés par secteur (valeurs de l'enum sector) : « le CV parle de ce domaine », sans prétendre que c'est le même poste. */
+export const SECTOR_KEYWORDS: Record<string, string[]> = {
+  nettoyage: ["nettoy", "entretien", "menage", "hygiene", "autolaveuse", "lavage", "proprete", "schoonmaak"],
+  logistique: ["cariste", "entrepot", "picking", "magasin", "preparat", "manutention", "expedition", "stock", "logisti"],
+  transport: ["chauffeur", "livraison", "camion", "transport", "tournee", "ADR".toLowerCase()],
+  construction: ["batiment", "chantier", "macon", "peintre", "electricien", "plomb", "carrel", "menuisier", "couvreur", "echafaud"],
+  industrie: ["production", "usine", "operateur", "soudure", "machine", "montage", "ligne de", "conducteur de"],
+  securite: ["gardiennage", "securite", "agent de", "surveillance", "controle d'acces"],
+  medical: ["infirm", "aide soignant", "soins", "patient", "maison de repos", "aide-soignant"],
+  commerce: ["vente", "vendeu", "caisse", "magasin", "client", "rayon", "commerc"],
+  horeca: ["restaurant", "serveu", "cuisin", "bar", "hotel", "horeca", "plongeur", "commis"],
+  administratif: ["administrat", "secretar", "accueil", "bureau", "encodage", "facturation", "comptab", "saisie", "call center", "assistante"],
+};
+
 /** Ce qu'on retient du texte d'un CV : rien d'autre que des correspondances simples avec l'offre. */
-export function analyzeCv(text: string, requiredLicenses: string[], titleWords: string[]) {
+export function analyzeCv(text: string, requiredLicenses: string[], titleWords: string[], sector?: string | null) {
   const t = norm(text);
   const licenses = requiredLicenses.filter((r) => {
     const k = norm(r).trim();
     if (!k) return false;
-    if (k.length <= 3) return new RegExp(`(permis|rijbewijs)\\s*(de\\s*conduire)?\\s*:?\\s*(cat\\w*\\.?\\s*)?${k}(?![a-z0-9])`).test(t);
+    if (k.length <= 2) return new RegExp(`(permis|rijbewijs)\\s*(de\\s*conduire)?\\s*:?\\s*(cat\\w*\\.?\\s*)?${k}(?![a-z0-9])`).test(t);
     return t.includes(k);
   });
   const titleHits = titleWords.filter((w) => new RegExp(`(^|[^a-z])${w}`).test(t));
+  const sectorHits = (SECTOR_KEYWORDS[sector ?? ""] ?? []).filter((w) => t.includes(w));
   const m = t.match(/(\d{1,2})\s*(?:ans?|jaar)\s*(?:d['’ ]\s*)?(?:experience|ervaring)/);
   const years = m ? Math.min(40, Number(m[1])) : null;
-  return { licenses, titleHits, years };
+  return { licenses, titleHits, sectorHits, years };
 }

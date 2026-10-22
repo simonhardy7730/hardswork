@@ -53,7 +53,7 @@ export default function PreferencesFields({
   return (
     <div className="space-y-6">
       <fieldset>
-        <legend className={label}>{l("Quel type d'emploi recherchez-vous ?", "Welk soort job zoek je?")}</legend>
+        <legend className={label}>{l("Quel type d'emploi recherches-tu ?", "Welk soort job zoek je?")}</legend>
         <p className="text-xs text-ink-400 mb-2">{l("Plusieurs réponses possibles.", "Meerdere antwoorden mogelijk.")}</p>
         <div className="flex flex-wrap gap-2">
           {JOB_TYPES.map((t) => (
@@ -103,7 +103,7 @@ export default function PreferencesFields({
           </Check>
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <label className={label} htmlFor="p-mob">{l("Mobilité (km autour de chez vous)", "Mobiliteit (km rond jouw woonplaats)")}</label>
+              <label className={label} htmlFor="p-mob">{l("Mobilité (km autour de chez toi)", "Mobiliteit (km rond jouw woonplaats)")}</label>
               <input id="p-mob" type="number" min={0} max={500} inputMode="numeric" className={input}
                 value={sp.mobility_km ?? ""} onChange={(e) => setSp({ mobility_km: e.target.value === "" ? null : Number(e.target.value) })} />
             </div>
@@ -122,7 +122,7 @@ export default function PreferencesFields({
             <Info size={14} className="shrink-0 mt-0.5 text-brand" />
             <span>
               {l(
-                "Le travail étudiant est soumis à des conditions légales belges (notamment un nombre d'heures limité par an). Wolko ne vérifie pas votre statut : votre éligibilité reste « à confirmer » et pourra être vérifiée par l'employeur. Aucun justificatif scolaire n'est demandé ici.",
+                "Le travail étudiant est soumis à des conditions légales belges (notamment un nombre d'heures limité par an). Wolko ne vérifie pas ton statut : ton éligibilité reste « à confirmer » et pourra être vérifiée par l'employeur. Aucun justificatif scolaire n'est demandé ici.",
                 "Studentenarbeid is aan Belgische wettelijke voorwaarden onderworpen (onder meer een beperkt aantal uren per jaar). Wolko controleert je status niet: je geschiktheid blijft « te bevestigen » en kan door de werkgever worden nagegaan. Hier wordt geen schoolattest gevraagd."
               )}
             </span>
@@ -160,7 +160,7 @@ export default function PreferencesFields({
               </select>
             </div>
             <div>
-              <label className={label} htmlFor="f-sit">{l("Votre situation professionnelle", "Je beroepssituatie")}</label>
+              <label className={label} htmlFor="f-sit">{l("Ta situation professionnelle", "Je beroepssituatie")}</label>
               <select id="f-sit" className={input} value={fp.situation ?? ""} onChange={(e) => setFp({ situation: e.target.value })}>
                 {FLEXI_SITUATIONS.map((m) => <option key={m.key} value={m.key}>{l(m.fr, m.nl)}</option>)}
               </select>
@@ -170,7 +170,7 @@ export default function PreferencesFields({
             <Info size={14} className="shrink-0 mt-0.5 text-brand" />
             <span>
               {l(
-                "Les règles du flexi-job en Belgique sont spécifiques et évoluent (statut du travailleur, période de référence, secteurs autorisés). Choisir « Flexi-job » ne signifie pas que vous y avez droit : votre éligibilité reste « à confirmer ». Nous ne demandons aucun détail sur votre employeur principal.",
+                "Les règles du flexi-job en Belgique sont spécifiques et évoluent (statut du travailleur, période de référence, secteurs autorisés). Choisir « Flexi-job » ne signifie pas que tu y as droit : ton éligibilité reste « à confirmer ». Nous ne demandons aucun détail sur ton employeur principal.",
                 "De flexi-jobregels in België zijn specifiek en evolueren (statuut van de werknemer, referentieperiode, toegelaten sectoren). « Flexi-job » kiezen betekent niet dat je er recht op hebt: je geschiktheid blijft « te bevestigen ». We vragen geen details over je hoofdwerkgever."
               )}
             </span>

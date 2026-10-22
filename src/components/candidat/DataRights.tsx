@@ -30,7 +30,7 @@ export default function DataRights() {
       </div>
       <div className="p-5 space-y-4">
         <p className="text-sm text-ink-500">
-          {l("Vous pouvez télécharger une copie de vos données ou supprimer définitivement votre compte.", "Je kunt een kopie van je gegevens downloaden of je account definitief verwijderen.")}
+          {l("Tu peux télécharger une copie de tes données ou supprimer définitivement ton compte.", "Je kunt een kopie van je gegevens downloaden of je account definitief verwijderen.")}
         </p>
         <a href="/api/account/export" className="inline-flex items-center gap-2 text-sm font-semibold text-ink border border-ink-100 rounded-xl px-4 py-2.5 hover:border-brand/50 transition">
           <Download size={14} /> {l("Télécharger mes données", "Mijn gegevens downloaden")}
@@ -43,7 +43,7 @@ export default function DataRights() {
           ) : (
             <div className="border border-red-200 bg-red-50 rounded-xl p-4 space-y-3">
               <p className="text-sm text-red-700">
-                {l("Action définitive : profil, disponibilités, documents et accès seront supprimés. Vos candidatures déjà envoyées seront anonymisées. Tapez SUPPRIMER pour confirmer.", "Definitieve actie: profiel, beschikbaarheden, documenten en toegang worden verwijderd. Reeds verstuurde sollicitaties worden geanonimiseerd. Typ SUPPRIMER om te bevestigen.")}
+                {l("Action définitive : profil, disponibilités, documents et accès seront supprimés. Tes candidatures déjà envoyées seront anonymisées. Tape SUPPRIMER pour confirmer.", "Definitieve actie: profiel, beschikbaarheden, documenten en toegang worden verwijderd. Reeds verstuurde sollicitaties worden geanonimiseerd. Typ SUPPRIMER om te bevestigen.")}
               </p>
               <input value={txt} onChange={(e) => setTxt(e.target.value)} className="w-full px-3 py-2.5 border border-red-200 rounded-lg text-sm bg-white" placeholder="SUPPRIMER" aria-label="SUPPRIMER" />
               {err && <p className="text-xs text-red-700">{err}</p>}

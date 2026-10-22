@@ -18,7 +18,7 @@ export default function AlertesPage() {
             {l("Mes", "Mijn")} <span className="text-brand">[{l("alertes", "alerts")}].</span>
           </h1>
           <p className="text-ink-500 text-sm mt-1">
-            {l("Recevez les nouvelles offres par email selon vos critères.", "Ontvang nieuwe vacatures per e-mail volgens uw criteria.")}
+            {l("Reçois les nouvelles offres par e-mail selon tes critères.", "Ontvang nieuwe vacatures per e-mail volgens je criteria.")}
           </p>
         </div>
         <button
@@ -42,7 +42,7 @@ export default function AlertesPage() {
           {l("Aucune alerte configurée", "Geen alerts ingesteld")}
         </h2>
         <p className="text-ink-500 text-sm max-w-xs mx-auto mb-6 leading-relaxed">
-          {l("Cette fonctionnalité arrive très bientôt. Vous pourrez créer des alertes email pour chaque nouveau poste correspondant à votre profil.", "Deze functie komt binnenkort. U kunt dan e-mailalerts aanmaken voor elke nieuwe vacature die bij uw profiel past.")}
+          {l("Cette fonctionnalité arrive très bientôt. Tu pourras créer des alertes e-mail pour chaque nouvelle offre correspondant à ton profil.", "Deze functie komt binnenkort. Je kunt dan e-mailalerts aanmaken voor elke nieuwe vacature die bij je profiel past.")}
         </p>
         <Link href="/jobs"
           className="inline-flex items-center gap-2 bg-brand text-white font-display font-black uppercase text-xs px-5 py-3 rounded-xl hover:bg-brand-dark transition"

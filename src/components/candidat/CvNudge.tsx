@@ -44,14 +44,14 @@ export default function CvNudge({ userId }: { userId: string }) {
     </div>
   );
 
-  const btn = "h-12 rounded-xl px-4 text-sm font-black inline-flex items-center justify-center gap-2 cursor-pointer";
+  const btn = "min-h-12 py-2 rounded-xl px-4 text-sm font-body font-extrabold text-center inline-flex items-center justify-center gap-2 cursor-pointer";
   return (
     <div className="bg-[#101F43] rounded-2xl p-5 text-white space-y-3">
       <div>
-        <p className="font-display font-black uppercase text-lg leading-tight">{l("Il manque ton CV", "Je cv ontbreekt nog")} <span className="text-brand">⚠</span></p>
-        <p className="text-sm text-white/75 mt-1">{l("Les employeurs appellent d'abord les profils avec CV. 1 minute suffit — pas besoin d'ordinateur.", "Werkgevers bellen eerst profielen met een cv. 1 minuut volstaat — geen computer nodig.")}</p>
+        <p className="font-display font-black uppercase text-lg leading-tight">{l("Ajoute ton CV et augmente tes chances d'être contacté !", "Voeg je cv toe en vergroot je kans om gecontacteerd te worden!")}</p>
+        <p className="text-sm font-body text-white/80 mt-1">{l("Une photo, un fichier ou un CV créé gratuitement sur WOLKO : choisis la méthode la plus simple pour toi.", "Een foto, een bestand of een gratis cv gemaakt op WOLKO: kies de eenvoudigste methode voor jou.")}</p>
       </div>
-      <div className="grid sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <label className={`${btn} bg-brand text-[#101F43] ${busy ? "opacity-60 pointer-events-none" : ""}`}>
           {busy ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />} {l("Photo de mon CV", "Foto van mijn cv")}
           <input type="file" accept="image/*" capture="environment" className="hidden" onChange={onFile} />

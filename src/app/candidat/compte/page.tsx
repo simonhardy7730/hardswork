@@ -76,7 +76,7 @@ export default async function ComptePage() {
         >
           {l("Mon", "Mijn")} <span className="text-brand">{l("[compte].", "[account].")}</span>
         </h1>
-        <p className="text-ink-500 text-sm mt-1">{l("Gérez vos informations personnelles.", "Beheer je persoonlijke gegevens.")}</p>
+        <p className="text-ink-500 text-sm mt-1">{l("Gère tes informations personnelles.", "Beheer je persoonlijke gegevens.")}</p>
       </div>
 
       {/* Avatar + nom */}

@@ -25,7 +25,7 @@ export default function VisibilityToggle({ initial, birthDate }: { initial: bool
       <div className="p-5">
         {!bd ? (
           <div className="space-y-2">
-            <p className="text-sm text-ink-700">{l("Indiquez votre date de naissance pour pouvoir être visible des recruteurs (réservé aux 18 ans et plus). Elle ne pourra plus être modifiée.", "Geef je geboortedatum op om zichtbaar te zijn voor werkgevers (vanaf 18 jaar). Ze kan daarna niet meer gewijzigd worden.")}</p>
+            <p className="text-sm text-ink-700">{l("Indique ta date de naissance pour pouvoir être visible des recruteurs (réservé aux 18 ans et plus). Elle ne pourra plus être modifiée.", "Geef je geboortedatum op om zichtbaar te zijn voor werkgevers (vanaf 18 jaar). Ze kan daarna niet meer gewijzigd worden.")}</p>
             <div className="flex gap-2 items-center flex-wrap">
               <input type="date" value={draft} onChange={(e) => setDraft(e.target.value)} max={new Date().toISOString().slice(0, 10)}
                 className="h-10 rounded-xl border border-ink-100 px-3 text-sm" />
@@ -37,7 +37,7 @@ export default function VisibilityToggle({ initial, birthDate }: { initial: bool
             </div>
           </div>
         ) : (ageFromBirthDate(bd) ?? 0) < ADULT_AGE ? (
-          <p className="text-sm text-ink-700">{l("La visibilité auprès des recruteurs est réservée aux 18 ans et plus. Vous pouvez toujours postuler aux offres.", "Zichtbaarheid voor werkgevers is voorbehouden aan 18-plussers. Je kunt wel nog solliciteren op vacatures.")}</p>
+          <p className="text-sm text-ink-700">{l("La visibilité auprès des recruteurs est réservée aux 18 ans et plus. Tu peux toujours postuler aux offres.", "Zichtbaarheid voor werkgevers is voorbehouden aan 18-plussers. Je kunt wel nog solliciteren op vacatures.")}</p>
         ) : (
         <>
         <label className="flex items-start gap-3 cursor-pointer">
@@ -52,8 +52,8 @@ export default function VisibilityToggle({ initial, birthDate }: { initial: bool
         </label>
         <p className="text-xs text-ink-500 mt-3">
           {on
-            ? l("Votre profil est visible des recruteurs abonnés.", "Je profiel is zichtbaar voor werkgevers met een abonnement.")
-            : l("Votre profil n'est transmis qu'aux recruteurs auxquels vous postulez.", "Je profiel wordt enkel doorgegeven aan werkgevers bij wie je solliciteert.")}
+            ? l("Ton profil est visible des recruteurs abonnés.", "Je profiel is zichtbaar voor werkgevers met een abonnement.")
+            : l("Ton profil n'est transmis qu'aux recruteurs auxquels tu postules.", "Je profiel wordt enkel doorgegeven aan werkgevers bij wie je solliciteert.")}
         </p>
         </>
         )}

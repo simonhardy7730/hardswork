@@ -66,7 +66,7 @@ export default function CvRequests({ userId, requests }: { userId: string; reque
           )}
         </div>
       ))}
-      {pending.length > 0 && <p className="text-[11px] text-ink-500 flex items-center gap-1"><FileText size={11} />{l("Seule l'entreprise qui vous le demande pourra ouvrir ce CV.", "Alleen het bedrijf dat erom vraagt kan dit CV openen.")}</p>}
+      {pending.length > 0 && <p className="text-[11px] text-ink-500 flex items-center gap-1"><FileText size={11} />{l("Seule l'entreprise qui te le demande pourra ouvrir ce CV.", "Alleen het bedrijf dat erom vraagt kan dit CV openen.")}</p>}
       {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );

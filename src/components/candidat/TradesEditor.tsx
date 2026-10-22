@@ -22,7 +22,7 @@ export default function TradesEditor({ initial, initialOther = "" }: { initial: 
         <p className="font-display font-black text-ink uppercase text-xs tracking-widest">{l("Mes métiers", "Mijn beroepen")}</p>
       </div>
       <div className="p-5 space-y-3">
-        <p className="text-sm text-ink-500">{l(`Choisissez jusqu'à ${MAX_TRADES} métiers. Les employeurs vous trouvent grâce à eux, même sans annonce.`, `Kies tot ${MAX_TRADES} beroepen. Werkgevers vinden je zo, ook zonder vacature.`)}</p>
+        <p className="text-sm text-ink-500">{l(`Choisis jusqu'à ${MAX_TRADES} métiers. Les employeurs te trouvent grâce à eux, même sans annonce.`, `Kies tot ${MAX_TRADES} beroepen. Werkgevers vinden je zo, ook zonder vacature.`)}</p>
         <div className="flex flex-wrap gap-2">
           {TRADES.map((t) => {
             const on = sel.includes(t.key);

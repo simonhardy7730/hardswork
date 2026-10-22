@@ -73,7 +73,7 @@ export default function DocumentsUpload({ userId }: { userId: string }) {
     <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden">
       <div className="px-5 py-4 border-b border-ink-100">
         <p className="font-display font-black text-ink uppercase text-xs tracking-widest">{l("Diplômes & permis", "Diploma's & rijbewijzen")}</p>
-        <p className="text-xs text-ink-400 mt-1">{l("Ajoutez vos justificatifs : ils restent privés et vous seul pouvez les ouvrir.", "Voeg je bewijsstukken toe: ze blijven privé en alleen jij kunt ze openen.")}</p>
+        <p className="text-xs text-ink-400 mt-1">{l("Ajoute tes justificatifs : ils restent privés et toi seul peux les ouvrir.", "Voeg je bewijsstukken toe: ze blijven privé en alleen jij kunt ze openen.")}</p>
       </div>
 
       {!ready ? (

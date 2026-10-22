@@ -11,3 +11,7 @@ test("limite par adresse et doublon", () => {
   assert.match(friendlyAuthError("For security purposes, you can only request this after 50 seconds", l), /50 secondes/);
   assert.match(friendlyAuthError("User already registered", l), /déjà un compte/);
 });
+test("mot de passe manquant ou refusé : message clair, pas l'erreur générique", () => {
+  assert.match(friendlyAuthError("Signup requires a valid password", l), /au moins 8 caractères/);
+  assert.match(friendlyAuthError("Password is known to be weak and easy to guess", l), /Mot de passe trop faible/);
+});

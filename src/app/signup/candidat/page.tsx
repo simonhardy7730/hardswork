@@ -172,6 +172,7 @@ export default function CandidatSignupPage() {
 
   async function doSubmit() {
     setError("");
+    if (auth.password.length < 8) { setError(l("Choisis un mot de passe d'au moins 8 caractères.", "Kies een wachtwoord van minstens 8 tekens.")); return; }
     if (cvMode === "") { setError(l("Réponds à la question « As-tu un CV ? ».", "Beantwoord de vraag « Heb je een cv? ».")); return; }
     if (cvMode === "file" && !cvFile) { setError(l("Ajoute ton CV (photo ou fichier), ou choisis « Non, pas de CV ».", "Voeg je cv toe (foto of bestand), of kies « Nee, geen cv ».")); return; }
     if (cvMode === "mini" && !miniReady(mini)) { setError(l("Indique ton dernier travail, ou coche « C'est mon premier emploi ».", "Vul je laatste job in, of vink « Dit is mijn eerste job » aan.")); return; }

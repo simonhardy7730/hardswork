@@ -30,7 +30,7 @@ export function friendlyAuthError(
       "Dit e-mailadres heeft al een account. Log in."
     );
   }
-  if (m.includes("password") && (m.includes("at least") || m.includes("weak") || m.includes("short"))) {
+  if (m.includes("password") && (m.includes("at least") || m.includes("weak") || m.includes("short") || m.includes("valid password") || m.includes("required") || m.includes("pwned") || m.includes("known"))) {
     return l(
       "Mot de passe trop faible : utilise au moins 8 caractères.",
       "Wachtwoord te zwak: gebruik minstens 8 tekens."

@@ -1,6 +1,8 @@
 "use client";
 import { GRADE_LABEL, summarize, type Grade, type MatchResult } from "@/lib/matching/score";
+import { useState } from "react";
 import { useL, useLang } from "@/lib/i18n/context";
+import { sendMatchFeedback, type MatchVerdict } from "@/app/(dashboard)/dashboard/candidatures/actions";
 
 const COLOR: Record<Grade, string> = {
   A: "bg-emerald-600 text-white", B: "bg-lime-500 text-white", C: "bg-amber-400 text-[#101F43]", D: "bg-orange-500 text-white", E: "bg-red-500 text-white",
@@ -40,8 +42,9 @@ const VERDICT: Record<Grade, { fr: string; nl: string }> = {
 };
 
 /** Bloc détaillé (fiche candidat) : verdict, pourquoi oui / pourquoi non, résumé du CV lu, détail du calcul. */
-export function GradePanel({ match, name }: { match: MatchResult | null | undefined; name?: string }) {
+export function GradePanel({ match, name, applicationId }: { match: MatchResult | null | undefined; name?: string; applicationId?: string }) {
   const l = useL();
+  const [sent, setSent] = useState<MatchVerdict | null>(null);
   const lang = useLang();
   if (!match) return null;
   const nl = lang === "nl";
@@ -78,6 +81,11 @@ export function GradePanel({ match, name }: { match: MatchResult | null | undefi
             : l("Le CV est en cours de lecture : recharge la page dans un instant.", "Het cv wordt gelezen: laad de pagina zo opnieuw.")}
         </p>
       )}
+      {cv && cv.status === "ok" && cv.common.length > 0 && (
+        <p className="text-xs font-body text-ink-600">
+          <b>{l("Mots de l'annonce retrouvés dans son CV :", "Woorden uit de vacature in zijn cv:")}</b> {cv.common.slice(0, 6).join(", ")}
+        </p>
+      )}
       {cv && cv.exps.length > 0 && (
         <div>
           <p className="text-[11px] font-black uppercase tracking-widest text-ink-500 mb-1">{l("Résumé du CV lu", "Samenvatting van het gelezen cv")}</p>
@@ -110,6 +118,23 @@ export function GradePanel({ match, name }: { match: MatchResult | null | undefi
           {l("Comment lire la note : A = très bon, B = bon, C = correct, D = partiel, E = peu adapté. Seuls les critères vérifiables comptent (✓ ok, ~ partiel, ✗ non, ? impossible à vérifier). Pour un A, le parcours doit correspondre au poste ; si des critères importants sont inconnus, la note est plafonnée.", "Zo lees je de score: A = zeer goed, B = goed, C = redelijk, D = gedeeltelijk, E = weinig geschikt. Enkel controleerbare criteria tellen (✓ ok, ~ gedeeltelijk, ✗ nee, ? niet te controleren). Voor een A moet het parcours bij de functie passen; als belangrijke criteria onbekend zijn, wordt de score beperkt.")}
         </p>
       </details>
+      {applicationId && match.grade && (
+        <div className="border-t border-ink-100 pt-2.5">
+          {sent ? (
+            <p className="text-xs font-body text-emerald-700">{l("Merci, c'est noté : ça nous aide à régler la note.", "Bedankt, genoteerd: dat helpt ons de score bij te stellen.")}</p>
+          ) : (
+            <>
+              <p className="text-xs font-body text-ink-500 mb-1.5">{l("Cette note te paraît…", "Deze score lijkt je…")}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {([["trop_basse", l("Trop basse", "Te laag")], ["juste", l("Juste", "Juist")], ["trop_haute", l("Trop haute", "Te hoog")]] as [MatchVerdict, string][]).map(([v, label]) => (
+                  <button key={v} type="button" onClick={() => { setSent(v); void sendMatchFeedback(applicationId, v, match.grade, match.percent); }}
+                    className="min-h-9 px-3 rounded-lg border border-ink-100 bg-white text-xs font-body font-bold text-ink hover:border-brand">{label}</button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
       <p className="text-[11px] text-ink-400 font-body">
         {l("Note automatique, sans IA, basée sur les informations fournies et le CV s'il est lisible (dates et mots-clés). Elle peut se tromper : c'est un tri, pas une décision.", "Automatische score, zonder AI, op basis van de opgegeven gegevens en het cv indien leesbaar (data en trefwoorden). Ze kan zich vergissen: een sortering, geen beslissing.")}
       </p>

@@ -98,3 +98,14 @@ test("vrai métier du poste : bonne note", () => {
   assert.equal(m.grade, "A");
   assert.match(summarize(m, "fr", "Marc"), /ans d'expérience dans ce poste/);
 });
+
+import { offerKeywords } from "../src/lib/matching/score";
+test("mots importants de l'annonce comparés au CV", () => {
+  const kw = offerKeywords({ title: "Nettoyeur industriel", description: "Nettoyer les sites industriels, machines et lignes de production. Utiliser des autolaveuses et du matériel haute pression. Respecter les protocoles d'hygiène. Salaire selon barème." });
+  const words = kw.map((k) => k.word);
+  assert.ok(words.some((w) => w.startsWith("nettoy")) && words.some((w) => w.startsWith("autolav")) && words.some((w) => w.startsWith("hygien")));
+  assert.ok(!words.includes("salaire") && !words.includes("bareme"));
+  const a = analyzeCv("Opérateur de nettoyage, autolaveuse et haute pression, hygiène en milieu industriel. 2019 à 2022", [], [], "nettoyage", new Date("2026-10-22"), kw);
+  assert.ok(a.common!.length >= 3);
+  assert.equal(a.exps[0].rel, "domain");
+});

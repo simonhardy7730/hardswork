@@ -85,7 +85,7 @@ function ym(x: string, now: Date, isEnd: boolean): { y: number; m: number } | nu
 }
 
 /** Expériences repérées par leurs dates (« 10/2020 à 09/2025 »), avec leur pertinence pour l'offre. Aucune IA : dates + mots-clés. */
-export function parseExperiences(text: string, titleWords: string[], sector: string | null | undefined, now = new Date()): CvExp[] {
+export function parseExperiences(text: string, titleWords: string[], sector: string | null | undefined, now = new Date(), offerKw: { stem: string; word: string }[] = []): CvExp[] {
   const out: CvExp[] = [];
   const kws = SECTOR_KEYWORDS[sector ?? ""] ?? [];
   let m: RegExpExecArray | null;
@@ -103,14 +103,14 @@ export function parseExperiences(text: string, titleWords: string[], sector: str
     const after = text.slice(m.index + m[0].length, m.index + m[0].length + 220);
     const zone = norm(`${role} ${after}`);
     const same = titleWords.some((w) => new RegExp(`(^|[^a-z])${w}`).test(zone));
-    const dom = kws.some((w) => zone.includes(w));
+    const dom = kws.some((w) => zone.includes(w)) || offerKw.filter((k) => new RegExp(`(^|[^a-z])${k.stem}`).test(zone)).length >= 2;
     out.push({ role: role || "—", from: m[1].replace(/^(du|de|depuis|van)\s+/i, ""), to: /^\d/.test(m[2]) ? m[2] : "aujourd'hui", months, rel: same ? "same" : dom ? "domain" : "other" });
   }
   return out;
 }
 
 /** Ce qu'on retient du texte d'un CV : rien d'autre que des correspondances simples avec l'offre. */
-export function analyzeCv(text: string, requiredLicenses: string[], titleWords: string[], sector?: string | null, now = new Date()) {
+export function analyzeCv(text: string, requiredLicenses: string[], titleWords: string[], sector?: string | null, now = new Date(), offerKw: { stem: string; word: string }[] = []) {
   const t = norm(text);
   const licenses = requiredLicenses.filter((r) => {
     const k = norm(r).trim();
@@ -122,5 +122,6 @@ export function analyzeCv(text: string, requiredLicenses: string[], titleWords: 
   const sectorHits = (SECTOR_KEYWORDS[sector ?? ""] ?? []).filter((w) => t.includes(w));
   const m = t.match(/(\d{1,2})\s*(?:ans?|jaar)\s*(?:d['’ ]\s*)?(?:experience|ervaring)/);
   const years = m ? Math.min(40, Number(m[1])) : null;
-  return { licenses, titleHits, sectorHits, years, exps: parseExperiences(text, titleWords, sector, now) };
+  const common = offerKw.filter((k) => new RegExp(`(^|[^a-z])${k.stem}`).test(t)).map((k) => k.word).slice(0, 8);
+  return { licenses, titleHits, sectorHits, years, common, exps: parseExperiences(text, titleWords, sector, now, offerKw) };
 }

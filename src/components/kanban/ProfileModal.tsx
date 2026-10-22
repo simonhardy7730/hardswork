@@ -122,7 +122,7 @@ export default function ProfileModal({ application: app, hasSubscription, onClos
             <p className="text-sm text-ink-500">{l("Coordonnées verrouillées : choisissez un abonnement pour les voir.", "Contactgegevens vergrendeld: kies een abonnement om ze te zien.")}</p>
           )}
 
-          {hasSubscription && <GradePanel match={app.match} name={app.applicant_name} />}
+          {hasSubscription && <GradePanel match={app.match} name={app.applicant_name} applicationId={app.id} />}
 
           {(app.licenses?.length > 0 || app.has_caces || slots.length > 0) && (
             <div>

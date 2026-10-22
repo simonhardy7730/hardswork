@@ -155,10 +155,14 @@ export default function KanbanBoard({
   const [fDay, setFDay] = useState("");
   const [fSlot, setFSlot] = useState("");
   const [fQuick, setFQuick] = useState(false);
+  const [fGrade, setFGrade] = useState<"" | "AB" | "ABC">("");
+  const [sortGrade, setSortGrade] = useState(false);
+  const hasGrades = apps.some(a => !!a.match?.grade);
   const hasSlots = apps.some(a => (a.availability_slots?.length ?? 0) > 0);
   const visible = apps.filter(a => {
     const s = a.availability_slots ?? [];
     if (fQuick && !a.quick_apply) return false;
+    if (fGrade && !(a.match?.grade && fGrade.includes(a.match.grade))) return false;
     if (fDay && !s.some(x => x.startsWith(`${fDay}:`))) return false;
     if (fSlot && !s.some(x => x.endsWith(`:${fSlot}`))) return false;
     return true;
@@ -196,6 +200,21 @@ export default function KanbanBoard({
         )}
       </div>
 
+      {hasGrades && (
+        <div className="flex items-center gap-2 flex-wrap mb-4" aria-label={l("Trier et filtrer par note", "Sorteren en filteren op score")}>
+          <label className="flex items-center gap-1.5 text-xs text-ink-700 cursor-pointer min-h-9">
+            <input type="checkbox" checked={sortGrade} onChange={e => setSortGrade(e.target.checked)} className="accent-brand" />
+            {l("Meilleures notes d'abord", "Beste scores eerst")}
+          </label>
+          <select className={sel} value={fGrade} onChange={e => setFGrade(e.target.value as "" | "AB" | "ABC")} aria-label={l("Filtrer par note", "Filteren op score")}>
+            <option value="">{l("Toutes les notes", "Alle scores")}</option>
+            <option value="AB">{l("A et B seulement", "Enkel A en B")}</option>
+            <option value="ABC">{l("A, B et C", "A, B en C")}</option>
+          </select>
+          {fGrade && <span className="text-xs text-ink-300">{visible.length}/{totalApps}</span>}
+        </div>
+      )}
+
       {hasSlots && (
         <div className="flex items-center gap-2 flex-wrap mb-4" aria-label={l("Filtrer par disponibilités", "Filteren op beschikbaarheid")}>
           <select className={sel} value={fDay} onChange={e => setFDay(e.target.value)} aria-label={l("Jour", "Dag")}>
@@ -225,6 +244,7 @@ export default function KanbanBoard({
         <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory sm:snap-none -mx-3 px-3 sm:mx-0 sm:px-0">
           {COLUMNS.map(col => {
             const colApps = visible.filter(a => a.status === col.id);
+            if (sortGrade) colApps.sort((x, y) => (y.match?.percent ?? -1) - (x.match?.percent ?? -1));
             return (
               <KanbanColumn key={col.id} column={col} count={colApps.length}>
                 <SortableContext

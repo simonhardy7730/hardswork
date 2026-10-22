@@ -1,6 +1,6 @@
 import { createClient as createAdmin } from "@supabase/supabase-js";
 import { asCv } from "@/lib/candidate/cv";
-import { scoreApplication, softRequirements, titleWords, type MatchOffer, type MatchResult } from "./score";
+import { scoreApplication, softRequirements, titleWords, offerKeywords, type MatchOffer, type MatchResult } from "./score";
 import { analyzeCv, cvTextFor } from "./cvtext";
 
 type AppRow = { id: string; account_user_id?: string | null; job_offer_id: string; candidate_id: string | null; licenses?: string[] | null; has_caces?: boolean | null; caces_types?: string[] | null; availability_slots?: string[] | null; screening_answers?: Record<string, boolean> | null };
@@ -52,7 +52,7 @@ export async function matchesFor(apps: AppRow[], offers: Map<string, MatchOffer>
       const read = path ? await cvTextFor(path, budget) : null;
       const text = read?.state === "ok" ? read.text : null;
       const cvStatus = !path ? "none" : read?.state === "ok" ? "ok" : read?.state === "empty" ? "unreadable" : "pending";
-      const cv = text ? analyzeCv(text, (offer.required_licenses?.length ? offer.required_licenses : softRequirements(offer)) ?? [], titleWords(offer.title), offer.sector) : null;
+      const cv = text ? analyzeCv(text, (offer.required_licenses?.length ? offer.required_licenses : softRequirements(offer)) ?? [], titleWords(offer.title), offer.sector, new Date(), offerKeywords(offer)) : null;
       // Secteurs/métiers : pour un profil créé en postulant (sans compte), ils sont déduits de l'offre elle-même : ignorés.
       const prof = usable ? { city: usable.city, sectors: usable.auth ? usable.sectors : [], trades: usable.auth ? usable.trades : [], experienceRoles: usable.roles } : {};
       out.set(a.id, scoreApplication(a, offer, { ...prof, cv, cvStatus }));

@@ -187,3 +187,23 @@ export async function getMiniCv(applicationId: string): Promise<MiniDoc | null> 
   if (!data || data.status !== "fulfilled" || !isMiniPath(data.cv_path)) return null;
   return loadMiniDoc(data.cv_path as string);
 }
+
+
+export type MatchVerdict = "juste" | "trop_haute" | "trop_basse";
+
+/** Retour du recruteur sur la note A→E (sert à régler les règles). Réservé aux candidatures de son organisation. */
+export async function sendMatchFeedback(applicationId: string, verdict: MatchVerdict, grade: string | null, percent: number | null): Promise<{ ok: boolean }> {
+  if (!["juste", "trop_haute", "trop_basse"].includes(verdict)) return { ok: false };
+  const ctx = await authorize(applicationId);
+  if (!ctx) return { ok: false };
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+  const g = grade && ["A", "B", "C", "D", "E"].includes(grade) ? grade : null;
+  const pct = typeof percent === "number" && percent >= 0 && percent <= 100 ? Math.round(percent) : null;
+  const { error } = await admin().from("match_feedback").upsert(
+    { application_id: applicationId, user_id: user.id, organization_id: ctx.orgId, verdict, grade: g, percent: pct },
+    { onConflict: "application_id,user_id" });
+  if (error) console.error("match_feedback (migration 038 ?):", error.message);
+  return { ok: !error };
+}

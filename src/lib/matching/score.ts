@@ -16,7 +16,7 @@ export interface MatchApplication {
   availability_slots?: string[] | null; screening_answers?: Record<string, boolean> | null;
 }
 export interface CvExp { role: string; from: string; to: string; months: number; rel: "same" | "domain" | "other" }
-export interface CvFindings { licenses: string[]; titleHits: string[]; sectorHits: string[]; years: number | null; exps?: CvExp[] }
+export interface CvFindings { licenses: string[]; titleHits: string[]; sectorHits: string[]; years: number | null; exps?: CvExp[]; common?: string[] }
 /** Infos du profil candidat. `sectors`/`trades` ne doivent venir que d'un profil rempli PAR le candidat (jamais déduits de l'offre). */
 export interface MatchProfile {
   city?: string | null; sectors?: string[] | null; trades?: string[] | null;
@@ -31,7 +31,7 @@ export interface MatchResult {
   good: { fr: string; nl: string }[]; check: { fr: string; nl: string }[];
   rows: Row[]; capped?: { fr: string; nl: string } | null;
   /** Résumé du CV lu (parcours détecté) ; null si aucun CV exploitable */
-  cv: { status: "ok" | "unreadable" | "pending" | "none"; exps: CvExp[]; totalMonths: number; sameMonths: number; domainMonths: number } | null;
+  cv: { status: "ok" | "unreadable" | "pending" | "none"; exps: CvExp[]; totalMonths: number; sameMonths: number; domainMonths: number; common: string[] } | null;
 }
 
 const STOP = new Set(["de", "du", "des", "la", "le", "les", "et", "en", "au", "aux", "un", "une", "h", "f", "m", "x", "d", "l", "cdi", "cdd", "interim", "int"]);
@@ -40,6 +40,24 @@ export const titleWords = (s: string) => words(s);
 const NO_GO = ["travail_be"]; // réponse « non » = pas de note au-dessus de E
 /** Questions « de base » : presque tout le monde répond oui, elles ne distinguent pas les profils (poids réduit). */
 const GENERIC_Q = new Set(["langue", "travail_be", "debout", "horaires", "vehicule"]);
+
+/** Mots génériques d'annonce qui ne disent rien du métier. */
+const GENERIC = new Set(["equipe", "emploi", "salaire", "contrat", "contrats", "horaire", "horaires", "region", "profil", "mission", "missions", "poste", "entreprise", "societe", "candidat", "candidate", "offre", "travail", "travailler", "rejoins", "rejoindre", "experience", "debutant", "debutante", "souhaitee", "souhaite", "conseille", "conseillee", "possible", "possibles", "selon", "bareme", "brut", "primes", "prime", "durable", "motive", "motivee", "accepte", "indicatif", "peut", "etre", "superieur", "fonction", "categories", "disponible", "decales", "pour", "dans", "avec", "votre", "notre", "vous", "tout", "plus", "aussi", "comme", "cette", "ainsi", "avoir", "faire", "etes", "tous", "toute", "toutes", "leurs", "elle", "nous", "mois", "annee", "annees", "salarie", "qualite", "bien", "bonne", "bonnes", "vous", "offrons", "offre", "propose", "proposons", "recherche", "recherchons", "recrutons", "tournai", "mouscron"]);
+
+/** Mots importants de l'annonce (titre compte double) : base pour comparer au vocabulaire du CV. Préfixe de 6 lettres = tolère pluriel/verbe. */
+export function offerKeywords(o: { title: string; description?: string | null; requirements?: string | null }): { stem: string; word: string }[] {
+  const freq = new Map<string, { word: string; n: number }>();
+  const add = (txt: string, weight: number) => {
+    for (const w of normalizePlace(txt).split(" ")) {
+      if (w.length < 5 || GENERIC.has(w) || STOP.has(w) || /^\d/.test(w)) continue;
+      const stem = w.slice(0, 6);
+      const cur = freq.get(stem);
+      freq.set(stem, { word: cur?.word && cur.word.length <= w.length ? cur.word : w, n: (cur?.n ?? 0) + weight });
+    }
+  };
+  add(o.title, 3); add(o.requirements ?? "", 1); add(o.description ?? "", 1);
+  return [...freq.entries()].sort((a, b) => b[1].n - a[1].n || b[1].word.length - a[1].word.length).slice(0, 24).map(([stem, v]) => ({ stem, word: v.word }));
+}
 
 /** Mots du texte de l'offre → exigences « conseillées » (permis, CACES, VCA), quand l'entreprise ne les a pas cochées. */
 export function softRequirements(o: MatchOffer): string[] {
@@ -168,11 +186,12 @@ export function scoreApplication(app: MatchApplication, offer: MatchOffer, profi
       else if (domM > 0) { rows.push({ key: "fit", status: "partial", fr: `Expérience dans le même domaine mais pas le même poste : ${yrs(domM)} sur ${yrs(totalM)} de parcours`, nl: `Ervaring in hetzelfde domein maar niet dezelfde functie: ${yrsNl(domM)} van ${yrsNl(totalM)}` }); check.push({ fr: `seulement ${yrs(domM)} d'expérience proche du poste (sur ${yrs(totalM)} de parcours)`, nl: `slechts ${yrsNl(domM)} ervaring dicht bij de functie (van ${yrsNl(totalM)})` }); }
       else { rows.push({ key: "fit", status: "no", fr: `Aucune expérience liée à ce poste dans son CV (${exps.length} expérience${exps.length > 1 ? "s" : ""}, ${yrs(totalM)} au total)`, nl: `Geen ervaring gerelateerd aan deze functie in zijn cv (${exps.length} ervaring(en), ${yrsNl(totalM)})` }); check.push({ fr: `aucune expérience liée à ce poste dans son CV (${yrs(totalM)} de parcours dans d'autres métiers)`, nl: `geen ervaring gerelateerd aan deze functie (${yrsNl(totalM)} in andere beroepen)` }); }
     } else {
-      fitRatio = roleHit || cvTitle ? 1 : tradeHit ? 0.9 : cvSector ? 0.55 : sectorHit ? 0.6 : haveCareer ? 0.15 : 0.2;
+      const common = profile.cv?.common ?? [];
+      fitRatio = roleHit || cvTitle ? 1 : tradeHit ? 0.9 : common.length >= 5 ? 0.7 : cvSector || common.length >= 3 ? 0.55 : sectorHit ? 0.6 : haveCareer ? 0.15 : 0.2;
       if (cvTitle) { const s = `« ${profile.cv!.titleHits.slice(0, 2).join(", ")} »`; rows.push({ key: "fit", status: "ok", fr: `Son CV mentionne ${s} (intitulé du poste)`, nl: `Zijn cv vermeldt ${s} (functietitel)` }); good.push({ fr: `son CV mentionne ${s}`, nl: `zijn cv vermeldt ${s}` }); }
       else if (roleHit) { rows.push({ key: "fit", status: "ok", fr: "Son CV Wolko contient un poste proche de l'offre", nl: "Zijn Wolko-cv bevat een gelijkaardige functie" }); good.push({ fr: "son CV mentionne un poste proche", nl: "zijn cv vermeldt een gelijkaardige functie" }); }
       else if (tradeHit) { rows.push({ key: "fit", status: "ok", fr: "Il a indiqué rechercher précisément ce métier", nl: "Hij gaf aan precies dit beroep te zoeken" }); good.push({ fr: "recherche précisément ce métier", nl: "zoekt precies dit beroep" }); }
-      else if (cvSector) { rows.push({ key: "fit", status: "partial", fr: `Son CV évoque le domaine (${profile.cv!.sectorHits.slice(0, 3).join(", ")}) mais pas le même poste`, nl: `Zijn cv raakt het domein (${profile.cv!.sectorHits.slice(0, 3).join(", ")}) maar niet dezelfde functie` }); check.push({ fr: "expérience dans le même domaine mais pas dans le même poste", nl: "ervaring in hetzelfde domein maar niet in dezelfde functie" }); }
+      else if (cvSector || common.length >= 3) { const w = (cvSector ? profile.cv!.sectorHits : common).slice(0, 3).join(", "); rows.push({ key: "fit", status: "partial", fr: `Son CV évoque le domaine (${w}) mais pas le même poste`, nl: `Zijn cv raakt het domein (${w}) maar niet dezelfde functie` }); check.push({ fr: "expérience dans le même domaine mais pas dans le même poste", nl: "ervaring in hetzelfde domein maar niet in dezelfde functie" }); }
       else if (sectorHit) { rows.push({ key: "fit", status: "partial", fr: "Il a indiqué chercher dans ce secteur", nl: "Hij gaf aan in deze sector te zoeken" }); good.push({ fr: "cherche dans ce secteur", nl: "zoekt in deze sector" }); }
       else { rows.push({ key: "fit", status: "no", fr: haveCareer ? "Son parcours ne mentionne ni ce poste ni ce domaine" : "Métier/secteur recherché différent de l'offre", nl: haveCareer ? "Zijn parcours vermeldt noch deze functie noch dit domein" : "Gezocht beroep/sector wijkt af van de vacature" }); check.push({ fr: haveCareer ? "parcours sans lien visible avec ce poste" : "métier/secteur recherché différent de l'offre", nl: haveCareer ? "parcours zonder zichtbare link met deze functie" : "gezocht beroep/sector wijkt af" }); }
     }
@@ -186,7 +205,7 @@ export function scoreApplication(app: MatchApplication, offer: MatchOffer, profi
   const total = ev.reduce((s, c) => s + c.w, 0);
   const strongW = ev.filter((c) => c.strong).reduce((s, c) => s + c.w, 0);
   const cvInfo: MatchResult["cv"] = profile.cvStatus && profile.cvStatus !== "none" || exps.length
-    ? { status: profile.cvStatus ?? "ok", exps: exps.slice(0, 6), totalMonths: totalM, sameMonths: sameM, domainMonths: domM } : null;
+    ? { status: profile.cvStatus ?? "ok", exps: exps.slice(0, 6), totalMonths: totalM, sameMonths: sameM, domainMonths: domM, common: profile.cv?.common ?? [] } : null;
   if (total < 30 || strongW < 8) return { grade: null, percent: null, good, check, rows, capped: null, cv: cvInfo };
   let percent = Math.round((ev.reduce((s, c) => s + c.w * c.ratio, 0) / total) * 100);
   let capped: MatchResult["capped"] = null;

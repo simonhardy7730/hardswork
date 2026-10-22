@@ -76,6 +76,8 @@ export default async function PostulerPage(
     }
   }
 
+  const { data: { user: viewer } } = await supabase.auth.getUser();
+
   const screeningIds = sanitizeScreeningIds((job as unknown as { screening_ids?: unknown }).screening_ids);
 
   const sectorLabel = SECTOR_LABELS[job.sector] ?? job.sector;
@@ -267,6 +269,12 @@ export default async function PostulerPage(
 
             {/* The form itself */}
             <div className="bg-white border border-ink-100 rounded-2xl p-6 shadow-sm">
+              {viewer && (
+                <p className="mb-4 rounded-xl bg-surface border border-ink-100 px-3.5 py-2.5 text-xs text-ink-700 leading-relaxed">
+                  {l("Tu es connecté : si tu as déjà enregistré un CV dans ton compte, Wolko l'utilise pour calculer une note indicative (de A à E) visible par l'entreprise. Elle ne voit pas ton fichier : seulement les points qui correspondent à l'offre.",
+                    "Je bent ingelogd: als je al een cv in je account hebt, gebruikt Wolko het om een indicatieve score (A tot E) te berekenen die het bedrijf ziet. Het bedrijf ziet je bestand niet, enkel de punten die bij de vacature passen.")}
+                </p>
+              )}
               {isQuick ? (
                 <QuickApplyForm
                   jobId={job.id}

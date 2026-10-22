@@ -4,7 +4,7 @@ import { scoreApplication, softRequirements, titleWords, type MatchOffer, type M
 import { analyzeCv, cvTextFor } from "./cvtext";
 import { isMiniPath } from "@/lib/candidate/mini-cv";
 
-type AppRow = { id: string; job_offer_id: string; candidate_id: string | null; licenses?: string[] | null; has_caces?: boolean | null; caces_types?: string[] | null; availability_slots?: string[] | null; screening_answers?: Record<string, boolean> | null };
+type AppRow = { id: string; account_user_id?: string | null; job_offer_id: string; candidate_id: string | null; licenses?: string[] | null; has_caces?: boolean | null; caces_types?: string[] | null; availability_slots?: string[] | null; screening_answers?: Record<string, boolean> | null };
 
 /**
  * Calcule la note de chaque candidature (côté serveur, uniquement pour l'organisation qui y a accès).
@@ -14,33 +14,47 @@ type AppRow = { id: string; job_offer_id: string; candidate_id: string | null; l
 export async function matchesFor(apps: AppRow[], offers: Map<string, MatchOffer>): Promise<Map<string, MatchResult>> {
   const out = new Map<string, MatchResult>();
   try {
+    const ok = !!(process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL);
+    const db = ok ? createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } }) : null;
+
+    // Profils liés aux candidatures
     const ids = Array.from(new Set(apps.map((a) => a.candidate_id).filter((x): x is string => !!x)));
-    const profiles = new Map<string, { city: string | null; sectors: string[]; trades: string[]; roles: string[] }>();
-    if (ids.length && process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      const db = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+    type Prof = { auth: string | null; city: string | null; sectors: string[]; trades: string[]; roles: string[] };
+    const profiles = new Map<string, Prof>();
+    if (db && ids.length) {
       const { data } = await db.from("candidates").select("id, auth_user_id, city, sectors, trades, cv_data").in("id", ids);
       for (const c of (data ?? []) as { id: string; auth_user_id: string | null; city: string | null; sectors: string[] | null; trades: string[] | null; cv_data: unknown }[]) {
-        // Secteurs/métiers : fiables seulement si le candidat a un compte (il les choisit lui-même). Pour un profil créé en postulant, ils sont déduits de l'offre elle-même : on les ignore.
-        const own = !!c.auth_user_id;
-        profiles.set(c.id, { city: c.city, sectors: own ? c.sectors ?? [] : [], trades: own ? c.trades ?? [] : [], roles: asCv(c.cv_data).experiences.map((e) => e.role) });
+        profiles.set(c.id, { auth: c.auth_user_id, city: c.city, sectors: c.sectors ?? [], trades: c.trades ?? [], roles: asCv(c.cv_data).experiences.map((e) => e.role) });
       }
     }
-    // CV joint À CETTE candidature (envoyé à la demande de l'entreprise) : seul celui-là est lu, jamais les documents privés du compte.
+
+    // CV joint À CETTE candidature (envoyé à la demande de l'entreprise)
     const cvPath = new Map<string, string>();
-    if (apps.length && process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      const db = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+    if (db && apps.length) {
       const { data } = await db.from("cv_requests").select("application_id, cv_path").in("application_id", apps.map((a) => a.id)).eq("status", "fulfilled").not("cv_path", "is", null);
       for (const r of (data ?? []) as { application_id: string; cv_path: string }[]) if (!isMiniPath(r.cv_path)) cvPath.set(r.application_id, r.cv_path);
     }
+    // CV déjà enregistré dans le compte du candidat : uniquement si la candidature a été envoyée CONNECTÉ à ce compte (lien vérifié par la session, migration 037).
+    const accounts = Array.from(new Set(apps.map((a) => a.account_user_id).filter((x): x is string => !!x)));
+    const accountCv = new Map<string, string>();
+    if (db && accounts.length) {
+      const { data } = await db.from("candidate_documents").select("auth_user_id, file_path, created_at").in("auth_user_id", accounts).ilike("label", "cv%").order("created_at", { ascending: false });
+      for (const d of (data ?? []) as { auth_user_id: string; file_path: string }[]) if (!accountCv.has(d.auth_user_id)) accountCv.set(d.auth_user_id, d.file_path);
+    }
+
     const budget = { left: 4 }; // nouveaux fichiers lus par affichage (le reste suit au prochain chargement)
     for (const a of apps) {
       const offer = offers.get(a.job_offer_id);
       if (!offer) continue;
       const p = a.candidate_id ? profiles.get(a.candidate_id) : undefined;
-      const path = cvPath.get(a.id);
+      // Profil avec compte : ses infos (ville, secteurs, métiers, CV Wolko) ne servent que si la candidature est bien liée à CE compte.
+      const usable = p && (!p.auth || (a.account_user_id && a.account_user_id === p.auth)) ? p : undefined;
+      const path = cvPath.get(a.id) ?? (a.account_user_id ? accountCv.get(a.account_user_id) : undefined);
       const text = path ? await cvTextFor(path, budget) : null;
       const cv = text ? analyzeCv(text, (offer.required_licenses?.length ? offer.required_licenses : softRequirements(offer)) ?? [], titleWords(offer.title), offer.sector) : null;
-      out.set(a.id, scoreApplication(a, offer, { ...(p ? { city: p.city, sectors: p.sectors, trades: p.trades, experienceRoles: p.roles } : {}), cv }));
+      // Secteurs/métiers : pour un profil créé en postulant (sans compte), ils sont déduits de l'offre elle-même : ignorés.
+      const prof = usable ? { city: usable.city, sectors: usable.auth ? usable.sectors : [], trades: usable.auth ? usable.trades : [], experienceRoles: usable.roles } : {};
+      out.set(a.id, scoreApplication(a, offer, { ...prof, cv }));
     }
   } catch (e) { console.error("matchesFor:", (e as Error).message); }
   return out;

@@ -43,6 +43,7 @@ export async function POST(req: Request) {
   const anon = { applicant_name: "Candidat supprimé", applicant_phone: "", applicant_email: null, cover_message: null };
   if (email) await admin.from("applications").update(anon).eq("applicant_email", email);
   if (candidateIds.length) await admin.from("applications").update(anon).in("candidate_id", candidateIds);
+  await admin.from("applications").update({ ...anon, account_user_id: null }).eq("account_user_id", user.id);
 
   // 3. Profil, disponibilités (cascade), puis compte d'authentification
   if (candidateIds.length) await admin.from("candidates").delete().in("id", candidateIds);

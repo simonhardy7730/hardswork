@@ -7,6 +7,7 @@ import { checkCvFile } from "@/lib/candidate/cv-file";
 import { sanitizeMini, miniToCv, MINI_SUFFIX, type MiniDoc } from "@/lib/candidate/mini-cv";
 import { publicOrgName } from "@/lib/confidential";
 import { createClient } from "@supabase/supabase-js";
+import { createClient as createSessionClient } from "@/lib/supabase/server";
 import { resend, FROM_EMAIL, FROM_NAME } from "@/lib/resend";
 import { render } from "@react-email/render";
 import CandidatureConfirmationEmail from "@/emails/CandidatureConfirmation";
@@ -156,6 +157,18 @@ export async function POST(req: NextRequest) {
     }
 
     // Réponses de présélection (migration 025) : enregistrées à part, sans jamais bloquer la candidature.
+    // Lien vérifié avec le compte : seulement si le candidat est connecté (session), jamais d'après l'e-mail saisi.
+    // Sert à noter la candidature avec le CV déjà enregistré dans SON compte (voir lib/matching). Échec toléré (migration 037).
+    if (!insertError && application) {
+      try {
+        const { data: { user: sessionUser } } = await (await createSessionClient()).auth.getUser();
+        if (sessionUser) {
+          const { error: lErr } = await supabaseAdmin.from("applications").update({ account_user_id: sessionUser.id }).eq("id", application.id);
+          if (lErr) console.error("applications.account_user_id manquante : lancer la migration 037", lErr.message);
+        }
+      } catch (e) { console.error("account link:", (e as Error).message); }
+    }
+
     if (!insertError && application && screeningAnswers) {
       const { error: sErr } = await supabaseAdmin.from("applications").update({ screening_answers: screeningAnswers }).eq("id", application.id);
       if (sErr) console.error("applications.screening_answers manquante : lancer la migration 025", sErr.message);

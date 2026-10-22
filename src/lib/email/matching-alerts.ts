@@ -1,5 +1,6 @@
+import { sendBulk } from "@/lib/email/budget";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { resend, FROM_EMAIL, FROM_NAME } from "@/lib/resend";
+import { FROM_EMAIL, FROM_NAME } from "@/lib/resend";
 import { layout, li, esc, orgRecipients } from "@/lib/email/subscription";
 import { getOrgAccess, hasPoolAccess } from "@/lib/billing/access";
 import { poolEnabled } from "@/lib/candidate/pool";
@@ -50,7 +51,7 @@ export async function runMatchingAlerts(db: SupabaseClient, now: Date = new Date
         `<p>Cette semaine, la candidathèque Wolko contient des candidats visibles qui correspondent à vos offres (même métier, dans un rayon de 25 km) :</p>${li(lines)}<p style="font-size:12px;color:#6B6B60">Seuls les candidats ayant accepté d'être visibles des recruteurs apparaissent. Contactez-les uniquement pour une offre concrète.</p>`,
         { label: "Voir les profils", href: `${appUrl}/dashboard/candidatheque` },
       );
-      const r = await resend.emails.send({ from: `${FROM_NAME} <${FROM_EMAIL}>`, to, subject: "Des profils correspondent à vos offres", html });
+      const r = await sendBulk({ from: `${FROM_NAME} <${FROM_EMAIL}>`, to, subject: "Des profils correspondent à vos offres", html });
       if (r.error) out.errors++; else out.orgs++;
     } catch (e) { console.error("matching alert", orgId, e); out.errors++; }
   }

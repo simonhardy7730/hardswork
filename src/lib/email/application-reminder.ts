@@ -1,5 +1,6 @@
+import { sendBulk } from "@/lib/email/budget";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { resend, FROM_EMAIL, FROM_NAME } from "@/lib/resend";
+import { FROM_EMAIL, FROM_NAME } from "@/lib/resend";
 import { layout, orgRecipients } from "@/lib/email/subscription";
 
 /** Relance (1 e-mail par organisation et par passage) pour les candidatures « Nouveau » restées sans réponse depuis 5 jours. */
@@ -36,7 +37,7 @@ export async function runApplicationReminders(db: SupabaseClient): Promise<{ org
         `<p>Des candidats ont postulé il y a plus de 5 jours sans réponse (${[...g.titles].slice(0, 3).map((t) => `<strong>${t.replace(/[<>&]/g, "")}</strong>`).join(", ")}).</p><p>Une réponse rapide, même négative, améliore votre image auprès des candidats : le délai de réponse est affiché sur vos offres.</p>`,
         { label: "Répondre aux candidats", href: `${appUrl}/dashboard/candidatures` },
       );
-      const r = await resend.emails.send({ from: `${FROM_NAME} <${FROM_EMAIL}>`, to, subject: `${n} candidature${n > 1 ? "s" : ""} sans réponse depuis 5 jours`, html });
+      const r = await sendBulk({ from: `${FROM_NAME} <${FROM_EMAIL}>`, to, subject: `${n} candidature${n > 1 ? "s" : ""} sans réponse depuis 5 jours`, html });
       if (r.error) { out.errors++; continue; }
       await db.from("applications").update({ reminder_sent_at: new Date().toISOString() }).in("id", g.ids);
       out.orgs++; out.apps += n;

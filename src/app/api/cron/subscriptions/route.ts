@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { runApplicationReminders } from "@/lib/email/application-reminder";
 import { runMatchingAlerts } from "@/lib/email/matching-alerts";
+import { resetEmailBudget } from "@/lib/email/budget";
 import { runJobAlerts } from "@/lib/email/job-alerts";
 import { runCvReminders, runApplicantCvReminders } from "@/lib/email/cv-reminder";
 import { runIndexingSync } from "@/lib/google/indexing";
@@ -16,6 +17,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   try {
+    resetEmailBudget();
     const db = adminClient();
     const stats = await runSubscriptionLifecycle(db);
     const flash = await runFlashLifecycle(db).catch((e) => { console.error('flash lifecycle', e); return { errors: 1 }; });

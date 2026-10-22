@@ -1,5 +1,6 @@
+import { sendBulk } from "@/lib/email/budget";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { resend, FROM_EMAIL, FROM_NAME } from "@/lib/resend";
+import { FROM_EMAIL, FROM_NAME } from "@/lib/resend";
 import { layout } from "@/lib/email/subscription";
 import { asCv } from "@/lib/candidate/cv";
 import { cvFilled } from "@/lib/candidate/pool-cv";
@@ -39,7 +40,7 @@ export async function runCvReminders(db: SupabaseClient): Promise<{ sent: number
 <ul><li>📸 <strong>prends ton CV papier en photo</strong>,</li><li>📄 ou ajoute ton fichier PDF / Word,</li><li>✍️ ou crée ton CV gratuitement sur Wolko (pas besoin d'en avoir un).</li></ul>`,
         { label: "Ajouter mon CV", href: `${appUrl}/candidat/dashboard` },
       );
-      const r = await resend.emails.send({ from: `${FROM_NAME} <${FROM_EMAIL}>`, to: [c.email as string], subject: "Il manque ton CV sur Wolko (1 minute)", html });
+      const r = await sendBulk({ from: `${FROM_NAME} <${FROM_EMAIL}>`, to: [c.email as string], subject: "Il manque ton CV sur Wolko (1 minute)", html });
       if (r.error) { out.errors++; continue; }
       out.sent++;
     } catch (e) { console.error("cv reminder", c.id, e); out.errors++; }
@@ -108,7 +109,7 @@ export async function runApplicantCvReminders(db: SupabaseClient, opts: { backlo
 <p>Pas besoin d'ordinateur : clique sur le bouton et <strong>prends ton CV papier en photo</strong> (ou envoie ton PDF / Word). Ça prend 1 minute, sans créer de compte.</p>`,
         { label: "📄 Ajouter mon CV", href: cvLink(last.id as string) },
       );
-      const r = await resend.emails.send({ from: `${FROM_NAME} <${FROM_EMAIL}>`, to: [email], subject: "📄 Il manque ton CV pour ta candidature", html });
+      const r = await sendBulk({ from: `${FROM_NAME} <${FROM_EMAIL}>`, to: [email], subject: "📄 Il manque ton CV pour ta candidature", html });
       if (r.error) { out.errors++; continue; }
       out.sent++;
       const rows = list.map((a) => {

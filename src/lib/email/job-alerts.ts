@@ -1,5 +1,6 @@
+import { sendBulk } from "@/lib/email/budget";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { resend, FROM_EMAIL, FROM_NAME } from "@/lib/resend";
+import { FROM_EMAIL, FROM_NAME } from "@/lib/resend";
 import { layout, li, esc } from "@/lib/email/subscription";
 import { suggestOffers, canPersonalize, type OfferForMatch } from "@/lib/candidate/suggestions";
 
@@ -40,7 +41,7 @@ export async function runJobAlerts(db: SupabaseClient, now: Date = new Date()): 
         `<p>Voici les nouvelles offres de la semaine qui correspondent à ton profil :</p>${li(lines)}<p style="font-size:12px;color:#6B6B60">Tu reçois cet e-mail parce que tu as activé les alertes emploi dans ton espace Wolko. <a href="${unsub}" style="color:#6B6B60">Me désinscrire</a></p>`,
         { label: "Voir les offres", href: `${appUrl}/jobs` },
       );
-      const r = await resend.emails.send({
+      const r = await sendBulk({
         from: `${FROM_NAME} <${FROM_EMAIL}>`, to: a.email as string, subject: "Nouvelles offres pour toi", html,
         headers: { "List-Unsubscribe": `<${unsub}>` },
       });

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpen } from "lucide-react";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { createClient } from "@/lib/supabase/server";
 import AlertPromo from "@/components/ressources/AlertPromo";
 import { GUIDES } from "@/lib/ressources/guides";
 
@@ -12,7 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://wolko.be/ressources" },
 };
 
-export default function RessourcesPage() {
+export default async function RessourcesPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
   return (
     <div className="min-h-screen bg-[#FFFBF2] font-body">
       <SiteNav />
@@ -46,7 +49,7 @@ export default function RessourcesPage() {
               </div>
             </Link>
           ))}
-          <AlertPromo className="mt-6" />
+          <AlertPromo loggedIn={!!user} className="mt-6" />
           <p className="text-xs text-[#101F43]/55 pt-4">Information générale, pas un conseil juridique. Simulateur de salaire net : bientôt.</p>
         </div>
       </main>

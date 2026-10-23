@@ -27,10 +27,12 @@ export default function CvSheet({ base, cv }: { base: CvBase; cv: CvData }) {
   return (
     <div id="cv-sheet" className="bg-white border border-ink-100 rounded-xl shadow-sm overflow-hidden text-[#101F43]" style={{ fontFamily: "Inter, Arial, sans-serif" }}>
       <div style={{ background: "#101F43", color: "#fff", padding: "42px 32px 28px", position: "relative" }}>
-        <div style={{ position: "absolute", top: 14, right: 16, display: "flex", alignItems: "center", gap: 6, background: "#FFB900", color: "#101F43", borderRadius: 999, padding: "4px 10px", fontSize: 10, fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+        <div style={{ position: "absolute", top: 14, right: 16, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+          <div style={{ background: "#FFB900", color: "#101F43", borderRadius: 999, padding: "4px 10px", fontSize: 10, fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            {l("CV créé avec Wolko", "Cv gemaakt met Wolko")}
+          </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icon.svg" alt="" width={14} height={14} style={{ borderRadius: 3 }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
-          {l("CV créé avec Wolko", "Cv gemaakt met Wolko")}
+          <img src="/images/email/wolf-head.png" alt="Wolko" width={84} height={80} style={{ display: "block", width: 84, height: "auto" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
         </div>
         <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-0.01em" }}>{base.name || l("Ton nom", "Je naam")}</div>
         {headline && <div style={{ color: "#FFB900", fontWeight: 800, fontSize: 15, marginTop: 4, textTransform: "uppercase", letterSpacing: "0.04em" }}>{headline}</div>}

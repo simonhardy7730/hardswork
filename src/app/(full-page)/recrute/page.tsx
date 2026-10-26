@@ -203,25 +203,6 @@ export default function RecrutePage() {
           </div>
         </div>
 
-        {/* ── VIDÉO ────────────────────────────────────────── */}
-        <div className="bg-[#101F43] py-16 px-6">
-          <div className="max-w-3xl mx-auto text-center">
-            <p className="text-[11px] font-black text-[#FFB900] uppercase tracking-widest mb-3">{l("Wolko en 20 secondes", "Wolko in 20 seconden")}</p>
-            <div className="rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-black">
-              <video
-                controls
-                playsInline
-                preload="metadata"
-                poster="/videos/wolko-recruteur-poster.jpg"
-                className="w-full h-auto block"
-                aria-label={l("Vidéo de présentation de Wolko pour les recruteurs", "Presentatievideo van Wolko voor recruiters")}
-              >
-                <source src="/videos/wolko-recruteur.mp4" type="video/mp4" />
-              </video>
-            </div>
-          </div>
-        </div>
-
         {/* ── COMMENT ÇA MARCHE ────────────────────────────── */}
         <div className="bg-[#FFFBF2] py-20 px-6">
           <div className="max-w-5xl mx-auto">

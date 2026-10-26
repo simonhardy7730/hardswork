@@ -36,7 +36,7 @@ async function callGraph(job: ShareJob): Promise<{ id?: string; error?: string }
 /** Publie UNE offre (une seule fois : la ligne social_posts sert de verrou). */
 export async function publishJobToFacebook(db: SupabaseClient, jobId: string): Promise<{ ok: boolean; error?: string; already?: boolean }> {
   if (!facebookConfigured()) return { ok: false, error: "Facebook n'est pas encore configuré (ID de page / token manquants)." };
-  const { data: job } = await db.from("jobs").select("id, title, city, contract_type, hide_company, status, organizations(name)").eq("id", jobId).maybeSingle();
+  const { data: job } = await db.from("job_offers").select("id, title, city, contract_type, hide_company, status, organizations(name)").eq("id", jobId).maybeSingle();
   if (!job || job.status !== "active") return { ok: false, error: "Offre introuvable ou inactive." };
 
   const { data: prev } = await db.from("social_posts").select("status, attempts").eq("job_id", jobId).maybeSingle();
@@ -58,7 +58,7 @@ export async function runFacebookAutopost(db: SupabaseClient): Promise<{ posted:
 
   const cap = Math.max(0, Number(process.env.FACEBOOK_DAILY_CAP ?? 3));
   const since = new Date(Date.now() - 7 * 86400_000).toISOString();
-  let q = db.from("jobs").select("id, organization_id").eq("status", "active").gte("created_at", since).order("created_at", { ascending: true }).limit(60);
+  let q = db.from("job_offers").select("id, organization_id").eq("status", "active").gte("created_at", since).order("created_at", { ascending: true }).limit(60);
   if (!all) q = q.in("organization_id", orgIds);
   const { data: jobs } = await q;
   if (!jobs?.length) return { posted: 0, failed: 0 };

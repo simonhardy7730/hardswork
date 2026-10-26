@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function PartagePage() {
   const db = adminClient();
   const { data } = await db
-    .from("jobs")
+    .from("job_offers")
     .select("id, title, city, contract_type, hide_company, organizations(name)")
     .eq("status", "active")
     .order("created_at", { ascending: false })

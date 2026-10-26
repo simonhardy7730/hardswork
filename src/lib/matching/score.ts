@@ -3,6 +3,7 @@
 // clairement au recruteur ; (3) un A exige que le parcours colle au poste, pas seulement « habite près + répond oui ».
 import { findCity, distanceKm, normalizePlace } from "@/lib/geo/distance";
 import { questionsFor } from "@/lib/screening";
+import { familiesIn, familiesForTrades, relationBetween } from "./families";
 
 export type Grade = "A" | "B" | "C" | "D" | "E";
 export interface MatchOffer {
@@ -15,7 +16,7 @@ export interface MatchApplication {
   licenses?: string[] | null; has_caces?: boolean | null; caces_types?: string[] | null;
   availability_slots?: string[] | null; screening_answers?: Record<string, boolean> | null;
 }
-export interface CvExp { role: string; from: string; to: string; months: number; rel: "same" | "domain" | "other" }
+export interface CvExp { role: string; from: string; to: string; months: number; rel: "same" | "domain" | "other"; start?: number; end?: number }
 export interface CvFindings { licenses: string[]; titleHits: string[]; sectorHits: string[]; years: number | null; exps?: CvExp[]; common?: string[] }
 /** Infos du profil candidat. `sectors`/`trades` ne doivent venir que d'un profil rempli PAR le candidat (jamais déduits de l'offre). */
 export interface MatchProfile {
@@ -70,7 +71,39 @@ export function softRequirements(o: MatchOffer): string[] {
   return Array.from(new Set(out)).slice(0, 4);
 }
 
-export function scoreApplication(app: MatchApplication, offer: MatchOffer, profile: MatchProfile = {}): MatchResult {
+/** Catégories de CACES précisées dans l'annonce (« CACES 3 », « CACES R489 cat. 3 ») ; [] si l'annonce dit seulement « CACES ». */
+export function cacesWanted(o: MatchOffer): string[] {
+  const t = normalizePlace(`${o.title} ${o.description ?? ""} ${o.requirements ?? ""}`);
+  if (!/\bcaces\b/.test(t)) return [];
+  const out = new Set<string>();
+  for (const m of t.matchAll(/\bcaces (?:r ?\d{3} )?(?:cat(?:egorie)? )?(\d)\b/g)) out.add(m[1]);
+  return [...out];
+}
+/** Le candidat a coché des catégories de CACES, mais aucune de celles que l'annonce précise : à signaler (« R489 » seul = catégorie inconnue, on ne tranche pas). */
+export function cacesMismatch(o: MatchOffer, a: MatchApplication): { wanted: string[]; has: string[] } | null {
+  const wanted = cacesWanted(o);
+  const types = (a.caces_types ?? []).filter(Boolean);
+  if (!wanted.length || !types.length) return null;
+  const digits = types.flatMap((x) => x.match(/\b\d\b/g) ?? []);
+  const hasGeneric = types.some((x) => !/\b\d\b/.test(x));
+  if (hasGeneric || digits.some((d) => wanted.includes(d))) return null;
+  return { wanted, has: types };
+}
+
+/** Mois d'expérience SANS compter deux fois les périodes qui se chevauchent (deux emplois en parallèle, CV mal daté). */
+export function unionMonths(exps: CvExp[]): number {
+  const dated = exps.filter((e) => e.start != null && e.end != null).map((e) => [e.start!, e.end!] as [number, number]).sort((a, b) => a[0] - b[0]);
+  let total = exps.filter((e) => e.start == null || e.end == null).reduce((x, e) => x + e.months, 0);
+  let cs = 0, ce = -1, open = false;
+  for (const [st, en] of dated) {
+    if (!open) { cs = st; ce = en; open = true; }
+    else if (st <= ce + 1) ce = Math.max(ce, en);
+    else { total += ce - cs + 1; cs = st; ce = en; }
+  }
+  return open ? total + ce - cs + 1 : total;
+}
+
+export function scoreApplication(app: MatchApplication, offer: MatchOffer, profile: MatchProfile = {}, now: Date = new Date()): MatchResult {
   const rows: Row[] = [];
   const good: MatchResult["good"] = [], check: MatchResult["check"] = [];
   const ev: { w: number; ratio: number; strong: boolean }[] = [];
@@ -87,6 +120,8 @@ export function scoreApplication(app: MatchApplication, offer: MatchOffer, profi
     const w = hard.length ? 25 : 8; applicable += w;
     const own = new Set([...(app.licenses ?? []), ...(app.has_caces ? ["CACES"] : [])].map((x) => x.toUpperCase()));
     const have = new Set([...own, ...fromCv]);
+    const cm = req.some((r) => r.toUpperCase() === "CACES") && !fromCv.has("CACES") ? cacesMismatch(offer, app) : null;
+    if (cm) have.delete("CACES"); // il a un CACES, mais pas de la catégorie demandée
     const ok = req.filter((r) => have.has(r.toUpperCase()));
     const readable = !!profile.cv;
     const unverifiable = req.filter((r) => !have.has(r.toUpperCase()) && r.toUpperCase() === "VCA" && !readable); // VCA : n'existe que dans un CV
@@ -103,8 +138,9 @@ export function scoreApplication(app: MatchApplication, offer: MatchOffer, profi
         good.push({ fr: `a les permis/qualifications ${word.fr} (${req.join(", ")})${onlyCv.length ? ` — ${onlyCv.join(", ")} lu dans son CV` : ""}`, nl: `heeft de ${word.nl} rijbewijzen/kwalificaties (${req.join(", ")})` });
       } else {
         const miss = req.filter((r) => !have.has(r.toUpperCase()));
-        rows.push({ key: "licenses", status: ratio === 0 ? "no" : "partial", fr: `Permis/qualifications ${word.fr} : manquant(s) ${miss.join(", ")}`, nl: `Rijbewijzen/kwalificaties ${word.nl}: ontbreekt ${miss.join(", ")}` });
-        check.push({ fr: `permis/qualifications manquants : ${miss.join(", ")}`, nl: `ontbrekende rijbewijzen/kwalificaties: ${miss.join(", ")}` });
+        const missTxt = miss.map((r) => (cm && r.toUpperCase() === "CACES" ? `CACES cat. ${cm.wanted.join(" ou ")} (il indique ${cm.has.join(", ")})` : r)).join(", ");
+        rows.push({ key: "licenses", status: ratio === 0 ? "no" : "partial", fr: `Permis/qualifications ${word.fr} : manquant(s) ${missTxt}`, nl: `Rijbewijzen/kwalificaties ${word.nl}: ontbreekt ${missTxt}` });
+        check.push({ fr: `permis/qualifications manquants : ${missTxt}`, nl: `ontbrekende rijbewijzen/kwalificaties: ${missTxt}` });
         if (ratio === 0 && hard.length) missingRequired = true;
       }
     }
@@ -165,14 +201,19 @@ export function scoreApplication(app: MatchApplication, offer: MatchOffer, profi
 
   // 5. Parcours / métier : CV lu, CV Wolko, ou profil rempli par le candidat lui-même
   const t = words(offer.title);
-  const roleHit = (profile.experienceRoles ?? []).some((r) => words(r).some((w) => t.includes(w)));
+  const offerFams = familiesIn(offer.title);
+  const roleHit = (profile.experienceRoles ?? []).some((r) => words(r).some((w) => t.includes(w)) || relationBetween(offerFams, familiesIn(r)) === "same");
   const cvTitle = (profile.cv?.titleHits.length ?? 0) > 0;
   const cvSector = (profile.cv?.sectorHits.length ?? 0) > 0;
   const exps = profile.cv?.exps ?? [];
-  const sameM = exps.filter((e) => e.rel === "same").reduce((x, e) => x + e.months, 0);
-  const domM = exps.filter((e) => e.rel === "domain").reduce((x, e) => x + e.months, 0);
-  const totalM = exps.reduce((x, e) => x + e.months, 0);
-  const tradeHit = (profile.trades ?? []).some((k) => t.some((w) => normalizePlace(k.replace(/_/g, " ")).includes(w)));
+  const sameM = unionMonths(exps.filter((e) => e.rel === "same"));
+  const domM = unionMonths(exps.filter((e) => e.rel === "domain"));
+  const totalM = unionMonths(exps);
+  const nowIdx = now.getFullYear() * 12 + now.getMonth();
+  const lastSameEnd = Math.max(-1, ...exps.filter((e) => e.rel === "same" && e.end != null).map((e) => e.end!));
+  const staleY = sameM > 0 && lastSameEnd >= 0 ? Math.floor((nowIdx - lastSameEnd) / 12) : 0; // années écoulées depuis la dernière expérience dans ce poste
+  const tradeHit = (profile.trades ?? []).some((k) => t.some((w) => normalizePlace(k.replace(/_/g, " ")).includes(w)))
+    || (offerFams.length > 0 && familiesForTrades(profile.trades ?? []).some((f) => offerFams.includes(f)));
   const sectorHit = !!offer.sector && (profile.sectors ?? []).includes(offer.sector);
   const haveCareer = !!profile.cv || (profile.experienceRoles ?? []).length > 0;
   const yrs = (m: number) => (m >= 12 ? `${Math.round((m / 12) * 10) / 10} an${m >= 18 ? "s" : ""}` : `${m} mois`);
@@ -182,7 +223,11 @@ export function scoreApplication(app: MatchApplication, offer: MatchOffer, profi
     if (exps.length) {
       // Le CV a été lu et ses dates repérées : on juge sur la DURÉE d'expérience réellement liée au poste.
       fitRatio = sameM >= 12 ? 1 : sameM > 0 ? 0.85 : domM >= 12 ? 0.6 : domM > 0 ? 0.35 : 0.12;
-      if (sameM > 0) { rows.push({ key: "fit", status: "ok", fr: `Expérience dans ce poste d'après son CV : ${yrs(sameM)}`, nl: `Ervaring in deze functie volgens zijn cv: ${yrsNl(sameM)}` }); good.push({ fr: `a ${yrs(sameM)} d'expérience dans ce poste (CV)`, nl: `heeft ${yrsNl(sameM)} ervaring in deze functie (cv)` }); }
+      if (sameM > 0 && staleY >= 5) {
+        fitRatio = Math.min(fitRatio, sameM >= 12 ? 0.8 : 0.6); // expérience ancienne : à confirmer, pas un A
+        rows.push({ key: "fit", status: "partial", fr: `Expérience dans ce poste d'après son CV : ${yrs(sameM)}, mais la dernière date d'il y a ${staleY} ans`, nl: `Ervaring in deze functie volgens zijn cv: ${yrsNl(sameM)}, maar de laatste is ${staleY} jaar geleden` });
+        check.push({ fr: `${yrs(sameM)} d'expérience dans ce poste, mais terminée il y a ${staleY} ans`, nl: `${yrsNl(sameM)} ervaring in deze functie, maar ${staleY} jaar geleden beëindigd` });
+      } else if (sameM > 0) { rows.push({ key: "fit", status: "ok", fr: `Expérience dans ce poste d'après son CV : ${yrs(sameM)}`, nl: `Ervaring in deze functie volgens zijn cv: ${yrsNl(sameM)}` }); good.push({ fr: `a ${yrs(sameM)} d'expérience dans ce poste (CV)`, nl: `heeft ${yrsNl(sameM)} ervaring in deze functie (cv)` }); }
       else if (domM > 0) { rows.push({ key: "fit", status: "partial", fr: `Expérience dans le même domaine mais pas le même poste : ${yrs(domM)} sur ${yrs(totalM)} de parcours`, nl: `Ervaring in hetzelfde domein maar niet dezelfde functie: ${yrsNl(domM)} van ${yrsNl(totalM)}` }); check.push({ fr: `seulement ${yrs(domM)} d'expérience proche du poste (sur ${yrs(totalM)} de parcours)`, nl: `slechts ${yrsNl(domM)} ervaring dicht bij de functie (van ${yrsNl(totalM)})` }); }
       else { rows.push({ key: "fit", status: "no", fr: `Aucune expérience liée à ce poste dans son CV (${exps.length} expérience${exps.length > 1 ? "s" : ""}, ${yrs(totalM)} au total)`, nl: `Geen ervaring gerelateerd aan deze functie in zijn cv (${exps.length} ervaring(en), ${yrsNl(totalM)})` }); check.push({ fr: `aucune expérience liée à ce poste dans son CV (${yrs(totalM)} de parcours dans d'autres métiers)`, nl: `geen ervaring gerelateerd aan deze functie (${yrsNl(totalM)} in andere beroepen)` }); }
     } else {

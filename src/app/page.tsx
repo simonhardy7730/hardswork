@@ -167,7 +167,7 @@ export default async function HomePage() {
                 <span className="text-[10px] font-bold opacity-60 tracking-widest">· {v.tag}</span>
               </div>
               <div className="rounded-b-2xl rounded-tr-2xl overflow-hidden shadow-2xl border border-white/10 bg-black">
-                <video autoPlay muted loop playsInline controls preload="metadata" poster={v.poster} className="w-full h-auto block" aria-label={v.alt}>
+                <video playsInline controls preload="none" poster={v.poster} className="w-full h-auto block" aria-label={v.alt}>
                   <source src={v.src} type="video/mp4" />
                 </video>
               </div>

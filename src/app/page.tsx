@@ -12,7 +12,6 @@ import { SearchModule } from "@/components/home/SearchModule";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
-import { WolfBadge } from "@/components/ui/WolfMascot";
 import { getDict, getL } from "@/lib/i18n/server";
 import { formatSalary } from "@/lib/salary";
 import { SECTOR_PHOTOS } from "@/lib/sector-photos";
@@ -135,42 +134,37 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Mosaïque multi-métiers + mascotte */}
-          <div className="relative pb-6 lg:pb-4">
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              {MOSAIC(t.mosaic).map((m, i) => (
-                <div key={m.label}
-                  className={`relative overflow-hidden rounded-xl sm:rounded-2xl h-28 sm:h-44 lg:h-52 ${i % 3 === 1 ? "lg:translate-y-6" : ""}`}>
-                  <div aria-hidden className="absolute inset-0 w-full h-full bg-cover"
-                    style={{ backgroundImage: `url(${m.local}), url(${m.src})`, backgroundPosition: m.pos }} />
-                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0B1630]/80 to-transparent" />
-                  <span className="absolute left-2 bottom-2 text-[10px] sm:text-xs font-bold text-white uppercase tracking-wide">{m.label}</span>
+          {/* Vidéos de présentation : à la place de la mosaïque, lancées par le visiteur */}
+          <div className="relative grid gap-4 sm:gap-5" aria-label="Vidéos de présentation">
+            {[
+              { label: "Je cherche un emploi", tag: "Candidats", src: "/videos/wolko-candidat.mp4", poster: "/videos/wolko-candidat-poster.jpg", alt: "Vidéo de présentation de Wolko pour les candidats", accent: true },
+              { label: "Je recrute", tag: "Entreprises", src: "/videos/wolko-recruteur.mp4", poster: "/videos/wolko-recruteur-poster.jpg", alt: "Vidéo de présentation de Wolko pour les recruteurs", accent: false },
+            ].map((v) => (
+              <div key={v.src}>
+                <div className={`inline-flex items-center gap-2 rounded-t-xl px-4 py-2 font-display font-black uppercase tracking-wide text-sm ${v.accent ? "bg-[#FFB900] text-[#101F43]" : "bg-[#FFFBF2] text-[#101F43]"}`}>
+                  {v.label}
+                  <span className="text-[10px] font-bold opacity-60 tracking-widest">· {v.tag}</span>
                 </div>
-              ))}
-            </div>
-            {/* Mascotte : discrète, en appui sur la mosaïque */}
-            <WolfBadge className="absolute -bottom-2 -left-2 sm:-left-4 w-24 sm:w-32 lg:w-36 z-10" />
+                <div className="rounded-b-2xl rounded-tr-2xl overflow-hidden shadow-2xl border border-white/10 bg-black">
+                  <video playsInline controls preload="none" poster={v.poster} className="w-full h-auto block" aria-label={v.alt}>
+                    <source src={v.src} type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── VIDÉOS : deux publics, côte à côte ────────── */}
-      <section className="bg-[#101F43] pb-14 sm:pb-16 -mt-2" aria-label="Vidéos de présentation">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-6 sm:gap-8">
-          {[
-            { label: "Je cherche un emploi", tag: "Candidats", src: "/videos/wolko-candidat.mp4", poster: "/videos/wolko-candidat-poster.jpg", alt: "Vidéo de présentation de Wolko pour les candidats", accent: true },
-            { label: "Je recrute", tag: "Entreprises", src: "/videos/wolko-recruteur.mp4", poster: "/videos/wolko-recruteur-poster.jpg", alt: "Vidéo de présentation de Wolko pour les recruteurs", accent: false },
-          ].map((v) => (
-            <div key={v.src}>
-              <div className={`inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 font-display font-black uppercase tracking-wide text-sm sm:text-base ${v.accent ? "bg-[#FFB900] text-[#101F43]" : "bg-[#FFFBF2] text-[#101F43]"}`}>
-                {v.label}
-                <span className="text-[10px] font-bold opacity-60 tracking-widest">· {v.tag}</span>
-              </div>
-              <div className="rounded-b-2xl rounded-tr-2xl overflow-hidden shadow-2xl border border-white/10 bg-black">
-                <video playsInline controls preload="none" poster={v.poster} className="w-full h-auto block" aria-label={v.alt}>
-                  <source src={v.src} type="video/mp4" />
-                </video>
-              </div>
+      {/* ── MÉTIERS : mosaïque de photos ──────────────── */}
+      <section className="bg-[#101F43] pb-14 sm:pb-16" aria-label="Métiers">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+          {MOSAIC(t.mosaic).map((m) => (
+            <div key={m.label} className="relative overflow-hidden rounded-xl sm:rounded-2xl h-28 sm:h-40">
+              <div aria-hidden className="absolute inset-0 w-full h-full bg-cover"
+                style={{ backgroundImage: `url(${m.local}), url(${m.src})`, backgroundPosition: m.pos }} />
+              <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0B1630]/80 to-transparent" />
+              <span className="absolute left-2 bottom-2 text-[10px] sm:text-xs font-bold text-white uppercase tracking-wide">{m.label}</span>
             </div>
           ))}
         </div>

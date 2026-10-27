@@ -96,3 +96,11 @@ export async function runFacebookAutopost(db: SupabaseClient): Promise<{ posted:
   }
   return { posted, failed };
 }
+
+/** Cette organisation a-t-elle droit à la publication automatique ? (même règle que le cron) */
+export function autopostAllowed(orgId: string | null | undefined): boolean {
+  if (process.env.FACEBOOK_AUTOPOST !== "1" || !facebookConfigured()) return false;
+  if (process.env.FACEBOOK_AUTOPOST_SCOPE === "all") return true;
+  const ids = (process.env.FACEBOOK_AUTOPOST_ORG_IDS ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+  return !!orgId && ids.includes(orgId);
+}

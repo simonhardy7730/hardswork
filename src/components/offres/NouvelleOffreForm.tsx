@@ -1,5 +1,6 @@
 "use client";
 
+import { autopostNewJob } from "@/app/actions/autopost";
 import { LANGUAGES } from "@/lib/languages";
 import { regionForCity } from "@/lib/geo/distance";
 import { useState } from "react";
@@ -248,6 +249,11 @@ export default function NouvelleOffreForm({
         ? l("Erreur lors de l'enregistrement. Réessayez.", "Fout bij het opslaan. Probeer opnieuw.")
         : l("Erreur lors de la création. Réessayez.", "Fout bij het aanmaken. Probeer opnieuw."));
       return;
+    }
+
+    // Nouvelle offre publiée : partage immédiat sur la page Facebook Wolko (si activé côté serveur). Jamais bloquant.
+    if (!offer && status === "active") {
+      await Promise.race([autopostNewJob(data.id).catch(() => null), new Promise((r) => setTimeout(r, 5000))]);
     }
 
     router.push(offer ? "/dashboard/offres" : `/dashboard/offres/${data.id}/confirmation`);

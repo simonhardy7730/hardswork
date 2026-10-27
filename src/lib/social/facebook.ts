@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { facebookPostParts, type ShareJob } from "@/lib/social/post-text";
+import { sendShareNotify } from "@/lib/email/share-notify";
 
 /**
  * Publication des offres sur la page Facebook Wolko (API Graph de Meta, gratuite).
@@ -9,6 +10,7 @@ import { facebookPostParts, type ShareJob } from "@/lib/social/post-text";
  *   FACEBOOK_AUTOPOST_ORG_IDS              → organisations dont les offres partent seules (ids séparés par des virgules).
  *   FACEBOOK_AUTOPOST_SCOPE=all            → (optionnel) ouvre l'automatique à toutes les organisations.
  *   FACEBOOK_DAILY_CAP                     → plafond de posts par passage du cron (3 par défaut).
+ *   FACEBOOK_NOTIFY_EMAIL                  → (optionnel) adresses prévenues à chaque offre publiée, avec le texte pour les groupes.
  * Le bouton « Publier sur la page » de /admin/partage fonctionne dès que l'ID et le token sont présents.
  *
  * Alternative SANS compte développeur Meta (gratuite) : FACEBOOK_WEBHOOK_URL = l'adresse d'un webhook Make (ou Zapier)
@@ -60,7 +62,9 @@ export async function publishJobToFacebook(db: SupabaseClient, jobId: string): P
   const { data: prev } = await db.from("social_posts").select("status, attempts").eq("job_id", jobId).maybeSingle();
   if (prev?.status === "posted") return { ok: true, already: true };
 
-  const r = await callGraph(toShare(job as unknown as Row));
+  const shared = toShare(job as unknown as Row);
+  const r = await callGraph(shared);
+  if (r.id) await sendShareNotify(shared); // e-mail « offre partie sur Facebook » avec le texte pour les groupes (si FACEBOOK_NOTIFY_EMAIL)
   const attempts = (prev?.attempts ?? 0) + 1;
   await db.from("social_posts").upsert({ job_id: jobId, status: r.id ? "posted" : "failed", fb_post_id: r.id ?? null, attempts, last_error: r.error ?? null, posted_at: new Date().toISOString() });
   return r.id ? { ok: true } : { ok: false, error: r.error };

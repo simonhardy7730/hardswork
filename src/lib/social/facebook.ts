@@ -10,10 +10,19 @@ import { facebookPostParts, type ShareJob } from "@/lib/social/post-text";
  *   FACEBOOK_AUTOPOST_SCOPE=all            → (optionnel) ouvre l'automatique à toutes les organisations.
  *   FACEBOOK_DAILY_CAP                     → plafond de posts par passage du cron (3 par défaut).
  * Le bouton « Publier sur la page » de /admin/partage fonctionne dès que l'ID et le token sont présents.
+ *
+ * Alternative SANS compte développeur Meta (gratuite) : FACEBOOK_WEBHOOK_URL = l'adresse d'un webhook Make (ou Zapier)
+ * dont le scénario publie sur la page. Wolko lui envoie {message, link, job_id} ; si cette variable est présente,
+ * c'est elle qui est utilisée à la place de l'API Graph (l'ID de page et le token ne sont alors pas nécessaires).
  */
 const GRAPH = `https://graph.facebook.com/${process.env.FACEBOOK_GRAPH_VERSION ?? "v25.0"}`;
 
-export const facebookConfigured = () => !!(process.env.FACEBOOK_PAGE_ID && process.env.FACEBOOK_PAGE_TOKEN);
+const webhookUrl = () => {
+  const u = (process.env.FACEBOOK_WEBHOOK_URL ?? "").trim();
+  return /^https:\/\//.test(u) ? u : null; // seulement du https
+};
+
+export const facebookConfigured = () => !!webhookUrl() || !!(process.env.FACEBOOK_PAGE_ID && process.env.FACEBOOK_PAGE_TOKEN);
 
 type Row = { id: string; title: string; city: string | null; contract_type: string | null; hide_company: boolean | null; organization_id?: string | null; organizations?: unknown };
 
@@ -22,6 +31,15 @@ const toShare = (r: Row): ShareJob => ({ id: r.id, title: r.title, city: r.city,
 
 async function callGraph(job: ShareJob): Promise<{ id?: string; error?: string }> {
   const { message, link } = facebookPostParts(job);
+  const hook = webhookUrl();
+  if (hook) {
+    try {
+      const res = await fetch(hook, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message, link, job_id: job.id }), signal: AbortSignal.timeout(15000) });
+      return res.ok ? { id: `webhook:${job.id}` } : { error: `webhook_http_${res.status}` };
+    } catch (e) {
+      return { error: e instanceof Error ? e.message.slice(0, 300) : "network_error" };
+    }
+  }
   const body = new URLSearchParams({ message, link, access_token: process.env.FACEBOOK_PAGE_TOKEN! });
   try {
     const res = await fetch(`${GRAPH}/${process.env.FACEBOOK_PAGE_ID}/feed`, { method: "POST", body, signal: AbortSignal.timeout(15000) });

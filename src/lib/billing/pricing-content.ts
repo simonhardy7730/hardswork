@@ -41,6 +41,7 @@ export const CONTENT = {
       description: b("Pour les PME qui recrutent en direct", "Voor kmo's die rechtstreeks werven"),
       features: [
         b("Publication d'offres d'emploi illimitées", "Onbeperkt vacatures publiceren"),
+        b("Offre partagée automatiquement sur la page Facebook Wolko, puis relayée dans des groupes d'emploi de la région", "Vacature automatisch gedeeld op de Facebookpagina van Wolko en doorgestuurd naar regionale jobgroepen"),
         b("Gestion des candidatures", "Beheer van sollicitaties"),
         b("Accès à la candidathèque", "Toegang tot de kandidatendatabank"),
         b("Coordonnées des candidats débloquées", "Contactgegevens van kandidaten ontgrendeld"),
@@ -60,6 +61,7 @@ export const CONTENT = {
         b("Accès à la candidathèque (recherche par métier)", "Toegang tot de kandidatendatabank (zoeken op beroep)"),
         b("ATS de recrutement (suivi des candidatures)", "ATS voor werving (opvolging van sollicitaties)"),
         b("Suivi des missions de recrutement", "Opvolging van wervingsopdrachten"),
+        b("Offre partagée automatiquement sur la page Facebook Wolko, puis relayée dans des groupes d'emploi de la région", "Vacature automatisch gedeeld op de Facebookpagina van Wolko en doorgestuurd naar regionale jobgroepen"),
         b("Équipe et rôles (administrateur, recruteur, lecture seule)", "Team en rollen (beheerder, recruiter, enkel lezen)"),
       ],
       cta: b("Découvrir WOLKO Agence", "WOLKO Kantoor ontdekken"),

@@ -26,7 +26,7 @@ export default async function Page(props: { searchParams: Promise<{ t?: string; 
         {valid ? (
           <form action={unsubscribe}>
             <input type="hidden" name="t" value={t} />
-            <p className="text-sm text-[#101F43]/70 mb-5">Confirme pour ne plus recevoir d'e-mails d'offres de Wolko. Tu pourras réactiver les alertes depuis ton espace.</p>
+            <p className="text-sm text-[#101F43]/70 mb-5">Confirme pour ne plus recevoir d&apos;e-mails d&apos;offres de Wolko. Tu pourras réactiver les alertes depuis ton espace.</p>
             <button className="bg-[#FFB900] text-[#101F43] font-bold rounded-xl px-6 py-3 min-h-12">Me désinscrire</button>
           </form>
         ) : <p className="text-sm text-[#101F43]/70">Lien invalide.</p>}

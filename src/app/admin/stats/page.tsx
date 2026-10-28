@@ -148,6 +148,9 @@ export default async function AdminStatsPage(props: { searchParams?: Promise<{ t
     </div>
   );
 
+  const alertsQ = await db.from("job_alerts").select("user_id", { count: "exact", head: true }).eq("active", true);
+  const alertsOn = alertsQ.error ? null : (alertsQ.count ?? 0);
+
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-3 flex-wrap">
@@ -161,6 +164,8 @@ export default async function AdminStatsPage(props: { searchParams?: Promise<{ t
           : <>Comptes de test de l&apos;équipe exclus ({testCands} profil(s), {testApps} candidature(s)). </>}
         <a href={withTests ? "?" : "?tests=1"} className="underline font-bold">{withTests ? "Masquer les tests" : "Les inclure"}</a>
       </p>
+
+      <p className="text-sm text-[#101F43]"><strong>Alertes emploi activées :</strong> {alertsOn === null ? "table introuvable (migration 039 non appliquée)" : `${alertsOn} candidat(s) sur ${cands.filter((c) => !!c.auth_user_id).length} avec un compte`}</p>
 
       <RemindCvButton missing={missingCv} />
 

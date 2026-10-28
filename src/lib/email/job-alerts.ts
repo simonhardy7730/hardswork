@@ -31,7 +31,9 @@ export async function runJobAlerts(db: SupabaseClient, now: Date = new Date()): 
       const profile = { city: (c?.city as string | null) ?? null, sectors: (c?.sectors as string[] | null) ?? [], trades: (c?.trades as string[] | null) ?? [], jobTypes: (c?.job_types as string[] | null) ?? [] };
       if (!canPersonalize(profile)) continue;
       const since = a.last_sent_at ? new Date(a.last_sent_at as string).getTime() : now.getTime() - 7 * 86400000;
-      const fresh = offers.filter((o) => new Date(o.created_at).getTime() > since);
+      const { data: sentLog } = await db.from("job_alert_log").select("job_id").eq("user_id", a.user_id); // déjà reçues en alerte immédiate
+      const already = new Set((sentLog ?? []).map((r) => r.job_id as string));
+      const fresh = offers.filter((o) => new Date(o.created_at).getTime() > since && !already.has(o.id));
       const picks = suggestOffers(profile, fresh, 5);
       if (picks.length === 0) continue;
       const lines = picks.map((s) => `<a href="${appUrl}/jobs/${esc(s.offer.id)}" style="color:#101F43"><strong>${esc(s.offer.title)}</strong></a>${s.offer.city ? ` · ${esc(s.offer.city)}` : ""}`);

@@ -27,6 +27,16 @@ export default async function AdminClientsPage() {
     db.from("users").select("organization_id, full_name, email, role").limit(2000),
     db.from("job_offers").select("organization_id, status").limit(5000),
   ]);
+  // Activité réelle : dernière connexion de chaque utilisateur + candidatures reçues et ce qu'elles sont devenues.
+  const authList = await db.auth.admin.listUsers({ page: 1, perPage: 200 }).catch(() => null);
+  const lastSeen = new Map((authList?.data?.users ?? []).map((u) => [(u.email ?? "").toLowerCase(), u.last_sign_in_at ?? null]));
+  const appQ = await db.from("applications").select("job_offer_id, status, notes, applied_at, updated_at, job_offers(organization_id)").limit(5000);
+  type AppRow = { job_offer_id: string; status: string; notes: string | null; applied_at: string; updated_at: string | null; job_offers: { organization_id: string } | { organization_id: string }[] | null };
+  const appsByOrg = new Map<string, AppRow[]>();
+  for (const a of (appQ.data ?? []) as unknown as AppRow[]) {
+    const jo = Array.isArray(a.job_offers) ? a.job_offers[0] : a.job_offers;
+    if (jo) appsByOrg.set(jo.organization_id, [...(appsByOrg.get(jo.organization_id) ?? []), a]);
+  }
   const orgs = (orgQ.data ?? []) as Org[];
   const subs = new Map(((subQ.data ?? []) as Sub[]).map((s) => [s.organization_id, s]));
   const users = (userQ.data ?? []) as U[];
@@ -63,8 +73,15 @@ export default async function AdminClientsPage() {
             </dl>
             <div className="mt-3 text-sm">
               <span className="font-bold">Utilisateurs : </span>
-              {us.length === 0 ? "—" : us.map((u) => `${dash(u.full_name)} (${dash(u.email)}, ${dash(u.role)})`).join(" · ")}
+              {us.length === 0 ? "—" : us.map((u) => `${dash(u.full_name)} (${dash(u.email)}, ${dash(u.role)}) — dernière connexion : ${fmt(lastSeen.get((u.email ?? "").toLowerCase()) ?? null)}`).join(" · ")}
             </div>
+            {(() => {
+              const ap = appsByOrg.get(o.id) ?? [];
+              if (ap.length === 0) return <div className="mt-1 text-sm"><span className="font-bold">Candidatures reçues : </span>aucune</div>;
+              const by = ap.reduce<Record<string, number>>((m, a) => ({ ...m, [a.status]: (m[a.status] ?? 0) + 1 }), {});
+              const touched = ap.filter((a) => a.status !== "nouveau" || (a.notes ?? "").trim()).length;
+              return <div className="mt-1 text-sm"><span className="font-bold">Candidatures reçues : </span>{ap.length} ({Object.entries(by).map(([k, v]) => `${v} ${k}`).join(", ")}) · traitées par l&apos;organisation : {touched}</div>;
+            })()}
           </section>
         );
       })}

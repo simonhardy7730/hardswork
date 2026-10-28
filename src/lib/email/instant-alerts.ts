@@ -3,14 +3,16 @@ import { resend, FROM_EMAIL, FROM_NAME } from "@/lib/resend";
 import { layout, esc } from "@/lib/email/subscription";
 import { publicOrgName } from "@/lib/confidential";
 import { citiesWithin, normalizePlace } from "@/lib/geo/distance";
-import { matchReasons, NEAR_KM, type OfferForMatch } from "@/lib/candidate/suggestions";
+import { matchReasons, type OfferForMatch } from "@/lib/candidate/suggestions";
 
 /**
  * Alerte IMMÉDIATE à la publication d'une offre : seuls les candidats qui ont activé les alertes ET dont le profil
- * correspond vraiment reçoivent le mail — métier ou secteur identique ET ville à moins de 15 km (règles explicables, sans IA).
+ * correspond vraiment reçoivent le mail — métier ou secteur identique ET ville à moins de 30 km (règles explicables, sans IA).
  * Une offre n'est jamais envoyée deux fois à la même personne (table job_alert_log, migration 040 ; sans elle, rien ne part).
  * Plafond par offre (INSTANT_ALERT_CAP, 20 par défaut) pour rester dans la limite d'envoi gratuite de Resend.
  */
+/** Rayon des alertes immédiates (plus large que les suggestions : 30 km, réglable avec INSTANT_ALERT_KM). */
+const RADIUS_KM = Math.max(5, Number(process.env.INSTANT_ALERT_KM ?? 30));
 const CAP = Math.max(0, Number(process.env.INSTANT_ALERT_CAP ?? 20));
 
 export async function runInstantAlertsForJob(db: SupabaseClient, jobId: string): Promise<{ sent: number; matched: number; skipped?: string }> {
@@ -38,8 +40,8 @@ export async function runInstantAlertsForJob(db: SupabaseClient, jobId: string):
       const { data: c } = await db.from("candidates").select("city, sectors, trades, job_types").eq("auth_user_id", a.user_id).maybeSingle();
       if (!c?.city) continue;
       const profile = { city: c.city as string, sectors: (c.sectors as string[] | null) ?? [], trades: (c.trades as string[] | null) ?? [], jobTypes: (c.job_types as string[] | null) ?? [] };
-      // Proximité calculée autour de la ville du CANDIDAT : l'offre doit être à moins de 15 km de chez lui.
-      const near = citiesWithin(profile.city, NEAR_KM);
+      // Proximité calculée autour de la ville du CANDIDAT : l'offre doit être à moins de 30 km de chez lui.
+      const near = citiesWithin(profile.city, RADIUS_KM);
       const nearSet = new Set<string>([normalizePlace(profile.city), ...(near?.names ?? []).map(normalizePlace)]);
       const reasons = matchReasons(profile, offer, nearSet);
       // Vraie correspondance : proche de chez lui ET même métier ou même secteur.

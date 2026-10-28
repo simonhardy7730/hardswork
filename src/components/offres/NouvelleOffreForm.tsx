@@ -255,7 +255,7 @@ export default function NouvelleOffreForm({
     // Nouvelle offre publiée : partage immédiat sur la page Facebook Wolko (si activé côté serveur). Jamais bloquant.
     if (!offer && status === "active") {
       await Promise.race([autopostNewJob(data.id).catch(() => null), new Promise((r) => setTimeout(r, 5000))]);
-      // Alerte immédiate aux candidats dont le profil correspond vraiment (métier/secteur + moins de 15 km).
+      // Alerte immédiate aux candidats dont le profil correspond vraiment (métier/secteur + moins de 30 km).
       await Promise.race([alertMatchingCandidates(data.id).catch(() => null), new Promise((r) => setTimeout(r, 8000))]);
     }
 

@@ -22,14 +22,16 @@ type AlertRow = { user_id: string; active: boolean; blocked: boolean; unsub_toke
 async function load(db: SupabaseClient, key: string) {
   const [{ data: cands }, { data: alerts }, log] = await Promise.all([
     db.from("candidates").select("auth_user_id, email, city, sectors, trades, job_types").not("auth_user_id", "is", null).limit(5000),
-    db.from("job_alerts").select("user_id, active, blocked, unsub_token").limit(5000),
+    db.from("job_alerts").select("user_id, active, blocked, unsub_token").limit(5000).then(async (r) => r.error
+      ? await db.from("job_alerts").select("user_id, active, unsub_token").limit(5000) // colonne « blocked » absente (migration 040 pas lancée)
+      : r),
     db.from("job_alert_log").select("user_id").eq("job_id", key).limit(5000),
   ]);
   // Migration 040 absente : on peut quand même COMPTER les destinataires, mais rien ne part (ready = false).
   return {
     ready: !log.error,
     cands: ((cands ?? []) as Cand[]).filter((c) => c.email),
-    alerts: new Map(((alerts ?? []) as AlertRow[]).map((a) => [a.user_id, a])),
+    alerts: new Map(((alerts ?? []) as Partial<AlertRow>[]).map((a) => [a.user_id as string, { ...a, blocked: !!a.blocked } as AlertRow])),
     done: new Set(((log.data ?? []) as { user_id: string }[]).map((r) => r.user_id)),
   };
 }

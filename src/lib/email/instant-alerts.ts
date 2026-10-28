@@ -13,6 +13,15 @@ import { matchReasons, type OfferForMatch } from "@/lib/candidate/suggestions";
  */
 /** Rayon des alertes immédiates (plus large que les suggestions : 30 km, réglable avec INSTANT_ALERT_KM). */
 const RADIUS_KM = Math.max(5, Number(process.env.INSTANT_ALERT_KM ?? 30));
+export type Profile = { city: string; sectors: string[]; trades: string[]; jobTypes: string[] };
+/** Vraie correspondance : l'offre est à moins de 30 km de chez le candidat ET même métier ou même secteur. */
+export function strictMatch(profile: Profile, offer: OfferForMatch): boolean {
+  const near = citiesWithin(profile.city, RADIUS_KM);
+  const nearSet = new Set<string>([normalizePlace(profile.city), ...(near?.names ?? []).map(normalizePlace)]);
+  const reasons = matchReasons(profile, offer, nearSet);
+  return reasons.includes("near") && (reasons.includes("trade") || reasons.includes("sector"));
+}
+
 const CAP = Math.max(0, Number(process.env.INSTANT_ALERT_CAP ?? 20));
 
 export async function runInstantAlertsForJob(db: SupabaseClient, jobId: string): Promise<{ sent: number; matched: number; skipped?: string }> {
@@ -40,12 +49,7 @@ export async function runInstantAlertsForJob(db: SupabaseClient, jobId: string):
       const { data: c } = await db.from("candidates").select("city, sectors, trades, job_types").eq("auth_user_id", a.user_id).maybeSingle();
       if (!c?.city) continue;
       const profile = { city: c.city as string, sectors: (c.sectors as string[] | null) ?? [], trades: (c.trades as string[] | null) ?? [], jobTypes: (c.job_types as string[] | null) ?? [] };
-      // Proximité calculée autour de la ville du CANDIDAT : l'offre doit être à moins de 30 km de chez lui.
-      const near = citiesWithin(profile.city, RADIUS_KM);
-      const nearSet = new Set<string>([normalizePlace(profile.city), ...(near?.names ?? []).map(normalizePlace)]);
-      const reasons = matchReasons(profile, offer, nearSet);
-      // Vraie correspondance : proche de chez lui ET même métier ou même secteur.
-      if (!(reasons.includes("near") && (reasons.includes("trade") || reasons.includes("sector")))) continue;
+      if (!strictMatch(profile, offer)) continue;
       out.matched++;
       const lock = await db.from("job_alert_log").insert({ job_id: jobId, user_id: a.user_id });
       if (lock.error) continue; // déjà envoyé (ou table absente)

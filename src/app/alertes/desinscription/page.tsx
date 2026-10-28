@@ -10,7 +10,9 @@ async function unsubscribe(formData: FormData) {
   "use server";
   const t = String(formData.get("t") ?? "");
   if (!UUID.test(t)) return;
-  await adminClient().from("job_alerts").update({ active: false }).eq("unsub_token", t);
+  const db = adminClient();
+  const r = await db.from("job_alerts").update({ active: false, blocked: true }).eq("unsub_token", t);
+  if (r.error) await db.from("job_alerts").update({ active: false }).eq("unsub_token", t); // colonne « blocked » absente (migration 040 pas encore lancée)
 }
 
 // Un simple clic sur le lien du mail ne désinscrit pas (les antivirus ouvrent les liens) : il faut confirmer.
@@ -24,7 +26,7 @@ export default async function Page(props: { searchParams: Promise<{ t?: string; 
         {valid ? (
           <form action={unsubscribe}>
             <input type="hidden" name="t" value={t} />
-            <p className="text-sm text-[#101F43]/70 mb-5">Confirme pour ne plus recevoir les alertes emploi Wolko. Tu pourras les réactiver depuis ton espace.</p>
+            <p className="text-sm text-[#101F43]/70 mb-5">Confirme pour ne plus recevoir d'e-mails d'offres de Wolko. Tu pourras réactiver les alertes depuis ton espace.</p>
             <button className="bg-[#FFB900] text-[#101F43] font-bold rounded-xl px-6 py-3 min-h-12">Me désinscrire</button>
           </form>
         ) : <p className="text-sm text-[#101F43]/70">Lien invalide.</p>}

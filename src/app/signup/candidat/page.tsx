@@ -24,6 +24,7 @@ import { tradesFor, MAX_TRADES } from "@/lib/candidate/trades";
 import { currentSource } from "@/lib/source";
 import CvChoice, { type CvMode } from "@/components/candidature/CvChoice";
 import { EMPTY_MINI, miniReady, type MiniInput } from "@/lib/candidate/mini-cv";
+import { setJobAlerts } from "@/app/candidat/alertes/actions";
 
 /* ─── Données secteurs ────────────────────────────────── */
 const SECTORS_DATA = [
@@ -159,6 +160,7 @@ export default function CandidatSignupPage() {
   const birthAge = ageFromBirthDate(birth);
   const isAdult = birthAge !== null && birthAge >= ADULT_AGE;
   const [visible, setVisible] = useState(false); // accord facultatif, jamais pré-coché
+  const [alertsOptIn, setAlertsOptIn] = useState(false); // alertes emploi : accord explicite, jamais pré-coché
 
   /* ── Submit final ──────────────────────────────────── */
   async function handleSubmit() {
@@ -274,6 +276,7 @@ export default function CandidatSignupPage() {
       return;
     }
 
+    if (alertsOptIn) await setJobAlerts(true).catch(() => null);
     router.push("/candidat/dashboard");
   }
 
@@ -659,6 +662,15 @@ export default function CandidatSignupPage() {
                   <span className="text-ink-400">{l("(facultatif)", "(optioneel)")}</span>
                 </span>
               </label>}
+
+              <label className="flex items-start gap-3 cursor-pointer bg-white border border-ink-100 rounded-xl p-3">
+                <input type="checkbox" checked={alertsOptIn} onChange={(e) => setAlertsOptIn(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[#101F43]" />
+                <span className="text-xs text-ink-700 leading-relaxed">
+                  {l("Prévenez-moi par e-mail dès qu'une offre correspond à mon profil, près de chez moi (jusqu'à 30 km).", "Verwittig me per e-mail zodra een vacature bij mijn profiel past, in mijn buurt (tot 30 km).")}{" "}
+                  <span className="text-ink-400">{l("(facultatif, désinscription en un clic)", "(optioneel, met één klik uitschrijven)")}</span>
+                </span>
+              </label>
 
               {error && (
                 <div className="text-sm px-4 py-3 rounded-xl bg-red-50 text-red-600 border border-red-200">

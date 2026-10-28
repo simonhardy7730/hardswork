@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, ArrowRight, ArrowLeft, Check, UserPlus } from "lucide-react";
 import { isValidVat } from "@/lib/vat";
+import { notifyNewSignup } from "@/app/actions/signup-notify";
 import { HardSworkLogo } from "@/components/ui/HardieIcon";
 import { useLang } from "@/lib/i18n/context";
 import { LangSwitch } from "@/components/layout/LangSwitch";
@@ -207,6 +208,7 @@ function NormalSignup() {
     });
     captcha.reset();
     if (authError || !authData.user) { setError(friendlyAuthError(authError?.message, l)); setLoading(false); return; }
+    await notifyNewSignup(formData.org_name).catch(() => null);
     if (!authData.session) {
       setNotice(l("Compte créé ! Vérifiez votre boîte mail et cliquez sur le lien pour confirmer votre adresse.", "Account aangemaakt! Controleer je mailbox en klik op de link om je e-mailadres te bevestigen."));
       setLoading(false);

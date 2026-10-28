@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { isValidVat, normalizeVat } from "@/lib/vat";
 import { getLang } from "@/lib/i18n/server";
 import { friendlyAuthError } from "@/lib/auth-errors";
+import { notifyNewSignup } from "@/app/actions/signup-notify";
 
 export async function signIn(formData: FormData) {
   const email = formData.get("email") as string;
@@ -72,6 +73,8 @@ export async function signUp(formData: FormData) {
     const nl = await getLang() === "nl";
     return { error: friendlyAuthError(authError?.message, (fr, n) => (nl ? n : fr)) };
   }
+
+  await notifyNewSignup(orgName);
 
   // Sans session (confirmation e-mail activée) : on demande de confirmer l'adresse.
   if (!authData.session) {

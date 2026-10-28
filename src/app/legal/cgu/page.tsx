@@ -23,7 +23,7 @@ export default function CGUPage() {
               Conditions <span className="text-brand">[générales]</span>
               <br />d&apos;utilisation.
             </h1>
-            <p className="text-white/35 mt-4 text-sm">Dernière mise à jour : 1er juin 2026</p>
+            <p className="text-white/35 mt-4 text-sm">Dernière mise à jour : 28 octobre 2026</p>
           </div>
         </div>
 
@@ -68,6 +68,25 @@ export default function CGUPage() {
               <p>
                 Wolko agit en tant qu&apos;intermédiaire technique et n&apos;est pas partie aux contrats
                 conclus entre recruteurs et candidats.
+              </p>
+              <p>
+                <strong>Diffusion des offres.</strong> En publiant une offre, le recruteur accorde à Wolko, à
+                titre gratuit et non exclusif, le droit de reproduire et de communiquer cette offre (titre,
+                lieu, type de contrat, description et visuel généré par Wolko) sur le site wolko.be et sur les
+                canaux de diffusion de Wolko, notamment sa page Facebook, les groupes d&apos;emploi régionaux et
+                les newsletters ou alertes emploi. Cette diffusion est incluse dans l&apos;abonnement ou
+                l&apos;annonce, sans frais supplémentaires, et dure aussi longtemps que l&apos;offre est active.
+                Le nom de l&apos;entreprise n&apos;est affiché que si le recruteur n&apos;a pas choisi
+                l&apos;option d&apos;offre confidentielle. Le recruteur garantit disposer des droits sur les
+                contenus qu&apos;il publie (textes, logos) et que l&apos;offre peut être diffusée publiquement.
+              </p>
+              <p>
+                Le recruteur peut à tout moment désactiver ou supprimer son offre, ou demander son retrait à{" "}
+                <a href="mailto:hello@wolko.be">hello@wolko.be</a> ; Wolko retire alors les publications qu&apos;il
+                contrôle dans un délai raisonnable. Les copies, partages ou captures effectués par des tiers
+                (par exemple les membres d&apos;un groupe) échappent au contrôle de Wolko. Wolko ne garantit ni la
+                portée de ces diffusions, ni un nombre minimal de candidatures, et reste étranger aux conditions
+                des réseaux sociaux utilisés.
               </p>
             </LegalSection>
 

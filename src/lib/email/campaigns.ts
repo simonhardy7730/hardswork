@@ -8,7 +8,7 @@ import type { OfferForMatch } from "@/lib/candidate/suggestions";
 /**
  * Envois ponctuels déclenchés à la main depuis /admin/envois (jamais automatiques) :
  *  1) invitation à activer les alertes, pour les comptes candidats qui ne les ont pas activées ;
- *  2) une offre précise envoyée aux comptes candidats dont le profil correspond vraiment (métier/secteur + moins de 30 km), alertes activées ou non.
+ *  2) une offre précise envoyée aux comptes candidats QUI ONT ACTIVÉ LES ALERTES et dont le profil correspond vraiment (métier/secteur + moins de 30 km).
  * Règles : un seul mail par personne et par envoi (journal job_alert_log), lien de désinscription dans chaque mail
  * (colonne blocked : plus aucun e-mail ensuite), jamais de coordonnées transmises à un recruteur, plafond par clic.
  */
@@ -50,7 +50,8 @@ export async function planOffer(db: SupabaseClient, jobId: string): Promise<Plan
   const org = Array.isArray(job.organizations) ? (job.organizations[0] as { name?: string } | undefined)?.name : (job.organizations as { name?: string } | null)?.name;
   const offer = { id: job.id as string, title: job.title as string, sector: (job.sector as string | null) ?? null, city: job.city as string, contract_type: (job.contract_type as string | null) ?? null, orgLabel: publicOrgName(job.hide_company as boolean | null, org ?? null, "fr") };
   const recipients = d.cands.filter((c) => {
-    if (d.done.has(c.auth_user_id) || d.alerts.get(c.auth_user_id)?.blocked || !c.city) return false;
+    const a = d.alerts.get(c.auth_user_id);
+    if (d.done.has(c.auth_user_id) || !a?.active || a.blocked || !c.city) return false; // seulement ceux qui ont activé les alertes
     const p: Profile = { city: c.city, sectors: c.sectors ?? [], trades: c.trades ?? [], jobTypes: c.job_types ?? [] };
     return strictMatch(p, offer);
   });
@@ -90,7 +91,7 @@ export async function sendInvites(db: SupabaseClient) {
   return sendTo(db, INVITE_ID, plan.recipients, (unsub) => ({
     subject: "Sois prévenu dès qu'une offre te correspond",
     html: layout("Sois prévenu dès qu'une offre te correspond",
-      `<p>Tu as un compte candidat sur Wolko. Active les alertes emploi : tu reçois un e-mail dès qu'une offre de ton métier ou de ton secteur est publiée près de chez toi (jusqu'à 30 km). Gratuit, tu peux te désinscrire en un clic.</p>${foot(unsub)}`,
+      `<p>Les candidats qui réagissent vite à une offre ont plus de chances de décrocher un job. Active les alertes emploi de ton compte Wolko : tu reçois un e-mail dès qu'une offre de ton métier ou de ton secteur est publiée près de chez toi (jusqu'à 30 km). Gratuit, tu peux te désinscrire en un clic.</p>${foot(unsub)}`,
       { label: "Activer mes alertes", href: `${appUrl()}/candidat/alertes` }),
   }));
 }
@@ -103,7 +104,7 @@ export async function sendOffer(db: SupabaseClient, jobId: string) {
   return sendTo(db, jobId, plan.recipients, (unsub) => ({
     subject: `Une offre près de chez toi : ${o.title}`,
     html: layout("Une offre pour toi",
-      `<p>Une offre correspond à ton profil, près de chez toi :</p><p><a href="${appUrl()}/jobs/${esc(o.id)}" style="color:#101F43"><strong>${esc(o.title)}</strong></a> · ${esc(o.city ?? "")}<br/>${esc(o.orgLabel)}</p><p>Pour être prévenu automatiquement des prochaines offres, <a href="${appUrl()}/candidat/alertes" style="color:#101F43">active tes alertes emploi</a>.</p>${foot(unsub)}`,
+      `<p>Une offre correspond à ton profil, près de chez toi :</p><p><a href="${appUrl()}/jobs/${esc(o.id)}" style="color:#101F43"><strong>${esc(o.title)}</strong></a> · ${esc(o.city ?? "")}<br/>${esc(o.orgLabel)}</p>${foot(unsub)}`,
       { label: "Voir l'offre", href: `${appUrl()}/jobs/${o.id}` }),
   }));
 }

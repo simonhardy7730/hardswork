@@ -39,8 +39,8 @@ export default async function EnvoisPage() {
     <div className="space-y-5">
       <h1 className="text-2xl font-black text-[#101F43]">Envois</h1>
       {!inv.ready && <p className="text-sm bg-red-50 text-red-700 border border-red-200 rounded-lg p-3">La migration 040 n&apos;est pas encore lancée dans Supabase : aucun envoi n&apos;est possible.</p>}
-      <Box title="Inviter à activer les alertes" text="Un seul e-mail par compte candidat qui n'a pas activé les alertes (sauf ceux qui se sont désinscrits)." n={inv.recipients.length} sent={inv.alreadySent} action={doInvites} label="Envoyer l'invitation" />
-      <Box title={`Offre Peps Interim${off.offer ? " — " + off.offer.title : ""}`} text="L'offre est envoyée aux comptes candidats dont le profil correspond vraiment : même métier ou secteur ET moins de 30 km de Tournai. Aucune coordonnée n'est transmise à Peps Interim." n={off.recipients.length} sent={off.alreadySent} action={doOffer} label="Envoyer l'offre" />
+      <Box title="Inviter à activer les alertes" text="Un seul e-mail par compte candidat qui n'a pas activé les alertes (sauf ceux qui se sont désinscrits) : on leur propose de les activer pour avoir plus de chances de trouver un job." n={inv.recipients.length} sent={inv.alreadySent} action={doInvites} label="Envoyer l'invitation" />
+      <Box title={`Offre Peps Interim${off.offer ? " — " + off.offer.title : ""}`} text="L'offre est envoyée uniquement aux candidats qui ont activé les alertes ET dont le profil correspond vraiment : même métier ou secteur, moins de 30 km de Tournai. Aucune coordonnée n'est transmise à Peps Interim." n={off.recipients.length} sent={off.alreadySent} action={doOffer} label="Envoyer l'offre" />
     </div>
   );
 }

@@ -40,7 +40,10 @@ export default async function Image(props: { params: Promise<{ id: string }> }) 
     dataUri(`https://images.unsplash.com/${photoId}?w=1200&h=630&auto=format&fit=crop&q=70`, "image/jpeg"),
     readFile(path.join(process.cwd(), "public/images/email/wolf-head.png")).catch(() => null),
   ]);
-  const logo = logoBuf ? `data:image/png;base64,${logoBuf.toString("base64")}` : null;
+  // En production (fonction serverless) le dossier public n'est pas toujours lisible sur disque : on va alors chercher le logo sur le site.
+  const logo = logoBuf
+    ? `data:image/png;base64,${logoBuf.toString("base64")}`
+    : await dataUri(`${process.env.NEXT_PUBLIC_APP_URL ?? "https://wolko.be"}/images/email/wolf-head.png`, "image/png");
 
   return new ImageResponse(
     (

@@ -5,6 +5,8 @@ export type ShareJob = {
   hide_company: boolean | null; org_name: string | null;
 };
 
+const CONTRACTS: Record<string, string> = { interim: "Intérim", interim_cdi: "Intérim / CDI", cdi: "CDI", cdd: "CDD", apprentissage: "Apprentissage", etudiant: "Job étudiant", flexi: "Flexi-job", stage: "Stage" };
+
 const HASHTAGS = "#emploi #Tournai #WallonniePicarde #Hainaut #offredemploi #Wolko";
 
 export const jobLink = (id: string) => `https://wolko.be/jobs/${id}`;
@@ -14,7 +16,7 @@ export function facebookPostParts(j: ShareJob): { message: string; link: string 
   const org = publicOrgName(j.hide_company, j.org_name, "fr");
   const lines = [
     `🚀 ${j.title}${j.city ? ` – ${j.city}` : ""}`,
-    ...(j.contract_type ? [`📄 ${j.contract_type}`] : []),
+    ...(j.contract_type ? [`📄 ${CONTRACTS[j.contract_type] ?? j.contract_type}`] : []),
     `🏢 ${org}`,
     "",
     "👉 Postule gratuitement en 2 minutes :",

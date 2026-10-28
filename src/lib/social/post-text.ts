@@ -7,7 +7,7 @@ export type ShareJob = {
 
 const CONTRACTS: Record<string, string> = { interim: "Intérim", interim_cdi: "Intérim / CDI", cdi: "CDI", cdd: "CDD", apprentissage: "Apprentissage", etudiant: "Job étudiant", flexi: "Flexi-job", stage: "Stage" };
 
-const HASHTAGS = "#emploi #Tournai #WallonniePicarde #Hainaut #offredemploi #Wolko";
+const HASHTAGS = "#emploi #WallonniePicarde #Hainaut #offredemploi #Wolko";
 
 export const jobLink = (id: string) => `https://wolko.be/jobs/${id}`;
 

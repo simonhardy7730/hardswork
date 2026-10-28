@@ -25,11 +25,12 @@ async function load(db: SupabaseClient, key: string) {
     db.from("job_alerts").select("user_id, active, blocked, unsub_token").limit(5000),
     db.from("job_alert_log").select("user_id").eq("job_id", key).limit(5000),
   ]);
-  if (log.error) return null; // migration 040 absente : rien ne part
+  // Migration 040 absente : on peut quand même COMPTER les destinataires, mais rien ne part (ready = false).
   return {
+    ready: !log.error,
     cands: ((cands ?? []) as Cand[]).filter((c) => c.email),
     alerts: new Map(((alerts ?? []) as AlertRow[]).map((a) => [a.user_id, a])),
-    done: new Set((log.data ?? []).map((r) => r.user_id as string)),
+    done: new Set(((log.data ?? []) as { user_id: string }[]).map((r) => r.user_id)),
   };
 }
 
@@ -37,16 +38,14 @@ export type Plan = { ready: boolean; recipients: Cand[]; alreadySent: number };
 
 export async function planInvites(db: SupabaseClient): Promise<Plan> {
   const d = await load(db, INVITE_ID);
-  if (!d) return { ready: false, recipients: [], alreadySent: 0 };
   const recipients = d.cands.filter((c) => { const a = d.alerts.get(c.auth_user_id); return !d.done.has(c.auth_user_id) && !a?.active && !a?.blocked; });
-  return { ready: true, recipients, alreadySent: d.done.size };
+  return { ready: d.ready, recipients, alreadySent: d.done.size };
 }
 
 export async function planOffer(db: SupabaseClient, jobId: string): Promise<Plan & { offer?: OfferForMatch & { orgLabel: string } }> {
   const { data: job } = await db.from("job_offers").select("id, title, sector, city, contract_type, status, hide_company, organizations(name)").eq("id", jobId).maybeSingle();
   if (!job || job.status !== "active" || !job.city) return { ready: true, recipients: [], alreadySent: 0 };
   const d = await load(db, jobId);
-  if (!d) return { ready: false, recipients: [], alreadySent: 0 };
   const org = Array.isArray(job.organizations) ? (job.organizations[0] as { name?: string } | undefined)?.name : (job.organizations as { name?: string } | null)?.name;
   const offer = { id: job.id as string, title: job.title as string, sector: (job.sector as string | null) ?? null, city: job.city as string, contract_type: (job.contract_type as string | null) ?? null, orgLabel: publicOrgName(job.hide_company as boolean | null, org ?? null, "fr") };
   const recipients = d.cands.filter((c) => {
@@ -55,7 +54,7 @@ export async function planOffer(db: SupabaseClient, jobId: string): Promise<Plan
     const p: Profile = { city: c.city, sectors: c.sectors ?? [], trades: c.trades ?? [], jobTypes: c.job_types ?? [] };
     return strictMatch(p, offer);
   });
-  return { ready: true, recipients, alreadySent: d.done.size, offer };
+  return { ready: d.ready, recipients, alreadySent: d.done.size, offer };
 }
 
 /** Garantit une ligne job_alerts (désactivée) pour disposer d'un jeton de désinscription. */

@@ -20,6 +20,7 @@ export const RC = {
     label: b("Ce que WOLKO vous apporte", "Wat WOLKO je biedt"),
     title: b("Un canal local, des outils simples.", "Een lokaal kanaal, eenvoudige tools."),
     items: [
+      { t: b("Multi-diffusion automatique", "Automatische multi-verspreiding"), d: b("Dès que vous publiez, votre offre part sur la page Facebook Wolko, puis notre équipe la relaie dans les groupes d'emploi de la région. Vous publiez une fois, nous la diffusons.", "Zodra je publiceert, verschijnt je vacature op de Facebookpagina van Wolko en ons team deelt ze in de regionale jobgroepen. Jij publiceert één keer, wij verspreiden.") },
       { t: b("Un canal supplémentaire", "Een extra kanaal"), d: b("Un canal de visibilité de plus pour vos offres, en complément de vos canaux habituels.", "Een extra kanaal voor je vacatures, naast je gebruikelijke kanalen.") },
       { t: b("Une approche locale", "Een lokale aanpak"), d: b("Un recrutement centré sur votre région : les candidats cherchent près de chez eux.", "Werving gericht op je regio: kandidaten zoeken dicht bij huis.") },
       { t: b("Une candidature simple", "Een eenvoudige sollicitatie"), d: b("Le candidat postule en quelques minutes, sans obligation de créer un compte.", "De kandidaat solliciteert in enkele minuten, zonder verplicht account.") },

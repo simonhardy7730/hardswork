@@ -22,6 +22,24 @@ async function pauseAll(fd: FormData) {
   revalidatePath("/admin/offres-wolko");
 }
 
+async function pauseSite(fd: FormData) {
+  "use server";
+  const admin = await getPlatformAdmin();
+  if (!admin || !can(admin.role, "suspend") || fd.get("ok") !== "on") return;
+  // Toutes les offres actives du site, clients compris. Réversible : rien n'est supprimé.
+  await adminClient().from("job_offers").update({ status: "paused" }).eq("status", "active");
+  revalidatePath("/admin/offres-wolko");
+}
+
+async function reactivateOne(fd: FormData) {
+  "use server";
+  const admin = await getPlatformAdmin();
+  const id = String(fd.get("id") ?? "");
+  if (!admin || !can(admin.role, "suspend") || !/^[0-9a-f-]{36}$/i.test(id)) return;
+  await adminClient().from("job_offers").update({ status: "active" }).eq("id", id).eq("status", "paused");
+  revalidatePath("/admin/offres-wolko");
+}
+
 async function reactivateAll(fd: FormData) {
   "use server";
   const admin = await getPlatformAdmin();
@@ -37,20 +55,25 @@ export default async function Page() {
   const admin = await getPlatformAdmin();
   const db = adminClient();
   const org = await wolkoOrgId(db);
-  const { data } = org ? await db.from("job_offers").select("id, title, city, status").eq("organization_id", org).order("created_at", { ascending: false }) : { data: [] };
-  const offers = (data ?? []) as { id: string; title: string; city: string | null; status: string }[];
+  const { data } = await db.from("job_offers").select("id, title, city, status, organization_id, organizations(name)").in("status", ["active", "paused"]).order("created_at", { ascending: false });
+  const offers = ((data ?? []) as unknown as { id: string; title: string; city: string | null; status: string; organization_id: string; organizations: { name: string } | { name: string }[] | null }[])
+    .map((o) => ({ ...o, org: (Array.isArray(o.organizations) ? o.organizations[0]?.name : o.organizations?.name) ?? "?" }));
   const active = offers.filter((o) => o.status === "active").length;
   const paused = offers.filter((o) => o.status === "paused").length;
   const allowed = !!admin && can(admin.role, "suspend");
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-black text-[#101F43]">Offres du compte Wolko</h1>
-      <p className="text-sm text-gray-700">{offers.length} offre(s) : {active} active(s), {paused} en pause. « En pause » retire l&apos;offre du site et des listes publiques sans rien supprimer ; les candidatures déjà reçues sont conservées.</p>
+      <h1 className="text-2xl font-black text-[#101F43]">Offres du site</h1>
+      <p className="text-sm text-gray-700">{offers.length} offre(s) actives ou en pause : {active} active(s), {paused} en pause. « En pause » retire l&apos;offre du site et des listes publiques sans rien supprimer ; les candidatures déjà reçues sont conservées.</p>
       <ul className="text-sm bg-white border border-gray-200 rounded-xl divide-y">
-        {offers.map((o) => <li key={o.id} className="px-4 py-2">{o.title} · {o.city ?? "—"} · <strong>{o.status}</strong></li>)}
+        {offers.map((o) => <li key={o.id} className="px-4 py-2 flex items-center justify-between gap-3"><span>{o.org} — {o.title} · {o.city ?? "—"} · <strong>{o.status}</strong></span>{allowed && o.status === "paused" && <form action={reactivateOne}><input type="hidden" name="id" value={o.id} /><button className="text-xs underline">Réactiver</button></form>}</li>)}
       </ul>
       {allowed ? (
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-3 gap-4">
+          <form action={pauseSite} className="bg-white border-2 border-red-300 rounded-xl p-4 space-y-2">
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="ok" /> Je confirme : mettre en pause TOUTES les {active} offres actives du site (clients compris)</label>
+            <button className="bg-red-600 text-white font-bold rounded-lg px-4 py-2">Tout mettre en pause</button>
+          </form>
           <form action={pauseAll} className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="ok" /> Je confirme : mettre en pause les {active} offre(s) active(s) de Wolko</label>
             <button className="bg-[#FFB900] text-[#101F43] font-bold rounded-lg px-4 py-2">Mettre en pause</button>

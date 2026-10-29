@@ -1,4 +1,6 @@
 import ProfileCta from "@/components/candidat/ProfileCta";
+import { MAINTENANCE } from "@/lib/maintenance";
+import { WolfHead } from "@/components/ui/WolfMascot";
 import { contractLabel } from "@/lib/contract-label";
 import { CONTRACT_LABELS } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
@@ -76,6 +78,17 @@ const CONTRACT_STYLE: Record<string, string> = {
 const H2 = { fontSize: "clamp(2rem, 4.5vw, 3.5rem)", lineHeight: 0.95 } as const;
 
 export default async function HomePage() {
+  if (MAINTENANCE) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center gap-6 bg-[#102044] px-6">
+        <WolfHead className="w-40 h-auto" />
+        <h1 className="font-display font-black uppercase text-white text-5xl sm:text-7xl" style={{ letterSpacing: "-0.01em" }}>
+          WOL<span className="text-[#FFB900]">KO</span>
+        </h1>
+      </main>
+    );
+  }
+
   const { t, lang } = await getDict();
   const l = await getL();
   const supabase = await createClient();

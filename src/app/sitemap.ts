@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { MAINTENANCE } from "@/lib/maintenance";
 import { createClient } from "@supabase/supabase-js";
 import { SEO_CITIES, SEO_SECTORS, citySlug } from "@/lib/seo/emploi";
 import { citiesWithin } from "@/lib/geo/distance";
@@ -7,6 +8,7 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = "https://wolko.be";
+  if (MAINTENANCE) return [{ url: base, changeFrequency: "weekly", priority: 1 }];
   const pages: MetadataRoute.Sitemap = ["", "/jobs", "/candidats", "/recrute", "/recrute/deja-equipe", "/tarifs", "/ressources", "/ressources/baremes", "/ressources/baremes/cp-124-construction", "/ressources/baremes/cp-121-nettoyage", "/ressources/guides/job-etudiant", "/ressources/guides/flexi-job", "/ressources/guides/preavis", "/legal/cgu", "/legal/privacy"]
     .map((p) => ({ url: `${base}${p}`, changeFrequency: "weekly" as const, priority: p === "" ? 1 : 0.7 }));
 

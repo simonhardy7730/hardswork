@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { MAINTENANCE } from "@/lib/maintenance";
 import { adminClient } from "@/lib/billing/lifecycle";
 import { autopostAllowed, publishJobToFacebook } from "@/lib/social/facebook";
 
@@ -11,7 +12,7 @@ import { autopostAllowed, publishJobToFacebook } from "@/lib/social/facebook";
  */
 export async function autopostNewJob(jobId: string): Promise<{ posted: boolean }> {
   try {
-    if (!/^[0-9a-f-]{36}$/i.test(jobId)) return { posted: false };
+    if (MAINTENANCE || !/^[0-9a-f-]{36}$/i.test(jobId)) return { posted: false };
     const supabase = await createClient();
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) return { posted: false };

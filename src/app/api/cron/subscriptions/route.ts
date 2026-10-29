@@ -6,6 +6,7 @@ import { runJobAlerts } from "@/lib/email/job-alerts";
 import { runCvReminders, runApplicantCvReminders } from "@/lib/email/cv-reminder";
 import { runFacebookAutopost } from "@/lib/social/facebook";
 import { runIndexingSync } from "@/lib/google/indexing";
+import { MAINTENANCE } from "@/lib/maintenance";
 import { adminClient, runSubscriptionLifecycle, runFlashLifecycle } from "@/lib/billing/lifecycle";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +23,7 @@ export async function GET(req: Request) {
     const db = adminClient();
     const stats = await runSubscriptionLifecycle(db);
     const flash = await runFlashLifecycle(db).catch((e) => { console.error('flash lifecycle', e); return { errors: 1 }; });
+    if (MAINTENANCE) return NextResponse.json({ ok: true, ...stats, flash, maintenance: "e-mails, Facebook et indexation suspendus" });
     const reminders = await runApplicationReminders(db).catch((e) => { console.error('app reminders', e); return { errors: 1 }; });
     const matching = await runMatchingAlerts(db).catch((e) => { console.error('matching alerts', e); return { errors: 1 }; });
     const cv = await runCvReminders(db).catch((e) => { console.error('cv reminders', e); return { errors: 1 }; });
